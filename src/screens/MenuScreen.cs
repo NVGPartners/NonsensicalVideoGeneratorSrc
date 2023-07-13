@@ -98,8 +98,8 @@ namespace YTPPlusPlusPlus
                 {
                     name = "Plugins"; // Editing a plugin
                 }
-                spriteBatch.DrawString(GlobalGraphics.fontMunro, name, new Vector2(GlobalGraphics.Scale(8+1), GlobalGraphics.Scale(136 + (pageOffset * i)+1)), Color.Black);
-                spriteBatch.DrawString(GlobalGraphics.fontMunro, name, new Vector2(GlobalGraphics.Scale(8), GlobalGraphics.Scale(136 + (pageOffset * i))), Color.White);
+                spriteBatch.DrawString(GlobalGraphics.fontMunro, name, new Vector2(GlobalGraphics.Scale(7+1), GlobalGraphics.Scale(136 + (pageOffset * i)+1)), Color.Black);
+                spriteBatch.DrawString(GlobalGraphics.fontMunro, name, new Vector2(GlobalGraphics.Scale(7), GlobalGraphics.Scale(136 + (pageOffset * i))), Color.White);
             }
             Texture2D menuwindow = GlobalContent.GetTexture("MenuWindow");
             spriteBatch.Draw(menuwindow, new Rectangle(GlobalGraphics.Scale(0), GlobalGraphics.Scale(132), GlobalGraphics.Scale(menuwindow.Width), GlobalGraphics.Scale(menuwindow.Height)), Color.White);

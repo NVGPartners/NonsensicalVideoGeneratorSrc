@@ -1,6 +1,7 @@
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Content;
 using Microsoft.Xna.Framework.Graphics;
+using Steamworks;
 
 namespace YTPPlusPlusPlus
 {
@@ -245,6 +246,7 @@ namespace YTPPlusPlusPlus
                             else
                                 GlobalContent.GetSound("Error").Play(int.Parse(SaveData.saveValues["SoundEffectVolume"]) / 100f, 0f, 0f);
                             Global.justCompletedRender = true;
+                            //SteamUserStats.SetAchievement("RENDER_VIDEO");
                         }, (sender, e) => {});
                         return true;
                 }

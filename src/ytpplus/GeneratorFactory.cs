@@ -36,7 +36,7 @@ namespace YTPPlusPlusPlus
         public BackgroundWorker? timeoutWorker { get; set; }
         
         public BackgroundWorker? killWorker { get; set; }
-        public static readonly int defaultTimeout = 20;
+        public static readonly int defaultTimeout = 30;
         public int timeout = defaultTimeout; // in seconds
         public static readonly string tempOutput = Path.Combine(Utilities.temporaryDirectory, "tempoutput.mp4");
         public void KillChildProcesses()

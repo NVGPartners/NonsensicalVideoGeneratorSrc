@@ -3,9 +3,9 @@
     <AssemblyName>YTP+++</AssemblyName>
     <AssemblyProduct>YTP+++</AssemblyProduct>
     <AssemblyTitle>Nonsensical video generator</AssemblyTitle>
-    <FileVersion>3.1.7</FileVersion>
-    <AssemblyVersion>3.1.7</AssemblyVersion>
-    <Version>3.1.7</Version>
+    <FileVersion>3.1.7.1</FileVersion>
+    <AssemblyVersion>3.1.7.1</AssemblyVersion>
+    <Version>3.1.7.1</Version>
     <AssemblyCopyright>Copyright © KiwifruitDev 2023</AssemblyCopyright>
     <AssemblyTrademark>YTP+++ licensed under the MIT License; Newtonsoft.Json licensed under MIT; MonoGame licensed under Ms-PL; Munro licensed under SIL OFL</AssemblyTrademark>
     <Authors>KiwifruitDev, hazelcode</Authors>
@@ -33,6 +33,7 @@
     <PackageReference Include="MonoGame.Framework.WindowsDX" Version="3.8.0.1641" />
     <PackageReference Include="MonoGame.Content.Builder.Task" Version="3.8.0.1641" />
     <PackageReference Include="Newtonsoft.Json" Version="13.0.1" />
+    <PackageReference Include="Steamworks.NET" Version="20.1.0" />
     <PackageReference Include="WindowsAPICodePack-Core" Version="1.1.2" />
     <PackageReference Include="WindowsAPICodePack-Shell" Version="1.1.1" />
   </ItemGroup>

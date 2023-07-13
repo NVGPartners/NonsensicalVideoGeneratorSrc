@@ -24,7 +24,7 @@ namespace YTPPlusPlusPlus
         private readonly Tweener tween = new();
         List<string> lines = new()
         {
-            Global.productName + " v" + Global.productVersion,
+            Global.productName + " v" + Global.productVersion + " (Steam)",
             " ",
             "If you find any bugs,",
             "please report them on",

@@ -20,6 +20,7 @@ namespace YTPPlusPlusPlus
         public static bool ffmpegInstalled = false;
         public static bool ffprobeInstalled = false;
         public static bool imagemagickInstalled = false;
+        public static bool ytDlpInstalled = false;
         public static bool updateFailed = false;
         public static bool updateAvailable = false;
         public static bool checkedForUpdates = false;
@@ -50,16 +51,21 @@ namespace YTPPlusPlusPlus
         {
             // Test for dependencies.
             ConsoleOutput.WriteLine("Checking for dependencies...", Microsoft.Xna.Framework.Color.Magenta);
-            bool[] status = new bool[3];
+            bool[] status = new bool[4];
             imagemagickInstalled = DoesCommandExist("magick");
-            // Check if .\ffmpeg.exe and .\ffprobe.exe exist.
-            status[0] = File.Exists(@".\ffmpeg.exe");
-            status[1] = File.Exists(@".\ffprobe.exe");
+            // Check if .\bin\ffmpeg.exe and .\bin\ffprobe.exe exist.
+            status[0] = File.Exists(@".\bin\ffmpeg.exe");
+            status[1] = File.Exists(@".\bin\ffprobe.exe");
+            status[3] = File.Exists(@".\bin\yt-dlp.exe");
             // If these don't exist, set Global.useSystemFFmpeg to true
             // so that the program will use the system ffmpeg and ffprobe.
             if (!status[0] || !status[1])
             {
                 Global.useSystemFFmpeg = true;
+            }
+            if(!status[3])
+            {
+                Global.useSystemYtDlp = true;
             }
             if(!Global.useSystemFFmpeg)
             {
@@ -71,10 +77,19 @@ namespace YTPPlusPlusPlus
                 ffmpegInstalled = DoesCommandExist("ffmpeg");
                 ffprobeInstalled = DoesCommandExist("ffprobe");
             }
+            if(!Global.useSystemYtDlp)
+            {
+                ytDlpInstalled = status[3];
+            }
+            else
+            {
+                ytDlpInstalled = DoesCommandExist("yt-dlp");
+            }
             return status;
         }
         public static bool CheckForUpdates()
         {
+            return false;
             try
             {
                 updateFailed = false;

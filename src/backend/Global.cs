@@ -27,6 +27,7 @@ namespace YTPPlusPlusPlus
         public static bool canRender = false;
         public static List<string> dragDropFiles = new();
         public static bool useSystemFFmpeg = false;
+        public static bool useSystemYtDlp = false;
         // YTP+ variables.
         public static GeneratorFactory generatorFactory = new GeneratorFactory();
     }

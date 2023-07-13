@@ -27,7 +27,6 @@ namespace YTPPlusPlusPlus
         private bool showing = false;
         private bool toggle = false;
         private bool check = false;
-        private bool check2 = false;
         public Vector2 offset = new(0, 0);
         private readonly Tweener tween = new();
         private readonly InteractableController controller = new();
@@ -129,6 +128,7 @@ namespace YTPPlusPlusPlus
                 "",
                 "The following software is optional, but recommended:",
                 " - ImageMagick",
+                " - yt-dlp",
                 "",
                 "If you have any issues, please refer to the installation guide.",
                 "You may check console at any time by pressing ~ (tilde).",
@@ -138,7 +138,6 @@ namespace YTPPlusPlusPlus
             new List<string>()
             { // PAGE 2
                 "Below shows the status of the prerequisites.",
-                "On the next page, we will check for updates.",
                 "",
                 "Required software:",
                 " - FFmpeg: %FFMPEG%",
@@ -146,6 +145,7 @@ namespace YTPPlusPlusPlus
                 "",
                 "Optional software:",
                 " - ImageMagick: %IMAGEMAGICK%",
+                " - yt-dlp: %YTDLP%",
                 "",
                 "If any required software is missing, install it and restart YTP+++.",
                 "",
@@ -155,12 +155,6 @@ namespace YTPPlusPlusPlus
             },
             new List<string>()
             { // PAGE 3
-                "Next, we will check for updates.",
-                "",
-                " - Update check: %UPDATECHECK%",
-                "",
-                "Download the latest version above if an update is available.",
-                "",
                 "More info about YTP+++  may be found in the Discord server.",
                 "",
                 "To refer back to this setup, it may be accessed at any time from",
@@ -204,7 +198,7 @@ namespace YTPPlusPlusPlus
                     dummyText = dummyText.Replace("%FFMPEG%", "Checking...");
                     dummyText = dummyText.Replace("%FFPROBE%", "Checking...");
                     dummyText = dummyText.Replace("%IMAGEMAGICK%", "Checking...");
-                    dummyText = dummyText.Replace("%UPDATECHECK%", "Checking...");
+                    dummyText = dummyText.Replace("%YTDLP%", "Checking...");
                     Vector2 textSize = GlobalGraphics.fontMunroSmall.MeasureString(dummyText);
                     spriteBatch.DrawString(GlobalGraphics.fontMunroSmall, dummyText, new Vector2(GlobalGraphics.Scale(8+16+1+320*i), GlobalGraphics.Scale(60+offsetText+1)), Color.Black);
                     spriteBatch.DrawString(GlobalGraphics.fontMunroSmall, dummyText, new Vector2(GlobalGraphics.Scale(8+16+320*i), GlobalGraphics.Scale(60+offsetText)), Color.White);
@@ -216,14 +210,17 @@ namespace YTPPlusPlusPlus
                             int offset = 0;
                             switch(j)
                             {
-                                case 4:
+                                case 3:
                                     offset = 43;
                                     break;
-                                case 5:
+                                case 4:
                                     offset = 47;
                                     break;
-                                case 8:
+                                case 7:
                                     offset = 64;
+                                    break;
+                                case 8:
+                                    offset = 43;
                                     break;
                             }
                             spriteBatch.DrawString(GlobalGraphics.fontMunroSmall, "Not installed", new Vector2(GlobalGraphics.Scale(offset+8+16+320*i), GlobalGraphics.Scale(60+offsetText)), Color.OrangeRed);
@@ -233,11 +230,17 @@ namespace YTPPlusPlusPlus
                             int offset = 0;
                             switch(j)
                             {
-                                case 4:
+                                case 3:
                                     offset = 43;
                                     break;
-                                case 5:
+                                case 4:
                                     offset = 47;
+                                    break;
+                                case 7:
+                                    offset = 64;
+                                    break;
+                                case 8:
+                                    offset = 43;
                                     break;
                             }
                             spriteBatch.DrawString(GlobalGraphics.fontMunroSmall, "Using system PATH", new Vector2(GlobalGraphics.Scale(offset+8+16+320*i), GlobalGraphics.Scale(60+offsetText)), Color.OrangeRed);
@@ -248,29 +251,20 @@ namespace YTPPlusPlusPlus
                             int offset = 0;
                             switch(j)
                             {
-                                case 4:
+                                case 3:
                                     offset = 43;
                                     break;
-                                case 5:
+                                case 4:
                                     offset = 47;
                                     break;
-                                case 8:
+                                case 7:
                                     offset = 64;
+                                    break;
+                                case 8:
+                                    offset = 43;
                                     break;
                             }
                             spriteBatch.DrawString(GlobalGraphics.fontMunroSmall, "Installed", new Vector2(GlobalGraphics.Scale(offset+8+16+320*i), GlobalGraphics.Scale(60+offsetText)), Color.LimeGreen);
-                        }
-                        // Draw green overlay if update is available
-                        if(tutorialText[i][j].Contains("Available"))
-                        {
-                            int offset = 68;
-                            spriteBatch.DrawString(GlobalGraphics.fontMunroSmall, "Available", new Vector2(GlobalGraphics.Scale(offset+8+16+320*i), GlobalGraphics.Scale(60+offsetText)), Color.LimeGreen);
-                        }
-                        // Draw blue overlay if up to date
-                        if(tutorialText[i][j].Contains("Up to date"))
-                        {
-                            int offset = 68;
-                            spriteBatch.DrawString(GlobalGraphics.fontMunroSmall, "Up to date", new Vector2(GlobalGraphics.Scale(offset+8+16+320*i), GlobalGraphics.Scale(60+offsetText)), Color.SkyBlue);
                         }
                         // Draw red overlay if update check failed
                         if(tutorialText[i][j].Contains("Failed"))
@@ -284,14 +278,17 @@ namespace YTPPlusPlusPlus
                             int offset = 68;
                             switch(j)
                             {
-                                case 4:
+                                case 3:
                                     offset = 43;
                                     break;
-                                case 5:
+                                case 4:
                                     offset = 47;
                                     break;
-                                case 8:
+                                case 7:
                                     offset = 64;
+                                    break;
+                                case 8:
+                                    offset = 43;
                                     break;
                             }
                             spriteBatch.DrawString(GlobalGraphics.fontMunroSmall, "Checking...", new Vector2(GlobalGraphics.Scale(offset+8+16+320*i), GlobalGraphics.Scale(60+offsetText)), Color.Yellow);
@@ -319,6 +316,7 @@ namespace YTPPlusPlusPlus
                 {
                     string ffmpeg = UpdateManager.ffmpegInstalled ? "Installed" : "Not installed";
                     string ffprobe = UpdateManager.ffprobeInstalled ? "Installed" : "Not installed";
+                    string ytDlp = UpdateManager.ytDlpInstalled ? "Installed" : "Not installed";
                     if(Global.useSystemFFmpeg)
                     {
                         if(!UpdateManager.ffmpegInstalled)
@@ -330,31 +328,22 @@ namespace YTPPlusPlusPlus
                         else
                             ffprobe = "Using system PATH";
                     }
+                    if(Global.useSystemYtDlp)
+                    {
+                        if(!UpdateManager.ytDlpInstalled)
+                            ytDlp = "Not installed";
+                        else
+                            ytDlp = "Using system PATH";
+                    }
                     tutorialText[h][j] = tutorialText[h][j].Replace("%FFMPEG%", ffmpeg);
                     tutorialText[h][j] = tutorialText[h][j].Replace("%FFPROBE%", ffprobe);
                     tutorialText[h][j] = tutorialText[h][j].Replace("%IMAGEMAGICK%", UpdateManager.imagemagickInstalled ? "Installed" : "Not installed");
+                    tutorialText[h][j] = tutorialText[h][j].Replace("%YTDLP%", ytDlp);
                 }
             }
             // Dispose of worker
             dependencyWorker.Dispose();
             dependencyWorker = null;
-        }
-        private BackgroundWorker updateWorker;
-        private void UpdateCheckThread(object? sender, DoWorkEventArgs e)
-        {
-            // Check for updates.
-            if(!UpdateManager.checkedForUpdates)
-                UpdateManager.CheckForUpdates();
-            for (int h = 0; h < tutorialText.Length; h++)
-            {
-                for (int j = 0; j < tutorialText[h].Count; j++)
-                {
-                    tutorialText[h][j] = tutorialText[h][j].Replace("%UPDATECHECK%", UpdateManager.updateFailed ? "Failed (v" + Global.productVersion + ")" : (UpdateManager.updateAvailable ? "Available (v" + Global.productVersion + " -> " + UpdateManager.updateTag + ")" : "Up to date (v" + Global.productVersion + ")"));
-                }
-            }
-            // Dispose of worker
-            updateWorker.Dispose();
-            updateWorker = null;
         }
         private bool check3 = false;
         private BackgroundWorker pluginWorker;
@@ -423,13 +412,6 @@ namespace YTPPlusPlusPlus
                         if(UpdateManager.ffmpegInstalled && UpdateManager.ffprobeInstalled)
                         {
                             GlobalContent.GetSound("Option").Play(int.Parse(SaveData.saveValues["SoundEffectVolume"]) / 100f, 0f, 0f);
-                            if(!check2)
-                            {
-                                check2 = true;
-                                updateWorker = new BackgroundWorker();
-                                updateWorker.DoWork += UpdateCheckThread;
-                                updateWorker.RunWorkerAsync();
-                            }
                             tween.TweenTo(this, t => t.offset, new Vector2(GlobalGraphics.Scale(-640), 0), 0.5f)
                                 .Easing(EasingFunctions.ExponentialOut);
                         }
@@ -480,6 +462,7 @@ namespace YTPPlusPlusPlus
                 }
                 return false;
             }));
+            /*
             controller.Add("Button6", new Button("Download Update", "", new Vector2(228+32+640-4, 78+12-6), (int i) => {
                 switch(i)
                 {
@@ -497,6 +480,7 @@ namespace YTPPlusPlusPlus
                 }
                 return false;
             }));
+            */
             controller.LoadContent(contentManager, graphicsDevice);
         }
     }

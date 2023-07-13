@@ -56,6 +56,7 @@ namespace YTPPlusPlusPlus
         }
         protected override void Initialize()
         {
+            SteamManager.Initialize();
             // File drag and drop support.
             Form gameForm = (Form)Form.FromHandle(Window.Handle);
             gameForm.AllowDrop = true;
@@ -138,6 +139,7 @@ namespace YTPPlusPlusPlus
         }
         protected override void Update(GameTime gameTime)
         {
+            SteamManager.Update();
             // Play music after 500ms.
             if(gameTime.TotalGameTime.TotalMilliseconds > Global.readyTime + 2500 && Global.ready)
             {
@@ -229,6 +231,11 @@ namespace YTPPlusPlusPlus
                 _spriteBatch.End();
             }
             base.Draw(gameTime);
+        }
+        protected override void OnExiting(object sender, EventArgs args)
+        {
+            base.OnExiting(sender, args);
+            SteamManager.Shutdown();
         }
     }
 }

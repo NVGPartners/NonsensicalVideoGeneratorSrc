@@ -1,5 +1,7 @@
 using System;
 using System.Collections.Generic;
+using System.Text.RegularExpressions;
+using System.Windows;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Content;
 using Microsoft.Xna.Framework.Graphics;
@@ -84,8 +86,16 @@ namespace YTPPlusPlusPlus
             spriteBatch.Draw(side, new Rectangle(GlobalGraphics.Scale(bounds.X + bounds.Width - 1 + side.Width/2), GlobalGraphics.Scale(bounds.Y - 1 + side.Height/2), GlobalGraphics.Scale(side.Width), GlobalGraphics.Scale(side.Height)), null, State == 0 ? Color.White : Color.LightBlue, MathHelper.ToRadians(180), new Vector2(side.Width/2, side.Height/2), SpriteEffects.None, 0);
             spriteBatch.Draw(inner, new Rectangle(GlobalGraphics.Scale(bounds.X+4), GlobalGraphics.Scale(bounds.Y), GlobalGraphics.Scale(bounds.Width-5), GlobalGraphics.Scale(inner.Height)), State == 0 ? Color.White : Color.LightBlue);
             // Inner text
-            spriteBatch.DrawString(GlobalGraphics.fontMunro, Tooltip, new Vector2(GlobalGraphics.Scale(bounds.X + 4 + 1), GlobalGraphics.Scale(bounds.Y + 1 + 1)), Color.Black);
-            spriteBatch.DrawString(GlobalGraphics.fontMunro, Tooltip, new Vector2(GlobalGraphics.Scale(bounds.X + 4), GlobalGraphics.Scale(bounds.Y + 1)), Color.White);
+            try
+            {
+                spriteBatch.DrawString(GlobalGraphics.fontMunro, Tooltip, new Vector2(GlobalGraphics.Scale(bounds.X + 4 + 1), GlobalGraphics.Scale(bounds.Y + 1 + 1)), Color.Black);
+                spriteBatch.DrawString(GlobalGraphics.fontMunro, Tooltip, new Vector2(GlobalGraphics.Scale(bounds.X + 4), GlobalGraphics.Scale(bounds.Y + 1)), Color.White);
+            }
+            catch (ArgumentException)
+            {
+                // Remove invalid characters
+                Tooltip = Tooltip.Remove(Tooltip.Length - 1);
+            }
             // Draw cursor every 500ms
             if (State == 1 && gameTime.TotalGameTime.TotalMilliseconds % 500 < 250)
             {
@@ -147,7 +157,7 @@ namespace YTPPlusPlusPlus
                     return char.IsLetterOrDigit(character);
                 case 5: // letters + numbers + spaces
                     return char.IsLetterOrDigit(character) || character == ' ';
-                default: // anything
+                default:
                     return true;
             }
         }
@@ -167,7 +177,58 @@ namespace YTPPlusPlusPlus
                 }
                 else if(Tooltip.Length < maxChars && ValidateInput(e.Character))
                 {
-                    Tooltip += e.Character;
+                    // If syn unicode character, paste from clipboard
+                    if (e.Character == '\u0016')
+                    {
+                        string clipboard = Clipboard.GetText();
+                        if (clipboard.Length + Tooltip.Length <= maxChars)
+                        {
+                            // Validate each character
+                            foreach (char c in clipboard)
+                            {
+                                if (!ValidateInput(c))
+                                {
+                                    GlobalContent.GetSound("Error").Play(int.Parse(SaveData.saveValues["SoundEffectVolume"]) / 100f, 0f, 0f);
+                                    return;
+                                }
+                            }
+                            Tooltip += clipboard;
+                        }
+                        else
+                        {
+                            GlobalContent.GetSound("Error").Play(int.Parse(SaveData.saveValues["SoundEffectVolume"]) / 100f, 0f, 0f);
+                        }
+                    }
+                    // \u0003 is copy
+                    else if (e.Character == '\u0003')
+                    {
+                        Clipboard.SetText(Tooltip);
+                    }
+                    // \u0018 is cut
+                    else if (e.Character == '\u0018')
+                    {
+                        Clipboard.SetText(Tooltip);
+                        Tooltip = "";
+                    }
+                    // \u0001 is select all, assume delete all
+                    else if (e.Character == '\u0001')
+                    {
+                        Tooltip = "";
+                    }
+                    // Undo is \u001A
+                    else if (e.Character == '\u001A')
+                    {
+                        Tooltip = "";
+                    }
+                    // Redo is \u0019
+                    else if (e.Character == '\u0019')
+                    {
+                        // Do nothing
+                    }
+                    else
+                    {
+                        Tooltip += e.Character;
+                    }
                 }
                 else
                 {

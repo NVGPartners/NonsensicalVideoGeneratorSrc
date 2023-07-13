@@ -24,9 +24,9 @@ namespace YTPPlusPlusPlus
             new GeneratePage(),
             new LibraryPage(),
             new PluginsPage(),
+            new DownloadPage(),
             new OptionsPage(),
             new HelpPage(),
-            new ExitPage(),
             // Subpages
         };
         // These two variables are the same for selectable pages, but different for subpages.

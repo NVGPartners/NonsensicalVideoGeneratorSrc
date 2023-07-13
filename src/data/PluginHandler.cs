@@ -58,14 +58,14 @@ namespace YTPPlusPlusPlus
                         SaveData.saveValues["VideoWidth"],
                         SaveData.saveValues["VideoHeight"],
                         @".\temp\",
-                        Global.useSystemFFmpeg ? "ffmpeg" : @".\ffmpeg.exe",
-                        Global.useSystemFFmpeg ? "ffprobe" : @".\ffprobe.exe",
+                        Global.useSystemFFmpeg ? "ffmpeg" : @".\bin\ffmpeg.exe",
+                        Global.useSystemFFmpeg ? "ffprobe" : @".\bin\ffprobe.exe",
                         "magick",
-                        @".\library\", // legacy resources folder
+                        LibraryData.libraryRootPath + @"\", // legacy resource path
                         @".\" +Path.Join("library", "audio", "sfx") + @"\",
                         @".\" +Path.Join("library", "videos", "transitions") + @"\",
                         @".\" +Path.Join("library", "audio", "music") + @"\",
-                        @".\library\",
+                        LibraryData.libraryRootPath + @"\",
                     };
                     string batchArgsString = string.Join(" ", batchArgs);
                     ProcessStartInfo batchStartInfo = new()
@@ -110,14 +110,14 @@ namespace YTPPlusPlusPlus
                         SaveData.saveValues["VideoWidth"],
                         SaveData.saveValues["VideoHeight"],
                         @".\temp\",
-                        Global.useSystemFFmpeg ? "ffmpeg" : @".\ffmpeg.exe",
-                        Global.useSystemFFmpeg ? "ffprobe" : @".\ffprobe.exe",
+                        Global.useSystemFFmpeg ? "ffmpeg" : @".\bin\ffmpeg.exe",
+                        Global.useSystemFFmpeg ? "ffprobe" : @".\bin\ffprobe.exe",
                         "magick",
-                        @".\library\", // legacy resources folder
+                        LibraryData.libraryRootPath + @"\", // legacy resource path
                         @".\" +Path.Join("library", "audio", "sfx") + @"\",
                         @".\" +Path.Join("library", "videos", "transitions") + @"\",
                         @".\" +Path.Join("library", "audio", "music") + @"\",
-                        @".\library\",
+                        LibraryData.libraryRootPath + @"\",
                         SaveData.saveFileName, // powershell plugins can access the JSON save file
                         settings.Count.ToString(), // number of settings
                     };
@@ -240,6 +240,11 @@ namespace YTPPlusPlusPlus
                 LibraryType dummyType = new(rootType, split[2].Replace("_", ""), description);
                 string libPath = Path.Join(rootType == LibraryRootType.Video ? "video" : "audio", split[2]);
                 string[] fileExts = LibraryData.libraryFileTypes[rootType == LibraryRootType.Video ? DefaultLibraryTypes.Video : DefaultLibraryTypes.Audio];
+                // Check to see if library already exists.
+                if (DefaultLibraryTypes.AllTypes.Contains(dummyType))
+                {
+                    continue;
+                }
                 DefaultLibraryTypes.AllTypes.Add(dummyType);
                 LibraryData.libraryPaths.Add(dummyType, libPath);
                 LibraryData.libraryFileTypes.Add(dummyType, fileExts);

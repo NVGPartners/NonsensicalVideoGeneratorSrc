@@ -116,7 +116,7 @@ namespace YTPPlusPlusPlus
                                     break;
                                 case 1:
                                     // Steam
-                                    tooltip = "Coming soon!";
+                                    tooltip = "Find us on Steam!";
                                     break;
                                 case 2:
                                     // GitHub
@@ -135,8 +135,8 @@ namespace YTPPlusPlusPlus
                                         break;
                                     case 1:
                                         // Steam
-                                        GlobalContent.GetSound("Error").Play(int.Parse(SaveData.saveValues["SoundEffectVolume"]) / 100f, 0f, 0f);
-                                        return true; // Not implemented yet
+                                        psi.FileName = "https://store.steampowered.com/app/2516360";
+                                        break;
                                     case 2:
                                         // GitHub
                                         psi.FileName = "https://github.com/YTP-Plus/YTPPlusPlusPlus";

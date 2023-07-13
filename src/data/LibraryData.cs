@@ -5,6 +5,9 @@ using Microsoft.Xna.Framework;
 using Newtonsoft.Json;
 using System.Runtime.InteropServices;
 using static YTPPlusPlusPlus.FileOperationAPIWrapper;
+using System.ComponentModel;
+using System.Net;
+using System.Diagnostics;
 
 namespace YTPPlusPlusPlus
 {
@@ -457,6 +460,114 @@ namespace YTPPlusPlusPlus
             else
                 ConsoleOutput.WriteLine("Organized file was not found, so it was not re-added.", Color.Yellow);
             return source;
+        }
+        // Download thread
+        private static BackgroundWorker downloadWorker;
+        private static string downloadUrl = "";
+        private static LibraryType downloadType;
+        private static bool youtube = false;
+        private static Action<bool> downloadCallback = (bool success) => { };
+        private static void DownloadWorker_DoWork(object sender, DoWorkEventArgs e)
+        {
+            // Download the clip.
+            string filename = Path.GetFileName(downloadUrl);
+            string path = Path.Combine(libraryRootPath, libraryPaths[downloadType], filename);
+            try
+            {
+                if(!Directory.Exists(Path.GetDirectoryName(path)))
+                    Directory.CreateDirectory(Path.GetDirectoryName(path));
+                if(File.Exists(path))
+                    File.Delete(path); // Delete the file if it already exists.
+                if(!youtube)
+                {
+                    using (WebClient client = new WebClient())
+                    {
+                        client.DownloadFile(downloadUrl, path);
+                    }
+                }
+                else if(UpdateManager.ytDlpInstalled)
+                {
+                    path = Path.Combine(libraryRootPath, libraryPaths[downloadType], "%(title)s.%(ext)s");
+                    string ytdlp = Global.useSystemYtDlp ? "yt-dlp" : @".\bin\yt-dlp.exe";
+                    bool sound = downloadType.RootType == LibraryRootType.Audio;
+                    ProcessStartInfo startInfo = new ProcessStartInfo(ytdlp, "-o \"" + path + "\" " + (sound ? "--extract-audio --audio-format mp3 " : "--format mp4 ") + downloadUrl);
+                    startInfo.UseShellExecute = false;
+                    startInfo.RedirectStandardOutput = true;
+                    startInfo.RedirectStandardError = true;
+                    Process process = new Process();
+                    process.StartInfo = startInfo;
+                    process.OutputDataReceived += (object sender, DataReceivedEventArgs e) =>
+                    {
+                        ConsoleOutput.WriteLine(e.Data, Color.Transparent);
+                    };
+                    process.ErrorDataReceived += (object sender, DataReceivedEventArgs e) =>
+                    {
+                        ConsoleOutput.WriteLine(e.Data, Color.Red);
+                    };
+                    process.Start();
+                    process.BeginOutputReadLine();
+                    process.BeginErrorReadLine();
+                    process.WaitForExit();
+                }
+                else
+                {
+                    ConsoleOutput.WriteLine("Failed to download clip: yt-dlp is not installed.", Color.Red);
+                    downloadCallback(false);
+                    return;
+                }
+            }
+            catch (Exception ex)
+            {
+                ConsoleOutput.WriteLine("Failed to download clip: " + ex.Message, Color.Red);
+                downloadCallback(false);
+                return;
+            }
+            // Add it to the library.
+            LibraryFile file = new(Path.GetFileNameWithoutExtension(path), path, downloadType);
+            // Run callback
+            downloadCallback(true);
+            libraryFiles.Add(file);
+            Global.justCompletedRender = true; // Refresh the library.
+            ConsoleOutput.WriteLine("Downloaded clip to library: " + path, Color.Green);
+        }
+        internal static bool DownloadClip(string clipUrl, LibraryType key, Action<bool> callback)
+        {
+            // Download a clip from a URL and add it to the library.
+            string filename = Path.GetFileName(clipUrl);
+            string path = Path.Combine(libraryRootPath, libraryPaths[key], filename);
+            try
+            {
+                // Does it end in a file extension?
+                if (!filename.Contains("."))
+                {
+                    // If not, is it a YouTube url?
+                    if (!clipUrl.Contains("youtube.com") || clipUrl.Contains("youtu.be"))
+                    {
+                        // Error: We don't know what to do with this.
+                        ConsoleOutput.WriteLine("Failed to download clip: URL is unknown.", Color.Red);
+                        return false;
+                    }
+                    // It's a YouTube url.
+                    youtube = true;
+                }
+                // Start download thread
+                downloadUrl = clipUrl;
+                downloadType = key;
+                downloadCallback = callback;
+                if(downloadWorker == null)
+                {
+                    downloadWorker = new BackgroundWorker();
+                    downloadWorker.DoWork += DownloadWorker_DoWork;
+                }
+                downloadWorker.RunWorkerAsync();
+                ConsoleOutput.WriteLine("Downloading clip from " + clipUrl + "...", Color.Yellow);
+                return true;
+            }
+            catch (Exception e)
+            {
+                ConsoleOutput.WriteLine("Failed to download clip: " + e.Message, Color.Red);
+                return false;
+            }
         }
     }
 }

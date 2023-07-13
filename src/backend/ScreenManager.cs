@@ -26,8 +26,18 @@ namespace YTPPlusPlusPlus
             // Load every screen in the assembly.
             Type screenType = typeof(IScreen);
             Type[] types = AppDomain.CurrentDomain.GetAssemblies()
-                .SelectMany(s => s.GetTypes())
-                .Where(p => screenType.IsAssignableFrom(p) && p.IsClass).ToArray();
+                .SelectMany(s => {
+                    Type[] t = null;
+                    try
+                    {
+                        t = s.GetTypes();
+                    }
+                    catch(Exception)
+                    {
+                        t = new Type[0];
+                    }
+                    return t;
+                }).Where(p => screenType.IsAssignableFrom(p) && p.IsClass).ToArray();
             foreach (Type type in types)
             {
                 // Add the screen to the list.

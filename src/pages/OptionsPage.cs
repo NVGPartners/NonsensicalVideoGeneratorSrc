@@ -60,7 +60,7 @@ namespace YTPPlusPlusPlus
                     SaveData.Save();
                 return false;
             }));
-            controller.Add("Scale", new Dial("Screen Scale", "Screen size multiplier, requires restart.", new Vector2(139, 51+19*3), int.Parse(SaveData.saveValues["ScreenScale"]) - 1, 0, 3, (int i) => {
+            controller.Add("Scale", new Dial("Scale (May cause issues)", "Screen size multiplier, requires restart.", new Vector2(139, 51+19*3), int.Parse(SaveData.saveValues["ScreenScale"]) - 1, 0, 3, (int i) => {
                 int oldValue = int.Parse(SaveData.saveValues["ScreenScale"]);
                 SaveData.saveValues["ScreenScale"] = (i + 1).ToString();
                 if(oldValue != int.Parse(SaveData.saveValues["ScreenScale"]))
