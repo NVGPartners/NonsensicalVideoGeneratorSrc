@@ -3,7 +3,7 @@ using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Content;
 using Microsoft.Xna.Framework.Graphics;
 
-namespace YTPPlusPlusPlus
+namespace NonsensicalVideoGenerator
 {
     /// <summary>
     /// This class stores repeated graphical functions for ease of use and cleanliness.

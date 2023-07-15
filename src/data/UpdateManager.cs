@@ -6,7 +6,7 @@ using System.Net.Http;
 using System.Diagnostics;
 using System.Drawing;
 
-namespace YTPPlusPlusPlus
+namespace NonsensicalVideoGenerator
 {    
     /// <summary>
     /// Automatic update checking.
@@ -14,7 +14,7 @@ namespace YTPPlusPlusPlus
     public static class UpdateManager
     {
         // Query URL
-        private static readonly string queryUrl = "https://api.github.com/repos/YTP-Plus/YTPPlusPlusPlus/releases/latest";
+        private static readonly string queryUrl = "";
         public static string updateUrl = "";
         public static string updateTag = "";
         public static bool ffmpegInstalled = false;
@@ -95,7 +95,7 @@ namespace YTPPlusPlusPlus
                 updateFailed = false;
                 // Get latest release info.
                 HttpClient client = new();
-                client.DefaultRequestHeaders.Add("User-Agent", "YTPPlusPlusPlus");
+                client.DefaultRequestHeaders.Add("User-Agent", "NonsensicalVideoGenerator");
                 string json = client.GetStringAsync(queryUrl).Result;
                 // Parse JSON.
                 dynamic? data = JsonConvert.DeserializeObject(json);
@@ -167,7 +167,7 @@ namespace YTPPlusPlusPlus
                 string[]? version = Global.productVersion?.Split('.');
                 if (version != null)
                 {
-                    string fileName = "ytpplusplusplus" + version[0] + version[1] + version[2] + ".zip";
+                    string fileName = "v" + version[0] + version[1] + version[2] + ".zip";
                     File.WriteAllBytes(fileName, data);
                     // Unzip update to a subfolder.
                     string? path = Path.GetDirectoryName(System.Reflection.Assembly.GetExecutingAssembly().Location);
@@ -186,7 +186,7 @@ namespace YTPPlusPlusPlus
                         List<string> batchScript = new()
                         {
                             "@echo off",
-                            "title YTP+++ Update",
+                            "title Update",
                             "echo Moving files...",
                             "robocopy update " + path + " /e /move /njh /njs /ndl /nc /ns /np",
                             "echo Deleting update folder...",
@@ -194,8 +194,8 @@ namespace YTPPlusPlusPlus
                             "rmdir update /s /q",
                             "echo Deleting update archive...",
                             "del " + fileName,
-                            "echo Update complete, starting YTP+++...",
-                            "start YTP+++.exe",
+                            "echo Update complete, starting...",
+                            "start NonsensicalVideoGenerator.exe",
                             "exit"
                         };
                         // Save the batch script.

@@ -6,7 +6,7 @@
         {
             "label": "watch",
             "type": "shell",
-            "command": "${workspaceFolder}\\bin\\Debug\\net6.0-windows\\YTP+++.exe",
+            "command": "${workspaceFolder}\\bin\\Debug\\net6.0-windows\\NonsensicalVideoGenerator.exe",
             "options":
             {
                 "cwd": "${workspaceFolder}\\bin\\Debug\\net6.0-windows",
@@ -18,7 +18,7 @@
             "type": "process",
             "args": [
                 "build",
-                "${workspaceFolder}\\YTP+++.csproj",
+                "${workspaceFolder}\\NonsensicalVideoGenerator.csproj",
                 "/property:GenerateFullPaths=true",
                 "/consoleloggerparameters:NoSummary"
             ],
@@ -30,7 +30,7 @@
             "type": "process",
             "args": [
                 "build",
-                "${workspaceFolder}\\YTP+++.csproj",
+                "${workspaceFolder}\\NonsensicalVideoGenerator.csproj",
                 "/property:GenerateFullPaths=true",
                 "/consoleloggerparameters:NoSummary",
                 "/p:Configuration=Release"

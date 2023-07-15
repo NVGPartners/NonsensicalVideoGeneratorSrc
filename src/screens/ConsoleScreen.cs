@@ -6,7 +6,7 @@ using Microsoft.Xna.Framework.Content;
 using Microsoft.Xna.Framework.Graphics;
 using MonoGame.Extended.Tweening;
 
-namespace YTPPlusPlusPlus
+namespace NonsensicalVideoGenerator
 {
     /// <summary>
     /// Show console output through a screen, acts as a modal but doesn't follow modal rules.
@@ -132,7 +132,7 @@ namespace YTPPlusPlusPlus
             }
             catch {}
             // Draw assembly version.
-            string version = "- " + Global.productName + " v" + Global.productVersion + " - View full output in console.txt -" + (ConsoleOutput.proxyOutput.Count > ConsoleOutput.maxLines ? (" Line " + (ConsoleOutput.scrollAmount > -1 ? (ConsoleOutput.scrollAmount + 1).ToString() : (ConsoleOutput.proxyOutput.Count - ConsoleOutput.maxLines + 1).ToString()) + "/" + ConsoleOutput.proxyOutput.Count.ToString() + " -") : "");
+            string version = "- v" + Global.productVersion + " - View full output in console.txt -" + (ConsoleOutput.proxyOutput.Count > ConsoleOutput.maxLines ? (" Line " + (ConsoleOutput.scrollAmount > -1 ? (ConsoleOutput.scrollAmount + 1).ToString() : (ConsoleOutput.proxyOutput.Count - ConsoleOutput.maxLines + 1).ToString()) + "/" + ConsoleOutput.proxyOutput.Count.ToString() + " -") : "");
             spriteBatch.DrawString(GlobalGraphics.fontMunroSmall, version, new Vector2(GlobalGraphics.Scale(8), lineY), Color.White);
             // End offset spritebatch
             spriteBatch.End();

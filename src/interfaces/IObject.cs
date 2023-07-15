@@ -2,7 +2,7 @@ using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Content;
 using Microsoft.Xna.Framework.Graphics;
 
-namespace YTPPlusPlusPlus
+namespace NonsensicalVideoGenerator
 {
     /// <summary>
     /// These are all UI objects that can be interacted with.

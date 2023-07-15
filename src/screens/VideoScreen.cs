@@ -9,7 +9,7 @@ using Microsoft.Xna.Framework.Graphics;
 using Microsoft.Xna.Framework.Input;
 using MonoGame.Extended.Tweening;
 
-namespace YTPPlusPlusPlus
+namespace NonsensicalVideoGenerator
 {
     public class VideoScreen : IScreen
     {
@@ -24,7 +24,7 @@ namespace YTPPlusPlusPlus
         private readonly Tweener tween = new();
         List<string> lines = new()
         {
-            Global.productName + " v" + Global.productVersion + " (Steam)",
+            " ",
             " ",
             "If you find any bugs,",
             "please report them on",
@@ -113,6 +113,8 @@ namespace YTPPlusPlusPlus
             Texture2D vidbg = GlobalContent.GetTexture("VidBG");
             spriteBatch.Draw(vidbg, new Rectangle(GlobalGraphics.Scale(6), GlobalGraphics.Scale(45), GlobalGraphics.Scale(vidbg.Width), GlobalGraphics.Scale(vidbg.Height)), Color.White);
             */
+            Texture2D logo = GlobalContent.GetTexture("Logo");
+            spriteBatch.Draw(logo, new Rectangle(GlobalGraphics.Scale(8), GlobalGraphics.Scale(47), GlobalGraphics.Scale(logo.Width), GlobalGraphics.Scale(logo.Height)), Color.White);
             SpriteFont munro = GlobalContent.GetFont("MunroSmall");
             Vector2 lastPos = new(GlobalGraphics.Scale(8), GlobalGraphics.Scale(45));
             for(int i = 0; i < lines.Count; i++)
@@ -135,6 +137,8 @@ namespace YTPPlusPlusPlus
         }
         public void LoadContent(ContentManager contentManager, GraphicsDevice graphicsDevice)
         {
+            // Logo
+            GlobalContent.AddTexture("Logo", contentManager.Load<Texture2D>("graphics/logo"));
             // Video Window
             GlobalContent.AddTexture("VidWindow", contentManager.Load<Texture2D>("graphics/vidwindow"));
             GlobalContent.AddTexture("VidButton", contentManager.Load<Texture2D>("graphics/vidbutton"));

@@ -7,7 +7,7 @@ using Microsoft.Xna.Framework.Graphics;
 using Microsoft.Xna.Framework.Input;
 using MonoGame.Extended.Tweening;
 
-namespace YTPPlusPlusPlus
+namespace NonsensicalVideoGenerator
 {
     /// <summary>
     /// This is the main menu screen. It is the first screen that is displayed when the application starts.
@@ -96,7 +96,7 @@ namespace YTPPlusPlusPlus
                 string name = Pagination.GetPage(i).Name;
                 if(name.Contains("."))
                 {
-                    name = "Plugins"; // Editing a plugin
+                    name = "Effects"; // Editing a plugin
                 }
                 spriteBatch.DrawString(GlobalGraphics.fontMunro, name, new Vector2(GlobalGraphics.Scale(7+1), GlobalGraphics.Scale(136 + (pageOffset * i)+1)), Color.Black);
                 spriteBatch.DrawString(GlobalGraphics.fontMunro, name, new Vector2(GlobalGraphics.Scale(7), GlobalGraphics.Scale(136 + (pageOffset * i))), Color.White);
@@ -153,6 +153,11 @@ namespace YTPPlusPlusPlus
             // Input
             if(handleInput)
             {
+                // Accessibility
+                for(int i = 0; i < Pagination.GetTopPageCount(); i++)
+                {
+                    Accessibility.CompatAccessibility(new Rectangle(GlobalGraphics.Scale(4), GlobalGraphics.Scale(i * 16 + 134), GlobalGraphics.Scale(45), GlobalGraphics.Scale(16)));
+                }
                 // Bounds of each segment
                 if(MouseInput.MouseState.X >= GlobalGraphics.Scale(4) && MouseInput.MouseState.X < GlobalGraphics.Scale(49) && MouseInput.MouseState.Y >= GlobalGraphics.Scale(134) && MouseInput.MouseState.Y < GlobalGraphics.Scale(230))
                 {
@@ -170,6 +175,12 @@ namespace YTPPlusPlusPlus
                         // Get click
                         if (MouseInput.LastMouseState.LeftButton == ButtonState.Released && MouseInput.MouseState.LeftButton == ButtonState.Pressed)
                         {
+                            // If page is "Workshop", error instead (not implemented yet)
+                            if (Pagination.GetPage(segment).Name == "Workshop")
+                            {
+                                GlobalContent.GetSound("Error").Play(int.Parse(SaveData.saveValues["SoundEffectVolume"]) / 100f, 0f, 0f);
+                                return true;
+                            }
                             // Set pagination
                             Pagination.SetPage(segment);
                             // Play sound

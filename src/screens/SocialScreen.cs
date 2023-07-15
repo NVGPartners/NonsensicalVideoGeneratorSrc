@@ -9,7 +9,7 @@ using Microsoft.Xna.Framework.Input;
 using Microsoft.Xna.Framework.Media;
 using MonoGame.Extended.Tweening;
 
-namespace YTPPlusPlusPlus
+namespace NonsensicalVideoGenerator
 {
     /// <summary>
     /// This is the social screen.
@@ -102,6 +102,12 @@ namespace YTPPlusPlusPlus
             if(handleInput)
             {
                 tooltip = "";
+                /*
+                for(int i = 0; i < buttons.Count; i++)
+                {
+                    Accessibility.CompatAccessibility(new Rectangle(GlobalGraphics.Scale(buttons[i].X), GlobalGraphics.Scale(buttons[i].Y), GlobalGraphics.Scale(buttons[i].Width), GlobalGraphics.Scale(buttons[i].Height)));
+                }
+                */
                 if(MouseInput.MouseState.X >= GlobalGraphics.Scale(74) && MouseInput.MouseState.X <= GlobalGraphics.Scale(119) && MouseInput.MouseState.Y >= GlobalGraphics.Scale(221) && MouseInput.MouseState.Y <= GlobalGraphics.Scale(233))
                 {
                     for(int i = 0; i < buttons.Count; i++)
@@ -120,7 +126,7 @@ namespace YTPPlusPlusPlus
                                     break;
                                 case 2:
                                     // GitHub
-                                    tooltip = "View our GitHub repository!";
+                                    tooltip = "View the issue tracker on GitHub!";
                                     break;
                             }
                             if(MouseInput.LastMouseState.LeftButton == ButtonState.Released && MouseInput.MouseState.LeftButton == ButtonState.Pressed)
@@ -135,11 +141,11 @@ namespace YTPPlusPlusPlus
                                         break;
                                     case 1:
                                         // Steam
-                                        psi.FileName = "https://store.steampowered.com/app/2516360";
+                                        psi.FileName = "https://store.steampowered.com/app/2516360/Nonsensical_Video_Generator/";
                                         break;
                                     case 2:
                                         // GitHub
-                                        psi.FileName = "https://github.com/YTP-Plus/YTPPlusPlusPlus";
+                                        psi.FileName = "https://github.com/KiwifruitDev/NonsensicalVideoGenerator/issues";
                                         break;
                                 }
                                 psi.UseShellExecute = true;

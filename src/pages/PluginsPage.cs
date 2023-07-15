@@ -9,15 +9,15 @@ using Microsoft.Xna.Framework.Graphics;
 using Microsoft.Xna.Framework.Input;
 using MonoGame.Extended.Tweening;
 
-namespace YTPPlusPlusPlus
+namespace NonsensicalVideoGenerator
 {
     /// <summary>
     /// Generate page.
     /// </summary>
     public class PluginsPage : IPage
     {
-        public string Name { get; set; } = "Plugins";
-        public string Tooltip { get; } = "Add, remove, or modify external plugins.";
+        public string Name { get; set; } = "Effects";
+        public string Tooltip { get; } = "Add, remove, or modify effect plugins.";
         private int scrollOffset = 0;
         private int maxScrollOffset = 0;
         private bool dragging = false;
@@ -138,7 +138,13 @@ namespace YTPPlusPlusPlus
                         if (MouseInput.MouseState.X >= GlobalGraphics.Scale(138) && MouseInput.MouseState.X < GlobalGraphics.Scale(inRange)
                             && MouseInput.MouseState.Y >= GlobalGraphics.Scale(59 + (i * 16) - scrollOffset) && MouseInput.MouseState.Y < GlobalGraphics.Scale(70 + (i * 16) - scrollOffset))
                         {
-                            internalTooltip = "Open plugin directory.";
+                            // Is this a workshop plugin?
+                            // If so, tooltip should be "Open workshop page."
+                            // Otherwise, tooltip should be "Open plugin directory."
+                            if (PluginHandler.plugins[i].workshopId != "")
+                                internalTooltip = "Open workshop page.";
+                            else
+                                internalTooltip = "Open plugin directory.";
                         }
                         if(PluginHandler.plugins[i].settings.Count > 0 && Global.canRender)
                         {
@@ -264,7 +270,7 @@ namespace YTPPlusPlusPlus
                     }
                     else
                     {
-                        if (MouseInput.LastMouseState.LeftButton == ButtonState.Released && MouseInput.MouseState.LeftButton == ButtonState.Pressed)
+                        if (MouseInput.MouseState.LeftButton == ButtonState.Pressed && MouseInput.LastMouseState.LeftButton == ButtonState.Released)
                         {
                             // 293, 57, 11x11 Scroll Up
                             if(MouseInput.MouseState.X >= GlobalGraphics.Scale(294) && MouseInput.MouseState.X < GlobalGraphics.Scale(304)
@@ -282,6 +288,26 @@ namespace YTPPlusPlusPlus
                             }
                         }
                         dragging = false;
+                    }
+                    // Accessibility
+                    Accessibility.CompatAccessibility(new Rectangle(GlobalGraphics.Scale(294), GlobalGraphics.Scale(57), GlobalGraphics.Scale(11), GlobalGraphics.Scale(11)));
+                    Accessibility.CompatAccessibility(new Rectangle(GlobalGraphics.Scale(294), GlobalGraphics.Scale(224), GlobalGraphics.Scale(11), GlobalGraphics.Scale(11)));
+                    for (int i = 0; i < PluginHandler.GetPluginCount(); i++)
+                    {
+                        int inRange = 228;
+                        if(PluginHandler.plugins[i].settings.Count <= 0 || !Global.canRender)
+                        {
+                            inRange = 267; // No settings button
+                        }
+                        // Toggle Button
+                        Accessibility.CompatAccessibility(new Rectangle(GlobalGraphics.Scale(269), GlobalGraphics.Scale(59 + (i * 16) - scrollOffset), GlobalGraphics.Scale(21), GlobalGraphics.Scale((70 + (i * 16) - scrollOffset) - (59 + (i * 16) - scrollOffset))));
+                        if(PluginHandler.plugins[i].settings.Count > 0 && Global.canRender)
+                        {
+                            // Settings Button
+                            Accessibility.CompatAccessibility(new Rectangle(GlobalGraphics.Scale(230), GlobalGraphics.Scale(59 + (i * 16) - scrollOffset), GlobalGraphics.Scale(37), GlobalGraphics.Scale((70 + (i * 16) - scrollOffset) - (59 + (i * 16) - scrollOffset))));
+                        }
+                        // Main Button
+                        //Accessibility.CompatAccessibility(new Rectangle(GlobalGraphics.Scale(138), GlobalGraphics.Scale(59 + (i * 16) - scrollOffset), GlobalGraphics.Scale(inRange-138), GlobalGraphics.Scale((70 + (i * 16) - scrollOffset) - (59 + (i * 16) - scrollOffset))));
                     }
                     if(MouseInput.MouseState.LeftButton == ButtonState.Pressed && MouseInput.LastMouseState.LeftButton == ButtonState.Released)
                     {
@@ -314,12 +340,20 @@ namespace YTPPlusPlusPlus
                                 && MouseInput.MouseState.Y >= GlobalGraphics.Scale(59 + (i * 16) - scrollOffset) && MouseInput.MouseState.Y < GlobalGraphics.Scale(70 + (i * 16) - scrollOffset))
                             {
                                 GlobalContent.GetSound("Option").Play(int.Parse(SaveData.saveValues["SoundEffectVolume"]) / 100f, 0f, 0f);
+                                
                                 // Open directory and select file
-                                ProcessStartInfo startInfo = new()
+                                ProcessStartInfo startInfo = new();
+                                // Workshop plugin should open workshop page
+                                if(PluginHandler.plugins[i].workshopId != "")
                                 {
-                                    FileName = "explorer.exe",
-                                    Arguments = "/select, \"" + Path.GetFullPath(PluginHandler.plugins[i].path) + "\""
-                                };
+                                    startInfo.FileName = "https://steamcommunity.com/sharedfiles/filedetails/?id=" + PluginHandler.plugins[i].workshopId;
+                                    startInfo.UseShellExecute = true;
+                                }
+                                else
+                                {
+                                    startInfo.FileName = "explorer.exe";
+                                    startInfo.Arguments = "/select, \"" + Path.GetFullPath(PluginHandler.plugins[i].path) + "\"";
+                                }
                                 Process.Start(startInfo);
                                 return true;
                             }
@@ -334,13 +368,13 @@ namespace YTPPlusPlusPlus
                                     controller.Clear();
                                     settingsIndex = i;
                                     editingSettings = true;
-                                    controller.Add("Back", new Button("Back", "Go back to plugin list.", new Vector2(119+36, 60+10+19*8), (int i) => {
+                                    controller.Add("Back", new Button("Back", "Go back to effect plugin list.", new Vector2(119+36, 60+10+19*8), (int i) => {
                                         switch(i)
                                         {
                                             case 2: // left click
                                                 GlobalContent.GetSound("Select").Play(int.Parse(SaveData.saveValues["SoundEffectVolume"]) / 100f, 0f, 0f);
                                                 controller.Clear();
-                                                Name = "Plugins";
+                                                Name = "Effects";
                                                 editingSettings = false;
                                                 return true;
                                         }

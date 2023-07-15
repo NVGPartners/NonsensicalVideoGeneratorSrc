@@ -5,7 +5,7 @@ using System.Linq;
 using Microsoft.Xna.Framework;
 using Newtonsoft.Json;
 
-namespace YTPPlusPlusPlus
+namespace NonsensicalVideoGenerator
 {
     /// <summary>
     /// This class handles data saving and loading.
@@ -25,26 +25,23 @@ namespace YTPPlusPlusPlus
             {"MaxClipCount", "20"},
             {"VideoWidth", "640"},
             {"VideoHeight", "480"},
-            {"TransitionsEnabled", "false"},
             {"IntrosEnabled", "false"},
-            {"OutrosEnabled", "false"},
-            {"OverlaysEnabled", "false"},
+            {"OutrosEnabled", "true"},
             {"AddToLibrary", "true"},
             {"AprilFoolsFlappyBirdScore", "0"},
-            {"TennisScore", "0"},
             {"MusicVolume", "100"},
             {"SoundEffectVolume", "100"},
             {"ActiveMusic", "1"},
             {"ShuffleMusic", "true"},
             {"TransitionChance", "20"},
-            {"ImageChance", "20"},
+            //{"ImageChance", "20"},
             {"OverlayChance", "20"},
             {"EffectChance", "60"},
             {"FirstBoot", "true"},
             {"FirstBootVersion", Global.productVersion},
-            {"TennisMode", "false"},
-            {"TransitionEffects", "false"},
-            {"TransitionEffectChance", "30"}
+            {"TransitionEffects", "true"},
+            {"TransitionEffectChance", "30"},
+            {"HiddenKeepTemporaryJobFolders", "false"}
         };
         public static string saveFileName = "Options.json";
         public static bool Save()

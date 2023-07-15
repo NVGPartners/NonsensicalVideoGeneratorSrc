@@ -402,5 +402,6 @@ FodyWeavers.xsd
 
 # End of https://www.toptal.com/developers/gitignore/api/csharp
 
-# YTP+++
+# Nonsensical video generator
 thumbs.db
+*.sfk

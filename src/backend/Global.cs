@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.Diagnostics;
 using System.Reflection;
 
-namespace YTPPlusPlusPlus
+namespace NonsensicalVideoGenerator
 {
     /// <summary>
     /// This class stores useful global variables and functions.
@@ -19,8 +19,6 @@ namespace YTPPlusPlusPlus
         public static bool exiting = false;
         public static bool shuffled = false;
         public static bool pluginsLoaded = true;
-        public static bool tennisMode = false;
-        public static int tennisScore = 1;
         public static bool dragDrop = false;
         public static bool ready = false;
         public static double readyTime = 0;
@@ -28,7 +26,6 @@ namespace YTPPlusPlusPlus
         public static List<string> dragDropFiles = new();
         public static bool useSystemFFmpeg = false;
         public static bool useSystemYtDlp = false;
-        // YTP+ variables.
         public static GeneratorFactory generatorFactory = new GeneratorFactory();
     }
 }

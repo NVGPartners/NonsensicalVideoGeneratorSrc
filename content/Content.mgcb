@@ -1225,6 +1225,18 @@
 /processorParam:Quality=Best
 /build:sound/back.wav
 
+#begin sound/compatselect.wav
+/importer:WavImporter
+/processor:SoundEffectProcessor
+/processorParam:Quality=Best
+/build:sound/compatselect.wav
+
+#begin sound/disambiguation.wav
+/importer:WavImporter
+/processor:SoundEffectProcessor
+/processorParam:Quality=Best
+/build:sound/disambiguation.wav
+
 #begin sound/error.wav
 /importer:WavImporter
 /processor:SoundEffectProcessor

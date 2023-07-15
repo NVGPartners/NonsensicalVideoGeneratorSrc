@@ -4,12 +4,11 @@ using System.IO;
 using Microsoft.Xna.Framework;
 using Newtonsoft.Json;
 using System.Runtime.InteropServices;
-using static YTPPlusPlusPlus.FileOperationAPIWrapper;
 using System.ComponentModel;
 using System.Net;
 using System.Diagnostics;
 
-namespace YTPPlusPlusPlus
+namespace NonsensicalVideoGenerator
 {
     public enum LibraryRootType
     {
@@ -69,10 +68,6 @@ namespace YTPPlusPlusPlus
         /// </summary>
         Image,
         /// <summary>
-        /// Tennis entries.
-        /// </summary>
-        Tennis,
-        /// <summary>
         /// Custom library type.
         /// </summary>
         Custom,
@@ -126,7 +121,6 @@ namespace YTPPlusPlusPlus
         public static LibraryType Outro { get; } = new LibraryType(LibraryRootType.Video, LibraryFileType.Outro, "Played at the end of the video.");
         public static LibraryType Overlay { get; } = new LibraryType(LibraryRootType.Video, LibraryFileType.Overlay, "Requires pure green chroma key.");
         public static LibraryType Image { get; } = new LibraryType(LibraryRootType.Video, LibraryFileType.Image, "Zooms in (non-gif only) while playing music.");
-        public static LibraryType Tennis { get; } = new LibraryType(LibraryRootType.Video, LibraryFileType.Tennis, "YTP+ Tennis entries.");
         public static List<LibraryType> AllTypes { get; } = new List<LibraryType>()
         {
             All,
@@ -141,7 +135,6 @@ namespace YTPPlusPlusPlus
             Outro,
             Overlay,
             Image,
-            Tennis,
         };
     }
     public class LibraryFile
@@ -176,7 +169,6 @@ namespace YTPPlusPlusPlus
             { DefaultLibraryTypes.Outro, @"video\outros" },
             { DefaultLibraryTypes.Overlay, @"video\overlays" },
             { DefaultLibraryTypes.Image, @"video\images" },
-            { DefaultLibraryTypes.Tennis, @"video\tennis" },
         };
         public static Dictionary<LibraryType, string[]> libraryFileTypes { get; } = new Dictionary<LibraryType, string[]>()
         {
@@ -192,7 +184,6 @@ namespace YTPPlusPlusPlus
             { DefaultLibraryTypes.Outro, new string[] { ".mp4", ".webm", ".mov", ".avi", ".mkv", ".wmv" } },
             { DefaultLibraryTypes.Overlay, new string[] { ".mp4", ".webm", ".mov", ".avi", ".mkv", ".wmv" } },
             { DefaultLibraryTypes.Image, new string[] { ".png", ".jpg", ".jpeg", ".gif" } },
-            { DefaultLibraryTypes.Tennis, new string[] { ".mp4", ".webm", ".mov", ".avi", ".mkv", ".wmv" } },
         };
         public static Dictionary<LibraryType, string> libraryNames { get; } = new Dictionary<LibraryType, string>()
         {
@@ -207,8 +198,6 @@ namespace YTPPlusPlusPlus
             { DefaultLibraryTypes.Intro, "Intros" },
             { DefaultLibraryTypes.Outro, "Outros" },
             { DefaultLibraryTypes.Overlay, "Overlays" },
-            { DefaultLibraryTypes.Image, "Images" },
-            { DefaultLibraryTypes.Tennis, "Tennis" },
         };
         private static void LoadRecursive(string path, LibraryType type)
         {
@@ -307,10 +296,9 @@ namespace YTPPlusPlusPlus
             }
             try
             {
-                //File.Delete(file.Path);
-                // Ask user if they want to move to recycle bin with fileoperationapiwrapper.
-                if(FileOperationAPIWrapper.Send(file.Path))
-                    libraryFiles.Remove(file);
+                File.Delete(file.Path);
+                //if(FileOperationAPIWrapper.Send(file.Path))
+                    //libraryFiles.Remove(file);
             }
             catch (Exception e)
             {

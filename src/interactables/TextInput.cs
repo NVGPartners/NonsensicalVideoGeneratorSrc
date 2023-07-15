@@ -7,7 +7,7 @@ using Microsoft.Xna.Framework.Content;
 using Microsoft.Xna.Framework.Graphics;
 using Microsoft.Xna.Framework.Input;
 
-namespace YTPPlusPlusPlus
+namespace NonsensicalVideoGenerator
 {
     /// <summary>
     /// Text entry boxes are used to enter text.
@@ -43,6 +43,7 @@ namespace YTPPlusPlusPlus
             scaledBounds = new((int)(bounds.X * GlobalGraphics.scale), (int)(bounds.Y * GlobalGraphics.scale), (int)(bounds.Width * GlobalGraphics.scale), (int)(bounds.Height * GlobalGraphics.scale));
             if (handleInput)
             {
+                Accessibility.CompatAccessibility(scaledBounds);
                 // Check if the mouse is hovering over the button.
                 if (scaledBounds.Contains(MouseInput.MouseState.Position))
                 {
@@ -58,14 +59,18 @@ namespace YTPPlusPlusPlus
                 // If state is 1, we are entering text.
                 if(State == 1)
                 {
+                    if(Accessibility.allowAccessibility)
+                        Accessibility.allowAccessibility = false;
                     // Capture keyboard input
+                    oldKeyboardState = newKeyboardState;
                     newKeyboardState = Keyboard.GetState();
                     // Check for enter
-                    if ((newKeyboardState.IsKeyDown(Keys.Enter) && oldKeyboardState.IsKeyUp(Keys.Enter)) || (newKeyboardState.IsKeyDown(Keys.Escape) && oldKeyboardState.IsKeyUp(Keys.Escape)))
+                    if ((newKeyboardState.IsKeyDown(Keys.Enter) && !oldKeyboardState.IsKeyDown(Keys.Enter)) || (newKeyboardState.IsKeyDown(Keys.Escape) && !oldKeyboardState.IsKeyDown(Keys.Escape)))
                     {
                         State = 0;
                         Callback(0);
                         GlobalContent.GetSound("Option").Play(int.Parse(SaveData.saveValues["SoundEffectVolume"]) / 100f, 0f, 0f);
+                        Accessibility.allowAccessibility = true;
                     }
                     return true;
                 }

@@ -9,7 +9,7 @@ using Microsoft.Xna.Framework.Input;
 using Microsoft.Xna.Framework.Media;
 using MonoGame.Extended.Tweening;
 
-namespace YTPPlusPlusPlus
+namespace NonsensicalVideoGenerator
 {
     /// <summary>
     /// This is the about screen.
@@ -95,34 +95,41 @@ namespace YTPPlusPlusPlus
                 return false;
             // Store mouse state
             MouseState mouseState = MouseInput.MouseState;
-            // Offset mouse position
-            MouseState offsetMouseState = new MouseState(mouseState.X - (int)offset.X, mouseState.Y - (int)offset.Y, mouseState.ScrollWheelValue, mouseState.LeftButton, mouseState.MiddleButton, mouseState.RightButton, mouseState.XButton1, mouseState.XButton2);
-            // Set new mouse state
-            MouseInput.MouseState = offsetMouseState;
             // Repeat for last mouse state
             MouseState lastMouseState = MouseInput.LastMouseState;
-            MouseState offsetLastMouseState = new MouseState(lastMouseState.X - (int)offset.X, lastMouseState.Y - (int)offset.Y, lastMouseState.ScrollWheelValue, lastMouseState.LeftButton, lastMouseState.MiddleButton, lastMouseState.RightButton, lastMouseState.XButton1, lastMouseState.XButton2);
-            MouseInput.LastMouseState = offsetLastMouseState;
+            if(Accessibility.selectedDisambiguationOption == -1)
+            {
+                // Offset mouse position
+                MouseState offsetMouseState = new MouseState(mouseState.X - (int)offset.X, mouseState.Y - (int)offset.Y, mouseState.ScrollWheelValue, mouseState.LeftButton, mouseState.MiddleButton, mouseState.RightButton, mouseState.XButton1, mouseState.XButton2);
+                // Set new mouse state
+                MouseInput._mouseState = offsetMouseState;
+                MouseState offsetLastMouseState = new MouseState(lastMouseState.X - (int)offset.X, lastMouseState.Y - (int)offset.Y, lastMouseState.ScrollWheelValue, lastMouseState.LeftButton, lastMouseState.MiddleButton, lastMouseState.RightButton, lastMouseState.XButton1, lastMouseState.XButton2);
+                MouseInput.LastMouseState = offsetLastMouseState;
+            }
             // Update controller
             if(controller.Update(gameTime, handleInput))
                 return true;
             // Revert
-            MouseInput.MouseState = mouseState;
-            MouseInput.LastMouseState = lastMouseState;
+            if(Accessibility.selectedDisambiguationOption == -1)
+            {
+                MouseInput._mouseState = mouseState;
+                MouseInput.LastMouseState = lastMouseState;
+            }
             return false;
         }
         public List<string>[] tutorialText = new List<string>[3]
         {
             new List<string>()
             { // PAGE 1
-                "Welcome to YTP+++ v" + Global.productVersion + "!",
+                "Nonsensical Video Generator v" + Global.productVersion,
+                "",
                 "This initial setup will help you get started with the program.",
                 "",
                 "This screen may be shown if there is an issue with your setup.",
                 "",
                 "On the next page, we will check prerequisites.",
                 "",
-                "The following software is required to run YTP+++:",
+                "The following software is required to use this software:",
                 " - FFmpeg",
                 " - FFprobe",
                 "",
@@ -147,26 +154,24 @@ namespace YTPPlusPlusPlus
                 " - ImageMagick: %IMAGEMAGICK%",
                 " - yt-dlp: %YTDLP%",
                 "",
-                "If any required software is missing, install it and restart YTP+++.",
+                "If any required software is missing, install it and restart.",
                 "",
-                "Instructions may be found in the installation guide.",
+                "Need help? Join the Discord server found on the Steam store page.",
                 "",
                 "Click \"Next Page\" to continue if all required software is installed."
             },
             new List<string>()
             { // PAGE 3
-                "More info about YTP+++  may be found in the Discord server.",
+                "More info about this software may be found in the Discord server.",
                 "",
-                "To refer back to this setup, it may be accessed at any time from",
-                "the \"Help\" tab under \"Show Tutorial Window\".",
-                "",
-                "Enjoy using YTP+++, and be sure to report any issues!",
-                "Click \"Continue\" to load plugins and proceed to YTP+++.",
+                "Enjoy, and be sure to report any problems to the issue tracker!",
                 "",
                 "If there are still issues, the continue button will be disabled.",
                 "Broken plugins may be the culprit, check \"console.txt\".",
                 "",
-                "Need help? Join the Discord server found on the GitHub page."
+                "Need help? Join the Discord server found on the Steam store page.",
+                "",
+                "Click \"Continue\" to proceed and load plugins."
             }
         };
         public void Draw(GameTime gameTime, SpriteBatch spriteBatch)

@@ -5,7 +5,7 @@ using Microsoft.Xna.Framework.Content;
 using Microsoft.Xna.Framework.Graphics;
 using Microsoft.Xna.Framework.Input;
 
-namespace YTPPlusPlusPlus
+namespace NonsensicalVideoGenerator
 {
     /// <summary>
     /// Switches have two states, on and off. They can be toggled by clicking on them.
@@ -34,6 +34,7 @@ namespace YTPPlusPlusPlus
             Rectangle scaledBounds = new((int)(bounds.X * GlobalGraphics.scale), (int)(bounds.Y * GlobalGraphics.scale), (int)(bounds.Width * GlobalGraphics.scale), (int)(bounds.Height * GlobalGraphics.scale));
             if (handleInput)
             {
+                Accessibility.CompatAccessibility(scaledBounds);
                 int mouseButtonFlags = 0;
                 // Check if the mouse is hovering over the button.
                 if (scaledBounds.Contains(MouseInput.MouseState.Position))

@@ -1,4 +1,4 @@
-# Dance plugin for YTP+++
+# Dance plugin
 
 # Query
 if ($args.Length -eq 1 -and $args[0] -eq "query") {
@@ -8,7 +8,7 @@ if ($args.Length -eq 1 -and $args[0] -eq "query") {
 
 # Check command line args
 if ($args.Length -lt 13) {
-    Write-Host "This is a YTP+++ plugin."
+    Write-Host "This is a Nonsensical Video Generator plugin."
     Write-Host "Usage: distort.ps1 <video> <width> <height> <temp> <ffmpeg> <ffprobe> <magick> <resources> <sounds> <sources> <music> <library> <options> <settingcount> [<settingname> <settingvalue> ... ...]"
     exit 1
 }
@@ -27,7 +27,8 @@ $sources = $args[9]
 $music = $args[10]
 $library = $args[11]
 $options = $args[12]
-$settingcount = $args[13]
+$output = $args[13]
+$settingcount = $args[14]
 
 # Delete distort files
 for ($i = 0; $i -lt 6; $i++) {
@@ -67,11 +68,11 @@ if (Get-Command magick -ErrorAction SilentlyContinue) {
     magick convert -size $width"x"$height canvas:black $black
 } else {
     # Use FFmpeg to create black frame
-    ffmpeg -f lavfi -i color=c=black:s=$width"x"$height -frames:v 1 -y $black
+    ffmpeg -f lavfi -i color=c=black:s=$width"x"$height -frames:v 1 -y "$black"
 }
 
 # Create one frame from video
-Invoke-Command -ScriptBlock {&$ffmpeg -i $video -ss 0 -update 1 -q:v 1 -y $distort0}
+Invoke-Command -ScriptBlock {&$ffmpeg -i "$video" -ss 0 -update 1 -q:v 1 -y "$distort0"}
 
 # Apply effect 5 times
 if (Get-Command magick -ErrorAction SilentlyContinue) {
@@ -107,7 +108,7 @@ else {
             6 {$command = "-vf negate"}
             7 {$command = ""}
         }
-        Invoke-Command -ScriptBlock {&$ffmpeg -i $distort0 $command -frames:v 1 -y $distort$i.png}
+        Invoke-Command -ScriptBlock {&$ffmpeg -i "$distort0" $command -frames:v 1 -y "$distort$i.png"}
     }
 }
 
@@ -132,11 +133,6 @@ Add-Content $temp"concatdistort.txt" "duration 0.4"
 Add-Content $temp"concatdistort.txt" "file 'distort5.png'"
 Add-Content $temp"concatdistort.txt" "duration 0.467"
 
-# Delete input file
-if (Test-Path $video) {
-    Remove-Item $video
-}
-
 # Concat distort
-Invoke-Command -ScriptBlock {&$ffmpeg -f concat -i $concatdistort -i $randomSound -c:v libx264 -c:a aac -pix_fmt yuv420p -y "$video"}
+Invoke-Command -ScriptBlock {&$ffmpeg -f concat -i "$concatdistort" -i "$randomSound" -c:v libx264 -c:a aac -pix_fmt yuv420p -y "$output"}
 

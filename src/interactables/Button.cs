@@ -5,7 +5,7 @@ using Microsoft.Xna.Framework.Content;
 using Microsoft.Xna.Framework.Graphics;
 using Microsoft.Xna.Framework.Input;
 
-namespace YTPPlusPlusPlus
+namespace NonsensicalVideoGenerator
 {
     /// <summary>
     /// Buttons are simple UI elements that can be clicked on to perform a single action.
@@ -38,6 +38,7 @@ namespace YTPPlusPlusPlus
             {
                 int mouseButton = 0;
                 // Check if the mouse is hovering over the button.
+                Accessibility.CompatAccessibility(scaledBounds);
                 if (scaledBounds.Contains(MouseInput.MouseState.Position))
                 {
                     // Check if the mouse is clicking on the button.

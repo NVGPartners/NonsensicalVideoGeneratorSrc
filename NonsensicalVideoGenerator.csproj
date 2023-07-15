@@ -1,16 +1,16 @@
 <Project Sdk="Microsoft.NET.Sdk">
   <PropertyGroup>
-    <AssemblyName>YTP+++</AssemblyName>
-    <AssemblyProduct>YTP+++</AssemblyProduct>
-    <AssemblyTitle>Nonsensical video generator</AssemblyTitle>
-    <FileVersion>3.1.7.1</FileVersion>
-    <AssemblyVersion>3.1.7.1</AssemblyVersion>
-    <Version>3.1.7.1</Version>
+    <AssemblyName>NonsensicalVideoGenerator</AssemblyName>
+    <AssemblyProduct>NonsensicalVideoGenerator</AssemblyProduct>
+    <AssemblyTitle>Nonsensical Video Generator</AssemblyTitle>
+    <FileVersion>1.0.0.0</FileVersion>
+    <AssemblyVersion>1.0.0.0</AssemblyVersion>
+    <Version>1.0.0.0</Version>
     <AssemblyCopyright>Copyright © KiwifruitDev 2023</AssemblyCopyright>
-    <AssemblyTrademark>YTP+++ licensed under the MIT License; Newtonsoft.Json licensed under MIT; MonoGame licensed under Ms-PL; Munro licensed under SIL OFL</AssemblyTrademark>
-    <Authors>KiwifruitDev, hazelcode</Authors>
+    <AssemblyTrademark>Nonsensical Video Generator licensed under MIT; Newtonsoft.Json licensed under MIT; MonoGame licensed under Ms-PL; MoonSharp licensed under MIT; Steamworks.NET licensed under MIT; Munro licensed under SIL OFL</AssemblyTrademark>
+    <Authors>KiwifruitDev</Authors>
     <ProjectGuid>{afd0cba3-e90b-47c4-ba45-32937471bc75}</ProjectGuid>
-    <RootNamespace>YTPPlusPlusPlus</RootNamespace>
+    <RootNamespace>NonsensicalVideoGenerator</RootNamespace>
     <TargetFramework>net6.0-windows</TargetFramework>
     <SchemaVersion>2.0</SchemaVersion>
     <OutputType>WinExe</OutputType>
@@ -30,8 +30,9 @@
   </ItemGroup>
   <ItemGroup>
     <PackageReference Include="MonoGame.Extended.Tweening" Version="3.8.0" />
-    <PackageReference Include="MonoGame.Framework.WindowsDX" Version="3.8.0.1641" />
     <PackageReference Include="MonoGame.Content.Builder.Task" Version="3.8.0.1641" />
+    <PackageReference Include="MonoGame.Framework.WindowsDX" Version="3.8.1.303" />
+    <PackageReference Include="MoonSharp" Version="2.0.0" />
     <PackageReference Include="Newtonsoft.Json" Version="13.0.1" />
     <PackageReference Include="Steamworks.NET" Version="20.1.0" />
     <PackageReference Include="WindowsAPICodePack-Core" Version="1.1.2" />
@@ -49,10 +50,8 @@
 		<MakeDir Directories="$(ProjectDir)bin\Release\net6.0-windows\plugins\bat" />
     <MakeDir Directories="$(ProjectDir)bin\Release\net6.0-windows\library" />
     <MakeDir Directories="$(ProjectDir)bin\Release\net6.0-windows\library\audio" />
-    <MakeDir Directories="$(ProjectDir)bin\Release\net6.0-windows\library\audio\distort" />
     <MakeDir Directories="$(ProjectDir)bin\Release\net6.0-windows\library\audio\music" />
     <MakeDir Directories="$(ProjectDir)bin\Release\net6.0-windows\library\audio\sfx" />
-    <MakeDir Directories="$(ProjectDir)bin\Release\net6.0-windows\library\audio\spartaremix" />
     <MakeDir Directories="$(ProjectDir)bin\Release\net6.0-windows\library\video" />
     <MakeDir Directories="$(ProjectDir)bin\Release\net6.0-windows\library\video\intros" />
     <MakeDir Directories="$(ProjectDir)bin\Release\net6.0-windows\library\video\materials" />
@@ -64,10 +63,8 @@
     <MakeDir Directories="$(ProjectDir)bin\Debug\net6.0-windows\plugins\bat" />
     <MakeDir Directories="$(ProjectDir)bin\Debug\net6.0-windows\library" />
     <MakeDir Directories="$(ProjectDir)bin\Debug\net6.0-windows\library\audio" />
-    <MakeDir Directories="$(ProjectDir)bin\Debug\net6.0-windows\library\audio\distort" />
     <MakeDir Directories="$(ProjectDir)bin\Debug\net6.0-windows\library\audio\music" />
     <MakeDir Directories="$(ProjectDir)bin\Debug\net6.0-windows\library\audio\sfx" />
-    <MakeDir Directories="$(ProjectDir)bin\Debug\net6.0-windows\library\audio\spartaremix" />
     <MakeDir Directories="$(ProjectDir)bin\Debug\net6.0-windows\library\video" />
     <MakeDir Directories="$(ProjectDir)bin\Debug\net6.0-windows\library\video\intros" />
     <MakeDir Directories="$(ProjectDir)bin\Debug\net6.0-windows\library\video\materials" />

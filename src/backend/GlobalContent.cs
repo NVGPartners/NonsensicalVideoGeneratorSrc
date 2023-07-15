@@ -7,7 +7,7 @@ using Microsoft.Xna.Framework.Content;
 using Microsoft.Xna.Framework.Graphics;
 using Microsoft.Xna.Framework.Media;
 
-namespace YTPPlusPlusPlus
+namespace NonsensicalVideoGenerator
 {
     /// <summary>
     /// Store content for access by other classes.
@@ -32,13 +32,15 @@ namespace YTPPlusPlusPlus
             AddSound("RenderComplete", contentManager.Load<SoundEffect>("sound/rendercomplete"));
             AddSound("Select", contentManager.Load<SoundEffect>("sound/select"));
             AddSound("Start", contentManager.Load<SoundEffect>("sound/start"));
+            AddSound("CompatSelect", contentManager.Load<SoundEffect>("sound/compatselect"));
+            AddSound("Disambiguation", contentManager.Load<SoundEffect>("sound/disambiguation"));
             // Load default fonts.
             int scale = int.Parse(SaveData.saveValues["ScreenScale"]);
             AddFont("Munro", contentManager.Load<SpriteFont>("fonts/munro-x"+scale));
             AddFont("MunroNarrow", contentManager.Load<SpriteFont>("fonts/munro-narrow-x"+scale));
             AddFont("MunroSmall", contentManager.Load<SpriteFont>("fonts/munro-small-x"+scale));
             // Load default songs.
-            AddSong("Theme", contentManager.Load<Song>("music/theme"), "300 This Is Sparta (YTP+ Mix)", "Funtastic Power! & KiwifruitDev");
+            AddSong("Theme", contentManager.Load<Song>("music/theme"), "This Is Nonsense!", "KiwifruitDev");
             AddSong("Theme2", contentManager.Load<Song>("music/theme2"), "A Nonsensical Song", "Bobby I Guess");
             //AddSong("Theme3", contentManager.Load<Song>("music/theme3"), "Creation", "Bobby I Guess");
             // Dynamic implementation is required for these two songs.

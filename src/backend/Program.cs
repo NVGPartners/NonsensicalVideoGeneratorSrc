@@ -1,6 +1,6 @@
 using System;
 
-namespace YTPPlusPlusPlus
+namespace NonsensicalVideoGenerator
 {
     static class Program
     {

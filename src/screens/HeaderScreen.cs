@@ -8,7 +8,7 @@ using Microsoft.Xna.Framework.Input;
 using Microsoft.Xna.Framework.Media;
 using MonoGame.Extended.Tweening;
 
-namespace YTPPlusPlusPlus
+namespace NonsensicalVideoGenerator
 {
     /// <summary>
     /// This is the about screen.
@@ -92,6 +92,7 @@ namespace YTPPlusPlusPlus
                 return false;
             if(handleInput)
             {
+                //Accessibility.CompatAccessibility(new Rectangle(GlobalGraphics.Scale(4), GlobalGraphics.Scale(7), GlobalGraphics.Scale(81-4), GlobalGraphics.Scale(33-7)));
                 if(MouseInput.MouseState.X >= GlobalGraphics.Scale(4) && MouseInput.MouseState.X <= GlobalGraphics.Scale(81) && MouseInput.MouseState.Y >= GlobalGraphics.Scale(7) && MouseInput.MouseState.Y <= GlobalGraphics.Scale(33))
                 {
                     if(MouseInput.LastMouseState.LeftButton == ButtonState.Released && MouseInput.MouseState.LeftButton == ButtonState.Pressed)
@@ -127,14 +128,16 @@ namespace YTPPlusPlusPlus
             // Use offset
             spriteBatch.Begin(SpriteSortMode.Deferred, BlendState.AlphaBlend, SamplerState.PointClamp, null, null, null, Matrix.CreateTranslation(offset.X, offset.Y, 0));
             // Logo.
+            SpriteFont font = GlobalContent.GetFont("MunroSmall");
             Texture2D logobg = GlobalContent.GetTexture("LogoBG");
             spriteBatch.Draw(logobg, new Rectangle(GlobalGraphics.Scale(0), GlobalGraphics.Scale(7), GlobalGraphics.Scale(logobg.Width), GlobalGraphics.Scale(logobg.Height)), Color.White);
-            Texture2D logo = GlobalContent.GetTexture("Logo");
-            spriteBatch.Draw(logo, new Rectangle(GlobalGraphics.Scale(9), GlobalGraphics.Scale(10), GlobalGraphics.Scale(logo.Width), GlobalGraphics.Scale(logo.Height)), Color.White);
+            spriteBatch.DrawString(font, "v" + Global.productVersion, new Vector2(GlobalGraphics.Scale(7+1), GlobalGraphics.Scale(8+1)), Color.Black);
+            spriteBatch.DrawString(font, "v" + Global.productVersion, new Vector2(GlobalGraphics.Scale(7), GlobalGraphics.Scale(8)), Color.White);
+            spriteBatch.DrawString(font, "Steam Version", new Vector2(GlobalGraphics.Scale(7+1), GlobalGraphics.Scale(18+1)), Color.Black);
+            spriteBatch.DrawString(font, "Steam Version", new Vector2(GlobalGraphics.Scale(7), GlobalGraphics.Scale(18)), Color.White);
             // Draw rendering progress
             if(Global.generatorFactory.progressText != "")
             {
-                SpriteFont font = GlobalContent.GetFont("MunroSmall");
                 string rendering = SaveData.saveValues["ProjectTitle"];
                 // measure to center horizontally (one on top of the other)
                 Vector2 renderingSize = font.MeasureString(rendering);
@@ -156,7 +159,6 @@ namespace YTPPlusPlusPlus
         {
             // Logo.
             GlobalContent.AddTexture("LogoBG", contentManager.Load<Texture2D>("graphics/bannerbg"));
-            GlobalContent.AddTexture("Logo", contentManager.Load<Texture2D>("graphics/logo"));
         }
     }
 }

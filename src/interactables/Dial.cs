@@ -5,7 +5,7 @@ using Microsoft.Xna.Framework.Content;
 using Microsoft.Xna.Framework.Graphics;
 using Microsoft.Xna.Framework.Input;
 
-namespace YTPPlusPlusPlus
+namespace NonsensicalVideoGenerator
 {
     /// <summary>
     /// Dials are a way to select a value from a range of values.
@@ -46,6 +46,8 @@ namespace YTPPlusPlusPlus
             scaledBounds = new(bounds.X * GlobalGraphics.scale, bounds.Y * GlobalGraphics.scale, bounds.Width * GlobalGraphics.scale, bounds.Height * GlobalGraphics.scale);
             if (handleInput)
             {
+                // TODO: Handle dials for accessibility
+                //Accessibility.CompatAccessibility(scaledBounds);
                 // Check if the mouse is hovering
                 switch(State)
                 {

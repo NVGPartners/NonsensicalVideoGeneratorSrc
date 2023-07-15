@@ -7,7 +7,7 @@ using Microsoft.Xna.Framework.Content;
 using Microsoft.Xna.Framework.Graphics;
 using Microsoft.Xna.Framework.Input;
 
-namespace YTPPlusPlusPlus
+namespace NonsensicalVideoGenerator
 {
     /// <summary>
     /// This screen displays a warning about photosensitive epilepsy.
@@ -27,6 +27,8 @@ namespace YTPPlusPlusPlus
         private bool fadingIn = false;
         private bool textFadedIn = false;
         private double timeText = 0;
+        private static KeyboardState oldKeyboardState;
+        private static KeyboardState newKeyboardState;
         // shamelessly copied from tutorial screen
         private BackgroundWorker updateWorker;
         private void ErrorOut()
@@ -76,13 +78,13 @@ namespace YTPPlusPlusPlus
             "when exposed to certain visual images, including flashing",
             "lights or patterns that may appear in generated content.",
             " ",
-            "When using YTP+++, please be aware of",
+            "When using this software, please be aware of",
             "this and take any necessary precautions.",
             " ",
             "If you are sensitive to flashing lights,",
-            "please do not use this program.",
+            "please do not use this software.",
             " ",
-            "Click anywhere to continue."
+            "Click anywhere or press any key to continue."
         };
         public void Show()
         {
@@ -135,11 +137,22 @@ namespace YTPPlusPlusPlus
                     }
                     if(handleInput)
                     {
+                        Accessibility.CompatAccessibility(new Rectangle(0, GlobalGraphics.Scale(24 + (warningText.Count - 1) * 16), GlobalGraphics.scaledWidth, GlobalGraphics.Scale(16)));
                         if (MouseInput.MouseState.LeftButton == ButtonState.Pressed && MouseInput.LastMouseState.LeftButton == ButtonState.Released)
                         {
                             accepted = true;
                             GlobalContent.GetSound("Select").Play(int.Parse(SaveData.saveValues["SoundEffectVolume"]) / 100f, 0f, 0f);
                         }
+                        // Keyboard input.
+                        if(oldKeyboardState == null)
+                            oldKeyboardState = Keyboard.GetState();
+                        newKeyboardState = Keyboard.GetState();
+                        if(newKeyboardState.GetPressedKeys().Length > 0 && oldKeyboardState.GetPressedKeys().Length == 0)
+                        {
+                            accepted = true;
+                            GlobalContent.GetSound("Select").Play(int.Parse(SaveData.saveValues["SoundEffectVolume"]) / 100f, 0f, 0f);
+                        }
+                        oldKeyboardState = newKeyboardState;
                     }
                 }
             }

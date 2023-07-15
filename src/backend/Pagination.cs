@@ -2,7 +2,7 @@ using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Content;
 using Microsoft.Xna.Framework.Graphics;
 
-namespace YTPPlusPlusPlus
+namespace NonsensicalVideoGenerator
 {
     /// <summary>
     /// A page, which is drawn from the content window and selectable from the menu screen.
@@ -25,8 +25,9 @@ namespace YTPPlusPlusPlus
             new LibraryPage(),
             new PluginsPage(),
             new DownloadPage(),
+            //new WorkshopPage(),
             new OptionsPage(),
-            new HelpPage(),
+            new ExitPage(),
             // Subpages
         };
         // These two variables are the same for selectable pages, but different for subpages.

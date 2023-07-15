@@ -1,15 +1,36 @@
+using System;
 using Microsoft.Xna.Framework.Input;
 
-namespace YTPPlusPlusPlus
+namespace NonsensicalVideoGenerator
 { 
     class MouseInput
     {
-        private static MouseState mouseState;
+        public static MouseState _mouseState;
+        public static MouseState overrideMouseState;
         private static MouseState lastMouseState;
+        public static bool done = false;
         public static MouseState MouseState
         {
-            get { return mouseState; }
-            set { mouseState = value; }
+            get { return CompatMouseState(); }
+            set { }
+        }
+        public static MouseState CompatMouseState()
+        {
+            // Hover over accessibility options if active
+            if(Accessibility.hovered != -1 && Accessibility.showDisambiguation && Accessibility.disambiguationOptions.Count > Accessibility.hovered)
+            {
+                _mouseState = new MouseState(Accessibility.disambiguationOptions[Accessibility.hovered].bounds.X, Accessibility.disambiguationOptions[Accessibility.hovered].bounds.Y, lastMouseState.ScrollWheelValue, ButtonState.Released, ButtonState.Released, ButtonState.Released, ButtonState.Released, ButtonState.Released);
+            }
+            // Build mouse state from accessibility if active
+            if(Accessibility.selectedDisambiguationOption != -1 && Accessibility.disambiguationOptions.Count > Accessibility.selectedDisambiguationOption)
+            {
+                int x = Accessibility.disambiguationOptions[Accessibility.selectedDisambiguationOption].bounds.X + Accessibility.disambiguationOptions[Accessibility.selectedDisambiguationOption].bounds.Width / 2;
+                int y = Accessibility.disambiguationOptions[Accessibility.selectedDisambiguationOption].bounds.Y + Accessibility.disambiguationOptions[Accessibility.selectedDisambiguationOption].bounds.Height / 2;
+                bool right = Accessibility.right;
+                overrideMouseState = new MouseState(x, y, lastMouseState.ScrollWheelValue, right ? ButtonState.Released : ButtonState.Pressed, ButtonState.Released, right ? ButtonState.Pressed : ButtonState.Released, ButtonState.Released, ButtonState.Released);
+                done = true;
+            }
+            return done ? overrideMouseState : _mouseState;
         }
         public static MouseState LastMouseState
         {

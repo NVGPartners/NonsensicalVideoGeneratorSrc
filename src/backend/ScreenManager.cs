@@ -6,7 +6,7 @@ using Microsoft.Xna.Framework.Content;
 using Microsoft.Xna.Framework.Graphics;
 using Microsoft.Xna.Framework.Input;
 
-namespace YTPPlusPlusPlus
+namespace NonsensicalVideoGenerator
 {
     public static class ScreenManager
     {
@@ -191,10 +191,13 @@ namespace YTPPlusPlusPlus
             if(UserInterface.instance != null)
             {
                 MouseInput.LastMouseState = MouseInput.MouseState;
-                MouseInput.MouseState = Mouse.GetState();
+                MouseInput._mouseState = Mouse.GetState();
             }
+            Accessibility.allowAccessibility = UserInterface.instance.IsActive;
             bool handleInput = UserInterface.instance.IsActive && MouseInput.MouseState.X >= 0 && MouseInput.MouseState.X <= GlobalGraphics.scaledWidth &&
                 MouseInput.MouseState.Y >= 0 && MouseInput.MouseState.Y <= GlobalGraphics.scaledHeight && !Global.dragDrop;
+            if(Accessibility.PreUpdate(gameTime))
+                handleInput = false;
             // Update the drawn screens in layer order and reversed.
             List<IScreen> orderedScreens = drawnScreens.OrderBy(s => s.layer).ToList();
             orderedScreens.Reverse();
@@ -205,9 +208,11 @@ namespace YTPPlusPlusPlus
                     handleInput = false;
                 }
             }
+            Accessibility.PostUpdate(gameTime);
         }
         public static void Draw(GameTime gameTime, SpriteBatch spriteBatch)
         {
+            Accessibility.PreDraw(gameTime, spriteBatch);
             // Draw the screens in layer order.
             List<IScreen> orderedScreens = drawnScreens.OrderBy(s => s.layer).ToList();
             for(int i = 0; i < orderedScreens.Count; i++)
@@ -217,6 +222,7 @@ namespace YTPPlusPlusPlus
                     orderedScreens[i].Draw(gameTime, spriteBatch);
                 }
             }
+            Accessibility.PostDraw(gameTime, spriteBatch);
         }
         public static void ShowModal(string title, string[] message, string[] buttons, int defaultButton, Action<int> callback)
         {

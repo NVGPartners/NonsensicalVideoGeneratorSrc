@@ -2,7 +2,7 @@ using System;
 using System.Collections;
 using Steamworks;
 
-namespace YTPPlusPlusPlus
+namespace NonsensicalVideoGenerator
 {
     public static class SteamManager
     {

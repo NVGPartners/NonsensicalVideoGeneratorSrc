@@ -13,8 +13,9 @@ using System.Diagnostics;
 using System;
 using System.ComponentModel;
 using System.Linq;
+using System.Reflection;
 
-namespace YTPPlusPlusPlus
+namespace NonsensicalVideoGenerator
 {
     /// <summary>
     /// Generate page.
@@ -208,9 +209,6 @@ namespace YTPPlusPlusPlus
             {
                 for (int i = 0; i < libraryTypes[currentRootType].Count; i++)
                 {
-                    // make sure it exists in rects
-                    if(libraryTypes[currentRootType][i] == "Tennis" && int.Parse(SaveData.saveValues["TennisScore"]) < Global.tennisScore)
-                        continue;
                     spriteBatch.Draw(subTypeButton, rects[currentRootType.ToString() + libraryTypes[currentRootType][i] + "Button"], Color.White);
                 }
             }
@@ -232,9 +230,6 @@ namespace YTPPlusPlusPlus
                 {
                     if((selectedFlags & (8 << i)) == (8 << i))
                     {
-                        // make sure it exists in rects
-                        if(libraryTypes[currentRootType][i] == "Tennis" && int.Parse(SaveData.saveValues["TennisScore"]) < Global.tennisScore)
-                            continue;
                         spriteBatch.Draw(subTypeButtonSelected, rects[currentRootType.ToString() + libraryTypes[currentRootType][i] + "Button"], Color.White);
                     }
                 }
@@ -274,12 +269,6 @@ namespace YTPPlusPlusPlus
             int offset = 0;
             for (int i = 0; i < libraryTypes[currentRootType].Count; i++)
             {
-                // make sure it exists in rects
-                if(libraryTypes[currentRootType][i] == "Tennis" && int.Parse(SaveData.saveValues["TennisScore"]) < Global.tennisScore)
-                {
-                    offset -= 13;
-                    continue;
-                }
                 spriteBatch.DrawString(munroSmall, libraryTypes[currentRootType][i], new Vector2(GlobalGraphics.Scale(139 + 1), GlobalGraphics.Scale(71 + offset + 13 * i + 1)), Color.Black);
                 spriteBatch.DrawString(munroSmall, libraryTypes[currentRootType][i], new Vector2(GlobalGraphics.Scale(139), GlobalGraphics.Scale(71 + offset + 13 * i)), Color.White);
             }
@@ -423,13 +412,6 @@ namespace YTPPlusPlusPlus
                     int offset = 0;
                     for(int i = 0; i < libraryTypes[type].Count; i++)
                     {
-                        // hardcoded: tennis
-                        if(libraryTypes[type][i] == "Tennis" && int.Parse(SaveData.saveValues["TennisScore"]) < Global.tennisScore)
-                        {
-                            // offset one and skip
-                            offset = -13;
-                            continue;
-                        }
                         // if rect name is already taken, remove it
                         if(rects.ContainsKey(type.ToString() + libraryTypes[type][i] + "Button"))
                             rects.Remove(type.ToString() + libraryTypes[type][i] + "Button");
@@ -529,6 +511,39 @@ namespace YTPPlusPlusPlus
             // Standard input
             if(handleInput && !organizing)
             {
+                // Accessibility
+                for(int i = 0; i < rects.Count; i++)
+                {
+                    if(rects.Keys.ElementAt(i).Contains("Audio") && rects.Keys.ElementAt(i) != "AudioButton" && currentRootType != LibraryRootType.Audio)
+                        continue;
+                    if(rects.Keys.ElementAt(i).Contains("Video") && rects.Keys.ElementAt(i) != "VideoButton" && currentRootType != LibraryRootType.Video)
+                        continue;
+                    if(rects.Keys.ElementAt(i).Contains("Header"))
+                        continue;
+                    Accessibility.CompatAccessibility(rects.Values.ElementAt(i));
+                }
+                // Video holders
+                for (int i = 0; i < 3; i++)
+                {
+                    for (int j = 0; j < 4; j++)
+                    {
+                        int position = i + (j * 3) + (12 * page);
+                        Texture2D videoHolder = GlobalContent.GetTexture("VideoHolder");
+                        Texture2D videoOn = GlobalContent.GetTexture("VideoOn");
+                        Texture2D videoOff = GlobalContent.GetTexture("VideoOff");
+                        Rectangle videoHolderRect = new Rectangle(GlobalGraphics.Scale(201 + (33 * i) + (i * 2)), GlobalGraphics.Scale(72 + (35 * j) + (j * 2)), GlobalGraphics.Scale(videoHolder.Width), GlobalGraphics.Scale(videoHolder.Height));
+                        Rectangle staticRect = new Rectangle(videoHolderRect.X + GlobalGraphics.Scale(2), videoHolderRect.Y + GlobalGraphics.Scale(2), GlobalGraphics.Scale(29), GlobalGraphics.Scale(22));
+                        // button 1: organize video 3, 27 5x5
+                        Rectangle button1Rect = new Rectangle(videoHolderRect.X + GlobalGraphics.Scale(3), videoHolderRect.Y + GlobalGraphics.Scale(27), GlobalGraphics.Scale(5), GlobalGraphics.Scale(5));
+                        // button 2: remove video 25, 27 5x5
+                        Rectangle button2Rect = new Rectangle(videoHolderRect.X + GlobalGraphics.Scale(25), videoHolderRect.Y + GlobalGraphics.Scale(27), GlobalGraphics.Scale(5), GlobalGraphics.Scale(5));
+                        Rectangle toggleButtonRect = new Rectangle(videoHolderRect.X + GlobalGraphics.Scale(11), videoHolderRect.Y + GlobalGraphics.Scale(27), GlobalGraphics.Scale(videoOn.Width), GlobalGraphics.Scale(videoOn.Height));
+                        //Accessibility.CompatAccessibility(staticRect);
+                        Accessibility.CompatAccessibility(button1Rect);
+                        Accessibility.CompatAccessibility(button2Rect);
+                        Accessibility.CompatAccessibility(toggleButtonRect);
+                    }
+                }
                 tooltip = "";
                 // Left click
                 if ((MouseInput.LastMouseState.LeftButton == ButtonState.Released && MouseInput.MouseState.LeftButton == ButtonState.Pressed) || (MouseInput.MouseState.RightButton == ButtonState.Released && MouseInput.LastMouseState.RightButton == ButtonState.Pressed))
@@ -716,12 +731,6 @@ namespace YTPPlusPlusPlus
                                         int offset = 0;
                                         for(int s = 0; s < libraryTypes[currentRootType].Count; s++)
                                         {
-                                            // make sure it exists in rects
-                                            if(libraryTypes[currentRootType][s] == "Tennis" && int.Parse(SaveData.saveValues["TennisScore"]) < Global.tennisScore)
-                                            {
-                                                offset -= 13;
-                                                continue;
-                                            }
                                             Rectangle subTypeRect = new Rectangle(GlobalGraphics.Scale(135), GlobalGraphics.Scale(71 + offset + 13 * s), GlobalGraphics.Scale(subTypeButton.Width), GlobalGraphics.Scale(subTypeButton.Height));
                                             Global.mask.AddUnmaskedObject("SubType" + s, new SimpleObject(subTypeRect, Color.Gray, subTypeButton, () => {
                                                 if(subTypeRect.Contains(MouseInput.MouseState.Position))
@@ -731,11 +740,6 @@ namespace YTPPlusPlusPlus
                                                     Vector2 mousePosition = MouseInput.MouseState.Position.ToVector2();
                                                     for (int i = 0; i < libraryTypes[currentRootType].Count; i++)
                                                     {
-                                                        if(libraryTypes[currentRootType][i] == "Tennis" && int.Parse(SaveData.saveValues["TennisScore"]) < Global.tennisScore)
-                                                        {
-                                                            mousePosition.Y += GlobalGraphics.Scale(13);
-                                                            continue;
-                                                        }
                                                         Rectangle subTypeRect = new Rectangle(GlobalGraphics.Scale(135), GlobalGraphics.Scale(71+ 13 * i), GlobalGraphics.Scale(subTypeButton.Width), GlobalGraphics.Scale(subTypeButton.Height));
                                                         if (subTypeRect.Contains(mousePosition))
                                                         {
@@ -759,7 +763,7 @@ namespace YTPPlusPlusPlus
                                         Texture2D videoPlayerTexture = useVideoPlayer ? videoPlayers[pagelessPosition] : GlobalContent.GetTexture("AudioAnim" + audioAnim);
                                         Global.mask.AddUnmaskedObject("VideoPlayer", new SimpleObject(staticRect, Color.White, videoPlayerTexture, () => {
                                             return false;
-                                        }));
+                                        }, false));
                                         // Replicate video holder
                                         Global.mask.AddUnmaskedObject("VideoHolder", new SimpleObject(videoHolderRect, Color.White, videoHolder, () => {
                                             if(!organizing)
@@ -775,11 +779,11 @@ namespace YTPPlusPlusPlus
                                                 return true;
                                             }
                                             return false;
-                                        }));
+                                        }, false));
                                         Texture2D videoToggle = libraryFileCache[currentLibraryType][position].Enabled ? videoOn : videoOff;
                                         Global.mask.AddUnmaskedObject("VideoToggle", new SimpleObject(toggleButtonRect, Color.White, videoToggle, () => {
                                             return false;
-                                        }));
+                                        }, false));
                                         // Activate mask
                                         Global.mask.Enable();
                                         organizing = true;
@@ -831,47 +835,68 @@ namespace YTPPlusPlusPlus
                                     add = true;
                                 }
                             }
-                            if(add && left)
+                            if(add && left || (right && libraryFileCache[currentLibraryType].Count > position))
                             {
-                                // Add button: Open file dialog with filters from library type
-                                GlobalContent.GetSound("Option").Play(int.Parse(SaveData.saveValues["SoundEffectVolume"]) / 100f, 0f, 0f);
-                                if(!currentLibraryType.Special)
+                                if(right)
                                 {
-                                    string filter = LibraryData.libraryNames[currentLibraryType] + "|";
-                                    foreach (string extension in LibraryData.libraryFileTypes[currentLibraryType])
+                                    foreach(KeyValuePair<LibraryType, string> path in LibraryData.libraryPaths)
                                     {
-                                        filter += "*" + extension + ";";
-                                    }
-                                    // Trim last semicolon
-                                    filter = filter[..^1];
-                                    System.Windows.Forms.OpenFileDialog openFileDialog = new()
-                                    {
-                                        Filter = filter,
-                                        Multiselect = true,
-                                        Title = "Add " + LibraryData.libraryNames[currentLibraryType]
-                                    };
-                                    if (openFileDialog.ShowDialog() == System.Windows.Forms.DialogResult.OK)
-                                    {
-                                        bool success = true;
-                                        foreach (string file in openFileDialog.FileNames)
+                                        if(path.Key == currentLibraryType)
                                         {
-                                            LibraryFile libraryFile = new(Path.GetFileNameWithoutExtension(file), file, currentLibraryType);
-                                            LibraryFile? newFile = LibraryData.Load(libraryFile);
-                                            if(newFile == null)
+                                            // Open directory and select file
+                                            ProcessStartInfo startInfo = new()
                                             {
-                                                success = false;
-                                                continue;
+                                                FileName = Path.GetFullPath(@"library\" + path.Value),
+                                                UseShellExecute = true,
+                                            };
+                                            Process.Start(startInfo);
+                                            GlobalContent.GetSound("Option").Play(int.Parse(SaveData.saveValues["SoundEffectVolume"]) / 100f, 0f, 0f);
+                                            return true;
+                                        }
+                                    }
+                                }
+                                else
+                                {
+                                    // Add button: Open file dialog with filters from library type
+                                    GlobalContent.GetSound("Option").Play(int.Parse(SaveData.saveValues["SoundEffectVolume"]) / 100f, 0f, 0f);
+                                    if(!currentLibraryType.Special)
+                                    {
+                                        string filter = LibraryData.libraryNames[currentLibraryType] + "|";
+                                        foreach (string extension in LibraryData.libraryFileTypes[currentLibraryType])
+                                        {
+                                            filter += "*" + extension + ";";
+                                        }
+                                        // Trim last semicolon
+                                        filter = filter[..^1];
+                                        System.Windows.Forms.OpenFileDialog openFileDialog = new()
+                                        {
+                                            Filter = filter,
+                                            Multiselect = true,
+                                            Title = "Add " + LibraryData.libraryNames[currentLibraryType]
+                                        };
+                                        if (openFileDialog.ShowDialog() == System.Windows.Forms.DialogResult.OK)
+                                        {
+                                            bool success = true;
+                                            foreach (string file in openFileDialog.FileNames)
+                                            {
+                                                LibraryFile libraryFile = new(Path.GetFileNameWithoutExtension(file), file, currentLibraryType);
+                                                LibraryFile? newFile = LibraryData.Load(libraryFile);
+                                                if(newFile == null)
+                                                {
+                                                    success = false;
+                                                    continue;
+                                                }
+                                                libraryFileCache[currentLibraryType].Add(newFile);
                                             }
-                                            libraryFileCache[currentLibraryType].Add(newFile);
-                                        }
-                                        demandChange = true;
-                                        if(!success)
-                                        {
-                                            GlobalContent.GetSound("Error").Play(int.Parse(SaveData.saveValues["SoundEffectVolume"]) / 100f, 0f, 0f);
-                                        }
-                                        else
-                                        {
-                                            GlobalContent.GetSound("AddSource").Play(int.Parse(SaveData.saveValues["SoundEffectVolume"]) / 100f, 0f, 0f);
+                                            demandChange = true;
+                                            if(!success)
+                                            {
+                                                GlobalContent.GetSound("Error").Play(int.Parse(SaveData.saveValues["SoundEffectVolume"]) / 100f, 0f, 0f);
+                                            }
+                                            else
+                                            {
+                                                GlobalContent.GetSound("AddSource").Play(int.Parse(SaveData.saveValues["SoundEffectVolume"]) / 100f, 0f, 0f);
+                                            }
                                         }
                                     }
                                 }

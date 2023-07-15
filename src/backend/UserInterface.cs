@@ -10,7 +10,7 @@ using System.IO;
 using System.Text;
 using System.Windows.Forms;
 
-namespace YTPPlusPlusPlus
+namespace NonsensicalVideoGenerator
 {
     public enum WindowState
     {
@@ -64,7 +64,7 @@ namespace YTPPlusPlusPlus
             gameForm.DragDrop += new DragEventHandler(DragDrop);
             gameForm.DragLeave += new EventHandler(DragLeave);
             // Set window title.
-            Window.Title = Global.productName;
+            Window.Title = "Nonsensical Video Generator";
             // Disable anti-aliasing.
             _graphics.PreferMultiSampling = false;
             GraphicsDevice.SamplerStates[0] = SamplerState.PointClamp;

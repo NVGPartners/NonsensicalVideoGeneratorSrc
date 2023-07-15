@@ -4,7 +4,7 @@ using System.IO;
 using System.Text;
 using Microsoft.Xna.Framework;
 
-namespace YTPPlusPlusPlus
+namespace NonsensicalVideoGenerator
 {
     /// <summary>
     /// This class stores text and color together.
@@ -52,38 +52,39 @@ namespace YTPPlusPlusPlus
             if (color != null)
                 c = (Color)color;
             // Wrap lines.
-            if(color != Color.Transparent)
+            if(color == Color.Transparent)
             {
-                int lineCount = line.Length / lineLength;
-                if (line.Length % lineLength > 0)
-                    lineCount++;
-                for (int i = 0; i < lineCount; i++)
-                {
-                    int start = i * lineLength;
-                    int end = (i + 1) * lineLength;
-                    if (end > line.Length)
-                        end = line.Length;
-                    if (newLine)
-                    {
-                        output.Add(new ColoredString(line.Substring(start, end - start), color));
-                        proxyOutput.Add(new ColoredString(line.Substring(start, end - start), color));
-                    }
-                    else
-                    {
-                        if (output.Count > 0)
-                            output[output.Count - 1].Text += line.Substring(start, end - start);
-                        else
-                            output.Add(new ColoredString(line.Substring(start, end - start), color));
-                        if(proxyOutput.Count > 0)
-                            proxyOutput[proxyOutput.Count - 1].Text += line.Substring(start, end - start);
-                        else
-                            proxyOutput.Add(new ColoredString(line.Substring(start, end - start), color));
-                    }
-                }
-                // Remove old lines.
-                while (output.Count > maxLines)
-                    output.RemoveAt(0);
+                color = Color.DarkGray;
             }
+            int lineCount = line.Length / lineLength;
+            if (line.Length % lineLength > 0)
+                lineCount++;
+            for (int i = 0; i < lineCount; i++)
+            {
+                int start = i * lineLength;
+                int end = (i + 1) * lineLength;
+                if (end > line.Length)
+                    end = line.Length;
+                if (newLine)
+                {
+                    output.Add(new ColoredString(line.Substring(start, end - start), color));
+                    proxyOutput.Add(new ColoredString(line.Substring(start, end - start), color));
+                }
+                else
+                {
+                    if (output.Count > 0)
+                        output[output.Count - 1].Text += line.Substring(start, end - start);
+                    else
+                        output.Add(new ColoredString(line.Substring(start, end - start), color));
+                    if(proxyOutput.Count > 0)
+                        proxyOutput[proxyOutput.Count - 1].Text += line.Substring(start, end - start);
+                    else
+                        proxyOutput.Add(new ColoredString(line.Substring(start, end - start), color));
+                }
+            }
+            // Remove old lines.
+            while (output.Count > maxLines)
+                output.RemoveAt(0);
             // Write to file.
             try
             {

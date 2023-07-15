@@ -8,7 +8,7 @@ using Microsoft.Xna.Framework.Input;
 using Microsoft.Xna.Framework.Media;
 using MonoGame.Extended.Tweening;
 
-namespace YTPPlusPlusPlus
+namespace NonsensicalVideoGenerator
 {
     public class AprilFoolsFlappyBirdObstacle : IObject
     {
@@ -18,6 +18,7 @@ namespace YTPPlusPlusPlus
         public int width = 32;
         public int height = 240;
         public bool isDead = true;
+        public bool point = false;
         public Rectangle[] hitboxes = new Rectangle[2];
         public AprilFoolsFlappyBirdObstacle(int offset)
         {
@@ -26,11 +27,11 @@ namespace YTPPlusPlusPlus
         }
         public bool Update(GameTime gameTime, bool handleInput)
         {
-            // time increases exponentially
             if(!isDead)
-                distance -= (int)(gameTime.ElapsedGameTime.TotalSeconds * 100);
+                distance -= 2;
             if(distance < -width)
             {
+                point = false;
                 distance = 320;
                 spacingPlacementY = Global.generatorFactory.globalRandom.Next(spacing*2, height-(spacing*2));
             }
@@ -65,7 +66,7 @@ namespace YTPPlusPlusPlus
         public int height = 0;
         public float velocity = 0f;
         public float gravity = 0.1f;
-        public float jump = 2f;
+        public float jump = 2.25f;
         public bool dead = false;
         public bool waiting = true;
         public int points = 0;
@@ -79,14 +80,12 @@ namespace YTPPlusPlusPlus
         }
         public bool Update(GameTime gameTime, bool handleInput)
         {
-            if(!handleInput)
-                return false;
             // time increases exponentially
             if(waiting)
             {
                 // math.sin is used to make the bird bob up and down
                 spacingPlacementY = (float)((240 / 2) - (height/2) + (Math.Sin(gameTime.TotalGameTime.TotalSeconds * 4) * 10));
-                if (MouseInput.LastMouseState.LeftButton == ButtonState.Released && MouseInput.MouseState.LeftButton == ButtonState.Pressed && handleInput)
+                if (handleInput && MouseInput.LastMouseState.LeftButton == ButtonState.Released && MouseInput.MouseState.LeftButton == ButtonState.Pressed && handleInput)
                 {
                     waiting = false;
                     velocity = -jump;
@@ -178,26 +177,46 @@ namespace YTPPlusPlusPlus
         private int currentCredit = 0;
         private readonly List<string> creditRoll = new()
         {
-            "Thank you for using YTP+++, score points to view credits!",
-            "These people have helped make YTP+ and its successors possible:",
-            "hellfire: Creating the original YTP+ software",
-            "KiwifruitDev: Programming, UI, maintenance, Discord management",
-            "nuppington: General help and Discord management",
-            "GMM: UI sound effects, and plugin development",
-            "Bobby I Guess: UI music, general help",
-            "DevanWolf: Providing support and creating fixes for YTP++",
-            "Supositware: Creating YTPB5000, a Twitter bot using YTP+ code",
-            "DeeMacias: Plugin development and general help",
-            "0zne: Discord moderation and continued involvement",
-            "Spiral: Discord moderation and continued involvement",
-            "You: For using YTP+++ and supporting the project!",
+            "Score points to view credits!",
+            "Lead Developer:",
+            "kiwifruitdev",
+            "Sound Designers:",
+            "gmm2003",
+            "bobbyiguess",
+            "Moderators:",
+            "0zne",
+            "spiral2839",
+            "Special Thanks:",
+            "supositware",
+            "devanwolf",
+            "deemacias",
+            "Superstars:",
+            "eddsworldfan69420",
+            "gungholizard",
+            "jankespro12",
+            "marcioleo123",
+            "classicbirch",
+            "nobodyhasabandonedme",
+            "rowster64",
+            "goggleskun",
+            "revilleaj",
+            "thebritishytper",
+            "OSS Licenses:",
+            "MonoGame (Ms-PL)",
+            "Newtonsoft.Json (MIT License)",
+            "Steamworks.NET (MIT License)",
+            "FFmpeg (GPL-2.1)",
+            "yt-dlp (Unlicense)",
+            "MoonSharp (MIT License)",
+            "Font Licenses:",
+            "Munro (SIL Open Font License)",
             "This is the end of the credits",
         };
         private AprilFoolsFlappyBirdPlayer player = new();
         public void Show()
         {
             toggle = true;
-            offset = new(0, GlobalGraphics.Scale(240)); // from bottom to top
+            offset = new(GlobalGraphics.scaledWidth, 0); // from bottom to top
             tween.TweenTo(this, t => t.offset, new Vector2(0, 0), 0.5f)
                 .Easing(EasingFunctions.ExponentialOut);
             showing = true;
@@ -206,7 +225,7 @@ namespace YTPPlusPlusPlus
         {
             toggle = false;
             offset = new(0, 0); // from top to bottom
-            tween.TweenTo(this, t => t.offset, new Vector2(0, GlobalGraphics.Scale(240*2)), 1f)
+            tween.TweenTo(this, t => t.offset, new Vector2(GlobalGraphics.scaledWidth, 0), 0.5f)
                 .Easing(EasingFunctions.ExponentialOut);
             hiding = true;
         }
@@ -242,7 +261,7 @@ namespace YTPPlusPlusPlus
         public bool Update(GameTime gameTime, bool handleInput)
         {
             // When animation is done, set screen type
-            if (hiding && offset.Y == GlobalGraphics.Scale(240*2))
+            if (hiding && offset.X >= GlobalGraphics.scaledWidth)
             {
                 screenType = ScreenType.Hidden;
                 hiding = false;
@@ -266,7 +285,11 @@ namespace YTPPlusPlusPlus
             {
                 obstacle.Update(gameTime, handleInput);
             }
-            if (handleInput && MouseInput.LastMouseState.RightButton == ButtonState.Released && MouseInput.MouseState.RightButton == ButtonState.Pressed && handleInput)
+            if(handleInput)
+            {
+                Accessibility.CompatAccessibility(new Rectangle(GlobalGraphics.Scale(player.spacing), (int)GlobalGraphics.Scale(player.spacingPlacementY) + GlobalGraphics.Scale(player.height/2), GlobalGraphics.Scale(player.width), GlobalGraphics.Scale(player.height/2)));
+            }
+            if (handleInput && MouseInput.LastMouseState.RightButton == ButtonState.Released && MouseInput.MouseState.RightButton == ButtonState.Pressed)
             {
                 GlobalContent.GetSound("Back").Play(int.Parse(SaveData.saveValues["SoundEffectVolume"]) / 100f, 0f, 0f);
                 Hide();
@@ -303,24 +326,29 @@ namespace YTPPlusPlusPlus
                         phase = 1;
                         break;
                     }
-                    else if(obstacle.hitboxes[0].X + (obstacle.hitboxes[0].Width/2) == player.spacing)
+                    // Once past obstacle, earn point
+                    else if(obstacle.distance + obstacle.spacing < player.spacing)
                     {
-                        GlobalContent.GetSound("AddSource").Play(int.Parse(SaveData.saveValues["SoundEffectVolume"]) / 100f, 0f, 0f);
-                        player.points++;
-                        currentCredit++;
-                        if(currentCredit > creditRoll.Count-1)
+                        if(!obstacle.isDead && !obstacle.point)
                         {
-                            currentCredit = 1;
-                        }
-                        if(player.points > highScore)
-                        {
-                            GlobalContent.GetSound("Prompt").Play(int.Parse(SaveData.saveValues["SoundEffectVolume"]) / 100f, 0f, 0f);
-                            highScore = player.points;
-                            SaveData.saveValues["AprilFoolsFlappyBirdScore"] = highScore.ToString();
-                            SaveData.Save();
-                            // get random high score tease
-                            int rand = Global.generatorFactory.globalRandom.Next(0, highScoreTeases.Count);
-                            ConsoleOutput.WriteLine(highScoreTeases[rand] + " New high score: " + highScore, Color.Cyan);
+                            obstacle.point = true;
+                            GlobalContent.GetSound("AddSource").Play(int.Parse(SaveData.saveValues["SoundEffectVolume"]) / 100f, 0f, 0f);
+                            player.points++;
+                            currentCredit++;
+                            if(currentCredit > creditRoll.Count-1)
+                            {
+                                currentCredit = 1;
+                            }
+                            if(player.points > highScore)
+                            {
+                                GlobalContent.GetSound("Prompt").Play(int.Parse(SaveData.saveValues["SoundEffectVolume"]) / 100f, 0f, 0f);
+                                highScore = player.points;
+                                SaveData.saveValues["AprilFoolsFlappyBirdScore"] = highScore.ToString();
+                                SaveData.Save();
+                                // get random high score tease
+                                int rand = Global.generatorFactory.globalRandom.Next(0, highScoreTeases.Count);
+                                ConsoleOutput.WriteLine(highScoreTeases[rand] + " New high score: " + highScore, Color.Cyan);
+                            }
                         }
                     }
                     if(phase == 0 && player.spacingPlacementY > 240-player.height)
@@ -459,9 +487,6 @@ namespace YTPPlusPlusPlus
         }
         public void LoadContent(ContentManager contentManager, GraphicsDevice graphicsDevice)
         {
-            // Logo.
-            GlobalContent.AddTexture("LogoBG", contentManager.Load<Texture2D>("graphics/bannerbg"));
-            GlobalContent.AddTexture("Logo", contentManager.Load<Texture2D>("graphics/logo"));
             // Load player
             player.LoadContent(contentManager, graphicsDevice);
             foreach (AprilFoolsFlappyBirdObstacle obstacle in obstacles)

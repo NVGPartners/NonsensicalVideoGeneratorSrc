@@ -7,7 +7,7 @@ using Microsoft.Xna.Framework.Content;
 using Microsoft.Xna.Framework.Graphics;
 using Microsoft.Xna.Framework.Input;
 
-namespace YTPPlusPlusPlus
+namespace NonsensicalVideoGenerator
 {
     public class SimpleObject : IObject
     {
@@ -15,6 +15,7 @@ namespace YTPPlusPlusPlus
         public Color color;
         public Texture2D texture;
         public Func<bool> updateAction;
+        public bool isButton = true;
         public SimpleObject(Rectangle rectangle, Color color, Texture2D texture, Func<bool> updateAction)
         {
             this.rectangle = rectangle;
@@ -22,10 +23,20 @@ namespace YTPPlusPlusPlus
             this.texture = texture;
             this.updateAction = updateAction;
         }
+        public SimpleObject(Rectangle rectangle, Color color, Texture2D texture, Func<bool> updateAction, bool isButton)
+        {
+            this.rectangle = rectangle;
+            this.color = color;
+            this.texture = texture;
+            this.updateAction = updateAction;
+            this.isButton = isButton;
+        }
         public bool Update(GameTime gameTime, bool handleInput)
         {
             if (handleInput)
             {
+                if(isButton)
+                    Accessibility.CompatAccessibility(rectangle);
                 if (MouseInput.LastMouseState.LeftButton == ButtonState.Released && MouseInput.MouseState.LeftButton == ButtonState.Pressed)
                 {
                     if (rectangle.Contains(MouseInput.MouseState.Position))
@@ -59,18 +70,14 @@ namespace YTPPlusPlusPlus
             {
                 if (handleInput)
                 {
-                    if (MouseInput.LastMouseState.LeftButton == ButtonState.Released && MouseInput.MouseState.LeftButton == ButtonState.Pressed)
+                    foreach (KeyValuePair<string, SimpleObject> unmaskedObject in unmaskedObjects)
                     {
-                        foreach (KeyValuePair<string, SimpleObject> unmaskedObject in unmaskedObjects)
+                        if (unmaskedObject.Value.Update(gameTime, handleInput))
                         {
-                            if (unmaskedObject.Value.Update(gameTime, handleInput))
-                            {
-                                return true;
-                            }
+                            return true;
                         }
-                        GlobalContent.GetSound("Error").Play(int.Parse(SaveData.saveValues["SoundEffectVolume"]) / 100f, 0f, 0f);
-                        return true;
                     }
+                    return true;
                 }
             }
             return false;

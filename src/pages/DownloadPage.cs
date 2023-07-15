@@ -3,7 +3,7 @@ using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Content;
 using Microsoft.Xna.Framework.Graphics;
 
-namespace YTPPlusPlusPlus
+namespace NonsensicalVideoGenerator
 {
     /// <summary>
     /// Generate page.
@@ -122,7 +122,7 @@ namespace YTPPlusPlusPlus
                 clipUrl = controller.interactables["DownloadClipUrl"].Tooltip;
                 return false;
             }));
-            controller.Add("Label", new Label("Type in a url to download:", new Vector2(139, 60)));
+            controller.Add("Label", new Label("Paste in a url to download:", new Vector2(139, 60)));
             // Interactable
             controller.LoadContent(contentManager, graphicsDevice);
         }
