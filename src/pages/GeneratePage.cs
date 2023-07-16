@@ -101,10 +101,10 @@ namespace NonsensicalVideoGenerator
                         return true;
                 }
                 return false;
-            }));
-            controllerAdvanced.Add("TransitionEffectChance", new Dial("Transition Effect Chance", "How often transition effects are rolled.", new Vector2(139, 60+19*5), int.Parse(SaveData.saveValues["TransitionEffectChance"]), 0, 100, (int i) => {
+            }));                                      
+            controllerAdvanced.Add("TransitionEffectChance", new TextEntry("Transition Effect Chance", "How often transitions get effects, from 0-100.", SaveData.saveValues["TransitionEffectChance"], new Vector2(139, 60+19*5), 24, 3, 2, (int i) => {
                 int oldValue = int.Parse(SaveData.saveValues["TransitionEffectChance"]);
-                SaveData.saveValues["TransitionEffectChance"] = i.ToString();
+                SaveData.saveValues["TransitionEffectChance"] = controllerAdvanced.interactables["TransitionEffectChance"].Tooltip;
                 if(oldValue != int.Parse(SaveData.saveValues["TransitionEffectChance"]))
                     SaveData.Save();
                 return false;
@@ -120,32 +120,23 @@ namespace NonsensicalVideoGenerator
                 }
                 return switchState;
             }, SaveData.saveValues["TransitionEffects"] == "true"));
-            /*
-            controllerAdvanced.Add("ImageChance", new Dial("Image Chance", "How often image types are rolled.", new Vector2(139, 60+19*5), int.Parse(SaveData.saveValues["ImageChance"]), 0, 100, (int i) => {
-                int oldValue = int.Parse(SaveData.saveValues["ImageChance"]);
-                SaveData.saveValues["ImageChance"] = i.ToString();
-                if(oldValue != int.Parse(SaveData.saveValues["ImageChance"]))
-                    SaveData.Save();
-                return false;
-            }));
-            */
-            controllerAdvanced.Add("TransitionChance", new Dial("Transition Chance", "How often transitions are rolled.", new Vector2(139, 60+19*3), int.Parse(SaveData.saveValues["TransitionChance"]), 0, 100, (int i) => {
+            controllerAdvanced.Add("TransitionChance", new TextEntry("Transition Chance", "How often transitions are rolled, from 0-100.", SaveData.saveValues["TransitionChance"], new Vector2(139, 60+19*3), 24, 3, 2, (int i) => {
                 int oldValue = int.Parse(SaveData.saveValues["TransitionChance"]);
-                SaveData.saveValues["TransitionChance"] = i.ToString();
+                SaveData.saveValues["TransitionChance"] = controllerAdvanced.interactables["TransitionChance"].Tooltip;
                 if(oldValue != int.Parse(SaveData.saveValues["TransitionChance"]))
                     SaveData.Save();
                 return false;
             }));
-            controllerAdvanced.Add("EffectChance", new Dial("Effect Chance", "How often any plugin effect is rolled.", new Vector2(139, 60+19*2), int.Parse(SaveData.saveValues["EffectChance"]), 0, 100, (int i) => {
+            controllerAdvanced.Add("EffectChance", new TextEntry("Effect Chance", "How often any effect are used, from 0-100.", SaveData.saveValues["EffectChance"], new Vector2(139, 60+19*2), 24, 3, 2, (int i) => {
                 int oldValue = int.Parse(SaveData.saveValues["EffectChance"]);
-                SaveData.saveValues["EffectChance"] = i.ToString();
+                SaveData.saveValues["EffectChance"] = controllerAdvanced.interactables["EffectChance"].Tooltip;
                 if(oldValue != int.Parse(SaveData.saveValues["EffectChance"]))
                     SaveData.Save();
                 return false;
             }));
-            controllerAdvanced.Add("OverlayChance", new Dial("Overlay Chance", "How often overlays are rolled.", new Vector2(139, 60+19), int.Parse(SaveData.saveValues["OverlayChance"]), 0, 100, (int i) => {
+            controllerAdvanced.Add("OverlayChance", new TextEntry("Overlay Chance", "How often overlays are rolled, from 0-100.", SaveData.saveValues["OverlayChance"], new Vector2(139, 60+19), 24, 3, 2, (int i) => {
                 int oldValue = int.Parse(SaveData.saveValues["OverlayChance"]);
-                SaveData.saveValues["OverlayChance"] = i.ToString();
+                SaveData.saveValues["OverlayChance"] = controllerAdvanced.interactables["OverlayChance"].Tooltip;
                 if(oldValue != int.Parse(SaveData.saveValues["OverlayChance"]))
                     SaveData.Save();
                 return false;

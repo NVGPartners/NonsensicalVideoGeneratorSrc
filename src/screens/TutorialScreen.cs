@@ -117,61 +117,67 @@ namespace NonsensicalVideoGenerator
             }
             return false;
         }
-        public List<string>[] tutorialText = new List<string>[3]
+        public static List<string>[] tutorialText = new List<string>[3]
+        {
+            new List<string>(),
+            new List<string>(),
+            new List<string>()
+        };
+        public static List<string>[] baseTutorialText = new List<string>[3]
         {
             new List<string>()
             { // PAGE 1
-                "Nonsensical Video Generator v" + Global.productVersion,
+                "Welcome to Nonsensical Video Generator!",
                 "",
-                "This initial setup will help you get started with the program.",
+                "This initial setup will help you get started.",
+                "On the next page, we will check these prerequisites.",
                 "",
-                "This screen may be shown if there is an issue with your setup.",
+                "These programs are required, but not included:",
+                " - ffmpeg",
+                " - ffprobe",
                 "",
-                "On the next page, we will check prerequisites.",
+                "You will need to place them in the same folder as this software.",
                 "",
-                "The following software is required to use this software:",
-                " - FFmpeg",
-                " - FFprobe",
+                "(Advanced: Add a folder containing them to your PATH variable.)",
                 "",
-                "The following software is optional, but recommended:",
-                " - ImageMagick",
-                " - yt-dlp",
-                "",
-                "If you have any issues, please refer to the installation guide.",
-                "You may check console at any time by pressing ~ (tilde).",
+                "These programs are optional:",
+                " - magick (only uses PATH)",
+                " - yt-dlp (bundled)",
                 "",
                 "Click \"Next Page\" to continue."
             },
             new List<string>()
             { // PAGE 2
-                "Below shows the status of the prerequisites.",
+                "The status of each program is shown below.",
                 "",
                 "Required software:",
-                " - FFmpeg: %FFMPEG%",
-                " - FFprobe: %FFPROBE%",
+                " - ffmpeg: %FFMPEG%",
+                " - ffprobe: %FFPROBE%",
                 "",
                 "Optional software:",
-                " - ImageMagick: %IMAGEMAGICK%",
+                " - magick: %IMAGEMAGICK%",
                 " - yt-dlp: %YTDLP%",
                 "",
-                "If any required software is missing, install it and restart.",
+                "A restart may be required if you install any of these programs.",
                 "",
-                "Need help? Join the Discord server found on the Steam store page.",
+                "Need help? Create an issue or post on the GitHub issue tracker.",
                 "",
-                "Click \"Next Page\" to continue if all required software is installed."
+                "The \"Next Page\" button will be disabled if there are issues."
             },
             new List<string>()
             { // PAGE 3
-                "More info about this software may be found in the Discord server.",
+                "All required software is installed!",
                 "",
-                "Enjoy, and be sure to report any problems to the issue tracker!",
+                "Don't hesitate to ask for help on the GitHub issue tracker!",
+                "Be sure to join the Discord server community from the menu!",
+                "",
+                "Enjoy using Nonsensical Video Generator!",
                 "",
                 "If there are still issues, the continue button will be disabled.",
-                "Broken plugins may be the culprit, check \"console.txt\".",
+                "In that case, broken plugins would have been detected.",
+                "Check console with ~ to see which plugins are broken, if so.",
                 "",
-                "Need help? Join the Discord server found on the Steam store page.",
-                "",
-                "Click \"Continue\" to proceed and load plugins."
+                "Click \"Continue\" to scan plugins and continue if successful."
             }
         };
         public void Draw(GameTime gameTime, SpriteBatch spriteBatch)
@@ -210,7 +216,7 @@ namespace NonsensicalVideoGenerator
                     // Draw red overlay if prerequisite is not met
                     if(GlobalGraphics.scale == 2)
                     {
-                        if(tutorialText[i][j].Contains("Not installed"))
+                        if(tutorialText[i][j].Contains("Not found"))
                         {
                             int offset = 0;
                             switch(j)
@@ -222,13 +228,13 @@ namespace NonsensicalVideoGenerator
                                     offset = 47;
                                     break;
                                 case 7:
-                                    offset = 64;
+                                    offset = 42;
                                     break;
                                 case 8:
                                     offset = 43;
                                     break;
                             }
-                            spriteBatch.DrawString(GlobalGraphics.fontMunroSmall, "Not installed", new Vector2(GlobalGraphics.Scale(offset+8+16+320*i), GlobalGraphics.Scale(60+offsetText)), Color.OrangeRed);
+                            spriteBatch.DrawString(GlobalGraphics.fontMunroSmall, "Not found", new Vector2(GlobalGraphics.Scale(offset+8+16+320*i), GlobalGraphics.Scale(60+offsetText)), Color.OrangeRed);
                         }
                         if(tutorialText[i][j].Contains("Using system PATH"))
                         {
@@ -242,13 +248,13 @@ namespace NonsensicalVideoGenerator
                                     offset = 47;
                                     break;
                                 case 7:
-                                    offset = 64;
+                                    offset = 42;
                                     break;
                                 case 8:
                                     offset = 43;
                                     break;
                             }
-                            spriteBatch.DrawString(GlobalGraphics.fontMunroSmall, "Using system PATH", new Vector2(GlobalGraphics.Scale(offset+8+16+320*i), GlobalGraphics.Scale(60+offsetText)), Color.OrangeRed);
+                            spriteBatch.DrawString(GlobalGraphics.fontMunroSmall, "Using system PATH", new Vector2(GlobalGraphics.Scale(offset+8+16+320*i), GlobalGraphics.Scale(60+offsetText)), Color.SeaGreen);
                         }
                         // Draw green overlay if prerequisite is met
                         if(tutorialText[i][j].Contains("Installed"))
@@ -263,7 +269,7 @@ namespace NonsensicalVideoGenerator
                                     offset = 47;
                                     break;
                                 case 7:
-                                    offset = 64;
+                                    offset = 42;
                                     break;
                                 case 8:
                                     offset = 43;
@@ -290,7 +296,7 @@ namespace NonsensicalVideoGenerator
                                     offset = 47;
                                     break;
                                 case 7:
-                                    offset = 64;
+                                    offset = 42;
                                     break;
                                 case 8:
                                     offset = 43;
@@ -319,33 +325,37 @@ namespace NonsensicalVideoGenerator
             {
                 for (int j = 0; j < tutorialText[h].Count; j++)
                 {
-                    string ffmpeg = UpdateManager.ffmpegInstalled ? "Installed" : "Not installed";
-                    string ffprobe = UpdateManager.ffprobeInstalled ? "Installed" : "Not installed";
-                    string ytDlp = UpdateManager.ytDlpInstalled ? "Installed" : "Not installed";
+                    string ffmpeg = UpdateManager.ffmpegInstalled ? "Installed" : "Not found";
+                    string ffprobe = UpdateManager.ffprobeInstalled ? "Installed" : "Not found";
+                    string ytDlp = UpdateManager.ytDlpInstalled ? "Installed" : "Not found";
                     if(Global.useSystemFFmpeg)
                     {
                         if(!UpdateManager.ffmpegInstalled)
-                            ffmpeg = "Not installed";
+                            ffmpeg = "Not found";
                         else
                             ffmpeg = "Using system PATH";
+                    }
+                    if(Global.useSystemFFprobe)
+                    {
                         if(!UpdateManager.ffprobeInstalled)
-                            ffprobe = "Not installed";
+                            ffprobe = "Not found";
                         else
                             ffprobe = "Using system PATH";
                     }
                     if(Global.useSystemYtDlp)
                     {
                         if(!UpdateManager.ytDlpInstalled)
-                            ytDlp = "Not installed";
+                            ytDlp = "Not found";
                         else
                             ytDlp = "Using system PATH";
                     }
                     tutorialText[h][j] = tutorialText[h][j].Replace("%FFMPEG%", ffmpeg);
                     tutorialText[h][j] = tutorialText[h][j].Replace("%FFPROBE%", ffprobe);
-                    tutorialText[h][j] = tutorialText[h][j].Replace("%IMAGEMAGICK%", UpdateManager.imagemagickInstalled ? "Installed" : "Not installed");
+                    tutorialText[h][j] = tutorialText[h][j].Replace("%IMAGEMAGICK%", UpdateManager.imagemagickInstalled ? "Using system PATH" : "Not found");
                     tutorialText[h][j] = tutorialText[h][j].Replace("%YTDLP%", ytDlp);
                 }
             }
+            check = false;
             // Dispose of worker
             dependencyWorker.Dispose();
             dependencyWorker = null;
@@ -398,6 +408,14 @@ namespace NonsensicalVideoGenerator
                         GlobalContent.GetSound("Option").Play(int.Parse(SaveData.saveValues["SoundEffectVolume"]) / 100f, 0f, 0f);
                         if(!check)
                         {
+                            for(int h = 0; h < baseTutorialText.Length; h++)
+                            {
+                                tutorialText[h] = new List<string>();
+                                for(int j = 0; j < baseTutorialText[h].Count; j++)
+                                {
+                                    tutorialText[h].Add(baseTutorialText[h][j]);
+                                }
+                            }
                             check = true;
                             dependencyWorker = new BackgroundWorker();
                             dependencyWorker.DoWork += DependencyCheckThread;
@@ -422,6 +440,21 @@ namespace NonsensicalVideoGenerator
                         }
                         else
                         {
+                            if(!check)
+                            {
+                                for(int h = 0; h < baseTutorialText.Length; h++)
+                                {
+                                    tutorialText[h] = new List<string>();
+                                    for(int j = 0; j < baseTutorialText[h].Count; j++)
+                                    {
+                                        tutorialText[h].Add(baseTutorialText[h][j]);
+                                    }
+                                }
+                                check = true;
+                                dependencyWorker = new BackgroundWorker();
+                                dependencyWorker.DoWork += DependencyCheckThread;
+                                dependencyWorker.RunWorkerAsync();
+                            }
                             GlobalContent.GetSound("Error").Play(int.Parse(SaveData.saveValues["SoundEffectVolume"]) / 100f, 0f, 0f);
                         }
                         return true;
@@ -486,6 +519,14 @@ namespace NonsensicalVideoGenerator
                 return false;
             }));
             */
+            for(int i = 0; i < baseTutorialText.Length; i++)
+            {
+                tutorialText[i] = new List<string>();
+                for(int j = 0; j < baseTutorialText[i].Count; j++)
+                {
+                    tutorialText[i].Add(baseTutorialText[i][j]);
+                }
+            }
             controller.LoadContent(contentManager, graphicsDevice);
         }
     }

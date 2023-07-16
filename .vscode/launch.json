@@ -10,9 +10,9 @@
             "request": "launch",
             "preLaunchTask": "build",
             // If you have changed target frameworks, make sure to update the program path.
-            "program": "${workspaceFolder}/bin/Debug/net6.0-windows/NonsensicalVideoGenerator.dll",
+            "program": "${workspaceFolder}/bin/x64/debug/net6.0-windows/NonsensicalVideoGenerator.dll",
             "args": [],
-            "cwd": "${workspaceFolder}/bin/Debug/net6.0-windows",
+            "cwd": "${workspaceFolder}/bin/x64/debug/net6.0-windows",
             // For more information about the 'console' field, see https://aka.ms/VSCode-CS-LaunchJson-Console
             "console": "internalConsole",
             "stopAtEntry": false

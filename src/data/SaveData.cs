@@ -34,14 +34,14 @@ namespace NonsensicalVideoGenerator
             {"ActiveMusic", "1"},
             {"ShuffleMusic", "true"},
             {"TransitionChance", "20"},
-            //{"ImageChance", "20"},
             {"OverlayChance", "20"},
             {"EffectChance", "60"},
             {"FirstBoot", "true"},
             {"FirstBootVersion", Global.productVersion},
             {"TransitionEffects", "true"},
             {"TransitionEffectChance", "30"},
-            {"HiddenKeepTemporaryJobFolders", "false"}
+            {"HiddenKeepTemporaryJobFolders", "false"},
+            {"HiddenVerbose", "false"}
         };
         public static string saveFileName = "Options.json";
         public static bool Save()

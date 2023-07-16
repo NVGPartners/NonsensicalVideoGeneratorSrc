@@ -1,4 +1,6 @@
 using System;
+using System.Collections.Generic;
+using System.Diagnostics;
 using System.Drawing.Imaging;
 using System.Globalization;
 using System.IO;
@@ -19,7 +21,7 @@ namespace NonsensicalVideoGenerator
                 System.Diagnostics.Process process = new System.Diagnostics.Process();
                 System.Diagnostics.ProcessStartInfo startInfo = new System.Diagnostics.ProcessStartInfo();
                 startInfo.WindowStyle = System.Diagnostics.ProcessWindowStyle.Hidden;
-                startInfo.FileName = Global.useSystemFFmpeg ? "ffprobe" : @".\bin\ffprobe.exe";
+                startInfo.FileName = Global.useSystemFFprobe ? "ffprobe" : @".\ffprobe.exe";
                 startInfo.Arguments = "-i \"" + file
                         + "\" -show_entries format=duration"
                         + " -v quiet"
@@ -70,12 +72,13 @@ namespace NonsensicalVideoGenerator
                 System.Diagnostics.Process process = new System.Diagnostics.Process();
                 System.Diagnostics.ProcessStartInfo startInfo = new System.Diagnostics.ProcessStartInfo();
                 startInfo.WindowStyle = System.Diagnostics.ProcessWindowStyle.Hidden;
-                startInfo.FileName = Global.useSystemFFmpeg ? "ffmpeg" : @".\bin\ffmpeg.exe";
+                startInfo.FileName = Global.useSystemFFmpeg ? "ffmpeg" : @".\ffmpeg.exe";
                 startInfo.Arguments = "-i \"" + video
                         + "\" -ss " + startTime
                         + " -to " + endTime
-                        + " -ac 1"
-                        + " -ar 44100"
+                        + " -c:v libx264"
+                        + " -crf 18"
+                        + " -preset veryfast"
                         + " -vf scale=" + SaveData.saveValues["VideoWidth"] + "x" + SaveData.saveValues["VideoHeight"] + ",setsar=1:1,fps=fps=30"
                         + " -y"
                         + " \"" + output + "\"";
@@ -116,7 +119,7 @@ namespace NonsensicalVideoGenerator
                 System.Diagnostics.Process process = new System.Diagnostics.Process();
                 System.Diagnostics.ProcessStartInfo startInfo = new System.Diagnostics.ProcessStartInfo();
                 startInfo.WindowStyle = System.Diagnostics.ProcessWindowStyle.Hidden;
-                startInfo.FileName = Global.useSystemFFmpeg ? "ffprobe" : @".\bin\ffprobe.exe";
+                startInfo.FileName = Global.useSystemFFprobe ? "ffprobe" : @".\ffprobe.exe";
                 startInfo.Arguments = "-i \"" + video
                         + "\" -show_streams"
                         + " -v quiet"
@@ -173,11 +176,11 @@ namespace NonsensicalVideoGenerator
                 System.Diagnostics.Process process = new System.Diagnostics.Process();
                 System.Diagnostics.ProcessStartInfo startInfo = new System.Diagnostics.ProcessStartInfo();
                 startInfo.WindowStyle = System.Diagnostics.ProcessWindowStyle.Hidden;
-                startInfo.FileName = Global.useSystemFFmpeg ? "ffmpeg" : @".\bin\ffmpeg.exe";
+                startInfo.FileName = Global.useSystemFFmpeg ? "ffmpeg" : @".\ffmpeg.exe";
                 startInfo.Arguments = "-i \"" + video + "\" " + appendNoAudio
-                        + " -ar 44100"
-                        + " -ac 1"
-                        //+ " -filter:v fps=fps=30,setsar=1:1"
+                        + " -c:v libx264"
+                        + " -crf 18"
+                        + " -preset veryfast"
                         + " -vf scale=" + SaveData.saveValues["VideoWidth"] + "x" + SaveData.saveValues["VideoHeight"] + ",setsar=1:1,fps=fps=30"
                         + " -y"
                         + " \"" + output + "\"";
@@ -218,6 +221,24 @@ namespace NonsensicalVideoGenerator
             // try to continue anyways
             try
             {
+                count++;
+                // Add outro if enabled
+                if (bool.Parse(SaveData.saveValues["OutrosEnabled"]))
+                {
+                    string outroPath = LibraryData.PickRandom(DefaultLibraryTypes.Outro, Global.generatorFactory.globalRandom);
+                    if(outroPath == "")
+                    {
+                        ConsoleOutput.WriteLine("No outros found in library.", Color.Yellow);
+                    }
+                    else
+                    {
+                        Global.generatorFactory.progressText = "Closing the film spool... (" + count + " of " + count + ")";
+                        ConsoleOutput.WriteLine("Outro clip enabled, adding 1 to max clips. New max clips is " + count, Color.Gray);
+                        Utilities.CopyVideo(outroPath, Path.Combine(Utilities.temporaryDirectory, "video" + count + ".mp4"));
+                        count++;
+                    }
+                }
+
                 string command1 = "";
 
                 // Rename all files in temporary directory that start with video to video0, video1, etc.
@@ -232,11 +253,38 @@ namespace NonsensicalVideoGenerator
                     }
                 }
 
+                List<bool> validFiles = new List<bool>();
+
                 for (int i = 0; i < i2; i++)
                 {
-                    if (File.Exists(Path.Combine(temporaryDirectory, "concat" + i + ".mp4")))
+                    // Make sure this is a valid file with ffprobe.
+                    ProcessStartInfo ffprobe = new ProcessStartInfo()
                     {
-                        command1 += " -i " + Path.Combine(temporaryDirectory, "concat" + i + ".mp4");
+                        FileName = Global.useSystemFFprobe ? "ffprobe" : @".\ffprobe.exe",
+                        Arguments = "-v error -select_streams v:0 -show_entries stream=codec_name -of default=noprint_wrappers=1:nokey=1 \"" + Path.Combine(temporaryDirectory, "concat" + i + ".mp4") + "\"",
+                        UseShellExecute = false,
+                        RedirectStandardOutput = true,
+                        CreateNoWindow = true
+                    };
+                    Process? ffprobeProcess = new Process();
+                    ffprobeProcess.StartInfo = ffprobe;
+                    string isVideo = null;
+                    ffprobeProcess.OutputDataReceived += (sender, e) =>
+                    {
+                        isVideo += e.Data;
+                    };
+                    ffprobeProcess.Start();
+                    ffprobeProcess.BeginOutputReadLine();
+                    ffprobeProcess.WaitForExit();
+                    if(isVideo != null && isVideo != "" && isVideo != "N/A")
+                    {
+                        validFiles.Add(true);
+                        command1 += " -i \"" + Path.Combine(temporaryDirectory, "concat" + i + ".mp4") + "\"";
+                    }
+                    else
+                    {
+                        validFiles.Add(false);
+                        ConsoleOutput.WriteLine("File " + Path.Combine(temporaryDirectory, "concat" + i + ".mp4") + " is not a valid video file, skipping.", Color.Yellow);
                     }
                 }
 
@@ -245,20 +293,20 @@ namespace NonsensicalVideoGenerator
                 int realCount = 0;
                 for (int i = 0; i < i2; i++)
                 {
-                    if (File.Exists(Path.Combine(temporaryDirectory, "concat" + i + ".mp4")))
+                    if (validFiles[i])
                     {
-                        command1 += "[" + i + ":v:0][" + i + ":a:0]";
+                        command1 += "[" + realCount + ":v:0][" + realCount + ":a:0]";
                         realCount += 1;
                     }
                 }
 
                 //realcount +=1;
-                command1 += "concat=n=" + realCount + ":v=1:a=1[outv][outa]\" -map [outv] -map [outa] -shortest -fps_mode vfr -y \"" + ou + "\"";
+                command1 += "concat=n=" + realCount + ":v=1:a=1[outv][outa];[outv]scale=" + SaveData.saveValues["VideoWidth"] + "x" + SaveData.saveValues["VideoHeight"] + ",setsar=1:1,fps=fps=30[outv]\" -map [outv] -map [outa] -shortest -c:v libx264 -crf 18 -preset veryfast -y \"" + ou + "\"";
 
                 System.Diagnostics.Process process = new System.Diagnostics.Process();
                 System.Diagnostics.ProcessStartInfo startInfo = new System.Diagnostics.ProcessStartInfo();
                 startInfo.WindowStyle = System.Diagnostics.ProcessWindowStyle.Hidden;
-                startInfo.FileName = Global.useSystemFFmpeg ? "ffmpeg" : @".\bin\ffmpeg.exe";
+                startInfo.FileName = Global.useSystemFFmpeg ? "ffmpeg" : @".\ffmpeg.exe";
                 startInfo.Arguments = command1;
                 startInfo.UseShellExecute = false;
                 startInfo.RedirectStandardError = true;
@@ -306,10 +354,10 @@ namespace NonsensicalVideoGenerator
                 System.Diagnostics.ProcessStartInfo startInfo = new System.Diagnostics.ProcessStartInfo();
                 string overlayed_video = video.Replace(".mp4", "_chromakey.mp4");
                 startInfo.WindowStyle = System.Diagnostics.ProcessWindowStyle.Hidden;
-                startInfo.FileName = Global.useSystemFFmpeg ? "ffmpeg" : @".\bin\ffmpeg.exe";
+                startInfo.FileName = Global.useSystemFFmpeg ? "ffmpeg" : @".\ffmpeg.exe";
                 startInfo.Arguments = "-i \"" + video
                         + "\" -i \"" + overlay
-                        + "\" -filter_complex \"[1:v]colorkey=0x00FF00:0.3:0.2,scale=" + SaveData.saveValues["VideoWidth"] + "x" + SaveData.saveValues["VideoHeight"] + ",setsar=1:1,fps=fps=30[outv];[0:v][outv]overlay=shortest=1[finalv];[0:a][1:a]amix=inputs=2:duration=shortest[outa]\" -map \"[finalv]\" -map \"[outa]\" -y \"" + overlayed_video + "\"";
+                        + "\" -filter_complex \"[1:v]colorkey=0x00FF00:0.3:0.2,scale=" + SaveData.saveValues["VideoWidth"] + "x" + SaveData.saveValues["VideoHeight"] + ",setsar=1:1,fps=fps=30[outv];[0:v][outv]overlay=shortest=1[finalv];[0:a][1:a]amix=inputs=2:duration=shortest[outa]\" -map \"[finalv]\" -map \"[outa]\" -c:v libx264 -crf 18 -preset veryfast -y \"" + overlayed_video + "\"";
                 startInfo.UseShellExecute = false;
                 startInfo.RedirectStandardError = true;
                 startInfo.WorkingDirectory = Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location);

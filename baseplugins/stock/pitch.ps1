@@ -39,8 +39,8 @@ $pitchUpOrDown = Get-Random -Minimum 0 -Maximum 2
 # Apply pitch filter
 if ($pitchUpOrDown -eq 0) {
     # Higher pitch
-    Invoke-Command -ScriptBlock {&$ffmpeg -i "$video" -filter:v setpts=0.5*PTS -af asetrate=44100*2,aresample=44100 -y "$output"}
+    Invoke-Command -ScriptBlock {&$ffmpeg -i "$video" -filter:v setpts=0.5*PTS -af asetrate=44100*2,aresample=44100 -preset veryfast -y "$output"}
 } else {
     # Lower pitch
-    Invoke-Command -ScriptBlock {&$ffmpeg -i "$video" -filter:v setpts=2.0*PTS -af asetrate=44100/2,aresample=44100 -y "$output"}
+    Invoke-Command -ScriptBlock {&$ffmpeg -i "$video" -filter:v setpts=2.0*PTS -af asetrate=44100/2,aresample=44100 -preset veryfast -y "$output"}
 }

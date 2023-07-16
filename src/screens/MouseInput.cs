@@ -6,9 +6,7 @@ namespace NonsensicalVideoGenerator
     class MouseInput
     {
         public static MouseState _mouseState;
-        public static MouseState overrideMouseState;
         private static MouseState lastMouseState;
-        public static bool done = false;
         public static MouseState MouseState
         {
             get { return CompatMouseState(); }
@@ -19,7 +17,9 @@ namespace NonsensicalVideoGenerator
             // Hover over accessibility options if active
             if(Accessibility.hovered != -1 && Accessibility.showDisambiguation && Accessibility.disambiguationOptions.Count > Accessibility.hovered)
             {
-                _mouseState = new MouseState(Accessibility.disambiguationOptions[Accessibility.hovered].bounds.X, Accessibility.disambiguationOptions[Accessibility.hovered].bounds.Y, lastMouseState.ScrollWheelValue, ButtonState.Released, ButtonState.Released, ButtonState.Released, ButtonState.Released, ButtonState.Released);
+                int x = Accessibility.disambiguationOptions[Accessibility.hovered].bounds.X + Accessibility.disambiguationOptions[Accessibility.hovered].bounds.Width / 2;
+                int y = Accessibility.disambiguationOptions[Accessibility.hovered].bounds.Y + Accessibility.disambiguationOptions[Accessibility.hovered].bounds.Height / 2;
+                _mouseState = new MouseState(x, y, _mouseState.ScrollWheelValue, ButtonState.Released, ButtonState.Released, ButtonState.Released, ButtonState.Released, ButtonState.Released);
             }
             // Build mouse state from accessibility if active
             if(Accessibility.selectedDisambiguationOption != -1 && Accessibility.disambiguationOptions.Count > Accessibility.selectedDisambiguationOption)
@@ -27,10 +27,10 @@ namespace NonsensicalVideoGenerator
                 int x = Accessibility.disambiguationOptions[Accessibility.selectedDisambiguationOption].bounds.X + Accessibility.disambiguationOptions[Accessibility.selectedDisambiguationOption].bounds.Width / 2;
                 int y = Accessibility.disambiguationOptions[Accessibility.selectedDisambiguationOption].bounds.Y + Accessibility.disambiguationOptions[Accessibility.selectedDisambiguationOption].bounds.Height / 2;
                 bool right = Accessibility.right;
-                overrideMouseState = new MouseState(x, y, lastMouseState.ScrollWheelValue, right ? ButtonState.Released : ButtonState.Pressed, ButtonState.Released, right ? ButtonState.Pressed : ButtonState.Released, ButtonState.Released, ButtonState.Released);
-                done = true;
+                lastMouseState = new MouseState(x, y, lastMouseState.ScrollWheelValue, ButtonState.Released, ButtonState.Released, ButtonState.Released, ButtonState.Released, ButtonState.Released);
+                return new MouseState(x, y, lastMouseState.ScrollWheelValue, right ? ButtonState.Released : ButtonState.Pressed, ButtonState.Released, right ? ButtonState.Pressed : ButtonState.Released, ButtonState.Released, ButtonState.Released);
             }
-            return done ? overrideMouseState : _mouseState;
+            return _mouseState;
         }
         public static MouseState LastMouseState
         {

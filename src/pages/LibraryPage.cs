@@ -14,6 +14,7 @@ using System;
 using System.ComponentModel;
 using System.Linq;
 using System.Reflection;
+using System.Windows;
 
 namespace NonsensicalVideoGenerator
 {
@@ -28,7 +29,7 @@ namespace NonsensicalVideoGenerator
         private readonly Dictionary<string, Rectangle> rects = new();
         private readonly Dictionary<LibraryRootType, List<string>> libraryTypes = new();
         private LibraryRootType currentRootType = LibraryRootType.Video;
-        private LibraryType currentLibraryType = DefaultLibraryTypes.Render;
+        private LibraryType currentLibraryType = DefaultLibraryTypes.Material;
         private readonly Dictionary<LibraryType, List<LibraryFile>> libraryFileCache = new();
         private readonly Dictionary<int, Texture2D> videoPlayers = new();
         private int selectedFlags = 1 | 8; // 1 = Video, 8 = First SubType
@@ -44,6 +45,10 @@ namespace NonsensicalVideoGenerator
         private int organizeFile = -1;
         private int organizeType = -1;
         private string tooltip = "";
+        private string clipUrl = "";
+        private bool downloading = false;
+        private static KeyboardState oldKeyboardState;
+        private static KeyboardState newKeyboardState;
         public void CacheLibrary()
         {
             libraryFileCache.Clear();
@@ -63,6 +68,11 @@ namespace NonsensicalVideoGenerator
         }
         public void LoadContent(ContentManager contentManager, GraphicsDevice graphicsDevice)
         {
+            GameWindow? window = UserInterface.instance?.Window;
+            if (window != null)
+            {
+                window.TextInput += TextInput;
+            }
             // Library assets
             GlobalContent.AddTexture("DeleteConfirm", contentManager.Load<Texture2D>("graphics/library/deleteconfirm"));
             GlobalContent.AddTexture("AddVideoOverlay", contentManager.Load<Texture2D>("graphics/library/addvideooverlay"));
@@ -108,6 +118,20 @@ namespace NonsensicalVideoGenerator
             rects.Add("PageRightButton", new Rectangle(GlobalGraphics.Scale(276), GlobalGraphics.Scale(223), GlobalGraphics.Scale(typeButton.Width), GlobalGraphics.Scale(typeButton.Height)));
             // Interactable
             controller.LoadContent(contentManager, graphicsDevice);
+        }
+        public void Done(bool success)
+        {
+            downloading = false;
+            if(success)
+            {
+                GlobalContent.GetSound("RenderComplete").Play(int.Parse(SaveData.saveValues["SoundEffectVolume"]) / 100f, 0f, 0f);
+                Global.generatorFactory.progressText = "Downloaded clip.";
+            }
+            else
+            {
+                GlobalContent.GetSound("Error").Play(int.Parse(SaveData.saveValues["SoundEffectVolume"]) / 100f, 0f, 0f);
+                Global.generatorFactory.progressText = "Failed to download clip.";
+            }
         }
         public void Draw(GameTime gameTime, SpriteBatch spriteBatch)
         {
@@ -250,8 +274,12 @@ namespace NonsensicalVideoGenerator
             spriteBatch.DrawString(munroSmall, "Back", new Vector2(GlobalGraphics.Scale(205), GlobalGraphics.Scale(223)), Color.White);
             spriteBatch.DrawString(munroSmall, "Next", new Vector2(GlobalGraphics.Scale(281 + 1), GlobalGraphics.Scale(223 + 1)), Color.Black);
             spriteBatch.DrawString(munroSmall, "Next", new Vector2(GlobalGraphics.Scale(281), GlobalGraphics.Scale(223)), Color.White);
-            // Video total indicator
-            string totalIndicator = "Total: " + libraryFileCache[currentLibraryType].Count + " (" + libraryFileCache[currentLibraryType].Count(x => x.Enabled) + " active)";
+            // Downloader
+            string totalIndicator = "Click to download media";
+            if((selectedFlags & 4) == 4)
+                totalIndicator =    "Paste URL to download";
+            if(downloading)
+                totalIndicator =    "Downloading...";
             Vector2 totalIndicatorSize = munroSmall.MeasureString(totalIndicator);
             Vector2 totalPosition = new Vector2((rects["HeaderButton"].X + rects["HeaderButton"].Width / 2 - totalIndicatorSize.X / 2) - GlobalGraphics.Scale(10), GlobalGraphics.Scale(56));
             spriteBatch.DrawString(munroSmall, totalIndicator, totalPosition + new Vector2(GlobalGraphics.Scale(1), GlobalGraphics.Scale(1)), Color.Black);
@@ -392,6 +420,30 @@ namespace NonsensicalVideoGenerator
             loadVideosThread.DoWork += LoadVideosThread;
             loadVideosThread.WorkerSupportsCancellation = true;
             loadVideosThread.RunWorkerAsync(new object[] { graphicsDevice, page });
+        }
+        private void TextInput(object? sender, TextInputEventArgs e)
+        {
+            if((selectedFlags & 4) == 4)
+            {
+                // If syn unicode character, paste from clipboard
+                if (e.Character == '\u0016')
+                {
+                    selectedFlags &= ~4;
+                    Global.generatorFactory.progressText = "Downloading...";
+                    downloading = true;
+                    string clipboard = Clipboard.GetText();
+                    // Remove newlines/invalid characters
+                    clipboard = clipboard.Replace("\n", "");
+                    clipboard = clipboard.Replace("\r", "");
+                    clipboard = clipboard.Replace("\t", "");
+                    clipboard = clipboard.Replace("\0", "");
+                    // Download
+                    if (!LibraryData.DownloadClip(clipboard, currentLibraryType, Done))
+                    {
+                        downloading = false;
+                    }
+                }
+            }
         }
         public bool Update(GameTime gameTime, bool handleInput)
         {
@@ -587,12 +639,17 @@ namespace NonsensicalVideoGenerator
                                         demandChange = true;
                                         GlobalContent.GetSound("Select").Play(int.Parse(SaveData.saveValues["SoundEffectVolume"]) / 100f, 0f, 0f);
                                         return true;
-                                    /*
                                     case "HeaderButton":
-                                        selectedFlags ^= 4;
-                                        GlobalContent.GetSound("Option").Play(int.Parse(SaveData.saveValues["SoundEffectVolume"]) / 100f, 0f, 0f);
+                                        if(!downloading)
+                                        {
+                                            selectedFlags ^= 4;
+                                            GlobalContent.GetSound("Option").Play(int.Parse(SaveData.saveValues["SoundEffectVolume"]) / 100f, 0f, 0f);
+                                        }
+                                        else
+                                        {
+                                            GlobalContent.GetSound("Error").Play(int.Parse(SaveData.saveValues["SoundEffectVolume"]) / 100f, 0f, 0f);
+                                        }
                                         return true;
-                                    */
                                     case "PageLeftButton":
                                         if (page > 0)
                                         {
@@ -684,7 +741,15 @@ namespace NonsensicalVideoGenerator
                                                 FileName = file.Path,
                                                 UseShellExecute = true
                                             };
-                                            Process.Start(startInfo);
+                                            try
+                                            {
+                                                Process.Start(startInfo);
+                                            }
+                                            catch
+                                            {
+                                                LibraryData.Unload(file);
+                                                Global.justCompletedRender = true;
+                                            }
                                         }
                                         if(right)
                                         {

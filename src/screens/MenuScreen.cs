@@ -91,13 +91,12 @@ namespace NonsensicalVideoGenerator
             int whichOption = currentPage == 0 ? 1 : (currentPage == Pagination.GetTopPageCount() - 1 ? 2 : 0); // 0: middle, 1: top, 2: bottom
             spriteBatch.Draw(whichOption == 1 ? menuselected2 : (whichOption == 2 ? menuselected3 : menuselected), new Rectangle(GlobalGraphics.Scale(4), GlobalGraphics.Scale(134 + (pageOffset * currentPage)), GlobalGraphics.Scale(menuselected.Width), GlobalGraphics.Scale(menuselected.Height)), Color.White);
             // Draw option text
+            string name;
             for (int i = 0; i < Pagination.GetTopPageCount(); i++)
             {
-                string name = Pagination.GetPage(i).Name;
-                if(name.Contains("."))
-                {
-                    name = "Effects"; // Editing a plugin
-                }
+                name = Pagination.GetPage(i).Name;
+                if(i == 2)
+                    name = "Effects";
                 spriteBatch.DrawString(GlobalGraphics.fontMunro, name, new Vector2(GlobalGraphics.Scale(7+1), GlobalGraphics.Scale(136 + (pageOffset * i)+1)), Color.Black);
                 spriteBatch.DrawString(GlobalGraphics.fontMunro, name, new Vector2(GlobalGraphics.Scale(7), GlobalGraphics.Scale(136 + (pageOffset * i))), Color.White);
             }
@@ -154,7 +153,8 @@ namespace NonsensicalVideoGenerator
             if(handleInput)
             {
                 // Accessibility
-                for(int i = 0; i < Pagination.GetTopPageCount(); i++)
+                // -1 because the exit button is not included
+                for(int i = 0; i < Pagination.GetTopPageCount()-1; i++)
                 {
                     Accessibility.CompatAccessibility(new Rectangle(GlobalGraphics.Scale(4), GlobalGraphics.Scale(i * 16 + 134), GlobalGraphics.Scale(45), GlobalGraphics.Scale(16)));
                 }
@@ -175,12 +175,6 @@ namespace NonsensicalVideoGenerator
                         // Get click
                         if (MouseInput.LastMouseState.LeftButton == ButtonState.Released && MouseInput.MouseState.LeftButton == ButtonState.Pressed)
                         {
-                            // If page is "Workshop", error instead (not implemented yet)
-                            if (Pagination.GetPage(segment).Name == "Workshop")
-                            {
-                                GlobalContent.GetSound("Error").Play(int.Parse(SaveData.saveValues["SoundEffectVolume"]) / 100f, 0f, 0f);
-                                return true;
-                            }
                             // Set pagination
                             Pagination.SetPage(segment);
                             // Play sound

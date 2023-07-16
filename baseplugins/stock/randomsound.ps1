@@ -48,8 +48,8 @@ if ($null -ne $randomSound) {
 
     # Use original audio if equal to 0
     if ($muteOriginalAudio -eq 0) {
-        Invoke-Command -ScriptBlock {&$ffmpeg -i "$video" -i "$randomSound" -filter_complex "[0:a]volume=1[a0];[1:a]volume=1[a1];[a0][a1]amix=inputs=2[a]" -map 0:v -map "[a]" -c:v copy -c:a aac -shortest -y "$output"}
+        Invoke-Command -ScriptBlock {&$ffmpeg -i "$video" -i "$randomSound" -filter_complex "[0:a]volume=1[a0];[1:a]volume=1[a1];[a0][a1]amix=inputs=2[a]" -map 0:v -map "[a]" -shortest -preset veryfast -y "$output"}
     } else {
-        Invoke-Command -ScriptBlock {&$ffmpeg -i "$video" -i "$randomSound" -filter_complex "[0:a]volume=0[a0];[1:a]volume=1[a1];[a0][a1]amix=inputs=2[a]" -map 0:v -map "[a]" -c:v copy -c:a aac -shortest -y "$output"}
+        Invoke-Command -ScriptBlock {&$ffmpeg -i "$video" -i "$randomSound" -filter_complex "[0:a]volume=0[a0];[1:a]volume=1[a1];[a0][a1]amix=inputs=2[a]" -map 0:v -map "[a]" -shortest -preset veryfast -y "$output"}
     }
 }

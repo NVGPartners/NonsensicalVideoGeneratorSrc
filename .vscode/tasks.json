@@ -6,10 +6,10 @@
         {
             "label": "watch",
             "type": "shell",
-            "command": "${workspaceFolder}\\bin\\Debug\\net6.0-windows\\NonsensicalVideoGenerator.exe",
+            "command": "${workspaceFolder}\\bin\\x64\\debug\\net6.0-windows\\NonsensicalVideoGenerator.exe",
             "options":
             {
-                "cwd": "${workspaceFolder}\\bin\\Debug\\net6.0-windows",
+                "cwd": "${workspaceFolder}\\bin\\x64\\debug\\net6.0-windows",
             }
         },
         {
@@ -20,7 +20,8 @@
                 "build",
                 "${workspaceFolder}\\NonsensicalVideoGenerator.csproj",
                 "/property:GenerateFullPaths=true",
-                "/consoleloggerparameters:NoSummary"
+                "/consoleloggerparameters:NoSummary",
+                "/p:Platform=x64",
             ],
             "problemMatcher": "$msCompile"
         },
@@ -33,7 +34,8 @@
                 "${workspaceFolder}\\NonsensicalVideoGenerator.csproj",
                 "/property:GenerateFullPaths=true",
                 "/consoleloggerparameters:NoSummary",
-                "/p:Configuration=Release"
+                "/p:Configuration=Release",
+                "/p:Platform=x64",
             ],
             "problemMatcher": "$msCompile"
         },

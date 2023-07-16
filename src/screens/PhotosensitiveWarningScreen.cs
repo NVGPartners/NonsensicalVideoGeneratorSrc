@@ -56,15 +56,10 @@ namespace NonsensicalVideoGenerator
             else
             {
                 UpdateManager.GetDependencyStatus();
-                if(!UpdateManager.ffmpegInstalled || !UpdateManager.ffprobeInstalled)
+                Global.pluginsLoaded = PluginHandler.LoadPlugins();
+                if(!UpdateManager.ffmpegInstalled || !UpdateManager.ffprobeInstalled || !Global.pluginsLoaded)
                 {
                     ErrorOut();
-                }
-                else
-                {
-                    Global.pluginsLoaded = PluginHandler.LoadPlugins();
-                    if(!Global.pluginsLoaded)
-                        ErrorOut();
                 }
             }
             // Dispose of worker.
@@ -165,6 +160,15 @@ namespace NonsensicalVideoGenerator
                     overlayOpacity = 255;
                     lastTextOpacity = 0;
                     ConsoleOutput.WriteLine("User acknowledged photosensitive warning.", Color.LightGreen);
+                    if(SteamManager.initialized)
+                    {
+                        ConsoleOutput.WriteLine("Steam initialized.", Color.LightGreen);
+                        PluginHandler.LoadWorkshop();
+                    }
+                    else
+                    {
+                        ConsoleOutput.WriteLine("Steam is not running, skipping workshop initialization.", Color.LightGreen);
+                    }
                     ScreenManager.PushNavigation("Main Menu");
                     ScreenManager.PushNavigation("Content");
                     ScreenManager.PushNavigation("Video");

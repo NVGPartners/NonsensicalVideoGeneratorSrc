@@ -47,29 +47,45 @@ namespace NonsensicalVideoGenerator
             ConsoleOutput.WriteLine(command + (exists ? " found." : " not found."), exists ? Microsoft.Xna.Framework.Color.Magenta : Microsoft.Xna.Framework.Color.Red);
             return exists;
         }
-        public static bool[] GetDependencyStatus()
+        public static void GetDependencyStatus()
         {
             // Test for dependencies.
             ConsoleOutput.WriteLine("Checking for dependencies...", Microsoft.Xna.Framework.Color.Magenta);
-            bool[] status = new bool[4];
+            bool[] status = new bool[3];
             imagemagickInstalled = DoesCommandExist("magick");
-            // Check if .\bin\ffmpeg.exe and .\bin\ffprobe.exe exist.
-            status[0] = File.Exists(@".\bin\ffmpeg.exe");
-            status[1] = File.Exists(@".\bin\ffprobe.exe");
-            status[3] = File.Exists(@".\bin\yt-dlp.exe");
+            // Check if .\ffmpeg.exe and .\ffprobe.exe exist.
+            status[0] = File.Exists(@".\ffmpeg.exe");
+            status[1] = File.Exists(@".\ffprobe.exe");
+            status[2] = File.Exists(@".\yt-dlp.exe");
             // If these don't exist, set Global.useSystemFFmpeg to true
             // so that the program will use the system ffmpeg and ffprobe.
-            if (!status[0] || !status[1])
+            if (!status[0])
             {
                 Global.useSystemFFmpeg = true;
             }
-            if(!status[3])
+            else
+            {
+                Global.useSystemFFmpeg = false;
+            }
+            if (!status[1])
+            {
+                Global.useSystemFFprobe = true;
+            }
+            else
+            {
+                Global.useSystemFFprobe = false;
+            }
+            if(!status[2])
             {
                 Global.useSystemYtDlp = true;
             }
+            else
+            {
+                Global.useSystemYtDlp = false;
+            }
             if(!Global.useSystemFFmpeg)
             {
-                ffmpegInstalled =  status[0];
+                ffmpegInstalled = status[0];
                 ffprobeInstalled = status[1];
             }
             else
@@ -79,13 +95,12 @@ namespace NonsensicalVideoGenerator
             }
             if(!Global.useSystemYtDlp)
             {
-                ytDlpInstalled = status[3];
+                ytDlpInstalled = status[2];
             }
             else
             {
                 ytDlpInstalled = DoesCommandExist("yt-dlp");
             }
-            return status;
         }
         public static bool CheckForUpdates()
         {

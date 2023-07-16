@@ -24,7 +24,7 @@ namespace NonsensicalVideoGenerator
             new GeneratePage(),
             new LibraryPage(),
             new PluginsPage(),
-            new DownloadPage(),
+            new WorkshopPage(),
             //new WorkshopPage(),
             new OptionsPage(),
             new ExitPage(),

@@ -63,15 +63,15 @@ $files | Sort-Object {Get-Random} | ForEach-Object -Begin { $count = 0 } -Proces
 Pop-Location
 
 # Rave effect on frames
-Invoke-Command -ScriptBlock {&$ffmpeg -i "$frames\_%0d.png" -vf "hue='H=PI*t: s=sin(PI*t)+1.5: enable=between(t,0,10)'" -y "$frames\_%0d.png"}
+Invoke-Command -ScriptBlock {&$ffmpeg -i "$frames\_%0d.png" -vf "hue='H=PI*t: s=sin(PI*t)+1.5: enable=between(t,0,10)'" -preset veryfast -y "$frames\_%0d.png"}
 
 # Create video from frames
-Invoke-Command -ScriptBlock {&$ffmpeg -framerate 30 -i $frames\_%0d.png -i $video -map 0:v -map 1:a -c:v libx264 -crf 18 -preset veryfast -y "$temp2"}
+Invoke-Command -ScriptBlock {&$ffmpeg -i $frames\_%0d.png -i $video -map 0:v -map 1:a -preset veryfast -preset veryfast -y "$temp2"}
 
 # Finalize
 if ($null -eq $randomSound) {
-    Invoke-Command -ScriptBlock {&$ffmpeg -i "$temp2" -filter_complex "[0:v]setpts=0.75*PTS[f];[0:v]setpts=0.5*PTS,reverse[fr];[f][fr]concat=n=2:v=1:a=0,format=yuv420p[v];[0:a]atempo=2.0[a1];[0:a]atempo=0.75,areverse[a2];[a1][a2]concat=n=2:v=0:a=1[a]" -map "[v]" -map "[a]" -shortest -y "$output"}
+    Invoke-Command -ScriptBlock {&$ffmpeg -i "$temp2" -filter_complex "[0:v]setpts=0.75*PTS[f];[0:v]setpts=0.5*PTS,reverse[fr];[f][fr]concat=n=2:v=1:a=0,format=yuv420p[v];[0:a]atempo=2.0[a1];[0:a]atempo=0.75,areverse[a2];[a1][a2]concat=n=2:v=0:a=1[a]" -map "[v]" -map "[a]" -shortest -preset veryfast -y "$output"}
 }
 else {
-    Invoke-Command -ScriptBlock {&$ffmpeg -i "$temp2" -i "$randomSound" -filter_complex "[0:v]setpts=0.75*PTS[f];[0:v]setpts=0.5*PTS,reverse[fr];[f][fr]concat=n=2:v=1:a=0,format=yuv420p[v]" -map "[v]" -map "1:a" -shortest -y "$output"}
+    Invoke-Command -ScriptBlock {&$ffmpeg -i "$temp2" -i "$randomSound" -filter_complex "[0:v]setpts=0.75*PTS[f];[0:v]setpts=0.5*PTS,reverse[fr];[f][fr]concat=n=2:v=1:a=0,format=yuv420p[v]" -map "[v]" -map "1:a" -shortest -preset veryfast -y "$output"}
 }

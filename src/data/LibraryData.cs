@@ -7,6 +7,7 @@ using System.Runtime.InteropServices;
 using System.ComponentModel;
 using System.Net;
 using System.Diagnostics;
+using System.Linq;
 
 namespace NonsensicalVideoGenerator
 {
@@ -40,10 +41,6 @@ namespace NonsensicalVideoGenerator
         /// </summary>
         Music,
         /// <summary>
-        /// Rendered videos.
-        /// </summary>
-        Render,
-        /// <summary>
         /// Material videos.
         /// </summary>
         Material,
@@ -64,9 +61,9 @@ namespace NonsensicalVideoGenerator
         /// </summary>
         Overlay,
         /// <summary>
-        /// Images.
+        /// Rendered videos.
         /// </summary>
-        Image,
+        Render,
         /// <summary>
         /// Custom library type.
         /// </summary>
@@ -113,14 +110,13 @@ namespace NonsensicalVideoGenerator
         public static LibraryType Video { get; } = new LibraryType(LibraryRootType.Video, LibraryFileType.All, true);
         public static LibraryType Audio { get; } = new LibraryType(LibraryRootType.Audio, LibraryFileType.All, true);
         public static LibraryType SFX { get; } = new LibraryType(LibraryRootType.Audio, LibraryFileType.SFX, "Random sound effects.");
-        public static LibraryType Music { get; } = new LibraryType(LibraryRootType.Audio, LibraryFileType.Music, "Random dance music. Also used for images.");
+        public static LibraryType Music { get; } = new LibraryType(LibraryRootType.Audio, LibraryFileType.Music, "Random dance music.");
         public static LibraryType Render { get; } = new LibraryType(LibraryRootType.Video, LibraryFileType.Render, "Generated videos.");
         public static LibraryType Material { get; } = new LibraryType(LibraryRootType.Video, LibraryFileType.Material, "Root video to be used in a render.");
         public static LibraryType Transition { get; } = new LibraryType(LibraryRootType.Video, LibraryFileType.Transition, "Played in full at random points.");
         public static LibraryType Intro { get; } = new LibraryType(LibraryRootType.Video, LibraryFileType.Intro, "Played at the start of the video.");
         public static LibraryType Outro { get; } = new LibraryType(LibraryRootType.Video, LibraryFileType.Outro, "Played at the end of the video.");
         public static LibraryType Overlay { get; } = new LibraryType(LibraryRootType.Video, LibraryFileType.Overlay, "Requires pure green chroma key.");
-        public static LibraryType Image { get; } = new LibraryType(LibraryRootType.Video, LibraryFileType.Image, "Zooms in (non-gif only) while playing music.");
         public static List<LibraryType> AllTypes { get; } = new List<LibraryType>()
         {
             All,
@@ -128,13 +124,12 @@ namespace NonsensicalVideoGenerator
             Audio,
             SFX,
             Music,
-            Render,
             Material,
             Transition,
             Intro,
             Outro,
             Overlay,
-            Image,
+            Render
         };
     }
     public class LibraryFile
@@ -162,13 +157,12 @@ namespace NonsensicalVideoGenerator
             { DefaultLibraryTypes.Audio, @"audio" },
             { DefaultLibraryTypes.SFX, @"audio\sfx" },
             { DefaultLibraryTypes.Music, @"audio\music" },
-            { DefaultLibraryTypes.Render, @"video\renders" },
             { DefaultLibraryTypes.Material, @"video\materials" },
             { DefaultLibraryTypes.Transition, @"video\transitions" },
             { DefaultLibraryTypes.Intro, @"video\intros" },
             { DefaultLibraryTypes.Outro, @"video\outros" },
             { DefaultLibraryTypes.Overlay, @"video\overlays" },
-            { DefaultLibraryTypes.Image, @"video\images" },
+            { DefaultLibraryTypes.Render, @"video\renders" }
         };
         public static Dictionary<LibraryType, string[]> libraryFileTypes { get; } = new Dictionary<LibraryType, string[]>()
         {
@@ -177,13 +171,12 @@ namespace NonsensicalVideoGenerator
             { DefaultLibraryTypes.Audio, new string[] { ".wav", ".mp3", ".ogg", ".m4a", ".flac" } },
             { DefaultLibraryTypes.SFX, new string[] { ".wav", ".mp3", ".ogg", ".m4a", ".flac" } },
             { DefaultLibraryTypes.Music, new string[] { ".wav", ".mp3", ".ogg", ".m4a", ".flac" } },
-            { DefaultLibraryTypes.Render, new string[] { ".mp4", ".webm", ".mov", ".avi", ".mkv", ".wmv" } },
             { DefaultLibraryTypes.Material, new string[] { ".mp4", ".webm", ".mov", ".avi", ".mkv", ".wmv" } },
             { DefaultLibraryTypes.Transition, new string[] { ".mp4", ".webm", ".mov", ".avi", ".mkv", ".wmv" } },
             { DefaultLibraryTypes.Intro, new string[] { ".mp4", ".webm", ".mov", ".avi", ".mkv", ".wmv" } },
             { DefaultLibraryTypes.Outro, new string[] { ".mp4", ".webm", ".mov", ".avi", ".mkv", ".wmv" } },
             { DefaultLibraryTypes.Overlay, new string[] { ".mp4", ".webm", ".mov", ".avi", ".mkv", ".wmv" } },
-            { DefaultLibraryTypes.Image, new string[] { ".png", ".jpg", ".jpeg", ".gif" } },
+            { DefaultLibraryTypes.Render, new string[] { ".mp4", ".webm", ".mov", ".avi", ".mkv", ".wmv" } }
         };
         public static Dictionary<LibraryType, string> libraryNames { get; } = new Dictionary<LibraryType, string>()
         {
@@ -192,12 +185,12 @@ namespace NonsensicalVideoGenerator
             { DefaultLibraryTypes.Audio, "Audio" },
             { DefaultLibraryTypes.SFX, "Sound FX" },
             { DefaultLibraryTypes.Music, "Music" },
-            { DefaultLibraryTypes.Render, "Renders" },
             { DefaultLibraryTypes.Material, "Materials" },
             { DefaultLibraryTypes.Transition, "Transitions" },
             { DefaultLibraryTypes.Intro, "Intros" },
             { DefaultLibraryTypes.Outro, "Outros" },
             { DefaultLibraryTypes.Overlay, "Overlays" },
+            { DefaultLibraryTypes.Render, "Renders" },
         };
         private static void LoadRecursive(string path, LibraryType type)
         {
@@ -269,18 +262,25 @@ namespace NonsensicalVideoGenerator
             {
                 if(libfile.Path == newfile)
                 {
-                    ConsoleOutput.WriteLine("Deleting existing library file", Color.Yellow);
-                    File.Delete(libfile.Path);
+                    // Make sure they're not the *exact* same file.
+                    if (!File.ReadAllBytes(libfile.Path).SequenceEqual(File.ReadAllBytes(file.Path)))
+                    {
+                        ConsoleOutput.WriteLine("Deleting existing library file", Color.Yellow);
+                        File.Delete(libfile.Path);
+                    }
+                    else
+                    {
+                        break;
+                    }
                 }
             }
             try
             {
                 File.Copy(file.Path, newfile);
             }
-            catch (Exception e)
+            catch
             {
-                ConsoleOutput.WriteLine("Failed to copy library file: " + e.Message, Color.Red);
-                return null;
+                // shh...
             }
             file.Path = newfile;
             libraryFiles.Add(file);
@@ -476,7 +476,7 @@ namespace NonsensicalVideoGenerator
                 else if(UpdateManager.ytDlpInstalled)
                 {
                     path = Path.Combine(libraryRootPath, libraryPaths[downloadType], "%(title)s.%(ext)s");
-                    string ytdlp = Global.useSystemYtDlp ? "yt-dlp" : @".\bin\yt-dlp.exe";
+                    string ytdlp = Global.useSystemYtDlp ? "yt-dlp" : @".\yt-dlp.exe";
                     bool sound = downloadType.RootType == LibraryRootType.Audio;
                     ProcessStartInfo startInfo = new ProcessStartInfo(ytdlp, "-o \"" + path + "\" " + (sound ? "--extract-audio --audio-format mp3 " : "--format mp4 ") + downloadUrl);
                     startInfo.UseShellExecute = false;

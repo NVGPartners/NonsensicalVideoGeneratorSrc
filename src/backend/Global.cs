@@ -25,6 +25,7 @@ namespace NonsensicalVideoGenerator
         public static bool canRender = false;
         public static List<string> dragDropFiles = new();
         public static bool useSystemFFmpeg = false;
+        public static bool useSystemFFprobe = false;
         public static bool useSystemYtDlp = false;
         public static GeneratorFactory generatorFactory = new GeneratorFactory();
     }

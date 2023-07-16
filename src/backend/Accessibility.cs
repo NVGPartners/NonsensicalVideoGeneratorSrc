@@ -30,6 +30,7 @@ namespace NonsensicalVideoGenerator
         public static int selectedDisambiguationOption = -1;
         public static int hovered = -1;
         public static bool selected = false;
+        public static bool holdItForMe = false;
         public static bool right = false;
         public static int offset = 0;
         private static KeyboardState oldKeyboardState;
@@ -41,7 +42,8 @@ namespace NonsensicalVideoGenerator
             oldKeyboardState = newKeyboardState;
             newKeyboardState = Keyboard.GetState();
             // Check if user pressed tab key and disambiguation is not already showing.
-            if(newKeyboardState.IsKeyDown(Keys.Tab) && !oldKeyboardState.IsKeyDown(Keys.Tab))
+            if(newKeyboardState.IsKeyDown(Keys.Tab) && !oldKeyboardState.IsKeyDown(Keys.Tab)
+                && (newKeyboardState.IsKeyDown(Keys.LeftControl) || newKeyboardState.IsKeyDown(Keys.RightControl)))
             {
                 if(!showDisambiguation)
                 {
@@ -69,12 +71,21 @@ namespace NonsensicalVideoGenerator
         }
         public static void PostUpdate(GameTime gameTime)
         {
-            if(MouseInput.done)
+            if(selectedDisambiguationOption > -1)
             {
-                Accessibility.selected = false;
-                Accessibility.right = false;
-                Accessibility.selectedDisambiguationOption = -1;
-                MouseInput.done = false;
+                selected = false;
+                right = false;
+                hovered = -1;
+                if(holdItForMe)
+                {
+                    showDisambiguation = true; // show disambiguation again
+                    holdItForMe = false;
+                }
+                else
+                {
+                    offset = 0;
+                }
+                selectedDisambiguationOption = -1;
             }
         }
         public static void PreDraw(GameTime gameTime, SpriteBatch spriteBatch)
@@ -83,14 +94,16 @@ namespace NonsensicalVideoGenerator
         public static void PostDraw(GameTime gameTime, SpriteBatch spriteBatch)
         {
             // Draw disambiguation options.
+            if(selectedDisambiguationOption > -1)
+                return;
             if(showDisambiguation)
             {
                 // Pressing ctrl will increase the offset.
                 // If disambiguation options are more than 10, then the user can scroll through the options.
-                if((newKeyboardState.IsKeyDown(Keys.LeftAlt) && !oldKeyboardState.IsKeyDown(Keys.LeftAlt))
-                    || (newKeyboardState.IsKeyDown(Keys.RightAlt) && !oldKeyboardState.IsKeyDown(Keys.RightAlt)))
+                if(newKeyboardState.IsKeyDown(Keys.Tab) && !oldKeyboardState.IsKeyDown(Keys.Tab)
+                    && !newKeyboardState.IsKeyDown(Keys.LeftControl) && !newKeyboardState.IsKeyDown(Keys.RightControl))
                 {
-                    if(disambiguationOptions.Count > 9)
+                    if(disambiguationOptions.Count > 0)
                     {
                         // Shift modifier
                         if(newKeyboardState.IsKeyDown(Keys.LeftShift) || newKeyboardState.IsKeyDown(Keys.RightShift))
@@ -102,10 +115,10 @@ namespace NonsensicalVideoGenerator
                             offset -= 1;
                         }
                         // Only 46 possible keys, so shift until the last option is able to be selected.
-                        if(offset < -(disambiguationOptions.Count - 9 - 1))
+                        if(offset < -(disambiguationOptions.Count - 1))
                         {
                             GlobalContent.GetSound("Error").Play(int.Parse(SaveData.saveValues["SoundEffectVolume"]) / 100f, 0f, 0f);
-                            offset = -(disambiguationOptions.Count - 9 - 1);
+                            offset = -(disambiguationOptions.Count - 1);
                         }
                         else if(offset > 0)
                         {
@@ -122,6 +135,10 @@ namespace NonsensicalVideoGenerator
                         GlobalContent.GetSound("Error").Play(int.Parse(SaveData.saveValues["SoundEffectVolume"]) / 100f, 0f, 0f);
                     }
                 }
+                if(offset < -(disambiguationOptions.Count - 1))
+                    offset = -(disambiguationOptions.Count - 1);
+                else if(offset > 0)
+                    offset = 0;
                 // Cycle through options for hover using gameTime
                 int count = disambiguationOptions.Count;
                 if(count > 0)
@@ -134,9 +151,10 @@ namespace NonsensicalVideoGenerator
                 string[] help = new string[]
                 {
                     "Disambiguation mode:",
-                    "Press tab or escape to close.",
-                    "Use alt and shift+alt to scroll through options.",
-                    "Press a number key to select an option.",
+                    "Press ctrl+tab or escape to close.",
+                    "Use tab and shift+tab to scroll through options.",
+                    "Press space or enter to select an option.",
+                    "Using space will close disambiguation mode.",
                 };
                 for(int i = 0; i < help.Length; i++)
                 {
@@ -153,11 +171,11 @@ namespace NonsensicalVideoGenerator
                     string key = "";
                     if(i+offset >= 0)
                     {
-                        if(i+offset < 10)
+                        if(i+offset < 1)
                         {
                             if (i+offset<9)
                             {
-                                key = (i+offset+1).ToString();
+                                key = "[ ]"; //(i+offset+1).ToString();
                             }
                             else
                             {
@@ -182,7 +200,7 @@ namespace NonsensicalVideoGenerator
                         spriteBatch.DrawString(munroSmall, key, new Vector2(disambiguationOptions[i].bounds.X + disambiguationOptions[i].bounds.Width / 2 - munroSmall.MeasureString(key).X / 2, disambiguationOptions[i].bounds.Y + disambiguationOptions[i].bounds.Height / 2 - munroSmall.MeasureString(key).Y / 2) + offsetv, Color.White);
                         // Input
                         Keys key2 = Keys.None;
-                        if(i+offset < 10)
+                        if(i+offset < 1)
                         {
                             if(i+offset<9)
                             {
@@ -194,20 +212,23 @@ namespace NonsensicalVideoGenerator
                             }
                         }
                         // Check if user pressed key and disambiguation is already showing.
-                        if(newKeyboardState.IsKeyDown(key2) && !oldKeyboardState.IsKeyDown(key2))
+                        if(newKeyboardState.IsKeyDown(Keys.Space) && !oldKeyboardState.IsKeyDown(Keys.Space)
+                            || newKeyboardState.IsKeyDown(Keys.Enter) && !oldKeyboardState.IsKeyDown(Keys.Enter))
                         {
                             selectedDisambiguationOption = i;
                             showDisambiguation = false;
-                            // Shift modifier
-                            if(newKeyboardState.IsKeyDown(Keys.LeftShift) || newKeyboardState.IsKeyDown(Keys.RightShift))
+                            if(newKeyboardState.IsKeyDown(Keys.Enter) && !oldKeyboardState.IsKeyDown(Keys.Enter))
                             {
-                                right = true;
+                                //right = true;
+                                holdItForMe = true;
                             }
                             else
                             {
-                                right = false;
+                                holdItForMe = false;
+                                //right = false;
                             }
                             GlobalContent.GetSound("CompatSelect").Play(int.Parse(SaveData.saveValues["SoundEffectVolume"]) / 100f, 0f, 0f);
+                            return;
                         }
                     }
                 }

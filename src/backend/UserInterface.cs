@@ -56,7 +56,14 @@ namespace NonsensicalVideoGenerator
         }
         protected override void Initialize()
         {
-            SteamManager.Initialize();
+            try
+            {
+                SteamManager.Initialize();
+            }
+            catch(Exception ex)
+            {
+                ConsoleOutput.WriteLine("SteamManager failed to initialize: " + ex.Message);
+            }
             // File drag and drop support.
             Form gameForm = (Form)Form.FromHandle(Window.Handle);
             gameForm.AllowDrop = true;

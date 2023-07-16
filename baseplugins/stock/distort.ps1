@@ -68,11 +68,11 @@ if (Get-Command magick -ErrorAction SilentlyContinue) {
     magick convert -size $width"x"$height canvas:black $black
 } else {
     # Use FFmpeg to create black frame
-    ffmpeg -f lavfi -i color=c=black:s=$width"x"$height -frames:v 1 -y "$black"
+    ffmpeg -f lavfi -i color=c=black:s=$width"x"$height -frames:v 1 -preset veryfast -y "$black"
 }
 
 # Create one frame from video
-Invoke-Command -ScriptBlock {&$ffmpeg -i "$video" -ss 0 -update 1 -q:v 1 -y "$distort0"}
+Invoke-Command -ScriptBlock {&$ffmpeg -i "$video" -ss 0 -update 1 -q:v 1 -preset veryfast -y "$distort0"}
 
 # Apply effect 5 times
 if (Get-Command magick -ErrorAction SilentlyContinue) {
@@ -108,7 +108,7 @@ else {
             6 {$command = "-vf negate"}
             7 {$command = ""}
         }
-        Invoke-Command -ScriptBlock {&$ffmpeg -i "$distort0" $command -frames:v 1 -y "$distort$i.png"}
+        Invoke-Command -ScriptBlock {&$ffmpeg -i "$distort0" $command -frames:v 1 -preset veryfast -y "$distort$i.png"}
     }
 }
 
@@ -134,5 +134,5 @@ Add-Content $temp"concatdistort.txt" "file 'distort5.png'"
 Add-Content $temp"concatdistort.txt" "duration 0.467"
 
 # Concat distort
-Invoke-Command -ScriptBlock {&$ffmpeg -f concat -i "$concatdistort" -i "$randomSound" -c:v libx264 -c:a aac -pix_fmt yuv420p -y "$output"}
+Invoke-Command -ScriptBlock {&$ffmpeg -f concat -i "$concatdistort" -i "$randomSound" -c:v libx264 -c:a aac -pix_fmt yuv420p -preset veryfast -shortest -y "$output"}
 

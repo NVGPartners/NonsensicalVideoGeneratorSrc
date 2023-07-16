@@ -10,6 +10,7 @@ using Microsoft.Xna.Framework;
 using System.Threading;
 using System.Linq;
 using System.Text.RegularExpressions;
+using System.Reflection;
 
 namespace NonsensicalVideoGenerator
 {
@@ -37,7 +38,7 @@ namespace NonsensicalVideoGenerator
         public BackgroundWorker? killWorker { get; set; }
         public static readonly int defaultTimeout = 30;
         public int timeout = defaultTimeout; // in seconds
-        public static readonly string tempOutput = Path.Combine(Utilities.temporaryDirectory, "tempoutput.mp4");
+        public string tempOutput = Path.Combine(Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location), "library", "video", "renders", "temp.mp4");
         public void KillChildProcesses()
         {
             // Find all child processes of the current process and kill them.
@@ -76,8 +77,8 @@ namespace NonsensicalVideoGenerator
             ConsoleOutput.WriteLine("Generation cancelled.", Color.Red);
             if(forceConcatenate)
             {
-                // Count videos under Path.Combine(Utilities.temporaryDirectory, "video(NUMBER).mp4")
-                Regex regex = new Regex(@"video(\d+).mp4");
+                // Count videos under Path.Combine(Utilities.temporaryDirectory, "video0.mp4")
+                Regex regex = new Regex(@"video(\d+)\.mp4");
                 int maxClips = 0;
                 foreach (string file in Directory.GetFiles(Utilities.temporaryDirectory))
                 {
@@ -89,7 +90,6 @@ namespace NonsensicalVideoGenerator
                             maxClips = clipNumber;
                     }
                 }
-                ConsoleOutput.WriteLine("Max clips: " + maxClips);
                 if(maxClips > 0)
                 {
                     ConsoleOutput.WriteLine("Concatenating clips...", Color.LightGreen);
@@ -187,7 +187,7 @@ namespace NonsensicalVideoGenerator
             LibraryData.Load();
 
             // Check to ensure that the source pool is not empty.
-            if(LibraryData.GetFileCount(DefaultLibraryTypes.Material) == 0 && LibraryData.GetFileCount(DefaultLibraryTypes.Image) == 0)
+            if(LibraryData.GetFileCount(DefaultLibraryTypes.Material) == 0)
             {
                 ConsoleOutput.WriteLine("No material files found in library.", Color.Red);
                 failureReason = "No material files found in library.";
@@ -221,21 +221,6 @@ namespace NonsensicalVideoGenerator
 
             // Make sure the temporary directory exists.
             Directory.CreateDirectory(Utilities.temporaryDirectory);
-
-            // Delete the temporary output file if it exists.
-            try
-            {
-                if (File.Exists(tempOutput))
-                    File.Delete(tempOutput);
-            }
-            catch
-            {
-                ConsoleOutput.WriteLine("Failed to delete temporary output file.", Color.Red);
-                failureReason = "Failed to delete temporary output file.";
-                progressText = failureReason;
-                CancelGeneration();
-                return;
-            }
 
             progressText = "Starting generation...";
             progressState = ProgressState.Rendering;
@@ -274,7 +259,6 @@ namespace NonsensicalVideoGenerator
                     {
                         bool rolledForOverlay = RandomInt(0, 101) < int.Parse(SaveData.saveValues["OverlayChance"]);
                         bool rolledForTransition = RandomInt(0, 101) < int.Parse(SaveData.saveValues["TransitionChance"]);
-                        //bool rolledForImage = RandomInt(0, 101) < int.Parse(SaveData.saveValues["ImageChance"]);
                         string overlayPath = "";
                         progress = Convert.ToInt32(((float)i / (float)maxClips));
                         progressText = "Clipping... (" + (i + 1) + " of " + maxClips + ")";
@@ -282,18 +266,10 @@ namespace NonsensicalVideoGenerator
                         float source = -1;
                         if(sourceToPick == "")
                         {
-                            if(LibraryData.GetFileCount(DefaultLibraryTypes.Image) > 0)
-                            {
-                                rolledForTransition = false;
-                                //rolledForImage = true;
-                            }
-                            else
-                            {
-                                ConsoleOutput.WriteLine("No material files found in library.", Color.Gray);
-                                progressText = "No material files found in library.";
-                                progressState = ProgressState.Failed;
-                                continue;
-                            }
+                            ConsoleOutput.WriteLine("No material files found in library.", Color.Gray);
+                            progressText = "No material files found in library.";
+                            progressState = ProgressState.Failed;
+                            continue;
                         }
                         else
                         {
@@ -395,17 +371,26 @@ namespace NonsensicalVideoGenerator
                                                 // Make sure this is a valid file with ffprobe.
                                                 ProcessStartInfo ffprobe = new ProcessStartInfo()
                                                 {
-                                                    FileName = Global.useSystemFFmpeg ? "ffprobe" : @".\bin\ffprobe.exe",
-                                                    Arguments = "-v error -select_streams v:0 -show_entries stream=width,height -of csv=s=x:p=0 " + file,
+                                                    FileName = Global.useSystemFFprobe ? "ffprobe" : @".\ffprobe.exe",
+                                                    Arguments = "-v error -select_streams v:0 -show_entries stream=codec_name -of default=noprint_wrappers=1:nokey=1 \"" + file + "\"",
                                                     UseShellExecute = false,
                                                     RedirectStandardOutput = true,
                                                     CreateNoWindow = true
                                                 };
-                                                Process? ffprobeProcess = Process.Start(ffprobe);
-                                                ffprobeProcess?.WaitForExit();
-                                                string? isVideo = ffprobeProcess?.StandardOutput?.ReadToEnd();
-                                                if(isVideo != "")
+                                                Process? ffprobeProcess = new Process();
+                                                ffprobeProcess.StartInfo = ffprobe;
+                                                string isVideo = null;
+                                                ffprobeProcess.OutputDataReceived += (sender, e) =>
+                                                {
+                                                    isVideo += e.Data;
+                                                };
+                                                ffprobeProcess.Start();
+                                                ffprobeProcess.BeginOutputReadLine();
+                                                ffprobeProcess.WaitForExit();
+                                                if (isVideo != null && isVideo != "" && isVideo != "N/A")
+                                                {
                                                     foundOutput = true;
+                                                }
                                                 break;
                                             }
                                         }
@@ -429,32 +414,13 @@ namespace NonsensicalVideoGenerator
                                             effect.success = false;
                                         }
                                         // Delete job folder.
-                                        Directory.Delete(effect.jobFolder, true);
+                                        if(!bool.Parse(SaveData.saveValues["HiddenKeepTemporaryJobFolders"]))
+                                            Directory.Delete(effect.jobFolder, true);
                                     }
                                     ConsoleOutput.WriteLine(effect.success ? "Applied "+effect.pluginName+" to " + (rolledForTransition ? "transition" : "clip") + " " + i + "." : "Failed to apply "+effect.pluginName+" to " + (rolledForTransition ? "transition" : "clip") + " " + i + ".", effect.success ? Color.LightGreen : Color.Red);
                                 }
                             }
                         }
-                    }
-                }
-                if (bool.Parse(SaveData.saveValues["OutrosEnabled"]))
-                {
-                    string outroPath = LibraryData.PickRandom(DefaultLibraryTypes.Outro, globalRandom);
-                    if(outroPath == "")
-                    {
-                        ConsoleOutput.WriteLine("No outros found in library.", Color.Yellow);
-                        outroPath = "";
-                    }
-                    else
-                    {
-                        if (vidThreadWorker?.CancellationPending == true)
-                            return;
-                        maxClips++;
-                        progressText = "Closing the film spool... (" + maxClips + " of " + maxClips + ")";
-                        ConsoleOutput.WriteLine("Outro clip enabled, adding 1 to max clips. New max clips is " + maxClips + ".", Color.Gray);
-                        ConsoleOutput.WriteLine("STARTING CLIP " + "video" + maxClips, Color.Gray);
-                        Utilities.CopyVideo(outroPath, Path.Combine(Utilities.temporaryDirectory, "video" + maxClips + ".mp4"));
-                        maxClips++;
                     }
                 }
                 // Finished, throw to get into catch block.
@@ -574,6 +540,7 @@ namespace NonsensicalVideoGenerator
                 }
                 forceConcatenate = false;
                 timeout = defaultTimeout;
+                tempOutput = Path.Combine(Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location), "library", "video", "renders", SaveData.saveValues["ProjectTitle"] + ".mp4");
                 timeoutWorker.RunWorkerAsync();
                 vidThreadWorker.RunWorkerAsync();
                 ConsoleOutput.WriteLine("Generation started.", Color.Green);
@@ -617,7 +584,14 @@ namespace NonsensicalVideoGenerator
                 }
                 else
                 {
-                    vidThreadWorker.ReportProgress(1);
+                    try
+                    {
+                        vidThreadWorker.ReportProgress(1);
+                    }
+                    catch
+                    {
+                        // oh well
+                    }
                 }
                 vidThreadWorker.CancelAsync();
                 generatorActive = false;

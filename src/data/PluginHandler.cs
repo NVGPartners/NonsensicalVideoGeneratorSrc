@@ -10,6 +10,7 @@ using System.Text.RegularExpressions;
 using Newtonsoft.Json.Linq;
 using MoonSharp.Interpreter;
 using MoonSharp.Interpreter.Loaders;
+using Steamworks;
 
 namespace NonsensicalVideoGenerator
 {
@@ -31,6 +32,120 @@ namespace NonsensicalVideoGenerator
             this.jobFolder = jobFolder;
         }
     }
+    public enum CommandType
+    {
+        Custom,
+        FFmpeg,
+        FFprobe,
+        Magick,
+        YtDlp,
+    }
+    public class Command
+    {
+        public CommandType type;
+        public string customCommand = "";
+        public string? args;
+        public string command
+        {
+            get
+            {
+                switch (type)
+                {
+                    case CommandType.FFmpeg:
+                        return Global.useSystemFFmpeg ? "ffmpeg" : Path.Combine(Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location), "ffmpeg.exe");
+                    case CommandType.FFprobe:
+                        return Global.useSystemFFprobe ? "ffprobe" : Path.Combine(Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location), "ffprobe.exe");
+                    case CommandType.Magick:
+                        return "magick"; // only system PATH is supported
+                    case CommandType.YtDlp:
+                        return Global.useSystemYtDlp ? "yt-dlp" : Path.Combine(Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location), "yt-dlp.exe");
+                    default:
+                        return customCommand;
+                }
+            }
+            set
+            {
+                switch (value)
+                {
+                    case "ffmpeg":
+                        type = CommandType.FFmpeg;
+                        break;
+                    case "ffprobe":
+                        type = CommandType.FFprobe;
+                        break;
+                    case "magick":
+                        type = CommandType.Magick;
+                        break;
+                    case "yt-dlp":
+                        type = CommandType.YtDlp;
+                        break;
+                    default:
+                        type = CommandType.Custom;
+                        customCommand = value;
+                        break;
+                }
+            }
+        }
+        public Command(CommandType type, string? args = null)
+        {
+            this.type = type;
+            this.args = args;
+        }
+        public Command(string command, string? args = null)
+        {
+            this.command = command;
+            this.args = args;
+        }
+        public string[] Call()
+        {
+            string args = this.args ?? "";
+            ProcessStartInfo startInfo = new()
+            {
+                FileName = command,
+                Arguments = args,
+                WorkingDirectory = Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location),
+                UseShellExecute = false,
+                RedirectStandardOutput = true,
+                RedirectStandardError = true,
+            };
+            Process process = new()
+            {
+                StartInfo = startInfo
+            };
+            process.Start();
+            string output = "";
+            string error = "";
+            process.OutputDataReceived += (sender, e) => {
+                if(e.Data != null)
+                {
+                    output += e.Data;
+                    ConsoleOutput.WriteLine(e.Data, Color.Transparent);
+                }
+            };
+            process.ErrorDataReceived += (sender, e) => {
+                if(e.Data != null)
+                {
+                    error += e.Data;
+                    ConsoleOutput.WriteLine(e.Data, Color.Transparent);
+                }
+            };
+            process.BeginOutputReadLine();
+            process.BeginErrorReadLine();
+            process.WaitForExit();
+            return new string[] { output, error };
+        }
+    }
+    public enum SettingType
+    {
+        TextInput,
+        TextInputNumbers,
+        TextInputDecimals,
+        TextInputLetters,
+        TextInputLettersNumbers,
+        TextInputLettersNumbersSpaces,
+        Label,
+        Switch,
+    }
     public class Plugin
     {
         public string path { get; set; }
@@ -38,126 +153,111 @@ namespace NonsensicalVideoGenerator
         public bool enabled { get; set; }
         public Script? luaScript;
         public string workshopId = "";
+        public string rootPath = "";
         public List<LibraryType> libraryTypes = new List<LibraryType>();
         public Dictionary<string, object> settings = new();
         public Dictionary<string, string> settingTooltips = new();
-        public Plugin(string path, PluginType type, bool enabled = true)
+        public Dictionary<string, SettingType> settingTypes = new();
+        public Plugin(string path, PluginType type, string rootPath, bool enabled = true)
         {
             this.path = path;
             this.type = type;
+            this.rootPath = rootPath;
             this.enabled = enabled;
         }
-        // RunFFmpeg for lua
-        public static string RunFFmpeg(string args)
+        public string GetDisplayName()
         {
-            Console.WriteLine("Running ffmpeg with args: " + args, Color.Transparent);
-            // Validate input
-            if (args.Contains("&&") || args.Contains("|") || args.Contains(";") || args.Contains("&") || args.Contains("||"))
+            // Setting "Display Name" is optional
+            if (settings.ContainsKey("Display Name"))
             {
-                Console.WriteLine("A plugin attempted to perform an illegal operation.", Color.Red);
-                return "Invalid input";
+                return (string)settings["Display Name"];
             }
-            ProcessStartInfo startInfo = new()
+            else
             {
-                FileName = Global.useSystemFFmpeg ? "ffmpeg" : @".\bin\ffmpeg.exe",
-                Arguments = args,
-                WorkingDirectory = Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location),
-                UseShellExecute = true
-            };
-            Process process = new()
+                // Workshop ID is prepended
+                string key = Path.GetFileName(path);
+                if (workshopId != "")
+                {
+                    key = workshopId + "/" + key;
+                }
+                return key;
+            }
+        }
+        public static bool ValidateInput(string args)
+        {
+            bool illegal = false;
+            // We're only going to allow special characters if they're inside of quotes and not exposed to the shell
+            if (args.Contains("|"))
             {
-                StartInfo = startInfo
-            };
-            process.Start();
-            process.WaitForExit();
-            return "";
+                // Match everything outside of quotes
+                Regex regex = new Regex(@"[^\s""]+|""([^""]*)""");
+                MatchCollection matches = regex.Matches(args);
+                foreach (Match match in matches)
+                {   
+                    string matchString = match.ToString();
+                    // If the match is not inside of quotes, check for pipes
+                    if (!matchString.StartsWith("\"") && !matchString.EndsWith("\""))
+                    {
+                        // FFmpeg uses pipes to separate filters
+                        if (matchString.Contains("|")
+                            || matchString.Contains("&")
+                            || matchString.Contains(">")
+                            || matchString.Contains("<"))
+                        {
+                            illegal = true;
+                            break;
+                        }
+                    }
+                }
+            }
+            if (illegal)
+            {
+                ConsoleOutput.WriteLine("A plugin attempted to perform an illegal operation.", Color.Red);
+                return false;
+            }
+            return true;
+        }
+        // RunFFmpeg for lua
+        public static void RunFFmpeg(string args)
+        {
+            if(!ValidateInput(args)) return;
+            PluginHandler.commands.Add(new Command(CommandType.FFmpeg, args));
         }
         // RunFFprobe for lua
-        public static string RunFFprobe(string args)
+        public static void RunFFprobe(string args)
         {
-            // Validate input
-            if (args.Contains("&&") || args.Contains("|") || args.Contains(";") || args.Contains("&") || args.Contains("||"))
-            {
-                Console.WriteLine("A plugin attempted to perform an illegal operation.", Color.Red);
-                return "Invalid input";
-            }
-            ProcessStartInfo startInfo = new()
-            {
-                FileName = Global.useSystemFFmpeg ? "ffprobe" : @".\bin\ffprobe.exe",
-                Arguments = args,
-                WorkingDirectory = Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location),
-                UseShellExecute = false,
-                RedirectStandardOutput = true,
-                RedirectStandardError = true,
-                CreateNoWindow = true
-            };
-            Process process = new()
-            {
-                StartInfo = startInfo
-            };
-            // Output data
-            string output = "";
-            process.OutputDataReceived += (sender, e) =>
-            {
-                output += e.Data + "\n";
-                if(e.Data != null)
-                    Console.WriteLine(e.Data, Color.Transparent);
-            };
-            process.ErrorDataReceived += (sender, e) =>
-            {
-                output += e.Data + "\n";
-                if(e.Data != null)
-                    Console.WriteLine(e.Data, Color.Transparent);
-            };
-            process.Start();
-            process.BeginOutputReadLine();
-            process.WaitForExit();
-            return output;
+            if(!ValidateInput(args)) return;
+            PluginHandler.commands.Add(new Command(CommandType.FFprobe, args));
         }
         // RunMagick for lua
-        public static string RunMagick(string args)
+        public static void RunMagick(string args)
         {
-            // Validate input
-            if (args.Contains("&&") || args.Contains("|") || args.Contains(";") || args.Contains("&") || args.Contains("||"))
-            {
-                Console.WriteLine("A plugin attempted to perform an illegal operation.", Color.Red);
-                return "Invalid input";
-            }
-            ProcessStartInfo startInfo = new()
-            {
-                FileName = "magick",
-                Arguments = args,
-                WorkingDirectory = Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location),
-                UseShellExecute = false,
-                RedirectStandardOutput = true,
-                RedirectStandardError = true,
-                CreateNoWindow = true
-            };
-            Process process = new()
-            {
-                StartInfo = startInfo
-            };
-            // Output data
-            string output = "";
-            process.OutputDataReceived += (sender, e) =>
-            {
-                output += e.Data + "\n";
-                if(e.Data != null)
-                    Console.WriteLine(e.Data, Color.Transparent);
-            };
-            process.ErrorDataReceived += (sender, e) =>
-            {
-                output += e.Data + "\n";
-                if(e.Data != null)
-                    Console.WriteLine(e.Data, Color.Transparent);
-            };
-            process.Start();
-            process.BeginOutputReadLine();
-            process.WaitForExit();
-            return output;
+            if(!ValidateInput(args)) return;
+            PluginHandler.commands.Add(new Command(CommandType.Magick, args));
+        }
+        // RunYtDlp for lua
+        public static void RunYtDlp(string args)
+        {
+            if(!ValidateInput(args)) return;
+            PluginHandler.commands.Add(new Command(CommandType.YtDlp, args));
+        }
+        // RandomDouble for lua (uses global random)
+        public static double RandomDouble(double min, double max)
+        {
+            return Global.generatorFactory.globalRandom.NextDouble() * (max - min) + min;
+        }
+        // RandomInt for lua (uses global random)
+        public static int RandomInt(int min, int max)
+        {
+            return Global.generatorFactory.globalRandom.Next(min, max);
+        }
+        // RandomBool for lua (uses global random)
+        public static bool RandomBool()
+        {
+            return Global.generatorFactory.globalRandom.Next(2) == 0;
         }
         // GetRandomLibraryFile for lua
-        public static string GetRandomLibraryFile(string path, string rootType = "video", string subType = "materials")
+        public static string GetRandomLibraryFile(string rootType = "video", string subType = "materials")
         {
             // Validate rootType and subType
             if (rootType != "video" && rootType != "audio")
@@ -167,7 +267,7 @@ namespace NonsensicalVideoGenerator
             // Validate subType
             foreach (KeyValuePair<LibraryType, string> pair in LibraryData.libraryPaths)
             {
-                if (pair.Value == rootType + @"\" + subType)
+                if (pair.Value == rootType + "\\" + subType)
                 {
                     break;
                 }
@@ -178,12 +278,6 @@ namespace NonsensicalVideoGenerator
             }
             string[] files = Directory.GetFiles(Path.Join(LibraryData.libraryRootPath, rootType, subType));
             return files[Global.generatorFactory.globalRandom.Next(files.Length)];
-        }
-        // GetVideoDuration for lua
-        public static double GetVideoDuration(string path)
-        {
-            string output = RunFFprobe($"-v error -show_entries format=duration -of default=noprint_wrappers=1:nokey=1 \"{path}\"");
-            return double.Parse(output);
         }
         public PluginReturnValue Call(string video)
         {
@@ -217,8 +311,8 @@ namespace NonsensicalVideoGenerator
                         SaveData.saveValues["VideoWidth"],
                         SaveData.saveValues["VideoHeight"],
                         jobPath + @"\",
-                        Global.useSystemFFmpeg ? "ffmpeg" : @".\bin\ffmpeg.exe",
-                        Global.useSystemFFmpeg ? "ffprobe" : @".\bin\ffprobe.exe",
+                        Global.useSystemFFmpeg ? "ffmpeg" : @".\ffmpeg.exe",
+                        Global.useSystemFFprobe ? "ffprobe" : @".\ffprobe.exe",
                         "magick",
                         LibraryData.libraryRootPath + @"\", // legacy resource path
                         @".\" +Path.Join("library", "audio", "sfx") + @"\",
@@ -270,9 +364,8 @@ namespace NonsensicalVideoGenerator
                 case PluginType.Lua:
                     if(luaScript == null)
                         return new PluginReturnValue(false, Path.GetFileName(path));
-                    // Create RunFFmpeg, RunFFprobe, and RunMagick functions
                     // Run Generate function if it exists.
-                    if (luaScript.Globals["Generate"] != null)
+                    if (luaScript.Globals["StartGeneration"] != null)
                     {
                         try
                         {
@@ -295,19 +388,37 @@ namespace NonsensicalVideoGenerator
                             }
                             // Add functions
                             Table functions = new(luaScript);
-                            functions["runFFmpeg"] = (Func<string, string>)RunFFmpeg;
-                            functions["runFFprobe"] = (Func<string, string>)RunFFprobe;
-                            functions["runMagick"] = (Func<string, string>)RunMagick;
-                            functions["getLength"] = (Func<string, double>)GetVideoDuration;
-                            // Call Generate function
-                            DynValue result = luaScript.Call(luaScript.Globals["Generate"], videoOptions, pluginSettings, functions);
-                            if (result.Type == DataType.Boolean)
+                            functions["runFFmpeg"] = (Action<string>)RunFFmpeg;
+                            functions["runFFprobe"] = (Action<string>)RunFFprobe;
+                            functions["runMagick"] = (Action<string>)RunMagick;
+                            functions["runYtDlp"] = (Action<string>)RunYtDlp;
+                            functions["randomDouble"] = (Func<double, double, double>)RandomDouble;
+                            functions["randomInt"] = (Func<int, int, int>)RandomInt;
+                            functions["randomBool"] = (Func<bool>)RandomBool;
+                            functions["getRandomLibraryFile"] = (Func<string, string, string>)GetRandomLibraryFile;
+                            PluginHandler.commands.Clear();
+                            // Call generation
+                            DynValue result = luaScript.Call(luaScript.Globals["StartGeneration"], videoOptions, pluginSettings, functions);
+                            if (result.Type == DataType.Boolean && result.Boolean)
                             {
-                                return new PluginReturnValue(result.Boolean, Path.GetFileName(path), jobPath + @"\");
+                                for (int i = 0; i < PluginHandler.commands.Count; i++)
+                                {
+                                    // PostCommand function is called with the index of the command
+                                    string[] outputs = PluginHandler.commands[i].Call();
+                                    luaScript.Call(luaScript.Globals["PostCommand"], i+1, outputs[0], outputs[1], videoOptions, pluginSettings, functions);
+                                }
+                                DynValue result2 = luaScript.Call(luaScript.Globals["StopGeneration"], videoOptions, pluginSettings, functions);
+                                if (result2.Type == DataType.Boolean && result2.Boolean)
+                                {
+                                    return new PluginReturnValue(true, Path.GetFileName(path), jobPath + @"\");
+                                }
+                                else
+                                {
+                                    return new PluginReturnValue(false, Path.GetFileName(path));
+                                }
                             }
                             else
                             {
-                                ConsoleOutput.WriteLine("Generate function did not return a boolean.", Color.Red);
                                 return new PluginReturnValue(false, Path.GetFileName(path));
                             }
                         }
@@ -399,19 +510,19 @@ namespace NonsensicalVideoGenerator
                         }
                         LibraryRootType rootType = split[0] == "0" ? LibraryRootType.Video : LibraryRootType.Audio;
                         // split[3] is description
-                        string description = split.Length >= 4 ? split[3].Replace("_", " ") : "";
-                        LibraryType dummyType = new(rootType, split[2].Replace("_", ""), description);
+                        string description = split.Length >= 4 ? split[3] : "";
+                        LibraryType dummyType = new(rootType, split[2], description);
                         string libPath = Path.Join(rootType == LibraryRootType.Video ? "video" : "audio", split[2]);
                         string[] fileExts = LibraryData.libraryFileTypes[rootType == LibraryRootType.Video ? DefaultLibraryTypes.Video : DefaultLibraryTypes.Audio];
                         // Check to see if library already exists.
-                        if (DefaultLibraryTypes.AllTypes.Contains(dummyType))
+                        if (LibraryData.libraryPaths.ContainsKey(dummyType))
                         {
                             continue;
                         }
                         DefaultLibraryTypes.AllTypes.Add(dummyType);
                         LibraryData.libraryPaths.Add(dummyType, libPath);
                         LibraryData.libraryFileTypes.Add(dummyType, fileExts);
-                        LibraryData.libraryNames.Add(dummyType, split[1].Replace("_", " "));
+                        LibraryData.libraryNames.Add(dummyType, split[1]);
                         libraryTypes.Add(dummyType);
                         Global.justCompletedRender = true; // demand a refresh
                         // Print to console.
@@ -441,6 +552,7 @@ namespace NonsensicalVideoGenerator
                         string settingTooltip = split.Length >= 3 ? split[2] : "";
                         settings.Add(settingName, settingValue);
                         settingTooltips.Add(settingName, settingTooltip);
+                        settingTypes.Add(settingName, SettingType.TextInput);
                         count++;
                     }
                     // Print count
@@ -449,7 +561,8 @@ namespace NonsensicalVideoGenerator
                     return true;
                 case PluginType.Lua:
                     // If root is not "workshop", set workshopId to name of plugin folder.
-                    if (Path.GetFileName(Path.GetDirectoryName(path)) != "workshop")
+                    if (Path.GetFileName(Path.GetDirectoryName(path)) != "workshop"
+                        && Path.GetFileName(Path.GetDirectoryName(path)) != "user")
                     {
                         workshopId = Path.GetFileName(Path.GetDirectoryName(path));
                     }
@@ -487,7 +600,7 @@ namespace NonsensicalVideoGenerator
                                 string libPath = Path.Join(rootType == LibraryRootType.Video ? "video" : "audio", libraryName);
                                 string[] fileExts = LibraryData.libraryFileTypes[rootType == LibraryRootType.Video ? DefaultLibraryTypes.Video : DefaultLibraryTypes.Audio];
                                 // Check to see if library already exists.
-                                if (DefaultLibraryTypes.AllTypes.Contains(dummyType))
+                                if (LibraryData.libraryPaths.ContainsKey(dummyType))
                                 {
                                     continue;
                                 }
@@ -515,11 +628,53 @@ namespace NonsensicalVideoGenerator
                                 {
                                     continue;
                                 }
+                                // Only "name" and "type" are required.
                                 string settingName = setting.Table.Get("name").String;
-                                string settingValue = setting.Table.Get("value").String;
-                                string settingTooltip = setting.Table.Get("tooltip").String;
+                                DynValue dynvalue = setting.Table.Get("value");
+                                string settingValue = dynvalue.Type == DataType.String ? dynvalue.String : "";
+                                DynValue dyntooltip = setting.Table.Get("tooltip");
+                                string settingTooltip = dyntooltip.Type == DataType.String ? dyntooltip.String : "";
+                                string settingValueType = setting.Table.Get("type").String;
                                 settings.Add(settingName, settingValue);
                                 settingTooltips.Add(settingName, settingTooltip);
+                                switch(settingValueType)
+                                {
+                                    case "int":
+                                    case "integer":
+                                    case "number":
+                                        settingTypes.Add(settingName, SettingType.TextInputNumbers);
+                                        break;
+                                    case "float":
+                                    case "double":
+                                    case "decimal":
+                                        settingTypes.Add(settingName, SettingType.TextInputDecimals);
+                                        break;
+                                    case "alphabetic":
+                                    case "alphabetical":
+                                    case "alphabet":
+                                        settingTypes.Add(settingName, SettingType.TextInputLetters);
+                                        break;
+                                    case "alphanumeric":
+                                    case "alphanumeral":
+                                    case "alphanumerical":
+                                        settingTypes.Add(settingName, SettingType.TextInputLettersNumbers);
+                                        break;
+                                    case "string":
+                                    case "text":
+                                        settingTypes.Add(settingName, SettingType.TextInputLettersNumbersSpaces);
+                                        break;
+                                    case "bool":
+                                    case "boolean":
+                                    case "switch":
+                                        settingTypes.Add(settingName, SettingType.Switch);
+                                        break;
+                                    case "label":
+                                        settingTypes.Add(settingName, SettingType.Label);
+                                        break;
+                                    default:
+                                        settingTypes.Add(settingName, SettingType.TextInput);
+                                        break;
+                                }
                                 settingCount++;
                             }
                             // Print count
@@ -539,6 +694,8 @@ namespace NonsensicalVideoGenerator
         public static List<Plugin> plugins = new();
         private static string pluginPath = @".\plugins";
         public static string pluginSettingsPath = @".\PluginSettings.json";
+        public static List<Command> commands = new();
+        public static PublishedFileId_t[]? subscribedItems;
         public static void LoadPluginSettings()
         {
             if (!File.Exists(pluginSettingsPath))
@@ -558,22 +715,37 @@ namespace NonsensicalVideoGenerator
             foreach(KeyValuePair<string, Dictionary<string, object>> pluginSetting in pluginSettings)
             {
                 string pluginName = pluginSetting.Key;
-                int index = plugins.FindIndex(plugin => Path.GetFileName(plugin.path) == pluginName);
+                int index = plugins.FindIndex(plugin => {
+                    if(plugin.workshopId != "")
+                    {
+                        if(plugin.workshopId + "/" + Path.GetFileName(plugin.path) == pluginName)
+                        {
+                            return true;
+                        }
+                    }
+                    else
+                    {
+                        if(Path.GetFileName(plugin.path) == pluginName)
+                        {
+                            return true;
+                        }
+                    }
+                    return false;
+                });
                 if (index == -1)
                     continue;
-                Plugin plugin = plugins[index];
+                plugins[index].enabled = !(pluginSetting.Value["disabled"] as bool? ?? false);
                 Dictionary<string, object>? settings = JsonConvert.DeserializeObject<Dictionary<string, object>>(pluginSetting.Value["settings"].ToString());
                 foreach(KeyValuePair<string, object> setting in settings)
                 {
                     ConsoleOutput.WriteLine($"Setting {setting.Key} to {setting.Value} for plugin {pluginName}...", Color.LightBlue);
-                    if(!plugin.settings.ContainsKey(setting.Key))
+                    if(!plugins[index].settings.ContainsKey(setting.Key))
                     {
                         ConsoleOutput.WriteLine($"Setting {setting.Key} not found for plugin {pluginName}.", Color.Red);
                         continue;
                     }
-                    plugin.settings[setting.Key] = setting.Value;
+                    plugins[index].settings[setting.Key] = setting.Value;
                 }
-                plugin.enabled = !(pluginSetting.Value["disabled"] as bool? ?? false);
             }
             SavePluginSettings();
         }
@@ -583,15 +755,31 @@ namespace NonsensicalVideoGenerator
             foreach(Plugin plugin in plugins)
             {
                 Dictionary<string, object> pluginSetting = new();
-                pluginSetting.Add("settings", plugin.settings);
+                // Copy settings so we can remove labels from it.
+                pluginSetting.Add("settings", plugin.settings.ToDictionary(setting => setting.Key, setting => setting.Value));
                 pluginSetting.Add("disabled", !plugin.enabled);
-                pluginSettings.Add(Path.GetFileName(plugin.path), pluginSetting);
+                // Remove labels from settings
+                foreach(KeyValuePair<string, SettingType> setting in plugin.settingTypes)
+                {
+                    if (setting.Value == SettingType.Label)
+                    {
+                        ((Dictionary<string, object>)pluginSetting["settings"]).Remove(setting.Key);
+                    }
+                }
+                // Key
+                string key = Path.GetFileName(plugin.path);
+                // If workshopId is set, prepend it to the key.
+                if (plugin.workshopId != "")
+                {
+                    key = $"{plugin.workshopId}/{key}";
+                }
+                pluginSettings.Add(key, pluginSetting);
             }
             File.WriteAllText(pluginSettingsPath, JsonConvert.SerializeObject(pluginSettings, Formatting.Indented));
         }
-        public static void LoadPlugin(string path, PluginType type)
+        public static void LoadPlugin(string path, PluginType type, string rootPath, string workshopid = "")
         {
-            Plugin plugin = new(path, type);
+            Plugin plugin = new(path, type, rootPath);
             Global.generatorFactory.progressText = $"Loading plugin {Path.GetFileName(path)}...";
             if(!plugin.Query())
                 throw new Exception($"Failed to query plugin {Path.GetFileName(path)}.");
@@ -606,17 +794,24 @@ namespace NonsensicalVideoGenerator
                 File.WriteAllText(pluginSettingsPath, "{}");
             }
             Dictionary<string, Dictionary<string, object>>? existingPluginSettings = JsonConvert.DeserializeObject<Dictionary<string, Dictionary<string, object>>>(File.ReadAllText(pluginSettingsPath));
+            // Key
+            string key = Path.GetFileName(path);
+            // If workshopId is set, prepend it to the key.
+            if (workshopid != "")
+            {
+                key = $"{workshopid}/{key}";
+            }
             if (existingPluginSettings != null)
             {
-                if (!existingPluginSettings.ContainsKey(Path.GetFileName(path)))
+                if (!existingPluginSettings.ContainsKey(key))
                 {
-                    existingPluginSettings.Add(Path.GetFileName(path), pluginSettings);
+                    existingPluginSettings.Add(key, pluginSettings);
                     File.WriteAllText(pluginSettingsPath, JsonConvert.SerializeObject(existingPluginSettings, Formatting.Indented));
                 }
             }
-            ConsoleOutput.WriteLine($"Loaded plugin {Path.GetFileName(path)}.", Color.LightBlue);
+            ConsoleOutput.WriteLine($"Loaded plugin {key}.", Color.LightBlue);
         }
-        private static void LoadPluginsRecursive(string path, PluginType type)
+        private static void LoadPluginsRecursive(string path, PluginType type, string root = "")
         {
             foreach (string file in Directory.GetFiles(path))
             {
@@ -625,13 +820,31 @@ namespace NonsensicalVideoGenerator
                     case PluginType.PowerShell:
                         if (file.EndsWith(".ps1"))
                         {
-                            LoadPlugin(file, type);
+                            LoadPlugin(file, type, root);
                         }
                         break;
                     case PluginType.Lua:
                         if (file.EndsWith(".lua"))
                         {
-                            LoadPlugin(file, type);
+                            // The basename of the directory is a steam workshop id.
+                            string basename = Path.GetFileName(path);
+                            // Is this in subscribedItems?
+                            if(root.Contains("workshop") && subscribedItems != null)
+                            {
+                                if (subscribedItems.Any(item => item.m_PublishedFileId.ToString() == basename))
+                                {
+                                    LoadPlugin(file, type, root, basename);
+                                }
+                                else if(basename != "user")
+                                {
+                                    ConsoleOutput.WriteLine($"Deleting plugin {basename} because it is not subscribed to.", Color.Red);
+                                    File.Delete(file);
+                                }
+                            }
+                            else
+                            {
+                                LoadPlugin(file, type, root, basename);
+                            }
                         }
                         break;
                 }
@@ -639,7 +852,69 @@ namespace NonsensicalVideoGenerator
             // Recurse into subdirectories.
             foreach(string file in Directory.GetDirectories(path))
             {
-                LoadPluginsRecursive(file, type);
+                LoadPluginsRecursive(file, type, path);
+            }
+        }
+        public static void LoadWorkshop()
+        {
+            // Create "plugins\workshop" if they don't exist.
+            Directory.CreateDirectory(Path.Combine(pluginPath, "workshop"));
+            // Load subscribed workshop items.
+            uint subscribedItemCount = SteamUGC.GetNumSubscribedItems();
+            ConsoleOutput.WriteLine($"Found {subscribedItemCount} subscribed workshop items.", Color.LightBlue);
+            subscribedItems = new PublishedFileId_t[subscribedItemCount];
+            if(subscribedItemCount > 0)
+            {
+                SteamUGC.GetSubscribedItems(subscribedItems, (uint)subscribedItems.Length);
+                ConsoleOutput.WriteLine("Updating subscribed workshop items...", Color.RoyalBlue);
+                foreach (PublishedFileId_t item in subscribedItems)
+                {
+                    string itemPath = Path.Combine(pluginPath, "workshop", item.m_PublishedFileId.ToString());
+                    bool download = SteamUGC.DownloadItem(item, true);
+                    if (download)
+                    {
+                        // Register callback.
+                        Callback<DownloadItemResult_t> downloadItemResult;
+                        downloadItemResult = Callback<DownloadItemResult_t>.Create((result) =>
+                        {
+                            if (result.m_nPublishedFileId == item)
+                            {
+                                if (result.m_eResult == EResult.k_EResultOK)
+                                {
+                                    ConsoleOutput.WriteLine($"Downloaded ID {item.m_PublishedFileId.ToString()} from workshop.", Color.RoyalBlue);
+                                }
+                                else
+                                {
+                                    ConsoleOutput.WriteLine($"Failed to download ID {item.m_PublishedFileId.ToString()} from workshop.", Color.Red);
+                                }
+                            }
+                        });
+                    }
+                    else
+                    {
+                        ConsoleOutput.WriteLine($"Failed to download ID {item.m_PublishedFileId.ToString()} from workshop.", Color.Red);
+                    }
+                }
+                // Locate workshop plugins.
+                foreach (PublishedFileId_t item in subscribedItems)
+                {
+                    SteamUGC.GetItemInstallInfo(item, out ulong size, out string folder, 1024, out uint timestamp);
+                    string itemPath = Path.Combine(pluginPath, "workshop", item.m_PublishedFileId.ToString());
+                    if (Directory.Exists(itemPath) == false)
+                    {
+                        Directory.CreateDirectory(itemPath);
+                    }
+                    // Copy files from workshop folder to plugin folder.
+                    foreach (string file in Directory.GetFiles(folder))
+                    {
+                        string dest = Path.Combine(itemPath, Path.GetFileName(file));
+                        if (File.Exists(dest) == false)
+                        {
+                            File.Copy(file, dest);
+                            ConsoleOutput.WriteLine($"Installed ID {Path.GetFileName(file)} from workshop.", Color.RoyalBlue);
+                        }
+                    }
+                }
             }
         }
         public static bool LoadPlugins()
@@ -656,6 +931,7 @@ namespace NonsensicalVideoGenerator
             {
                 "stock",
                 "workshop",
+                "user"
             };
             // Create plugin subdirectories if they don't exist.
             foreach(string subdir in pluginDirs)
@@ -671,14 +947,22 @@ namespace NonsensicalVideoGenerator
                 foreach (string file in Directory.GetDirectories(pluginPath))
                 {
                     string dirName = Path.GetFileName(file);
-                    PluginType type = PluginType.Lua;
+                    PluginType type = PluginType.None;
                     switch (dirName)
                     {
                         case "stock":
                             type = PluginType.PowerShell;
                             break;
+                        case "workshop":
+                            type = PluginType.Lua;
+                            break;
+                        case "user":
+                            type = PluginType.Lua;
+                            break;
                     }
                     ConsoleOutput.WriteLine($"Loading {dirName} plugins...", Color.LightBlue);
+                    if (type == PluginType.None)
+                        continue;
                     LoadPluginsRecursive(file, type);
                 }
                 LoadPluginSettings();

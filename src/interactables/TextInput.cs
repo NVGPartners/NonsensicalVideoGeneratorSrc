@@ -59,6 +59,13 @@ namespace NonsensicalVideoGenerator
                 // If state is 1, we are entering text.
                 if(State == 1)
                 {
+                    if (MouseInput.LastMouseState.LeftButton == ButtonState.Released && MouseInput.MouseState.LeftButton == ButtonState.Pressed)
+                    {
+                        State = 0;
+                        Callback(0);
+                        GlobalContent.GetSound("Option").Play(int.Parse(SaveData.saveValues["SoundEffectVolume"]) / 100f, 0f, 0f);
+                        return true;
+                    }
                     if(Accessibility.allowAccessibility)
                         Accessibility.allowAccessibility = false;
                     // Capture keyboard input
@@ -140,13 +147,14 @@ namespace NonsensicalVideoGenerator
             GlobalContent.AddTexture("InteractiveTextEntryInner", contentManager.Load<Texture2D>("graphics/interactivetextentryinner"));
             Register();
         }
-        public void Register()
+        public TextEntry Register()
         {
             GameWindow? window = UserInterface.instance?.Window;
             if (window != null)
             {
                 window.TextInput += TextInput;
             }
+            return this;
         }
         private bool ValidateInput(char character)
         {
@@ -191,6 +199,13 @@ namespace NonsensicalVideoGenerator
                             // Validate each character
                             foreach (char c in clipboard)
                             {
+                                // no newlines
+                                if (c == '\n')
+                                {
+                                    GlobalContent.GetSound("Error").Play(int.Parse(SaveData.saveValues["SoundEffectVolume"]) / 100f, 0f, 0f);
+                                    return;
+                                }
+                                // validate
                                 if (!ValidateInput(c))
                                 {
                                     GlobalContent.GetSound("Error").Play(int.Parse(SaveData.saveValues["SoundEffectVolume"]) / 100f, 0f, 0f);

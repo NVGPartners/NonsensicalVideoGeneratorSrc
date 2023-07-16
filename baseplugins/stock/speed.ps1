@@ -39,8 +39,8 @@ $speed = Get-Random -Minimum 0 -Maximum 2
 # Apply speed filter
 if ($speed -eq 0) {
     # Speed up
-    Invoke-Command -ScriptBlock {&$ffmpeg -i "$video" -filter:v setpts=0.5*PTS -filter:a atempo=2.0 -y "$output"}
+    Invoke-Command -ScriptBlock {&$ffmpeg -i "$video" -filter:v setpts=0.5*PTS -filter:a atempo=2.0 -preset veryfast -y "$output"}
 } else {
     # Slow down
-    Invoke-Command -ScriptBlock {&$ffmpeg -i "$video" -filter:v setpts=2.0*PTS -filter:a atempo=0.5 -y "$output"}
+    Invoke-Command -ScriptBlock {&$ffmpeg -i "$video" -filter:v setpts=2.0*PTS -filter:a atempo=0.5 -preset veryfast -y "$output"}
 }
