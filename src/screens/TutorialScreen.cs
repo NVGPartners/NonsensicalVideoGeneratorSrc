@@ -362,39 +362,6 @@ namespace NonsensicalVideoGenerator
         }
         private bool check3 = false;
         private BackgroundWorker pluginWorker;
-        private void PluginCheckThread(object? sender, DoWorkEventArgs e)
-        {
-            if(!Global.pluginsLoaded)
-                Global.pluginsLoaded = PluginHandler.LoadPlugins();
-            if(Global.pluginsLoaded)
-            {
-                SaveData.saveValues["FirstBoot"] = "false";
-                SaveData.Save();
-                GlobalContent.GetSound("Back").Play(int.Parse(SaveData.saveValues["SoundEffectVolume"]) / 100f, 0f, 0f);
-                toggle = false;
-                tween.TweenTo(this, t => t.offset, new Vector2(GlobalGraphics.Scale(-640), GlobalGraphics.Scale(240)), 0.5f)
-                    .Easing(EasingFunctions.ExponentialOut);
-                hiding = true;
-                ScreenManager.PushNavigation("Main Menu");
-                ScreenManager.GetScreen<MenuScreen>("Main Menu")?.Show();
-                ScreenManager.PushNavigation("Video");
-                ScreenManager.GetScreen<VideoScreen>("Video")?.Show();
-                ScreenManager.PushNavigation("Content");
-                ScreenManager.GetScreen<ContentScreen>("Content")?.Show();
-                ScreenManager.PushNavigation("Socials");
-                ScreenManager.GetScreen<SocialScreen>("Socials")?.Show();
-            }
-            else
-            {
-                GlobalContent.GetSound("Error").Play(int.Parse(SaveData.saveValues["SoundEffectVolume"]) / 100f, 0f, 0f);
-                ScreenManager.PushNavigation("Console");
-                ScreenManager.GetScreen<ConsoleScreen>("Console")?.Show();
-            }
-            check3 = false;
-            // Dispose of worker
-            pluginWorker.Dispose();
-            pluginWorker = null;
-        }
         public void LoadContent(ContentManager contentManager, GraphicsDevice graphicsDevice)
         {
             // Tutorial window
@@ -492,9 +459,21 @@ namespace NonsensicalVideoGenerator
                         if(!check3)
                         {
                             check3 = true;
-                            pluginWorker = new BackgroundWorker();
-                            pluginWorker.DoWork += PluginCheckThread;
-                            pluginWorker.RunWorkerAsync();
+                            SaveData.saveValues["FirstBoot"] = "false";
+                            SaveData.Save();
+                            GlobalContent.GetSound("Back").Play(int.Parse(SaveData.saveValues["SoundEffectVolume"]) / 100f, 0f, 0f);
+                            toggle = false;
+                            tween.TweenTo(this, t => t.offset, new Vector2(GlobalGraphics.Scale(-640), GlobalGraphics.Scale(240)), 0.5f)
+                                .Easing(EasingFunctions.ExponentialOut);
+                            hiding = true;
+                            ScreenManager.PushNavigation("Main Menu");
+                            ScreenManager.GetScreen<MenuScreen>("Main Menu")?.Show();
+                            ScreenManager.PushNavigation("Video");
+                            ScreenManager.GetScreen<VideoScreen>("Video")?.Show();
+                            ScreenManager.PushNavigation("Content");
+                            ScreenManager.GetScreen<ContentScreen>("Content")?.Show();
+                            ScreenManager.PushNavigation("Socials");
+                            ScreenManager.GetScreen<SocialScreen>("Socials")?.Show();
                         }
                         return true;
                 }

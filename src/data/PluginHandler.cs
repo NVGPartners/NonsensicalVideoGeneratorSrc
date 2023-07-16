@@ -11,6 +11,7 @@ using Newtonsoft.Json.Linq;
 using MoonSharp.Interpreter;
 using MoonSharp.Interpreter.Loaders;
 using Steamworks;
+using System.ComponentModel;
 
 namespace NonsensicalVideoGenerator
 {
@@ -855,6 +856,50 @@ namespace NonsensicalVideoGenerator
                 LoadPluginsRecursive(file, type, path);
             }
         }
+        private static uint allDoneCount = 0;
+        private static BackgroundWorker pluginWorker = new();
+        public static void AllDone(uint count)
+        {
+            allDoneCount++;
+            if(allDoneCount == count)
+            {
+                foreach (PublishedFileId_t item in subscribedItems)
+                {
+                    string itemPath = Path.Combine(pluginPath, "workshop", item.m_PublishedFileId.ToString());
+                    SteamUGC.GetItemInstallInfo(item, out ulong size, out string folder, 1024, out uint timestamp);
+                    if (Directory.Exists(itemPath) == false)
+                    {
+                        Directory.CreateDirectory(itemPath);
+                    }
+                    // Copy files from workshop folder to plugin folder.
+                    foreach (string file in Directory.GetFiles(folder))
+                    {
+                        string dest = Path.Combine(itemPath, Path.GetFileName(file));
+                        // File hash check.
+                        if(File.Exists(dest))
+                        {
+                            if (File.ReadAllBytes(file).SequenceEqual(File.ReadAllBytes(dest)))
+                            {
+                                continue;
+                            }
+                        }
+                        if(File.Exists(dest))
+                        {
+                            File.Delete(dest);
+                        }
+                        File.Copy(file, dest);
+                        ConsoleOutput.WriteLine($"Installed ID {Path.GetFileName(file)} from workshop.", Color.RoyalBlue);
+                    }
+                }
+                pluginWorker.DoWork += PluginWorker_DoWork;
+                pluginWorker.RunWorkerAsync();
+                ConsoleOutput.WriteLine("All done.", Color.RoyalBlue);
+            }
+        }
+        private static void PluginWorker_DoWork(object sender, DoWorkEventArgs e)
+        {
+            Global.pluginsLoaded = PluginHandler.LoadPlugins();
+        }
         public static void LoadWorkshop()
         {
             // Create "plugins\workshop" if they don't exist.
@@ -887,32 +932,13 @@ namespace NonsensicalVideoGenerator
                                 {
                                     ConsoleOutput.WriteLine($"Failed to download ID {item.m_PublishedFileId.ToString()} from workshop.", Color.Red);
                                 }
+                                AllDone(subscribedItemCount);
                             }
                         });
                     }
                     else
                     {
                         ConsoleOutput.WriteLine($"Failed to download ID {item.m_PublishedFileId.ToString()} from workshop.", Color.Red);
-                    }
-                }
-                // Locate workshop plugins.
-                foreach (PublishedFileId_t item in subscribedItems)
-                {
-                    SteamUGC.GetItemInstallInfo(item, out ulong size, out string folder, 1024, out uint timestamp);
-                    string itemPath = Path.Combine(pluginPath, "workshop", item.m_PublishedFileId.ToString());
-                    if (Directory.Exists(itemPath) == false)
-                    {
-                        Directory.CreateDirectory(itemPath);
-                    }
-                    // Copy files from workshop folder to plugin folder.
-                    foreach (string file in Directory.GetFiles(folder))
-                    {
-                        string dest = Path.Combine(itemPath, Path.GetFileName(file));
-                        if (File.Exists(dest) == false)
-                        {
-                            File.Copy(file, dest);
-                            ConsoleOutput.WriteLine($"Installed ID {Path.GetFileName(file)} from workshop.", Color.RoyalBlue);
-                        }
                     }
                 }
             }

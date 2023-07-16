@@ -86,7 +86,6 @@ function StartGeneration(options, pluginSettings, functions)
     segmentLength = functions.randomDouble(randomTimeMin, randomTimeMax)
     seek = functions.randomInt(musicSeekStart, musicSeekEnd)
     randomSound = functions.getRandomLibraryFile("audio", "music")
-    print(randomSound)
     useOriginalAudio = (randomSound != "" and functions.randomInt(1, 100) <= tonumber(pluginSettings["No Music Chance"]))
     -- Apply effect
     if useOriginalAudio then

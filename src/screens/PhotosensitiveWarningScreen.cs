@@ -47,24 +47,13 @@ namespace NonsensicalVideoGenerator
         }
         private void UpdateCheckThread(object? sender, DoWorkEventArgs e)
         {
-            // Check for updates.
-            UpdateManager.CheckForUpdates();
-            if(UpdateManager.updateAvailable)
+            if(SteamManager.initialized)
+                PluginHandler.LoadWorkshop();
+            UpdateManager.GetDependencyStatus();
+            if(!UpdateManager.ffmpegInstalled || !UpdateManager.ffprobeInstalled)
             {
                 ErrorOut();
             }
-            else
-            {
-                UpdateManager.GetDependencyStatus();
-                Global.pluginsLoaded = PluginHandler.LoadPlugins();
-                if(!UpdateManager.ffmpegInstalled || !UpdateManager.ffprobeInstalled || !Global.pluginsLoaded)
-                {
-                    ErrorOut();
-                }
-            }
-            // Dispose of worker.
-            updateWorker.Dispose();
-            updateWorker = null;
         }
         private List<string> warningText = new List<string>()
         {
@@ -163,12 +152,14 @@ namespace NonsensicalVideoGenerator
                     if(SteamManager.initialized)
                     {
                         ConsoleOutput.WriteLine("Steam initialized.", Color.LightGreen);
-                        PluginHandler.LoadWorkshop();
                     }
                     else
                     {
                         ConsoleOutput.WriteLine("Steam is not running, skipping workshop initialization.", Color.LightGreen);
                     }
+                    updateWorker = new BackgroundWorker();
+                    updateWorker.DoWork += UpdateCheckThread;
+                    updateWorker.RunWorkerAsync();
                     ScreenManager.PushNavigation("Main Menu");
                     ScreenManager.PushNavigation("Content");
                     ScreenManager.PushNavigation("Video");
@@ -180,10 +171,6 @@ namespace NonsensicalVideoGenerator
                     ScreenManager.GetScreen<BackgroundScreen>("Background")?.Show();
                     ScreenManager.GetScreen<HeaderScreen>("Header")?.Show();
                     ScreenManager.GetScreen<SocialScreen>("Socials")?.Show();
-                    overlayOpacity = 255;
-                    updateWorker = new BackgroundWorker();
-                    updateWorker.DoWork += UpdateCheckThread;
-                    updateWorker.RunWorkerAsync();
                     Global.ready = true;
                     Global.readyTime = gameTime.TotalGameTime.TotalMilliseconds;
                     // Play startup sound.
