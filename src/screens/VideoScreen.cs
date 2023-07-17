@@ -153,7 +153,7 @@ namespace NonsensicalVideoGenerator
                         }
                         catch {}
                     }
-                    else if(MouseInput.MouseState.RightButton == ButtonState.Released && MouseInput.LastMouseState.RightButton == ButtonState.Pressed)
+                    else if(MouseInput.MouseState.RightButton == ButtonState.Pressed && MouseInput.LastMouseState.RightButton == ButtonState.Released)
                     {
                         if(FramePlayer.audio != null)
                         {
@@ -187,6 +187,10 @@ namespace NonsensicalVideoGenerator
         public int flash = 0;
         public void Draw(GameTime gameTime, SpriteBatch spriteBatch)
         {
+            Texture2D vidoverlay = GlobalContent.GetTexture("VidOverlay");
+            Texture2D pixel = GlobalContent.GetTexture("Pixel");
+            if(FramePlayer.playing && !FramePlayer.canPlayBgMusic)
+                spriteBatch.Draw(pixel, new Rectangle(GlobalGraphics.Scale(4), GlobalGraphics.Scale(4), GlobalGraphics.Scale(vidoverlay.Width), GlobalGraphics.Scale(vidoverlay.Height)), Color.Black * 0.5f);
             // End existing spritebatch
             spriteBatch.End();
             // Use offset
@@ -210,7 +214,6 @@ namespace NonsensicalVideoGenerator
                 // Absolute value
                 if(flash < 0)
                     flash *= -1;
-                Texture2D pixel = GlobalContent.GetTexture("Pixel");
                 spriteBatch.Draw(pixel, new Rectangle(GlobalGraphics.Scale(0), GlobalGraphics.Scale(43), GlobalGraphics.Scale(104), GlobalGraphics.Scale(78)), new Color(flash, flash, flash, 255));
             }
             /*
@@ -255,6 +258,7 @@ namespace NonsensicalVideoGenerator
             GlobalContent.AddTexture("VidWindow", contentManager.Load<Texture2D>("graphics/vidwindow"));
             GlobalContent.AddTexture("VidButton", contentManager.Load<Texture2D>("graphics/vidbutton"));
             GlobalContent.AddTexture("VidBG", contentManager.Load<Texture2D>("graphics/vidbg"));
+            GlobalContent.AddTexture("VidOverlay", contentManager.Load<Texture2D>("graphics/vidoverlay"));
         }
     }
 }

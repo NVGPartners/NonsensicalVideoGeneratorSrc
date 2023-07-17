@@ -85,24 +85,61 @@ namespace NonsensicalVideoGenerator
             }
             // Tween
             tween.Update((float)gameTime.ElapsedGameTime.TotalSeconds);
+            bool overrideReturn = false;
+            int scrollWeight = newKeyboardState.IsKeyDown(Keys.LeftShift) || newKeyboardState.IsKeyDown(Keys.RightShift) ? 5 : 1;
             // Show/hide console when you press ` (tilde).
-            if (oldKeyboardState.IsKeyDown(Keys.OemTilde) && newKeyboardState.IsKeyUp(Keys.OemTilde) && Global.ready)
+            if (!oldKeyboardState.IsKeyDown(Keys.OemTilde) && newKeyboardState.IsKeyDown(Keys.OemTilde) && Global.ready)
             {
+                overrideReturn = true;
                 if(Toggle())
+                {
+                    ConsoleOutput.ResetScroll();
                     GlobalContent.GetSound("Select").Play(int.Parse(SaveData.saveValues["SoundEffectVolume"]) / 100f, 0f, 0f);
+                    if(Accessibility.showDisambiguation)
+                        Accessibility.TTS("Console shown.");
+                }
                 else
+                {
                     GlobalContent.GetSound("Back").Play(int.Parse(SaveData.saveValues["SoundEffectVolume"]) / 100f, 0f, 0f);
+                    if(Accessibility.showDisambiguation)
+                        Accessibility.TTS("Console hidden.");
+                }
             }
             // Scrolling will set ConsoleOutput.paused to true.
             if (MouseInput.MouseState.ScrollWheelValue != MouseInput.LastMouseState.ScrollWheelValue)
             {
-                ConsoleOutput.Scroll(MouseInput.MouseState.ScrollWheelValue - MouseInput.LastMouseState.ScrollWheelValue);
+                int wheel = MouseInput.MouseState.ScrollWheelValue - MouseInput.LastMouseState.ScrollWheelValue;
+                ConsoleOutput.Scroll(wheel * scrollWeight); // automatically divides by 120
+            }
+            // Clicking or pressing enter will also reset the scroll.
+            if (MouseInput.MouseState.LeftButton == ButtonState.Pressed && MouseInput.LastMouseState.LeftButton == ButtonState.Released)
+            {
+                ConsoleOutput.ResetScroll();
             }
             oldKeyboardState = newKeyboardState;
             newKeyboardState = Keyboard.GetState();
+            // And you can scroll with the arrow keys.
+            if (!oldKeyboardState.IsKeyDown(Keys.Up) && newKeyboardState.IsKeyDown(Keys.Up))
+            {
+                ConsoleOutput.Scroll(scrollWeight * 120);
+            }
+            if (!oldKeyboardState.IsKeyDown(Keys.Down) && newKeyboardState.IsKeyDown(Keys.Down))
+            {
+                ConsoleOutput.Scroll(-scrollWeight * 120);
+            }
+            // Page up scrolls up by 10 lines.
+            if (!oldKeyboardState.IsKeyDown(Keys.PageUp) && newKeyboardState.IsKeyDown(Keys.PageUp))
+            {
+                ConsoleOutput.Scroll(ConsoleOutput.maxLines * 120);
+            }
+            // Page down scrolls down by 10 lines.
+            if (!oldKeyboardState.IsKeyDown(Keys.PageDown) && newKeyboardState.IsKeyDown(Keys.PageDown))
+            {
+                ConsoleOutput.Scroll(-ConsoleOutput.maxLines * 120);
+            }
             // (DEBUG) Fill the console with nonsense.
             //ConsoleOutput.WriteLine(Math.Sin(gameTime.TotalGameTime.TotalSeconds).ToString());
-            return handleInput;
+            return handleInput && !overrideReturn;
         }
         public void Draw(GameTime gameTime, SpriteBatch spriteBatch)
         {

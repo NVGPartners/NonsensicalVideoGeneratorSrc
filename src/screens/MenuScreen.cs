@@ -159,7 +159,7 @@ namespace NonsensicalVideoGenerator
                     string name = Pagination.GetPage(i).Name;
                     if(i == 2)
                         name = "Effects";
-                    Accessibility.CompatAccessibility(new Rectangle(GlobalGraphics.Scale(4), GlobalGraphics.Scale(i * 16 + 134), GlobalGraphics.Scale(45), GlobalGraphics.Scale(16)), name + "(" + Pagination.GetPage(i).Tooltip + ")");
+                    Accessibility.CompatAccessibility(new Rectangle(GlobalGraphics.Scale(4), GlobalGraphics.Scale(i * 16 + 134), GlobalGraphics.Scale(45), GlobalGraphics.Scale(16)), name + " (" + Pagination.GetPage(i).Tooltip + ")");
                 }
                 // Bounds of each segment
                 if(MouseInput.MouseState.X >= GlobalGraphics.Scale(4) && MouseInput.MouseState.X < GlobalGraphics.Scale(49) && MouseInput.MouseState.Y >= GlobalGraphics.Scale(134) && MouseInput.MouseState.Y < GlobalGraphics.Scale(230))

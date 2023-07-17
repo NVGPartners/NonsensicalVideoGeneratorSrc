@@ -531,8 +531,8 @@ namespace NonsensicalVideoGenerator
                         count++;
                     }
                     // Print count
-                    if (count > 0)
-                        ConsoleOutput.WriteLine($"Plugin {Path.GetFileName(path)} added {count} libraries.", Color.LightBlue);
+                    //if (count > 0)
+                        //ConsoleOutput.WriteLine($"Plugin {Path.GetFileName(path)} added {count} libraries.", Color.LightBlue);
                     // Library query successful, check for settings query.
                     if (outputarray.Length < 2)
                     {
@@ -557,8 +557,8 @@ namespace NonsensicalVideoGenerator
                         count++;
                     }
                     // Print count
-                    if (count > 0)
-                        ConsoleOutput.WriteLine($"Plugin {Path.GetFileName(path)} added {count} settings.", Color.LightBlue);
+                    //if (count > 0)
+                        //ConsoleOutput.WriteLine($"Plugin {Path.GetFileName(path)} added {count} settings.", Color.LightBlue);
                     return true;
                 case PluginType.Lua:
                     // If root is not "workshop", set workshopId to name of plugin folder.
@@ -616,8 +616,8 @@ namespace NonsensicalVideoGenerator
                                 libraryCount++;
                             }
                             // Print count
-                            if (libraryCount > 0)
-                                ConsoleOutput.WriteLine($"Plugin {Path.GetFileName(path)} added {libraryCount} libraries.", Color.LightBlue);
+                            //if (libraryCount > 0)
+                                //ConsoleOutput.WriteLine($"Plugin {Path.GetFileName(path)} added {libraryCount} libraries.", Color.LightBlue);
                         }
                         DynValue luaSettings = luaQuery.Table.Get("settings");
                         if (luaSettings.Type == DataType.Table)
@@ -679,8 +679,8 @@ namespace NonsensicalVideoGenerator
                                 settingCount++;
                             }
                             // Print count
-                            if (settingCount > 0)
-                                ConsoleOutput.WriteLine($"Plugin {Path.GetFileName(path)} added {settingCount} settings.", Color.LightBlue);
+                            //if (settingCount > 0)
+                                //ConsoleOutput.WriteLine($"Plugin {Path.GetFileName(path)} added {settingCount} settings.", Color.LightBlue);
                         }
                     }
                     return true;
@@ -739,10 +739,8 @@ namespace NonsensicalVideoGenerator
                 Dictionary<string, object>? settings = JsonConvert.DeserializeObject<Dictionary<string, object>>(pluginSetting.Value["settings"].ToString());
                 foreach(KeyValuePair<string, object> setting in settings)
                 {
-                    ConsoleOutput.WriteLine($"Setting {setting.Key} to {setting.Value} for plugin {pluginName}...", Color.LightBlue);
                     if(!plugins[index].settings.ContainsKey(setting.Key))
                     {
-                        ConsoleOutput.WriteLine($"Setting {setting.Key} not found for plugin {pluginName}.", Color.Red);
                         continue;
                     }
                     plugins[index].settings[setting.Key] = setting.Value;

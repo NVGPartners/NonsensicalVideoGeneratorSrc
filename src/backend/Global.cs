@@ -29,6 +29,7 @@ namespace NonsensicalVideoGenerator
         public static bool useSystemYtDlp = false;
         public static string editing = "";
         public static string appId = "2516360";
+        public static string videoTitle = "Render1";
         public static GeneratorFactory generatorFactory = new GeneratorFactory();
     }
 }

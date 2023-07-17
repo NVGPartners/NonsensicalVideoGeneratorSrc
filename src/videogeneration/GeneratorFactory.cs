@@ -101,7 +101,7 @@ namespace NonsensicalVideoGenerator
                     if (File.Exists(tempOutput))
                     {
                         ConsoleOutput.WriteLine("Saving to library...", Color.LightGreen);
-                        LibraryFile libraryFile = new LibraryFile(SaveData.saveValues["ProjectTitle"], tempOutput, DefaultLibraryTypes.Render);
+                        LibraryFile libraryFile = new LibraryFile(Global.videoTitle, tempOutput, DefaultLibraryTypes.Render);
                         progressText = "Saving to library...";
                         if(LibraryData.Load(libraryFile) == null)
                         {
@@ -209,7 +209,7 @@ namespace NonsensicalVideoGenerator
             int seed = DateTime.Now.Millisecond;
             // Convert ProjectTitle to int seed
             /*
-            string seedString = SaveData.saveValues["ProjectTitle"];
+            string seedString = Global.videoTitle;
             int seed = 0;
             foreach (char c in seedString)
             {
@@ -452,7 +452,7 @@ namespace NonsensicalVideoGenerator
                     if (File.Exists(tempOutput))
                     {
                         ConsoleOutput.WriteLine("Saving to library...", Color.LightGreen);
-                        LibraryFile libraryFile = new LibraryFile(SaveData.saveValues["ProjectTitle"], tempOutput, DefaultLibraryTypes.Render);
+                        LibraryFile libraryFile = new LibraryFile(Global.videoTitle, tempOutput, DefaultLibraryTypes.Render);
                         progressText = "Saving to library...";
                         if(LibraryData.Load(libraryFile) == null)
                         {
@@ -556,7 +556,7 @@ namespace NonsensicalVideoGenerator
                 }
                 forceConcatenate = false;
                 timeout = defaultTimeout;
-                tempOutput = Path.Combine(Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location), "library", "video", "renders", SaveData.saveValues["ProjectTitle"] + ".mp4");
+                tempOutput = Path.Combine(Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location), "library", "video", "renders", Global.videoTitle + ".mp4");
                 timeoutWorker.RunWorkerAsync();
                 vidThreadWorker.RunWorkerAsync();
                 ConsoleOutput.WriteLine("Generation started.", Color.Green);

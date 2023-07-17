@@ -20,6 +20,7 @@ namespace NonsensicalVideoGenerator
         public static double timeStarted = 0;
         public static int fps = 30;
         public static bool playing = false;
+        public static bool audioPlaying = false;
         public static SoundEffectInstance audio;
         public static bool processing = false;
         public static double startedProcessing = 0;
@@ -27,6 +28,7 @@ namespace NonsensicalVideoGenerator
         public static BackgroundWorker worker = new();
         public static BackgroundWorker progressWorker = new();
         public static BackgroundWorker countWorker = new();
+        public static BackgroundWorker audioConvertWorker = new();
         public static int count = 0;
         public static double audioLength = 0;
         public static double currentAudioTime = 0;
@@ -187,6 +189,7 @@ namespace NonsensicalVideoGenerator
                 if(countWorker.IsBusy || progressWorker.IsBusy || worker.IsBusy)
                 {
                     // Stop workers
+                    audioConvertWorker.CancelAsync();
                     countWorker.CancelAsync();
                     progressWorker.CancelAsync();
                     worker.CancelAsync();
@@ -196,6 +199,7 @@ namespace NonsensicalVideoGenerator
                 {
                     processing = false;
                 }
+                audioPlaying = false;
                 audioLength = 0;
                 currentAudioTime = 0;
                 playing = false;
@@ -229,6 +233,55 @@ namespace NonsensicalVideoGenerator
             }
             return true;
         }
+        public static void AudioConvertThread()
+        {
+            try
+            {
+                if(audioConvertWorker.CancellationPending || !processing)
+                    return;
+                ProcessStartInfo startInfo = new()
+                {
+                    FileName = "ffmpeg",
+                    Arguments = "-i \"" + currentPath + "\" -vn -acodec pcm_s16le -ar 44100 -ac 2 -f wav -y .\\temp\\extracted\\audio.wav",
+                    UseShellExecute = false,
+                    RedirectStandardError = true,
+                    CreateNoWindow = true
+                };
+                Process process = new()
+                {
+                    StartInfo = startInfo
+                };
+                process.ErrorDataReceived += (sender, args) => {
+                    if(args.Data != null)
+                        ConsoleOutput.WriteLine(args.Data, Color.Transparent);
+                };
+                if(audioConvertWorker.CancellationPending || !processing)
+                    return;
+                process.Start();
+                if(audioConvertWorker.CancellationPending || !processing)
+                    return;
+                process.BeginErrorReadLine();
+                if(audioConvertWorker.CancellationPending || !processing)
+                    return;
+                process.WaitForExit();
+                FileStream audioFile = File.OpenRead(".\\temp\\extracted\\audio.wav");
+                SoundEffect snd = SoundEffect.FromStream(audioFile);
+                audio = snd.CreateInstance();
+                audioFile.Close();
+                currentAudioTime = 0;
+                audioLength = snd.Duration.TotalMilliseconds;
+                canPlayBgMusic = false;
+                audio.Play();
+                audioPlaying = true;
+                Global.generatorFactory.progressText = "Playing media...";
+            }
+            catch(Exception e)
+            {
+                ConsoleOutput.WriteLine($"Failed to convert audio.");
+                ConsoleOutput.WriteLine(e.Message);
+            }
+            processing = false;
+        }
         public static void PlayMedia(LibraryFile file)
         {
             // If file is identical to current file, loop
@@ -236,7 +289,21 @@ namespace NonsensicalVideoGenerator
             {
                 if(audio != null)
                 {
-                    audio.Stop();
+                    if(!audioPlaying)
+                    {
+                        audio.Play();
+                        Global.generatorFactory.progressText = "Playing media...";
+                        FramePlayer.canPlayBgMusic = false;
+                        audioPlaying = true;
+                    }
+                    else
+                    {
+                        audio.Stop();
+                        currentAudioTime = 0;
+                        audioPlaying = false;
+                        FramePlayer.canPlayBgMusic = true;
+                        Global.generatorFactory.progressText = "Stopped playback.";
+                    }
                 }
                 playing = false;
                 return;
@@ -246,60 +313,60 @@ namespace NonsensicalVideoGenerator
                 Global.generatorFactory.progressText = "Loading media...";
                 currentPath = file.Path;
                 // Extract frames and audio
-                if(file.Type.RootType == LibraryRootType.Video && !processing)
+                if(!processing)
                 {
-                    // Run ffmpeg to extract frames and audio to .\temp\extracted\frames\* and .\temp\extracted\audio.wav
-                    // Create the directory if it doesn't exist
-                    if (!Directory.Exists(".\\temp\\extracted\\frames"))
+                    if(file.Type.RootType == LibraryRootType.Video)
                     {
-                        Directory.CreateDirectory(".\\temp\\extracted\\frames");
-                    }
-                    currentAudioTime = 0;
-                    audioLength = 0;
-                    processing = true;
-                    startedProcessing = 0;
-                    worker = new();
-                    worker.WorkerSupportsCancellation = true;
-                    worker.DoWork += (sender, args) => ExtractFramesAndAudio();
-                    worker.RunWorkerAsync();
-                    countWorker = new();
-                    countWorker.WorkerSupportsCancellation = true;
-                    countWorker.DoWork += (sender, args) => CountThread();
-                    countWorker.RunWorkerCompleted += (sender, args) => {
-                        progressWorker = new();
-                        progressWorker.WorkerSupportsCancellation = true;
-                        progressWorker.DoWork += (sender, args) => ProgressThread();
-                        progressWorker.RunWorkerAsync();
-                    };
-                    countWorker.RunWorkerAsync();
-                }
-                else
-                {
-                    try
-                    {
-                        if(audio != null)
+                        // Run ffmpeg to extract frames and audio to .\temp\extracted\frames\* and .\temp\extracted\audio.wav
+                        // Create the directory if it doesn't exist
+                        if (!Directory.Exists(".\\temp\\extracted\\frames"))
                         {
-                            audio.Stop();
-                            audio.Dispose();
-                            audio = null;
+                            Directory.CreateDirectory(".\\temp\\extracted\\frames");
                         }
-                        // Assume audio
-                        FileStream audioFile = File.OpenRead(file.Path);
-                        SoundEffect snd = SoundEffect.FromStream(audioFile);
-                        audio = snd.CreateInstance();
-                        audioFile.Close();
                         currentAudioTime = 0;
-                        audioLength = snd.Duration.TotalMilliseconds;
-                        canPlayBgMusic = false;
-                        audio.Play();
-                        Global.generatorFactory.progressText = "Playing media...";
+                        audioLength = 0;
+                        processing = true;
+                        startedProcessing = 0;
+                        worker = new();
+                        worker.WorkerSupportsCancellation = true;
+                        worker.DoWork += (sender, args) => ExtractFramesAndAudio();
+                        worker.RunWorkerAsync();
+                        countWorker = new();
+                        countWorker.WorkerSupportsCancellation = true;
+                        countWorker.DoWork += (sender, args) => CountThread();
+                        countWorker.RunWorkerCompleted += (sender, args) => {
+                            progressWorker = new();
+                            progressWorker.WorkerSupportsCancellation = true;
+                            progressWorker.DoWork += (sender, args) => ProgressThread();
+                            progressWorker.RunWorkerAsync();
+                        };
+                        countWorker.RunWorkerAsync();
                     }
-                    catch(Exception e)
+                    else
                     {
-                        ConsoleOutput.WriteLine($"Failed to play media.");
-                        ConsoleOutput.WriteLine(e.Message);
-                        GlobalContent.GetSound("Error").Play(int.Parse(SaveData.saveValues["SoundEffectVolume"]) / 100f, 0f, 0f);
-                        Global.generatorFactory.progressText = "Failed to play media.";
+                        try
+                        {
+                            // Create the directory if it doesn't exist
+                            if (!Directory.Exists(".\\temp\\extracted"))
+                            {
+                                Directory.CreateDirectory(".\\temp\\extracted");
+                            }
+                            currentAudioTime = 0;
+                            audioLength = 0;
+                            processing = true;
+                            startedProcessing = 0;
+                            audioConvertWorker = new();
+                            audioConvertWorker.WorkerSupportsCancellation = true;
+                            audioConvertWorker.DoWork += (sender, args) => AudioConvertThread();
+                            audioConvertWorker.RunWorkerAsync();
+                        }
+                        catch(Exception e)
+                        {
+                            ConsoleOutput.WriteLine($"Failed to play media.");
+                            ConsoleOutput.WriteLine(e.Message);
+                            GlobalContent.GetSound("Error").Play(int.Parse(SaveData.saveValues["SoundEffectVolume"]) / 100f, 0f, 0f);
+                            Global.generatorFactory.progressText = "Failed to play media.";
+                        }
                     }
                 }
             }
@@ -311,12 +378,13 @@ namespace NonsensicalVideoGenerator
         }
         public static void Update(GameTime gameTime)
         {
-            if(audioLength > 0 && currentAudioTime < audioLength)
+            if(audioLength > 0 && currentAudioTime < audioLength && audioPlaying)
             {
                 currentAudioTime += gameTime.ElapsedGameTime.TotalMilliseconds;
                 if(currentAudioTime > audioLength)
                 {
                     Stop();
+                    audioPlaying = false;
                 }
             }
             if(frames.Count > 0 && !playing && audio != null && !processing)

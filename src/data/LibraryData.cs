@@ -194,25 +194,19 @@ namespace NonsensicalVideoGenerator
         };
         private static void LoadRecursive(string path, LibraryType type)
         {
-            foreach (string file in Directory.GetFiles(path))
+            // sort by date ascending
+            foreach (string file in Directory.GetFiles(path).OrderBy(f => new FileInfo(f).CreationTime))
             {
                 foreach (string filetype in libraryFileTypes[type])
                 {
                     if (file.EndsWith(filetype))
                     {
                         LibraryFile libFile = new LibraryFile(Path.GetFileNameWithoutExtension(file), file, type);
-                        // If path contains .disabled, move to disabled folder (update version).
-                        if (libFile.Path.Contains(".disabled"))
-                        {
-                            string newName = Path.GetFileName(libFile.Path).Replace(".disabled", "");
-                            string newPath = Path.Combine(Path.GetDirectoryName(libFile.Path), "disabled", newName);
-                            File.Move(libFile.Path, newPath);
-                            libFile.Path = newPath;
-                        }
-                        // If path is in disabled folder, disable it.
-                        if (libFile.Path.Contains(@"\disabled\"))
+                        // If path is disabled, disable it.
+                        if (libFile.Path.Contains(@".disabled"))
                             libFile.Enabled = false;
                         libraryFiles.Add(libFile);
+                        SequentialName(libFile);
                         break;
                     }
                 }
@@ -284,7 +278,28 @@ namespace NonsensicalVideoGenerator
             }
             file.Path = newfile;
             libraryFiles.Add(file);
+            SequentialName(file);
             return file;
+        }
+        public static void SequentialName(LibraryFile file)
+        {
+            // Set Global.videoTitle to next sequential render name if render
+            if(file.Type == DefaultLibraryTypes.Render)
+            {
+                string[] files = Directory.GetFiles(Path.Combine(libraryRootPath, libraryPaths[file.Type]));
+                int max = 0;
+                foreach(string f in files)
+                {
+                    string name = Path.GetFileNameWithoutExtension(f);
+                    if (name.StartsWith("Render"))
+                    {
+                        int num = 0;
+                        if (int.TryParse(name.Substring(6), out num))
+                            max = Math.Max(max, num);
+                    }
+                }
+                Global.videoTitle = "Render" + (max + 1);
+            }
         }
         public static void Unload(LibraryFile file)
         {
@@ -320,10 +335,9 @@ namespace NonsensicalVideoGenerator
                             ConsoleOutput.WriteLine("Cannot enable library file: path is null.", Color.Red);
                             return;
                         }
-                        // Get path before /disabled/
-                        string rootPath = file.Path.Substring(0, file.Path.IndexOf(@"\disabled\"));
-                        string newpath = Path.Combine(rootPath, Path.GetFileName(file.Path));
-                        // If a file already exists in the root path, delete it.
+                        // Enable: rename and remove .disabled from extension prefix
+                        string newpath = Path.Combine(Path.GetDirectoryName(file.Path), Path.GetFileNameWithoutExtension(file.Path).Replace(".disabled", "") + Path.GetExtension(file.Path));
+                        // If a file already exists in the new path, delete it.
                         if (File.Exists(newpath))
                             File.Delete(newpath);
                         try
@@ -344,11 +358,8 @@ namespace NonsensicalVideoGenerator
                             ConsoleOutput.WriteLine("Cannot disable library file: path is null.", Color.Red);
                             return;
                         }
-                        // Move to disabled/
-                        string newpath = Path.Combine(Path.GetDirectoryName(file.Path), @"disabled\" + Path.GetFileName(file.Path));
-                        // Create disabled/ if it doesn't exist.
-                        if (!Directory.Exists(Path.GetDirectoryName(newpath)))
-                            Directory.CreateDirectory(Path.GetDirectoryName(newpath));
+                        // Rename and add .disabled to extension prefix
+                        string newpath = Path.Combine(Path.GetDirectoryName(file.Path), Path.GetFileNameWithoutExtension(file.Path) + ".disabled" + Path.GetExtension(file.Path));
                         // If a file already exists in disabled/, delete it.
                         if (File.Exists(newpath))
                             File.Delete(newpath);
@@ -444,9 +455,14 @@ namespace NonsensicalVideoGenerator
             source.Path = finalpath;
             source.Type = newType;
             if(removed)
+            {
                 libraryFiles.Add(source);
+                SequentialName(source);
+            }
             else
+            {
                 ConsoleOutput.WriteLine("Organized file was not found, so it was not re-added.", Color.Yellow);
+            }
             return source;
         }
         // Download thread
@@ -515,6 +531,7 @@ namespace NonsensicalVideoGenerator
             // Run callback
             downloadCallback(true);
             libraryFiles.Add(file);
+            SequentialName(file);
             Global.justCompletedRender = true; // Refresh the library.
             ConsoleOutput.WriteLine("Downloaded clip to library: " + path, Color.Green);
         }

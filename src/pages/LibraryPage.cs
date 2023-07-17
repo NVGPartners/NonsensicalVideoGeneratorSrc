@@ -408,7 +408,8 @@ namespace NonsensicalVideoGenerator
                             if (loadVideosThread != null && loadVideosThread.CancellationPending)
                                 return;
                             // Update video players
-                            videoPlayers.Add(position, texture);
+                            int pagelessPosition = position - (12 * page);
+                            videoPlayers.Add(pagelessPosition, texture);
                         }
                     }
                     catch
@@ -601,12 +602,6 @@ namespace NonsensicalVideoGenerator
                     string tts = rects.Keys.ElementAt(i);
                     switch(tts)
                     {
-                        case "AudioButton":
-                            tts = "Audio";
-                            break;
-                        case "VideoButton":
-                            tts = "Video";
-                            break;
                         case "HeaderButton":
                             string totalIndicator = "Click to download media";
                             if((selectedFlags & 4) == 4)
@@ -619,13 +614,13 @@ namespace NonsensicalVideoGenerator
                     bool selected = false;
                     // selectedFlags 1, 2, 4 are each button
                     // bitwise
-                    if(selectedFlags == 1 && rects.Keys.ElementAt(i) == "AudioButton")
+                    if((selectedFlags & 1) == 1 && rects.Keys.ElementAt(i) == "VideoButton")
                         selected = true;
-                    if(selectedFlags == 2 && rects.Keys.ElementAt(i) == "VideoButton")
+                    if((selectedFlags & 2) == 2 && rects.Keys.ElementAt(i) == "AudioButton")
                         selected = true;
-                    if(selectedFlags == 4 && rects.Keys.ElementAt(i) == "HeaderButton")
+                    if((selectedFlags & 4) == 4 && rects.Keys.ElementAt(i) == "HeaderButton")
                         selected = true;
-                    Accessibility.CompatAccessibility(rects.Values.ElementAt(i), "Header Button: " + tts + ", " + (selected ? "selected" : "not selected"));
+                    Accessibility.CompatAccessibility(rects.Values.ElementAt(i), tts + ", " + (selected ? "selected" : "not selected"));
                 }
                 // Video holders
                 for (int i = 0; i < 3; i++)
@@ -645,23 +640,25 @@ namespace NonsensicalVideoGenerator
                         Rectangle toggleButtonRect = new Rectangle(videoHolderRect.X + GlobalGraphics.Scale(11), videoHolderRect.Y + GlobalGraphics.Scale(27), GlobalGraphics.Scale(videoOn.Width), GlobalGraphics.Scale(videoOn.Height));
                         if(libraryFileCache[currentLibraryType].Count > position)
                         {
-                            Accessibility.CompatAccessibility(button1Rect, (deleteConfirmPos == position ? "Confirm delete " : "Organize ") + "\"" + Path.GetFileName(libraryFileCache[currentLibraryType][position].Path) + "\"");
-                            Accessibility.CompatAccessibility(button2Rect, (deleteConfirmPos == position ? "Cancel delete " : "Delete ") + "\"" + Path.GetFileName(libraryFileCache[currentLibraryType][position].Path) + "\"");
+                            Accessibility.CompatAccessibility(button1Rect, (deleteConfirmPos == position ? "Confirm delete " : "Organize ") + "\"" + Path.GetFileName(libraryFileCache[currentLibraryType][position].Path).Replace(".disabled","") + "\"");
+                            Accessibility.CompatAccessibility(button2Rect, (deleteConfirmPos == position ? "Cancel delete " : "Delete ") + "\"" + Path.GetFileName(libraryFileCache[currentLibraryType][position].Path).Replace(".disabled","") + "\"");
                             if(currentLibraryType != DefaultLibraryTypes.Render)
-                                Accessibility.CompatAccessibility(toggleButtonRect, (libraryFileCache[currentLibraryType][position].Enabled ? "Disable " : "Enable ") + "\"" + Path.GetFileName(libraryFileCache[currentLibraryType][position].Path) + "\"");
-                            else
-                                Accessibility.CompatAccessibility(staticRect, "Open \"" + Path.GetFileName(libraryFileCache[currentLibraryType][position].Path) + "\"");
+                                Accessibility.CompatAccessibility(toggleButtonRect, (libraryFileCache[currentLibraryType][position].Enabled ? "Disable " : "Enable ") + "\"" + Path.GetFileName(libraryFileCache[currentLibraryType][position].Path).Replace(".disabled","") + "\"");
+                            Accessibility.CompatAccessibility(staticRect, "Open \"" + Path.GetFileName(libraryFileCache[currentLibraryType][position].Path).Replace(".disabled","") + "\"");
                         }
-                        if(currentLibraryType != DefaultLibraryTypes.Render)
-                            Accessibility.CompatAccessibility(staticRect, "Add media");
+                        else
+                        {
+                            if(currentLibraryType != DefaultLibraryTypes.Render)
+                                Accessibility.CompatAccessibility(staticRect, "Add media");
+                        }
                     }
                 }
                 tooltip = "";
                 // Left click
-                if ((MouseInput.LastMouseState.LeftButton == ButtonState.Released && MouseInput.MouseState.LeftButton == ButtonState.Pressed) || (MouseInput.MouseState.RightButton == ButtonState.Released && MouseInput.LastMouseState.RightButton == ButtonState.Pressed))
+                if ((MouseInput.LastMouseState.LeftButton == ButtonState.Released && MouseInput.MouseState.LeftButton == ButtonState.Pressed) || (MouseInput.LastMouseState.RightButton == ButtonState.Released && MouseInput.MouseState.RightButton == ButtonState.Pressed))
                 {
                     bool left = MouseInput.LastMouseState.LeftButton == ButtonState.Released && MouseInput.MouseState.LeftButton == ButtonState.Pressed;
-                    bool right = MouseInput.MouseState.RightButton == ButtonState.Released && MouseInput.LastMouseState.RightButton == ButtonState.Pressed;
+                    bool right = MouseInput.MouseState.RightButton == ButtonState.Pressed && MouseInput.LastMouseState.RightButton == ButtonState.Released;
                     if(left)
                     {
                         // Loop rects
@@ -1093,7 +1090,7 @@ namespace NonsensicalVideoGenerator
                                 LibraryFile file = libraryFileCache[currentLibraryType][position];
                                 if (file.Path != null)
                                 {
-                                    tooltip = Path.GetFileName(file.Path).Replace("\\", "/").Replace("disabled/", "");
+                                    tooltip = Path.GetFileName(file.Path).Replace("\\", "/").Replace(".disabled", "");
                                 }
                             }
                             else if(currentLibraryType != DefaultLibraryTypes.Render)

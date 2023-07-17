@@ -132,15 +132,33 @@ namespace NonsensicalVideoGenerator
         {
             if(!allowAccessibility)
                 return;
-            if(enableTts && Accessibility.disambiguationOptions.Count > 0 && Accessibility.disambiguationOptions.Count > -(Accessibility.offset))
+            string ttsString = overrideString;
+            if(disambiguationOptions.Count > 0 && disambiguationOptions.Count > -(offset))
+            {
+                if(enableTts)
+                {
+                    if(synth.State == SynthesizerState.Speaking)
+                        synth.SpeakAsyncCancelAll();
+                    if(overrideString != "")
+                        synth.SpeakAsync(overrideString);
+                    else
+                    {
+                        ttsString = disambiguationOptions[-(offset)].tts;
+                        synth.SpeakAsync(disambiguationOptions[-offset].tts);
+                    }
+                }
+                else
+                {
+                    ttsString = disambiguationOptions[-(offset)].tts;
+                }
+            }
+            else if(enableTts && overrideString != "")
             {
                 if(synth.State == SynthesizerState.Speaking)
                     synth.SpeakAsyncCancelAll();
-                if(overrideString != "")
-                    synth.SpeakAsync(overrideString);
-                else
-                    synth.SpeakAsync(disambiguationOptions[-offset].tts);
+                synth.SpeakAsync(overrideString);
             }
+            help[help.Length - 1] = ttsString;
         }
         public static string[] help = new string[]
         {
@@ -148,7 +166,8 @@ namespace NonsensicalVideoGenerator
             "Press F1 to toggle keyboard navigation. Press F2 to toggle text to speech.",
             "Press enter to select an option.",
             "Press space to select and close keyboard navigation.",
-            "Use arrow keys or tab to cycle through options."
+            "Use arrow keys or tab to cycle through options.",
+            ""
         };
         public static void PostDraw(GameTime gameTime, SpriteBatch spriteBatch)
         {

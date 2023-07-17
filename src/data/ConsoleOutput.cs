@@ -161,6 +161,10 @@ namespace NonsensicalVideoGenerator
                 }
             }
         }
+        public static void ResetScroll()
+        {
+            scrollAmount = -1;
+        }
         public static void Clear()
         {
             output.Clear();

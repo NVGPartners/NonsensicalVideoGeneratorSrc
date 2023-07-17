@@ -19,7 +19,6 @@ namespace NonsensicalVideoGenerator
             {"ScreenHeight", "240"},
             {"ScreenScale", "2"}, // 1 - 4 ONLY!
             {"BackgroundSaturation", "0"},
-            {"ProjectTitle", "Result"},
             {"MinStreamDuration", "0.2"},
             {"MaxStreamDuration", "0.4"},
             {"MaxClipCount", "20"},

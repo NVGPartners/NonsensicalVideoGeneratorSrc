@@ -43,7 +43,7 @@ namespace NonsensicalVideoGenerator
             scaledBounds = new((int)(bounds.X * GlobalGraphics.scale), (int)(bounds.Y * GlobalGraphics.scale), (int)(bounds.Width * GlobalGraphics.scale), (int)(bounds.Height * GlobalGraphics.scale));
             if (handleInput)
             {
-                Accessibility.CompatAccessibility(scaledBounds, "Text Input: " + Name + "(" + hiddenToolTip + ") set to \"" + Tooltip + "\"");
+                Accessibility.CompatAccessibility(scaledBounds, "Text Input: " + Name + " (" + hiddenToolTip + ") set to \"" + Tooltip + "\"");
                 // Capture keyboard input
                 oldKeyboardState = newKeyboardState;
                 newKeyboardState = Keyboard.GetState();

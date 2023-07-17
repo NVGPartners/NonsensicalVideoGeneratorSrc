@@ -213,13 +213,6 @@ namespace NonsensicalVideoGenerator
                 return false;
             }));
             // Add text entries
-            controller.Add("ProjectTitle", new TextEntry("Project Name", "The name of the output video file.", SaveData.saveValues["ProjectTitle"], new Vector2(139, 60+19*4), 101, 20, 5, (int i) => {
-                string oldValue = SaveData.saveValues["ProjectTitle"];
-                SaveData.saveValues["ProjectTitle"] = controller.interactables["ProjectTitle"].Tooltip;
-                if(oldValue != SaveData.saveValues["ProjectTitle"])
-                    SaveData.Save();
-                return false;
-            }));
             controller.Add("MaxStreamDuration", new TextEntry("Random Length", "End of random length range.", SaveData.saveValues["MaxStreamDuration"], new Vector2(172, 60+19*3), 26, 5, 2, (int i) => {
                 string oldValue = SaveData.saveValues["MaxStreamDuration"];
                 if(float.Parse(controller.interactables["MaxStreamDuration"].Tooltip) < 0.2)

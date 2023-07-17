@@ -142,7 +142,7 @@ namespace NonsensicalVideoGenerator
             // Draw rendering progress
             if(Global.generatorFactory.progressText != "")
             {
-                string rendering = SaveData.saveValues["ProjectTitle"];
+                string rendering = Global.videoTitle;
                 // measure to center horizontally (one on top of the other)
                 Vector2 renderingSize = font.MeasureString(rendering);
                 Vector2 progressSize = font.MeasureString(Global.generatorFactory.progressText != "" ? Global.generatorFactory.progressText : (Global.generatorFactory.failureReason != "" ? Global.generatorFactory.failureReason : Global.generatorFactory.progress + "%"));
