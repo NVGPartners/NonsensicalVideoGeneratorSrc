@@ -3,12 +3,12 @@ function Query()
         ["settings"] = {
             {
                 ["name"] = "Display Name",
-                ["value"] = "DSP",
+                ["value"] = "Speed",
                 ["type"] = "label",
             },
             {
                 ["name"] = "Description",
-                ["value"] = "Applies vibrato or chorus audio effects.",
+                ["value"] = "Speeds up or down the clip.",
                 ["type"] = "label",
             },
             {
@@ -25,7 +25,7 @@ end
 local chance = 50
 
 -- Variables
-local vibratoOrChorus = false
+local speedUpOrDown = false
 
 function StartGeneration(options, pluginSettings, functions)
     -- Set settings
@@ -33,16 +33,16 @@ function StartGeneration(options, pluginSettings, functions)
         chance = tonumber(pluginSettings["Chance Roll"])
     end
     -- Set variables
-    vibratoOrChorus = functions.randomInt(1, 100) <= chance and true or false
+    speedUpOrDown = functions.randomInt(1, 100) <= chance and true or false
     -- Apply effect
-    if vibratoOrChorus then
-        -- Vibrato effect
-        -- Invoke-Command -ScriptBlock {&$ffmpeg -i "$video" -af chorus="0.5:0.9:50|60|40:0.4|0.32|0.3:0.25|0.4|0.3:2|2.3|1.3" -preset veryfast -y "$output"}
-        functions.runFFmpeg("-i \"" .. options.inputVideo .. "\" -af chorus=\"0.5:0.9:50|60|40:0.4|0.32|0.3:0.25|0.4|0.3:2|2.3|1.3\" -preset veryfast -y \"" .. options.outputVideo .. "\"")
+    if speedUpOrDown then
+        -- Speed up effect
+        -- Invoke-Command -ScriptBlock {&$ffmpeg -i "$video" -filter:v setpts=0.5*PTS -filter:a atempo=2.0 -preset veryfast -y "$output"}
+        functions.runFFmpeg("-i \"" .. options.inputVideo .. "\" -filter:v setpts=0.5*PTS -filter:a atempo=2.0 -preset veryfast -y \"" .. options.outputVideo .. "\"")
     else
-        -- Chorus effect
-        -- Invoke-Command -ScriptBlock {&$ffmpeg -i "$video" -af vibrato=f=7.0:d=0.5 -preset veryfast -y "$output"}
-        functions.runFFmpeg("-i \"" .. options.inputVideo .. "\" -af vibrato=f=7.0:d=0.5 -preset veryfast -y \"" .. options.outputVideo .. "\"")
+        -- Slow down effect
+        -- Invoke-Command -ScriptBlock {&$ffmpeg -i "$video" -filter:v setpts=2.0*PTS -filter:a atempo=0.5 -preset veryfast -y "$output"}
+        functions.runFFmpeg("-i \"" .. options.inputVideo .. "\" -filter:v setpts=2.0*PTS -filter:a atempo=0.5 -preset veryfast -y \"" .. options.outputVideo .. "\"")
     end
     return true
 end

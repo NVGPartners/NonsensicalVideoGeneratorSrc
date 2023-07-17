@@ -34,7 +34,7 @@ namespace NonsensicalVideoGenerator
             Rectangle scaledBounds = new((int)(bounds.X * GlobalGraphics.scale), (int)(bounds.Y * GlobalGraphics.scale), (int)(bounds.Width * GlobalGraphics.scale), (int)(bounds.Height * GlobalGraphics.scale));
             if (handleInput)
             {
-                Accessibility.CompatAccessibility(scaledBounds);
+                Accessibility.CompatAccessibility(scaledBounds, "Toggle Switch: " + Name + " (" + Tooltip + ") set to " + (SwitchState ? "On" : "Off"));
                 int mouseButtonFlags = 0;
                 // Check if the mouse is hovering over the button.
                 if (scaledBounds.Contains(MouseInput.MouseState.Position))
@@ -71,7 +71,7 @@ namespace NonsensicalVideoGenerator
                 if((mouseButtonFlags & 2) == 2)
                     return true;
             }
-            return false;
+            return Global.editing != "";
         }
         public void Draw(GameTime gameTime, SpriteBatch spriteBatch)
         {

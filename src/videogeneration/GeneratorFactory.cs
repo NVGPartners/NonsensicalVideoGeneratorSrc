@@ -111,6 +111,11 @@ namespace NonsensicalVideoGenerator
                             failureReason = "Failed to save to library.";
                             finished = false;
                         }
+                        else
+                        {
+                            if (bool.Parse(SaveData.saveValues["PlayAutomatically"]))
+                                FramePlayer.PlayMedia(libraryFile);
+                        }
                     }
                     else
                     {
@@ -125,8 +130,10 @@ namespace NonsensicalVideoGenerator
                         progressText = "Completed!";
                         progressState = ProgressState.Completed;
                         generatorActive = false;
+                        GlobalContent.GetSound("RenderComplete").Play(int.Parse(SaveData.saveValues["SoundEffectVolume"]) / 100f, 0f, 0f);
+                        /*
                         // Open the video in the default video player if the user has that option enabled.
-                        if (bool.Parse(SaveData.saveValues["AddToLibrary"]))
+                        if (bool.Parse(SaveData.saveValues["PlayAutomatically"]))
                         {
                             ProcessStartInfo startInfo = new()
                             {
@@ -135,6 +142,7 @@ namespace NonsensicalVideoGenerator
                             };
                             Process.Start(startInfo);
                         }
+                        */
                         Global.justCompletedRender = true;
                     }
                 }
@@ -231,7 +239,7 @@ namespace NonsensicalVideoGenerator
                     timeout = defaultTimeout;
                     if (vidThreadWorker?.CancellationPending == true)
                         return;
-                    progressText = "Starting clip " + (i + 1) + " of " + maxClips + "...";
+                    progressText = "Starting clip " + (i + 1) + "/" + maxClips + "...";
                     bool intro = false;
                     if (i == 0 && bool.Parse(SaveData.saveValues["IntrosEnabled"]))
                     {
@@ -247,7 +255,7 @@ namespace NonsensicalVideoGenerator
                             maxClips++;
                             ConsoleOutput.WriteLine("Intro clip enabled, adding 1 to max clips. New max clips is " + maxClips + ".", Color.Gray);
                             progress = Convert.ToInt32(((float)i / (float)maxClips));
-                            progressText = "Introducing ourselves... (" + (i + 1) + " of " + maxClips + ")";
+                            progressText = "Introducing ourselves... (" + (i + 1) + "/" + maxClips + ")";
                             Utilities.CopyVideo(introPath, Path.Combine(Utilities.temporaryDirectory, "video" + i + ".mp4"));
                             // get length of intro and add it to currentTime
                             float introLength = float.Parse(Utilities.GetLength(introPath));
@@ -261,7 +269,7 @@ namespace NonsensicalVideoGenerator
                         bool rolledForTransition = RandomInt(0, 101) < int.Parse(SaveData.saveValues["TransitionChance"]);
                         string overlayPath = "";
                         progress = Convert.ToInt32(((float)i / (float)maxClips));
-                        progressText = "Clipping... (" + (i + 1) + " of " + maxClips + ")";
+                        progressText = "Clipping... (" + (i + 1) + "/" + maxClips + ")";
                         string sourceToPick = LibraryData.PickRandom(DefaultLibraryTypes.Material, globalRandom);
                         float source = -1;
                         if(sourceToPick == "")
@@ -309,7 +317,7 @@ namespace NonsensicalVideoGenerator
                                 ConsoleOutput.WriteLine("No transitions found in library.", Color.Yellow);
                                 continue;
                             }
-                            progressText = "Transitioning... (" + (i + 1) + " of " + maxClips + ")";
+                            progressText = "Transitioning... (" + (i + 1) + "/" + maxClips + ")";
                             Utilities.CopyVideo(transitionPath, Path.Combine(Utilities.temporaryDirectory, "video" + i + ".mp4"));
                         }
                         else
@@ -327,7 +335,7 @@ namespace NonsensicalVideoGenerator
                                 ConsoleOutput.WriteLine("No overlays found in library.", Color.Yellow);
                                 continue;
                             }
-                            progressText = "Chroma keying... (" + (i + 1) + " of " + maxClips + ")";
+                            progressText = "Chroma keying... (" + (i + 1) + "/" + maxClips + ")";
                             ConsoleOutput.WriteLine("Rolled for overlay, adding overlay to clip " + i + ".", Color.Gray);
                             // We snip the clip here in case it was a transition
                             //if(!alreadySnipped)
@@ -354,7 +362,7 @@ namespace NonsensicalVideoGenerator
                                 // Roll for effect
                                 if(RandomInt(0, 101) < (rolledForTransition ? int.Parse(SaveData.saveValues["TransitionEffectChance"]) : int.Parse(SaveData.saveValues["EffectChance"])))
                                 {
-                                    progressText = (rolledForTransition ? "Boiling" : "Baking") + " effects... (" + (i + 1) + " of " + maxClips + ")";
+                                    progressText = (rolledForTransition ? "Boiling" : "Baking") + " effects... (" + (i + 1) + "/" + maxClips + ")";
                                     // We rolled for an effect, let's pick one.
                                     PluginReturnValue effect = PluginHandler.PickRandom(globalRandom, Path.Combine(Utilities.temporaryDirectory, "video" + i + ".mp4"));
                                     if(effect.success)
@@ -455,6 +463,11 @@ namespace NonsensicalVideoGenerator
                             finished = false;
                             CancelGeneration();
                         }
+                        else
+                        {
+                            if (bool.Parse(SaveData.saveValues["PlayAutomatically"]))
+                                FramePlayer.PlayMedia(libraryFile);
+                        }
                     }
                     else
                     {
@@ -477,7 +490,8 @@ namespace NonsensicalVideoGenerator
                         if(timeoutWorker != null)
                             timeoutWorker.CancelAsync();
                         // Open the video in the default video player if the user has that option enabled.
-                        if (bool.Parse(SaveData.saveValues["AddToLibrary"]))
+                        /*
+                        if (bool.Parse(SaveData.saveValues["PlayAutomatically"]))
                         {
                             ProcessStartInfo startInfo = new()
                             {
@@ -486,6 +500,7 @@ namespace NonsensicalVideoGenerator
                             };
                             Process.Start(startInfo);
                         }
+                        */
                     }
                     else
                     {
@@ -512,6 +527,7 @@ namespace NonsensicalVideoGenerator
         }
         public void StartGeneration(ProgressChangedEventHandler progressReporter, RunWorkerCompletedEventHandler completedReporter)
         {
+            FramePlayer.Stop();
             try
             {
                 if(vidThreadWorker == null)

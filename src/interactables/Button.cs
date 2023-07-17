@@ -38,7 +38,7 @@ namespace NonsensicalVideoGenerator
             {
                 int mouseButton = 0;
                 // Check if the mouse is hovering over the button.
-                Accessibility.CompatAccessibility(scaledBounds);
+                Accessibility.CompatAccessibility(scaledBounds, "Button: " + Name + " (" + Tooltip + ")");
                 if (scaledBounds.Contains(MouseInput.MouseState.Position))
                 {
                     // Check if the mouse is clicking on the button.
@@ -68,7 +68,7 @@ namespace NonsensicalVideoGenerator
                         return true;
                 }
             }
-            return false;
+            return Global.editing != "";
         }
         public void Draw(GameTime gameTime, SpriteBatch spriteBatch)
         {

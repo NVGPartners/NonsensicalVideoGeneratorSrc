@@ -697,6 +697,30 @@
 /processorParam:TextureFormat=Color
 /build:graphics/library/headerbuttonselected.png
 
+#begin graphics/library/renderaddvideooverlay.png
+/importer:TextureImporter
+/processor:TextureProcessor
+/processorParam:ColorKeyColor=255,0,255,255
+/processorParam:ColorKeyEnabled=True
+/processorParam:GenerateMipmaps=False
+/processorParam:PremultiplyAlpha=True
+/processorParam:ResizeToPowerOfTwo=False
+/processorParam:MakeSquare=False
+/processorParam:TextureFormat=Color
+/build:graphics/library/renderaddvideooverlay.png
+
+#begin graphics/library/rendernobutton.png
+/importer:TextureImporter
+/processor:TextureProcessor
+/processorParam:ColorKeyColor=255,0,255,255
+/processorParam:ColorKeyEnabled=True
+/processorParam:GenerateMipmaps=False
+/processorParam:PremultiplyAlpha=True
+/processorParam:ResizeToPowerOfTwo=False
+/processorParam:MakeSquare=False
+/processorParam:TextureFormat=Color
+/build:graphics/library/rendernobutton.png
+
 #begin graphics/library/separator.png
 /importer:TextureImporter
 /processor:TextureProcessor

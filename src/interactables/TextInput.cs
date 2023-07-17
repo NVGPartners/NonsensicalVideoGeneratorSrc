@@ -43,46 +43,111 @@ namespace NonsensicalVideoGenerator
             scaledBounds = new((int)(bounds.X * GlobalGraphics.scale), (int)(bounds.Y * GlobalGraphics.scale), (int)(bounds.Width * GlobalGraphics.scale), (int)(bounds.Height * GlobalGraphics.scale));
             if (handleInput)
             {
-                Accessibility.CompatAccessibility(scaledBounds);
+                Accessibility.CompatAccessibility(scaledBounds, "Text Input: " + Name + "(" + hiddenToolTip + ") set to \"" + Tooltip + "\"");
+                // Capture keyboard input
+                oldKeyboardState = newKeyboardState;
+                newKeyboardState = Keyboard.GetState();
                 // Check if the mouse is hovering over the button.
                 if (scaledBounds.Contains(MouseInput.MouseState.Position))
                 {
                     // Check if the mouse is clicking on the button.
                     if (MouseInput.LastMouseState.LeftButton == ButtonState.Released && MouseInput.MouseState.LeftButton == ButtonState.Pressed)
                     {
-                        State = (State == 0) ? 1 : 0;
-                        Callback(State);
-                        GlobalContent.GetSound("Option").Play(int.Parse(SaveData.saveValues["SoundEffectVolume"]) / 100f, 0f, 0f);
+                        if(Global.editing == Name + "Input")
+                        {
+                            Global.editing = "";
+                            State = 0;
+                            Callback(State);
+                            Accessibility.allowAccessibility = true;
+                            GlobalContent.GetSound("Option").Play(int.Parse(SaveData.saveValues["SoundEffectVolume"]) / 100f, 0f, 0f);
+                        }
+                        else if(Global.editing == "")
+                        {
+                            Global.editing = Name + "Input";
+                            State = 1;
+                            Callback(State);
+                            Accessibility.allowAccessibility = false;
+                            GlobalContent.GetSound("Option").Play(int.Parse(SaveData.saveValues["SoundEffectVolume"]) / 100f, 0f, 0f);
+                        }
+                        else
+                        {
+                            GlobalContent.GetSound("Error").Play(int.Parse(SaveData.saveValues["SoundEffectVolume"]) / 100f, 0f, 0f);
+                        }
                         return true;
                     }
                 }
                 // If state is 1, we are entering text.
                 if(State == 1)
                 {
-                    if (MouseInput.LastMouseState.LeftButton == ButtonState.Released && MouseInput.MouseState.LeftButton == ButtonState.Pressed)
+                    if(Global.editing != Name + "Input")
                     {
                         State = 0;
                         Callback(0);
-                        GlobalContent.GetSound("Option").Play(int.Parse(SaveData.saveValues["SoundEffectVolume"]) / 100f, 0f, 0f);
-                        return true;
+                        Accessibility.allowAccessibility = true;
                     }
-                    if(Accessibility.allowAccessibility)
-                        Accessibility.allowAccessibility = false;
-                    // Capture keyboard input
-                    oldKeyboardState = newKeyboardState;
-                    newKeyboardState = Keyboard.GetState();
                     // Check for enter
                     if ((newKeyboardState.IsKeyDown(Keys.Enter) && !oldKeyboardState.IsKeyDown(Keys.Enter)) || (newKeyboardState.IsKeyDown(Keys.Escape) && !oldKeyboardState.IsKeyDown(Keys.Escape)))
                     {
                         State = 0;
                         Callback(0);
-                        GlobalContent.GetSound("Option").Play(int.Parse(SaveData.saveValues["SoundEffectVolume"]) / 100f, 0f, 0f);
+                        Global.editing = "";
                         Accessibility.allowAccessibility = true;
+                        GlobalContent.GetSound("Option").Play(int.Parse(SaveData.saveValues["SoundEffectVolume"]) / 100f, 0f, 0f);
+                    }
+                    else
+                    {
+                        // If number entry, use arrows to change number
+                        if (mode <= 2)
+                        {
+                            if (newKeyboardState.IsKeyDown(Keys.Up) && !oldKeyboardState.IsKeyDown(Keys.Up))
+                            {
+                                switch(mode)
+                                {
+                                    case 1: // numbers only (inc 1)
+                                        int.TryParse(Tooltip, out int num);
+                                        num += 1;
+                                        Tooltip = num.ToString();
+                                        break;
+                                    case 2: // decimals (inc 0.01)
+                                        float.TryParse(Tooltip, out float dec);
+                                        dec += 0.01f;
+                                        Tooltip = dec.ToString("0.00");
+                                        // Remove 0s at end
+                                        while (Tooltip.EndsWith("0"))
+                                        {
+                                            Tooltip = Tooltip.Remove(Tooltip.Length - 1);
+                                        }
+                                        break;
+                                }
+                            }
+                            if (newKeyboardState.IsKeyDown(Keys.Down) && !oldKeyboardState.IsKeyDown(Keys.Down))
+                            {
+                                switch (mode)
+                                {
+                                    case 1: // numbers only (dec 1)
+                                        int.TryParse(Tooltip, out int num);
+                                        num -= 1;
+                                        Tooltip = num.ToString();
+                                        break;
+                                    case 2: // decimals (dec 0.01)
+                                        float.TryParse(Tooltip, out float dec);
+                                        dec -= 0.01f;
+                                        // round to 2 decimal places in string
+                                        Tooltip = dec.ToString("0.00");
+                                        // Remove 0s at end
+                                        while (Tooltip.EndsWith("0"))
+                                        {
+                                            Tooltip = Tooltip.Remove(Tooltip.Length - 1);
+                                        }
+                                        break;
+                                }
+                            }
+                        }
                     }
                     return true;
                 }
             }
-            return false;
+            return Name != "" && Global.editing == Name + "Input";
         }
         public void Draw(GameTime gameTime, SpriteBatch spriteBatch)
         {

@@ -81,26 +81,6 @@ namespace NonsensicalVideoGenerator
             _graphics.PreferredBackBufferHeight = (int)(int.Parse(SaveData.saveValues["ScreenHeight"]) * scale);
             _graphics.ApplyChanges();
             ConsoleOutput.Clear();
-            // Delete update.bat
-            try
-            {
-                if(System.IO.File.Exists("update.bat"))
-                    System.IO.File.Delete("update.bat");
-            }
-            catch
-            {
-            }
-            // Load plugins.
-            if(!bool.Parse(SaveData.saveValues["FirstBoot"]) && SaveData.saveValues["FirstBootVersion"] == Global.productVersion)
-            {
-                //Global.pluginsLoaded = PluginHandler.LoadPlugins(); // Only load plugins after first boot.
-            }
-            else
-            {
-                SaveData.saveValues["FirstBoot"] = "true";
-                SaveData.saveValues["FirstBootVersion"] = Global.productVersion;
-                SaveData.Save();
-            }
             // Load all screens.
             ScreenManager.LoadScreens();
             ConsoleOutput.WriteLine("Initialization complete for v" + Global.productVersion + ".");
@@ -127,37 +107,17 @@ namespace NonsensicalVideoGenerator
         }
         private void FindMusic()
         {
-            int music = int.Parse(SaveData.saveValues["ActiveMusic"]);
-            if(!Global.shuffled && SaveData.saveValues["ShuffleMusic"] == "true")
-            {
-                // Shuffle music.
-                Global.shuffled = true;
-                music = Global.generatorFactory.globalRandom.Next(0, GlobalContent.GetSongCount());
-                SaveData.saveValues["ActiveMusic"] = music.ToString();
-                SaveData.Save();
-            }
-            // Make sure music is in range.
-            if(music < 0 || music >= GlobalContent.GetSongCount())
-            {
-                music = 0;
-                SaveData.saveValues["ActiveMusic"] = music.ToString();
-                SaveData.Save();
-            }
+            _musicActive = Global.generatorFactory.globalRandom.Next(0, GlobalContent.GetSongCount());
+            MediaPlayer.Play(GlobalContent.GetSongByIndex(_musicActive));
+            MediaPlayer.Volume = 0f;
         }
         protected override void Update(GameTime gameTime)
         {
             SteamManager.Update();
+            FramePlayer.Update(gameTime);
             // Play music after 500ms.
             if(gameTime.TotalGameTime.TotalMilliseconds > Global.readyTime + 2500 && Global.ready)
             {
-                // Exchange music if it's not the same as the active music.
-                if(_musicActive != int.Parse(SaveData.saveValues["ActiveMusic"]))
-                {
-                    _musicActive = int.Parse(SaveData.saveValues["ActiveMusic"]);
-                    MediaPlayer.Play(GlobalContent.GetSongByIndex(_musicActive));
-                    MediaPlayer.Volume = 0f;
-                }
-                    
                 if(Global.exiting)
                 {
                     if(MediaPlayer.Volume > 0.01f)
@@ -170,49 +130,44 @@ namespace NonsensicalVideoGenerator
                 }
                 else
                 {
-                    switch(_windowState)
+                    if((_windowState == WindowState.Focused && _musicState == MusicState.Playing) && FramePlayer.canPlayBgMusic)
                     {
-                        case WindowState.Focused:
-                            if(_musicState == MusicState.Playing)
-                            {
-                                // Fade in music.
-                                float vol = int.Parse(SaveData.saveValues["MusicVolume"]) / 100f;
-                                if(MediaPlayer.Volume < vol)
-                                    MediaPlayer.Volume += 0.1f;
-                                // Clamp music if it's over the volume level.
-                                if(MediaPlayer.Volume > vol)
-                                    MediaPlayer.Volume = vol;
-                            }
-                            else if(_musicState == MusicState.Stopped)
-                            {
-                                MediaPlayer.Play(GlobalContent.GetSongByIndex(_musicActive));
-                                _musicState = MusicState.Playing;
-                            }
-                            else if(_musicState == MusicState.Paused)
-                            {
-                                MediaPlayer.Resume();
-                                _musicState = MusicState.Playing;
-                            }
-                            // Loop music.
-                            if(MediaPlayer.State == MediaState.Stopped)
-                            {
-                                MediaPlayer.Play(GlobalContent.GetSongByIndex(_musicActive));
-                            }
-
-                            break;
-                        case WindowState.Unfocused:
-                            if(_musicState == MusicState.Playing)
-                            {
-                                // Fade out music.
-                                if(MediaPlayer.Volume > 0.1f)
-                                    MediaPlayer.Volume -= 0.1f;
-                                else
-                                {
-                                    MediaPlayer.Pause();
-                                    _musicState = MusicState.Paused;
-                                }
-                            }
-                            break;
+                        // Fade in music.
+                        float vol = int.Parse(SaveData.saveValues["MusicVolume"]) / 100f;
+                        if(MediaPlayer.Volume < vol)
+                            MediaPlayer.Volume += 0.1f;
+                        // Clamp music if it's over the volume level.
+                        if(MediaPlayer.Volume > vol)
+                            MediaPlayer.Volume = vol;
+                    }
+                    else if((_windowState == WindowState.Focused && _musicState == MusicState.Stopped) && FramePlayer.canPlayBgMusic)
+                    {
+                        MediaPlayer.Play(GlobalContent.GetSongByIndex(_musicActive));
+                        _musicState = MusicState.Playing;
+                    }
+                    else if((_windowState == WindowState.Focused && _musicState == MusicState.Paused) && FramePlayer.canPlayBgMusic)
+                    {
+                        MediaPlayer.Resume();
+                        _musicState = MusicState.Playing;
+                    }
+                    // Loop music.
+                    if((_windowState == WindowState.Focused && MediaPlayer.State == MediaState.Stopped) && FramePlayer.canPlayBgMusic)
+                    {
+                        int newSong = Global.generatorFactory.globalRandom.Next(0, GlobalContent.GetSongCount());
+                        while(newSong == _musicActive)
+                            newSong = Global.generatorFactory.globalRandom.Next(0, GlobalContent.GetSongCount());
+                        _musicActive = newSong;
+                    }
+                    if((_windowState == WindowState.Unfocused &&_musicState == MusicState.Playing) || !FramePlayer.canPlayBgMusic)
+                    {
+                        // Fade out music.
+                        if(MediaPlayer.Volume > 0.1f)
+                            MediaPlayer.Volume -= 0.1f;
+                        else
+                        {
+                            MediaPlayer.Pause();
+                            _musicState = MusicState.Paused;
+                        }
                     }
                 }
             }

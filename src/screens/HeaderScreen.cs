@@ -97,7 +97,7 @@ namespace NonsensicalVideoGenerator
                 {
                     if(MouseInput.LastMouseState.LeftButton == ButtonState.Released && MouseInput.MouseState.LeftButton == ButtonState.Pressed)
                     {
-                        if(Global.pluginsLoaded)
+                        if(Global.pluginsLoaded || !UpdateManager.ffmpegInstalled || !UpdateManager.ffprobeInstalled)
                         {
                             // Play sound
                             GlobalContent.GetSound("Select").Play(int.Parse(SaveData.saveValues["SoundEffectVolume"]) / 100f, 0f, 0f); 
@@ -129,12 +129,16 @@ namespace NonsensicalVideoGenerator
             spriteBatch.Begin(SpriteSortMode.Deferred, BlendState.AlphaBlend, SamplerState.PointClamp, null, null, null, Matrix.CreateTranslation(offset.X, offset.Y, 0));
             // Logo.
             SpriteFont font = GlobalContent.GetFont("MunroSmall");
+            /*
             Texture2D logobg = GlobalContent.GetTexture("LogoBG");
             spriteBatch.Draw(logobg, new Rectangle(GlobalGraphics.Scale(0), GlobalGraphics.Scale(7), GlobalGraphics.Scale(logobg.Width), GlobalGraphics.Scale(logobg.Height)), Color.White);
             spriteBatch.DrawString(font, "v" + Global.productVersion, new Vector2(GlobalGraphics.Scale(7+1), GlobalGraphics.Scale(8+1)), Color.Black);
             spriteBatch.DrawString(font, "v" + Global.productVersion, new Vector2(GlobalGraphics.Scale(7), GlobalGraphics.Scale(8)), Color.White);
             spriteBatch.DrawString(font, "Steam Version", new Vector2(GlobalGraphics.Scale(7+1), GlobalGraphics.Scale(18+1)), Color.Black);
             spriteBatch.DrawString(font, "Steam Version", new Vector2(GlobalGraphics.Scale(7), GlobalGraphics.Scale(18)), Color.White);
+            */
+            Texture2D logo = GlobalContent.GetTexture("Logo");
+            spriteBatch.Draw(logo, new Rectangle(GlobalGraphics.Scale(10), GlobalGraphics.Scale(10), GlobalGraphics.Scale(logo.Width), GlobalGraphics.Scale(logo.Height)), Color.White);
             // Draw rendering progress
             if(Global.generatorFactory.progressText != "")
             {

@@ -27,6 +27,8 @@ namespace NonsensicalVideoGenerator
         public static bool useSystemFFmpeg = false;
         public static bool useSystemFFprobe = false;
         public static bool useSystemYtDlp = false;
+        public static string editing = "";
+        public static string appId = "2516360";
         public static GeneratorFactory generatorFactory = new GeneratorFactory();
     }
 }

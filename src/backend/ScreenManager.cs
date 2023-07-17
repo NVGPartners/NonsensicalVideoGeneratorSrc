@@ -191,9 +191,11 @@ namespace NonsensicalVideoGenerator
             if(UserInterface.instance != null)
             {
                 MouseInput.LastMouseState = MouseInput.MouseState;
-                MouseInput._mouseState = Mouse.GetState();
+                if(!Accessibility.showDisambiguation)
+                {
+                    MouseInput._mouseState = Mouse.GetState();
+                }
             }
-            Accessibility.allowAccessibility = UserInterface.instance.IsActive;
             bool handleInput = UserInterface.instance.IsActive && MouseInput.MouseState.X >= 0 && MouseInput.MouseState.X <= GlobalGraphics.scaledWidth &&
                 MouseInput.MouseState.Y >= 0 && MouseInput.MouseState.Y <= GlobalGraphics.scaledHeight && !Global.dragDrop;
             if(Accessibility.PreUpdate(gameTime))

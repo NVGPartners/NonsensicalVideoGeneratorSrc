@@ -61,6 +61,7 @@ local segmentLength = 0.2
 local seek = 1;
 local randomSound = ""
 local useOriginalAudio = false
+local runCount = 0
 
 function StartGeneration(options, pluginSettings, functions)
     -- Set settings
@@ -83,6 +84,7 @@ function StartGeneration(options, pluginSettings, functions)
     temp2 = options.workingDirectory .. "temp2.mp4"
     temp3 = options.workingDirectory .. "temp3.mp4"
     -- Set variables
+    runCount = 0
     segmentLength = functions.randomDouble(randomTimeMin, randomTimeMax)
     seek = functions.randomInt(musicSeekStart, musicSeekEnd)
     randomSound = functions.getRandomLibraryFile("audio", "music")

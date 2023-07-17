@@ -1,6 +1,8 @@
+using System.Diagnostics;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Content;
 using Microsoft.Xna.Framework.Graphics;
+using Steamworks;
 
 namespace NonsensicalVideoGenerator
 {
@@ -21,62 +23,76 @@ namespace NonsensicalVideoGenerator
         }
         public void Draw(GameTime gameTime, SpriteBatch spriteBatch)
         {
-            // Draw text
-            spriteBatch.DrawString(GlobalGraphics.fontMunro, "Music: " + GlobalContent.GetSongTitleByIndex(int.Parse(SaveData.saveValues["ActiveMusic"])), new Vector2(GlobalGraphics.Scale(1+139), GlobalGraphics.Scale(1+51+19*6)), Color.Black);
-            spriteBatch.DrawString(GlobalGraphics.fontMunro, "Music: " + GlobalContent.GetSongTitleByIndex(int.Parse(SaveData.saveValues["ActiveMusic"])), new Vector2(GlobalGraphics.Scale(139), GlobalGraphics.Scale(51+19*6)), Color.White);
-            spriteBatch.DrawString(GlobalGraphics.fontMunro, "By: " + GlobalContent.GetSongArtistByIndex(int.Parse(SaveData.saveValues["ActiveMusic"])), new Vector2(GlobalGraphics.Scale(1+139), GlobalGraphics.Scale(1+51+12+19*6)), Color.Black);
-            spriteBatch.DrawString(GlobalGraphics.fontMunro, "By: " + GlobalContent.GetSongArtistByIndex(int.Parse(SaveData.saveValues["ActiveMusic"])), new Vector2(GlobalGraphics.Scale(139), GlobalGraphics.Scale(51+12+19*6)), Color.White);
             // Interactable
             controller.Draw(gameTime, spriteBatch);
         }
         public void LoadContent(ContentManager contentManager, GraphicsDevice graphicsDevice)
         {
-            // Add labels
-            controller.Add("DialLabel", new Label("Click and rotate dials slowly.", new Vector2(139, 60)));
-            // Add switches
-            controller.Add("ShuffleMusic", new Switch("Shuffle", "Shuffle the music on startup.", new Vector2(139+85, 51+19*5), (int i) => {
-                bool switchState = (i & 256) != 0;
-                if((i & 2) != 0)
-                {
-                    string oldValue = SaveData.saveValues["ShuffleMusic"];
-                    SaveData.saveValues["ShuffleMusic"] = switchState.ToString().ToLower();
-                    if(oldValue != SaveData.saveValues["ShuffleMusic"])
-                        SaveData.Save();
-                }
-                return switchState;
-            }, SaveData.saveValues["ShuffleMusic"] == "true"));
-            controller.Add("ActiveMusic", new Dial("Music Type", "Change the current background music.", new Vector2(139, 51+19*5), int.Parse(SaveData.saveValues["ActiveMusic"]), 0, GlobalContent.GetSongCount() - 1, (int i) => {
-                int oldValue = int.Parse(SaveData.saveValues["ActiveMusic"]);
-                SaveData.saveValues["ActiveMusic"] = i.ToString();
-                if(oldValue != int.Parse(SaveData.saveValues["ActiveMusic"]))
-                    SaveData.Save();
-                return false;
-            }));
             // Add dials
-            controller.Add("BGSaturation", new Dial("Background Saturation", "Adjust color in the animated background.", new Vector2(139, 51+19*4), int.Parse(SaveData.saveValues["BackgroundSaturation"]), 0, 100, (int i) => {
+            controller.Add("BGSaturation", new TextEntry("Background Saturation", "Adjust color in the animated background, from 0-255.", SaveData.saveValues["BackgroundSaturation"], new Vector2(139, 60+19*4), 24, 3, 1, (int i) => {
                 int oldValue = int.Parse(SaveData.saveValues["BackgroundSaturation"]);
-                SaveData.saveValues["BackgroundSaturation"] = i.ToString();
+                // Range: 0-255
+                if(int.Parse(controller.interactables["BGSaturation"].Tooltip) < 0)
+                    controller.interactables["BGSaturation"].Tooltip = "0";
+                if(int.Parse(controller.interactables["BGSaturation"].Tooltip) > 255)
+                    controller.interactables["BGSaturation"].Tooltip = "255";
+                SaveData.saveValues["BackgroundSaturation"] = controller.interactables["BGSaturation"].Tooltip;
                 if(oldValue != int.Parse(SaveData.saveValues["BackgroundSaturation"]))
                     SaveData.Save();
                 return false;
             }));
-            controller.Add("Scale", new Dial("Scale (May cause issues)", "Screen size multiplier, requires restart.", new Vector2(139, 51+19*3), int.Parse(SaveData.saveValues["ScreenScale"]) - 1, 0, 3, (int i) => {
+            controller.Add("Scale", new TextEntry("Screen Resolution Multiplier", "A restart will be performed when set.", SaveData.saveValues["ScreenScale"], new Vector2(139, 60+19*3), 24, 3, 1, (int i) => {
                 int oldValue = int.Parse(SaveData.saveValues["ScreenScale"]);
-                SaveData.saveValues["ScreenScale"] = (i + 1).ToString();
+                // Range: 1-4
+                if(int.Parse(controller.interactables["Scale"].Tooltip) < 1)
+                    controller.interactables["Scale"].Tooltip = "1";
+                if(int.Parse(controller.interactables["Scale"].Tooltip) > 4)
+                    controller.interactables["Scale"].Tooltip = "4";
+                SaveData.saveValues["ScreenScale"] = controller.interactables["Scale"].Tooltip;
                 if(oldValue != int.Parse(SaveData.saveValues["ScreenScale"]))
+                {
+                    SaveData.Save();
+                    // Restart software through steam
+                    ProcessStartInfo startInfo = new ProcessStartInfo();
+                    startInfo.FileName = "steam://rungameid/" + Global.appId;
+                    startInfo.UseShellExecute = true;
+                    startInfo.Verb = "open";
+                    Process.Start(startInfo);
+                    // Close software
+                    SteamAPI.Shutdown();
+                    UserInterface.instance.Exit();
+                }
+                return false;
+            }));
+            controller.Add("VideoVolume", new TextEntry("Media Playback Volume", "In-app media volume level.", SaveData.saveValues["VideoVolume"], new Vector2(139, 60+19*2), 24, 3, 1, (int i) => {
+                string oldValue = SaveData.saveValues["VideoVolume"];
+                if(int.Parse(controller.interactables["VideoVolume"].Tooltip) < 0)
+                    controller.interactables["VideoVolume"].Tooltip = "0";
+                if(int.Parse(controller.interactables["VideoVolume"].Tooltip) > 100)
+                    controller.interactables["VideoVolume"].Tooltip = "100";
+                SaveData.saveValues["VideoVolume"] = controller.interactables["VideoVolume"].Tooltip;
+                if(oldValue != SaveData.saveValues["VideoVolume"])
                     SaveData.Save();
                 return false;
             }));
-            controller.Add("SFXVolume", new Dial("Sound Effect Volume", "Sound effect volume level.", new Vector2(139, 51+19*2), int.Parse(SaveData.saveValues["SoundEffectVolume"]), 0, 100, (int i) => {
+            controller.Add("SFXVolume", new TextEntry("Sound Effect Volume", "Sound effect volume level.", SaveData.saveValues["SoundEffectVolume"], new Vector2(139, 60+19), 24, 3, 1, (int i) => {
                 string oldValue = SaveData.saveValues["SoundEffectVolume"];
-                SaveData.saveValues["SoundEffectVolume"] = i.ToString();
+                if(int.Parse(controller.interactables["SFXVolume"].Tooltip) < 0)
+                    controller.interactables["SFXVolume"].Tooltip = "0";
+                if(int.Parse(controller.interactables["SFXVolume"].Tooltip) > 100)
+                    controller.interactables["SFXVolume"].Tooltip = "100";
+                SaveData.saveValues["SoundEffectVolume"] = controller.interactables["SFXVolume"].Tooltip;
                 if(oldValue != SaveData.saveValues["SoundEffectVolume"])
                     SaveData.Save();
                 return false;
             }));
-            controller.Add("MusicVolume", new Dial("Music Volume", "Background music volume level.", new Vector2(139, 51+19), int.Parse(SaveData.saveValues["MusicVolume"]), 0, 100, (int i) => {
+            controller.Add("MusicVolume", new TextEntry("Music Volume", "Background music volume level.", SaveData.saveValues["MusicVolume"], new Vector2(139, 60), 24, 3, 1, (int i) => {
                 string oldValue = SaveData.saveValues["MusicVolume"];
-                SaveData.saveValues["MusicVolume"] = i.ToString();
+                if(int.Parse(controller.interactables["MusicVolume"].Tooltip) < 0)
+                    controller.interactables["MusicVolume"].Tooltip = "0";
+                if(int.Parse(controller.interactables["MusicVolume"].Tooltip) > 100)
+                    controller.interactables["MusicVolume"].Tooltip = "100";
+                SaveData.saveValues["MusicVolume"] = controller.interactables["MusicVolume"].Tooltip;
                 if(oldValue != SaveData.saveValues["MusicVolume"])
                     SaveData.Save();
                 return false;

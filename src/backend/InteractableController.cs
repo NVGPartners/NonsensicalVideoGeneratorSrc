@@ -14,13 +14,19 @@ namespace NonsensicalVideoGenerator
         public Dictionary<string, IInteractable> interactables = new();
         public bool Update(GameTime gameTime, bool handleInput)
         {
+            bool returnValue = false;
+            List<string> names = new();
             // Update all interactables.
             foreach (KeyValuePair<string, IInteractable> interactable in interactables)
             {
+                names.Add(interactable.Value.Name + "Input");
                 if(interactable.Value.Update(gameTime, handleInput))
-                    return true;
+                    returnValue = true;
             }
-            return false;
+            // If editing is not in the name list, set it to ""
+            if (Global.editing != "" && !names.Contains(Global.editing))
+                Global.editing = "";
+            return returnValue;
         }
         public void Draw(GameTime gameTime, SpriteBatch spriteBatch)
         {

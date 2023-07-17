@@ -102,8 +102,13 @@ namespace NonsensicalVideoGenerator
                 }
                 return false;
             }));                                      
-            controllerAdvanced.Add("TransitionEffectChance", new TextEntry("Transition Effect Chance", "How often transitions get effects, from 0-100.", SaveData.saveValues["TransitionEffectChance"], new Vector2(139, 60+19*5), 24, 3, 2, (int i) => {
+            controllerAdvanced.Add("TransitionEffectChance", new TextEntry("Transition Effect Chance", "How often transitions get effects, from 0-100.", SaveData.saveValues["TransitionEffectChance"], new Vector2(139, 60+19*5), 24, 3, 1, (int i) => {
                 int oldValue = int.Parse(SaveData.saveValues["TransitionEffectChance"]);
+                // Range: 0-100
+                if(int.Parse(controllerAdvanced.interactables["TransitionEffectChance"].Tooltip) < 0)
+                    controllerAdvanced.interactables["TransitionEffectChance"].Tooltip = "0";
+                if(int.Parse(controllerAdvanced.interactables["TransitionEffectChance"].Tooltip) > 100)
+                    controllerAdvanced.interactables["TransitionEffectChance"].Tooltip = "100";
                 SaveData.saveValues["TransitionEffectChance"] = controllerAdvanced.interactables["TransitionEffectChance"].Tooltip;
                 if(oldValue != int.Parse(SaveData.saveValues["TransitionEffectChance"]))
                     SaveData.Save();
@@ -120,36 +125,54 @@ namespace NonsensicalVideoGenerator
                 }
                 return switchState;
             }, SaveData.saveValues["TransitionEffects"] == "true"));
-            controllerAdvanced.Add("TransitionChance", new TextEntry("Transition Chance", "How often transitions are rolled, from 0-100.", SaveData.saveValues["TransitionChance"], new Vector2(139, 60+19*3), 24, 3, 2, (int i) => {
+            controllerAdvanced.Add("TransitionChance", new TextEntry("Transition Chance", "How often transitions are rolled, from 0-100.", SaveData.saveValues["TransitionChance"], new Vector2(139, 60+19*3), 24, 3, 1, (int i) => {
                 int oldValue = int.Parse(SaveData.saveValues["TransitionChance"]);
+                if(int.Parse(controllerAdvanced.interactables["TransitionChance"].Tooltip) < 0)
+                    controllerAdvanced.interactables["TransitionChance"].Tooltip = "0";
+                if(int.Parse(controllerAdvanced.interactables["TransitionChance"].Tooltip) > 100)
+                    controllerAdvanced.interactables["TransitionChance"].Tooltip = "100";
                 SaveData.saveValues["TransitionChance"] = controllerAdvanced.interactables["TransitionChance"].Tooltip;
                 if(oldValue != int.Parse(SaveData.saveValues["TransitionChance"]))
                     SaveData.Save();
                 return false;
             }));
-            controllerAdvanced.Add("EffectChance", new TextEntry("Effect Chance", "How often any effect are used, from 0-100.", SaveData.saveValues["EffectChance"], new Vector2(139, 60+19*2), 24, 3, 2, (int i) => {
+            controllerAdvanced.Add("EffectChance", new TextEntry("Effect Chance", "How often any effect are used, from 0-100.", SaveData.saveValues["EffectChance"], new Vector2(139, 60+19*2), 24, 3, 1, (int i) => {
                 int oldValue = int.Parse(SaveData.saveValues["EffectChance"]);
+                if(int.Parse(controllerAdvanced.interactables["EffectChance"].Tooltip) < 0)
+                    controllerAdvanced.interactables["EffectChance"].Tooltip = "0";
+                if(int.Parse(controllerAdvanced.interactables["EffectChance"].Tooltip) > 100)
+                    controllerAdvanced.interactables["EffectChance"].Tooltip = "100";
                 SaveData.saveValues["EffectChance"] = controllerAdvanced.interactables["EffectChance"].Tooltip;
                 if(oldValue != int.Parse(SaveData.saveValues["EffectChance"]))
                     SaveData.Save();
                 return false;
             }));
-            controllerAdvanced.Add("OverlayChance", new TextEntry("Overlay Chance", "How often overlays are rolled, from 0-100.", SaveData.saveValues["OverlayChance"], new Vector2(139, 60+19), 24, 3, 2, (int i) => {
+            controllerAdvanced.Add("OverlayChance", new TextEntry("Overlay Chance", "How often overlays are rolled, from 0-100.", SaveData.saveValues["OverlayChance"], new Vector2(139, 60+19), 24, 3, 1, (int i) => {
                 int oldValue = int.Parse(SaveData.saveValues["OverlayChance"]);
+                if(int.Parse(controllerAdvanced.interactables["OverlayChance"].Tooltip) < 0)
+                    controllerAdvanced.interactables["OverlayChance"].Tooltip = "0";
+                if(int.Parse(controllerAdvanced.interactables["OverlayChance"].Tooltip) > 100)
+                    controllerAdvanced.interactables["OverlayChance"].Tooltip = "100";
                 SaveData.saveValues["OverlayChance"] = controllerAdvanced.interactables["OverlayChance"].Tooltip;
                 if(oldValue != int.Parse(SaveData.saveValues["OverlayChance"]))
                     SaveData.Save();
                 return false;
             }));
-            controllerAdvanced.Add("Height", new TextEntry("Output Resolution", "Height: how tall the result is.", SaveData.saveValues["VideoHeight"], new Vector2(170, 60), 24, 4, 2, (int i) => {
+            controllerAdvanced.Add("Height", new TextEntry("Output Resolution", "Height: how tall the result is.", SaveData.saveValues["VideoHeight"], new Vector2(170, 60), 24, 4, 1, (int i) => {
                 string oldValue = SaveData.saveValues["VideoHeight"];
+                // height must be a multiple of 2
+                if(int.Parse(controllerAdvanced.interactables["Height"].Tooltip) % 2 != 0)
+                    controllerAdvanced.interactables["Height"].Tooltip = (int.Parse(controllerAdvanced.interactables["Height"].Tooltip) - 1).ToString();
                 SaveData.saveValues["VideoHeight"] = controllerAdvanced.interactables["Height"].Tooltip;
                 if(oldValue != SaveData.saveValues["VideoHeight"])
                     SaveData.Save();
                 return false;
             }));
-            controllerAdvanced.Add("Width", new TextEntry("", "Width: how wide the result is.", SaveData.saveValues["VideoWidth"], new Vector2(139, 60), 24, 4, 2, (int i) => {
+            controllerAdvanced.Add("Width", new TextEntry("", "Width: how wide the result is.", SaveData.saveValues["VideoWidth"], new Vector2(139, 60), 24, 4, 1, (int i) => {
                 string oldValue = SaveData.saveValues["VideoWidth"];
+                // width must be a multiple of 2
+                if(int.Parse(controllerAdvanced.interactables["Width"].Tooltip) % 2 != 0)
+                    controllerAdvanced.interactables["Width"].Tooltip = (int.Parse(controllerAdvanced.interactables["Width"].Tooltip) - 1).ToString();
                 SaveData.saveValues["VideoWidth"] = controllerAdvanced.interactables["Width"].Tooltip;
                 if(oldValue != SaveData.saveValues["VideoWidth"])
                     SaveData.Save();
@@ -199,6 +222,8 @@ namespace NonsensicalVideoGenerator
             }));
             controller.Add("MaxStreamDuration", new TextEntry("Random Length", "End of random length range.", SaveData.saveValues["MaxStreamDuration"], new Vector2(172, 60+19*3), 26, 5, 2, (int i) => {
                 string oldValue = SaveData.saveValues["MaxStreamDuration"];
+                if(float.Parse(controller.interactables["MaxStreamDuration"].Tooltip) < 0.2)
+                    controller.interactables["MaxStreamDuration"].Tooltip = "0.2";
                 SaveData.saveValues["MaxStreamDuration"] = controller.interactables["MaxStreamDuration"].Tooltip;
                 if(oldValue != SaveData.saveValues["MaxStreamDuration"])
                     SaveData.Save();
@@ -206,12 +231,14 @@ namespace NonsensicalVideoGenerator
             }));
             controller.Add("MinStreamDuration", new TextEntry("", "Start of random length range.", SaveData.saveValues["MinStreamDuration"], new Vector2(139, 60+19*3), 26, 5, 2, (int i) => {
                 string oldValue = SaveData.saveValues["MinStreamDuration"];
+                if(float.Parse(controller.interactables["MinStreamDuration"].Tooltip) < 0.2)
+                    controller.interactables["MinStreamDuration"].Tooltip = "0.2";
                 SaveData.saveValues["MinStreamDuration"] = controller.interactables["MinStreamDuration"].Tooltip;
                 if(oldValue != SaveData.saveValues["MinStreamDuration"])
                     SaveData.Save();
                 return false;
             }));
-            controller.Add("ClipCount", new TextEntry("Clip Count", "How many clips to generate.", SaveData.saveValues["MaxClipCount"], new Vector2(139, 60+19*2), 24, 4, 2, (int i) => {
+            controller.Add("ClipCount", new TextEntry("Clip Count", "How many clips to generate.", SaveData.saveValues["MaxClipCount"], new Vector2(139, 60+19*2), 24, 4, 1, (int i) => {
                 string oldValue = SaveData.saveValues["MaxClipCount"];
                 SaveData.saveValues["MaxClipCount"] = controller.interactables["ClipCount"].Tooltip;
                 if(oldValue != SaveData.saveValues["MaxClipCount"])
@@ -245,13 +272,13 @@ namespace NonsensicalVideoGenerator
                 bool switchState = (i & 256) != 0;
                 if((i & 2) != 0)
                 {
-                    string oldValue = SaveData.saveValues["AddToLibrary"];
-                    SaveData.saveValues["AddToLibrary"] = switchState.ToString().ToLower();
-                    if(oldValue != SaveData.saveValues["AddToLibrary"])
+                    string oldValue = SaveData.saveValues["PlayAutomatically"];
+                    SaveData.saveValues["PlayAutomatically"] = switchState.ToString().ToLower();
+                    if(oldValue != SaveData.saveValues["PlayAutomatically"])
                         SaveData.Save();
                 }
                 return switchState;
-            }, SaveData.saveValues["AddToLibrary"] == "true"));
+            }, SaveData.saveValues["PlayAutomatically"] == "true"));
             // Interactable
             controller.LoadContent(contentManager, graphicsDevice);
             controllerAdvanced.LoadContent(contentManager, graphicsDevice);

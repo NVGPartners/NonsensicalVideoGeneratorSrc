@@ -27,21 +27,18 @@ namespace NonsensicalVideoGenerator
             {"VideoHeight", "480"},
             {"IntrosEnabled", "false"},
             {"OutrosEnabled", "true"},
-            {"AddToLibrary", "true"},
-            {"AprilFoolsFlappyBirdScore", "0"},
+            {"PlayAutomatically", "true"},
+            {"GameHighScore", "0"},
             {"MusicVolume", "100"},
             {"SoundEffectVolume", "100"},
-            {"ActiveMusic", "1"},
-            {"ShuffleMusic", "true"},
+            {"VideoVolume", "100"},
             {"TransitionChance", "20"},
             {"OverlayChance", "20"},
             {"EffectChance", "60"},
-            {"FirstBoot", "true"},
-            {"FirstBootVersion", Global.productVersion},
             {"TransitionEffects", "true"},
             {"TransitionEffectChance", "30"},
             {"HiddenKeepTemporaryJobFolders", "false"},
-            {"HiddenVerbose", "false"}
+            {"HiddenVerbose", "false"},
         };
         public static string saveFileName = "Options.json";
         public static bool Save()

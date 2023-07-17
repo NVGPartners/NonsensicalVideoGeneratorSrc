@@ -286,7 +286,7 @@ namespace NonsensicalVideoGenerator
             }
             if(handleInput)
             {
-                Accessibility.CompatAccessibility(new Rectangle(GlobalGraphics.Scale(player.spacing), (int)GlobalGraphics.Scale(player.spacingPlacementY) + GlobalGraphics.Scale(player.height/2), GlobalGraphics.Scale(player.width), GlobalGraphics.Scale(player.height/2)));
+                Accessibility.CompatAccessibility(new Rectangle(GlobalGraphics.Scale(player.spacing), (int)GlobalGraphics.Scale(player.spacingPlacementY) + GlobalGraphics.Scale(player.height/2), GlobalGraphics.Scale(player.width), GlobalGraphics.Scale(player.height/2)), "Player; Press Shift+Space to exit");
             }
             if (handleInput && MouseInput.LastMouseState.RightButton == ButtonState.Released && MouseInput.MouseState.RightButton == ButtonState.Pressed)
             {
@@ -342,7 +342,7 @@ namespace NonsensicalVideoGenerator
                             {
                                 GlobalContent.GetSound("Prompt").Play(int.Parse(SaveData.saveValues["SoundEffectVolume"]) / 100f, 0f, 0f);
                                 highScore = player.points;
-                                SaveData.saveValues["AprilFoolsFlappyBirdScore"] = highScore.ToString();
+                                SaveData.saveValues["GameHighScore"] = highScore.ToString();
                                 SaveData.Save();
                                 // get random high score tease
                                 int rand = Global.generatorFactory.globalRandom.Next(0, highScoreTeases.Count);
@@ -493,7 +493,7 @@ namespace NonsensicalVideoGenerator
                 obstacle.LoadContent(contentManager, graphicsDevice);
             }
             // Set high score
-            highScore = int.Parse(SaveData.saveValues["AprilFoolsFlappyBirdScore"]);
+            highScore = int.Parse(SaveData.saveValues["GameHighScore"]);
         }
     }
 }

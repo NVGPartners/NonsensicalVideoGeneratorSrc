@@ -232,7 +232,7 @@ namespace NonsensicalVideoGenerator
                     }
                     else
                     {
-                        Global.generatorFactory.progressText = "Closing the film spool... (" + count + " of " + count + ")";
+                        Global.generatorFactory.progressText = "Closing the film spool... (" + count + "/" + count + ")";
                         ConsoleOutput.WriteLine("Outro clip enabled, adding 1 to max clips. New max clips is " + count, Color.Gray);
                         Utilities.CopyVideo(outroPath, Path.Combine(Utilities.temporaryDirectory, "video" + count + ".mp4"));
                         count++;

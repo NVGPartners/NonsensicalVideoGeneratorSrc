@@ -861,7 +861,7 @@ namespace NonsensicalVideoGenerator
         public static void AllDone(uint count)
         {
             allDoneCount++;
-            if(allDoneCount == count)
+            if(allDoneCount >= count)
             {
                 foreach (PublishedFileId_t item in subscribedItems)
                 {
@@ -891,6 +891,7 @@ namespace NonsensicalVideoGenerator
                         ConsoleOutput.WriteLine($"Installed ID {Path.GetFileName(file)} from workshop.", Color.RoyalBlue);
                     }
                 }
+                pluginWorker = new();
                 pluginWorker.DoWork += PluginWorker_DoWork;
                 pluginWorker.RunWorkerAsync();
                 ConsoleOutput.WriteLine("All done.", Color.RoyalBlue);
@@ -939,8 +940,13 @@ namespace NonsensicalVideoGenerator
                     else
                     {
                         ConsoleOutput.WriteLine($"Failed to download ID {item.m_PublishedFileId.ToString()} from workshop.", Color.Red);
+                        AllDone(subscribedItemCount);
                     }
                 }
+            }
+            else
+            {
+                AllDone(0);
             }
         }
         public static bool LoadPlugins()

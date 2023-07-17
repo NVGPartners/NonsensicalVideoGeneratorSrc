@@ -4,6 +4,7 @@ using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Content;
 using Microsoft.Xna.Framework.Graphics;
 using Microsoft.Xna.Framework.Input;
+using Steamworks;
 
 namespace NonsensicalVideoGenerator
 {
@@ -53,6 +54,7 @@ namespace NonsensicalVideoGenerator
                 exitOpacity += 0.0075f;
                 if(exitOpacity >= 1)
                 {
+                    SteamAPI.Shutdown();
                     if(UserInterface.instance != null)
                         UserInterface.instance.Exit();
                 }

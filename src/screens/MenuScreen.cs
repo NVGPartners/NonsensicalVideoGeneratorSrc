@@ -104,7 +104,7 @@ namespace NonsensicalVideoGenerator
             spriteBatch.Draw(menuwindow, new Rectangle(GlobalGraphics.Scale(0), GlobalGraphics.Scale(132), GlobalGraphics.Scale(menuwindow.Width), GlobalGraphics.Scale(menuwindow.Height)), Color.White);
             // Draw window title
             Vector2 titleSize = GlobalGraphics.fontMunroSmall.MeasureString(title);
-            spriteBatch.DrawString(GlobalGraphics.fontMunroSmall, title, new Vector2(GlobalGraphics.Scale(52), GlobalGraphics.Scale(204)), Color.White, MathHelper.ToRadians(90), new Vector2(titleSize.X, titleSize.Y), 1, SpriteEffects.None, 0);
+            spriteBatch.DrawString(GlobalGraphics.fontMunroSmall, title, new Vector2(GlobalGraphics.Scale(52), GlobalGraphics.Scale(203)), Color.White, MathHelper.ToRadians(90), new Vector2(titleSize.X, titleSize.Y), 1, SpriteEffects.None, 0);
             // If hovering, draw tooltip
             if (hovering && !Global.exiting)
             {
@@ -156,7 +156,10 @@ namespace NonsensicalVideoGenerator
                 // -1 because the exit button is not included
                 for(int i = 0; i < Pagination.GetTopPageCount()-1; i++)
                 {
-                    Accessibility.CompatAccessibility(new Rectangle(GlobalGraphics.Scale(4), GlobalGraphics.Scale(i * 16 + 134), GlobalGraphics.Scale(45), GlobalGraphics.Scale(16)));
+                    string name = Pagination.GetPage(i).Name;
+                    if(i == 2)
+                        name = "Effects";
+                    Accessibility.CompatAccessibility(new Rectangle(GlobalGraphics.Scale(4), GlobalGraphics.Scale(i * 16 + 134), GlobalGraphics.Scale(45), GlobalGraphics.Scale(16)), name + "(" + Pagination.GetPage(i).Tooltip + ")");
                 }
                 // Bounds of each segment
                 if(MouseInput.MouseState.X >= GlobalGraphics.Scale(4) && MouseInput.MouseState.X < GlobalGraphics.Scale(49) && MouseInput.MouseState.Y >= GlobalGraphics.Scale(134) && MouseInput.MouseState.Y < GlobalGraphics.Scale(230))

@@ -49,6 +49,8 @@ namespace NonsensicalVideoGenerator
         {
             if(SteamManager.initialized)
                 PluginHandler.LoadWorkshop();
+            else
+                PluginHandler.LoadPlugins();
             UpdateManager.GetDependencyStatus();
             if(!UpdateManager.ffmpegInstalled || !UpdateManager.ffprobeInstalled)
             {
@@ -121,7 +123,7 @@ namespace NonsensicalVideoGenerator
                     }
                     if(handleInput)
                     {
-                        Accessibility.CompatAccessibility(new Rectangle(0, GlobalGraphics.Scale(24 + (warningText.Count - 1) * 16), GlobalGraphics.scaledWidth, GlobalGraphics.Scale(16)));
+                        Accessibility.CompatAccessibility(new Rectangle(0, GlobalGraphics.Scale(24 + (warningText.Count - 1) * 16), GlobalGraphics.scaledWidth, GlobalGraphics.Scale(16)), "Click anywhere or press any key to continue.");
                         if (MouseInput.MouseState.LeftButton == ButtonState.Pressed && MouseInput.LastMouseState.LeftButton == ButtonState.Released)
                         {
                             accepted = true;

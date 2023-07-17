@@ -459,7 +459,6 @@ namespace NonsensicalVideoGenerator
                         if(!check3)
                         {
                             check3 = true;
-                            SaveData.saveValues["FirstBoot"] = "false";
                             SaveData.Save();
                             GlobalContent.GetSound("Back").Play(int.Parse(SaveData.saveValues["SoundEffectVolume"]) / 100f, 0f, 0f);
                             toggle = false;
