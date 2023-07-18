@@ -10,17 +10,17 @@ using MonoGame.Extended.Tweening;
 
 namespace NonsensicalVideoGenerator
 {
-    public class AprilFoolsFlappyBirdObstacle : IObject
+    public class PastimeGameObstacle : IObject
     {
         public int distance = 320;
         public int spacingPlacementY = 200;
-        public int spacing = 32;
-        public int width = 32;
+        public int spacing = 38;
+        public static int width = 32;
         public int height = 240;
         public bool isDead = true;
         public bool point = false;
         public Rectangle[] hitboxes = new Rectangle[2];
-        public AprilFoolsFlappyBirdObstacle(int offset)
+        public PastimeGameObstacle(int offset)
         {
             distance = 320 + offset;
             spacingPlacementY = Global.generatorFactory.globalRandom.Next(spacing*2, height-(spacing*2));
@@ -57,7 +57,7 @@ namespace NonsensicalVideoGenerator
             return false;
         }
     }
-    public class AprilFoolsFlappyBirdPlayer : IObject
+    public class PastimeGamePlayer : IObject
     {
         public int distance = 0;
         public float spacingPlacementY = 0f;
@@ -70,11 +70,11 @@ namespace NonsensicalVideoGenerator
         public bool dead = false;
         public bool waiting = true;
         public int points = 0;
-        public AprilFoolsFlappyBirdPlayer()
+        public PastimeGamePlayer()
         {
             distance = 32;
             spacingPlacementY = 120;
-            spacing = 32;
+            spacing = (320 / 2) - (5/2) - 1;
             width = 5;
             height = 5;
         }
@@ -85,7 +85,7 @@ namespace NonsensicalVideoGenerator
             {
                 // math.sin is used to make the bird bob up and down
                 spacingPlacementY = (float)((240 / 2) - (height/2) + (Math.Sin(gameTime.TotalGameTime.TotalSeconds * 4) * 10));
-                if (handleInput && MouseInput.LastMouseState.LeftButton == ButtonState.Released && MouseInput.MouseState.LeftButton == ButtonState.Pressed && handleInput)
+                if (handleInput && MouseInput.LastMouseState.LeftButton == ButtonState.Released && MouseInput.MouseState.LeftButton == ButtonState.Pressed)
                 {
                     waiting = false;
                     velocity = -jump;
@@ -108,6 +108,8 @@ namespace NonsensicalVideoGenerator
                     if (MouseInput.LastMouseState.LeftButton == ButtonState.Released && MouseInput.MouseState.LeftButton == ButtonState.Pressed)
                     {
                         velocity = -jump;
+                        GlobalContent.GetSound("Hover").Play(int.Parse(SaveData.saveValues["SoundEffectVolume"]) / 100f, 0f, 0f);
+                        return true;
                     }
                 }
             }
@@ -122,16 +124,6 @@ namespace NonsensicalVideoGenerator
             spriteBatch.Draw(GlobalContent.GetTexture("Pixel"), new Rectangle(GlobalGraphics.Scale(spacing) + GlobalGraphics.Scale(1), (int)GlobalGraphics.Scale(spacingPlacementY) + GlobalGraphics.Scale(1) + GlobalGraphics.Scale(height/2), GlobalGraphics.Scale(width), GlobalGraphics.Scale(1)), Color.Black);
             spriteBatch.Draw(GlobalContent.GetTexture("Pixel"), new Rectangle(GlobalGraphics.Scale(spacing) + GlobalGraphics.Scale(width/2), (int)GlobalGraphics.Scale(spacingPlacementY), GlobalGraphics.Scale(1), GlobalGraphics.Scale(height)), Color.White);
             spriteBatch.Draw(GlobalContent.GetTexture("Pixel"), new Rectangle(GlobalGraphics.Scale(spacing), (int)GlobalGraphics.Scale(spacingPlacementY) + GlobalGraphics.Scale(height/2), GlobalGraphics.Scale(width), GlobalGraphics.Scale(1)), Color.White);
-            // If player is waiting, draw click to start
-            if (waiting)
-            {
-                // Draw click to start
-                SpriteFont font = GlobalContent.GetFont("Munro");
-                Vector2 textSize = font.MeasureString("Left click to start or right click to leave.");
-                // Center both
-                spriteBatch.DrawString(font, "Left click to start or right click to leave.", new Vector2(GlobalGraphics.Scale(160) - (textSize.X / 2) + GlobalGraphics.Scale(1), GlobalGraphics.Scale(120) - (textSize.Y / 2) + GlobalGraphics.Scale(1)), Color.Black);
-                spriteBatch.DrawString(font, "Left click to start or right click to leave.", new Vector2(GlobalGraphics.Scale(160) - (textSize.X / 2), GlobalGraphics.Scale(120) - (textSize.Y / 2)), Color.White);
-            }
         }
         public void LoadContent(ContentManager contentManager, GraphicsDevice graphicsDevice)
         {
@@ -140,13 +132,13 @@ namespace NonsensicalVideoGenerator
     /// <summary>
     /// This screen was made for April Fools 2023, it now functions as the credits screen.
     /// </summary>
-    public class AprilFoolsScreen : IScreen
+    public class PastimeGameScreen : IScreen
     {
         /// <summary>
         /// The title of the screen. This is displayed on the header bar.
         /// </summary>
-        public string title { get; } = "April Fools";
-        public int layer { get; } = 13;
+        public string title { get; } = "Pastime Game";
+        public int layer { get; } = 7;
         public ScreenType screenType { get; set; } = ScreenType.Hidden;
         public int currentPlacement { get; set; } = -1;
         private bool hiding = false;
@@ -157,9 +149,9 @@ namespace NonsensicalVideoGenerator
         public int highScore = 0;
         public Vector2 offset = new(0, 0);
         private readonly Tweener tween = new();
-        private readonly List<AprilFoolsFlappyBirdObstacle> obstacles = new() {
-            new AprilFoolsFlappyBirdObstacle(0),
-            new AprilFoolsFlappyBirdObstacle(320/2),
+        private readonly List<PastimeGameObstacle> obstacles = new() {
+            new PastimeGameObstacle(0),
+            new PastimeGameObstacle((320/2) - (PastimeGameObstacle.width/4)),
         };
         private readonly List<string> highScoreTeases = new()
         {
@@ -211,7 +203,7 @@ namespace NonsensicalVideoGenerator
             "Munro (SIL Open Font License)",
             "This is the end of the credits",
         };
-        private AprilFoolsFlappyBirdPlayer player = new();
+        private PastimeGamePlayer player = new();
         public void Show()
         {
             toggle = true;
@@ -272,15 +264,15 @@ namespace NonsensicalVideoGenerator
                 hiding = false;
                 // Reset state
                 obstacles.Clear();
-                obstacles.Add(new AprilFoolsFlappyBirdObstacle(0));
-                obstacles.Add(new AprilFoolsFlappyBirdObstacle(320 / 2));
-                player = new AprilFoolsFlappyBirdPlayer();
+                obstacles.Add(new PastimeGameObstacle(0));
+                obstacles.Add(new PastimeGameObstacle(320 / 2));
+                player = new PastimeGamePlayer();
             }
             handleInput = handleInput && !hiding && !showing;
             // Tween
             tween.Update((float)gameTime.ElapsedGameTime.TotalSeconds);
             // Update obstacles
-            foreach (AprilFoolsFlappyBirdObstacle obstacle in obstacles)
+            foreach (PastimeGameObstacle obstacle in obstacles)
             {
                 obstacle.Update(gameTime, handleInput);
             }
@@ -288,12 +280,11 @@ namespace NonsensicalVideoGenerator
             {
                 Accessibility.CompatAccessibility(new Rectangle(GlobalGraphics.Scale(player.spacing), (int)GlobalGraphics.Scale(player.spacingPlacementY) + GlobalGraphics.Scale(player.height/2), GlobalGraphics.Scale(player.width), GlobalGraphics.Scale(player.height/2)), "Player; Press Shift+Space to exit");
             }
+            /*
             if (handleInput && MouseInput.MouseState.RightButton == ButtonState.Pressed && MouseInput.LastMouseState.RightButton == ButtonState.Released)
             {
                 GlobalContent.GetSound("Back").Play(int.Parse(SaveData.saveValues["SoundEffectVolume"]) / 100f, 0f, 0f);
                 Hide();
-                ScreenManager.PushNavigation("Main Menu");
-                ScreenManager.GetScreen<MenuScreen>("Main Menu")?.Show();
                 ScreenManager.PushNavigation("Video");
                 ScreenManager.GetScreen<VideoScreen>("Video")?.Show();
                 ScreenManager.PushNavigation("Content");
@@ -304,10 +295,11 @@ namespace NonsensicalVideoGenerator
                 ScreenManager.GetScreen<SocialScreen>("Socials")?.Show();
                 return true;
             }
+            */
             // Query obstacles so player can collide with them
             if (!player.dead)
             {
-                foreach (AprilFoolsFlappyBirdObstacle obstacle in obstacles)
+                foreach (PastimeGameObstacle obstacle in obstacles)
                 {
                     if(!player.waiting)
                     {
@@ -338,7 +330,7 @@ namespace NonsensicalVideoGenerator
                             {
                                 currentCredit = 1;
                             }
-                            if(player.points > highScore)
+                            if(player.points >= highScore)
                             {
                                 GlobalContent.GetSound("Prompt").Play(int.Parse(SaveData.saveValues["SoundEffectVolume"]) / 100f, 0f, 0f);
                                 highScore = player.points;
@@ -397,7 +389,7 @@ namespace NonsensicalVideoGenerator
                         timer = (float)gameTime.TotalGameTime.TotalMilliseconds + 500f;
                         break;
                     case 4:
-                        player = new AprilFoolsFlappyBirdPlayer();
+                        player = new PastimeGamePlayer();
                         obstacles.Clear();
                         offset = new Vector2(GlobalGraphics.Scale(320*2), GlobalGraphics.Scale(0));
                         if(!hiding && !showing)
@@ -407,8 +399,8 @@ namespace NonsensicalVideoGenerator
                         timer = (float)gameTime.TotalGameTime.TotalMilliseconds + 500f;
                         break;
                     case 5:
-                        obstacles.Add(new AprilFoolsFlappyBirdObstacle(0));
-                        obstacles.Add(new AprilFoolsFlappyBirdObstacle(320 / 2));
+                        obstacles.Add(new PastimeGameObstacle(0));
+                        obstacles.Add(new PastimeGameObstacle(320 / 2));
                         phase = 0;
                         break;
                 }
@@ -416,7 +408,7 @@ namespace NonsensicalVideoGenerator
             else if (phase == 0 && player.dead)
             {
                 // Set all obstacles to dead
-                foreach (AprilFoolsFlappyBirdObstacle obstacle in obstacles)
+                foreach (PastimeGameObstacle obstacle in obstacles)
                 {
                     obstacle.isDead = true;
                 }
@@ -436,7 +428,7 @@ namespace NonsensicalVideoGenerator
             spriteBatch.Begin(SpriteSortMode.Deferred, BlendState.AlphaBlend, SamplerState.PointClamp, null, null, null, Matrix.CreateTranslation(offset.X, offset.Y, 0));
             // Flappy bird clone
             // Draw all obstacles
-            foreach (AprilFoolsFlappyBirdObstacle obstacle in obstacles)
+            foreach (PastimeGameObstacle obstacle in obstacles)
             {
                 obstacle.Draw(gameTime, spriteBatch);
             }
@@ -444,32 +436,48 @@ namespace NonsensicalVideoGenerator
             player.Draw(gameTime, spriteBatch);
             // Draw points
             SpriteFont font = GlobalContent.GetFont("MunroSmall");
-            Vector2 textSize = font.MeasureString(player.points.ToString());
             // Center horizontally
-            spriteBatch.DrawString(font, player.points.ToString(), new Vector2(GlobalGraphics.Scale(160) - (textSize.X / 2) + GlobalGraphics.Scale(1), GlobalGraphics.Scale(16+16+8) + GlobalGraphics.Scale(1)), Color.Black);
-            spriteBatch.DrawString(font, player.points.ToString(), new Vector2(GlobalGraphics.Scale(160) - (textSize.X / 2), GlobalGraphics.Scale(16+16+8)), Color.White);
-            // Draw high score
-            textSize = font.MeasureString(highScore.ToString());
-            // Center horizontally
-            spriteBatch.DrawString(font, highScore.ToString(), new Vector2(GlobalGraphics.Scale(160) - (textSize.X / 2) + GlobalGraphics.Scale(1), GlobalGraphics.Scale(240) - textSize.Y - GlobalGraphics.Scale(8) + GlobalGraphics.Scale(1)), Color.Black);
-            spriteBatch.DrawString(font, highScore.ToString(), new Vector2(GlobalGraphics.Scale(160) - (textSize.X / 2), GlobalGraphics.Scale(240) - textSize.Y - GlobalGraphics.Scale(8)), Color.White);
-            // Draw score text
-            textSize = font.MeasureString("Score");
-            // Center horizontally
-            spriteBatch.DrawString(font, "Score", new Vector2(GlobalGraphics.Scale(160) - (textSize.X / 2) + GlobalGraphics.Scale(1), GlobalGraphics.Scale(8+16+8) + GlobalGraphics.Scale(1)), Color.Black);
-            spriteBatch.DrawString(font, "Score", new Vector2(GlobalGraphics.Scale(160) - (textSize.X / 2), GlobalGraphics.Scale(8+16+8)), Color.White);
-            // Draw high score text
-            textSize = font.MeasureString("High Score");
-            // Center horizontally
-            spriteBatch.DrawString(font, "High Score", new Vector2(GlobalGraphics.Scale(160) - (textSize.X / 2) + GlobalGraphics.Scale(1), GlobalGraphics.Scale(240) - textSize.Y - GlobalGraphics.Scale(16) + GlobalGraphics.Scale(1)), Color.Black);
-            spriteBatch.DrawString(font, "High Score", new Vector2(GlobalGraphics.Scale(160) - (textSize.X / 2), GlobalGraphics.Scale(240) - textSize.Y - GlobalGraphics.Scale(16)), Color.White);
+            if (!player.waiting)
+            {
+                Vector2 textSize = font.MeasureString(player.points.ToString());
+                spriteBatch.DrawString(font, player.points.ToString(), new Vector2(GlobalGraphics.Scale(160) - (textSize.X / 2) + GlobalGraphics.Scale(1), GlobalGraphics.Scale(240) - textSize.Y - GlobalGraphics.Scale(8) + GlobalGraphics.Scale(1)), Color.Black);
+                spriteBatch.DrawString(font, player.points.ToString(), new Vector2(GlobalGraphics.Scale(160) - (textSize.X / 2), GlobalGraphics.Scale(240) - textSize.Y - GlobalGraphics.Scale(8)), Color.White);
+                // Draw score text
+                string scoreText = "Score";
+                if(player.points == highScore)
+                {
+                    scoreText = "High Score";
+                }
+                textSize = font.MeasureString(scoreText);
+                // Center horizontally
+                spriteBatch.DrawString(font, scoreText, new Vector2(GlobalGraphics.Scale(160) - (textSize.X / 2) + GlobalGraphics.Scale(1), GlobalGraphics.Scale(240) - textSize.Y - GlobalGraphics.Scale(16) + GlobalGraphics.Scale(1)), Color.Black);
+                spriteBatch.DrawString(font, scoreText, new Vector2(GlobalGraphics.Scale(160) - (textSize.X / 2), GlobalGraphics.Scale(240) - textSize.Y - GlobalGraphics.Scale(16)), Color.White);
+            }
+            else
+            {
+                // Draw score text
+                Vector2 textSize = font.MeasureString("Click to start!");
+                // Center horizontally
+                spriteBatch.DrawString(font, "Click to start!", new Vector2(GlobalGraphics.Scale(160) - (textSize.X / 2) + GlobalGraphics.Scale(1), GlobalGraphics.Scale(8+16+8) + GlobalGraphics.Scale(1)), Color.Black);
+                spriteBatch.DrawString(font, "Click to start!", new Vector2(GlobalGraphics.Scale(160) - (textSize.X / 2), GlobalGraphics.Scale(8+16+8)), Color.White);
+                // Draw high score text
+                textSize = font.MeasureString("High Score");
+                // Center horizontally
+                spriteBatch.DrawString(font, "High Score", new Vector2(GlobalGraphics.Scale(160) - (textSize.X / 2) + GlobalGraphics.Scale(1), GlobalGraphics.Scale(240) - textSize.Y - GlobalGraphics.Scale(16) + GlobalGraphics.Scale(1)), Color.Black);
+                spriteBatch.DrawString(font, "High Score", new Vector2(GlobalGraphics.Scale(160) - (textSize.X / 2), GlobalGraphics.Scale(240) - textSize.Y - GlobalGraphics.Scale(16)), Color.White);
+                // Draw high score
+                textSize = font.MeasureString(highScore.ToString());
+                // Center horizontally
+                spriteBatch.DrawString(font, highScore.ToString(), new Vector2(GlobalGraphics.Scale(160) - (textSize.X / 2) + GlobalGraphics.Scale(1), GlobalGraphics.Scale(240) - textSize.Y - GlobalGraphics.Scale(8) + GlobalGraphics.Scale(1)), Color.Black);
+                spriteBatch.DrawString(font, highScore.ToString(), new Vector2(GlobalGraphics.Scale(160) - (textSize.X / 2), GlobalGraphics.Scale(240) - textSize.Y - GlobalGraphics.Scale(8)), Color.White);
+            }
             // Draw current credit
             spriteBatch.DrawString(font, creditRoll[currentCredit], new Vector2(GlobalGraphics.Scale(9), GlobalGraphics.Scale(9)), Color.Black);
             spriteBatch.DrawString(font, creditRoll[currentCredit], new Vector2(GlobalGraphics.Scale(8), GlobalGraphics.Scale(8)), Color.White);
             // Draw render progress on right side (pastime)
             if(Global.generatorFactory.progressText != "")
             {
-                textSize = font.MeasureString(Global.videoTitle);
+                Vector2 textSize = font.MeasureString(Global.videoTitle);
                 spriteBatch.DrawString(font, Global.videoTitle, new Vector2(GlobalGraphics.Scale(320) - textSize.X - GlobalGraphics.Scale(8), GlobalGraphics.Scale(9)), Color.Black);
                 spriteBatch.DrawString(font, Global.videoTitle, new Vector2(GlobalGraphics.Scale(320) - textSize.X - GlobalGraphics.Scale(9), GlobalGraphics.Scale(8)), Color.White);
                 Vector2 textSize2 = font.MeasureString(Global.generatorFactory.progressText);
@@ -488,7 +496,7 @@ namespace NonsensicalVideoGenerator
         {
             // Load player
             player.LoadContent(contentManager, graphicsDevice);
-            foreach (AprilFoolsFlappyBirdObstacle obstacle in obstacles)
+            foreach (PastimeGameObstacle obstacle in obstacles)
             {
                 obstacle.LoadContent(contentManager, graphicsDevice);
             }

@@ -264,6 +264,13 @@ namespace NonsensicalVideoGenerator
                 if(audioConvertWorker.CancellationPending || !processing)
                     return;
                 process.WaitForExit();
+                // Unload audio
+                if(audio != null)
+                {
+                    audio.Stop();
+                    audio.Dispose();
+                    audio = null;
+                }
                 FileStream audioFile = File.OpenRead(".\\temp\\extracted\\audio.wav");
                 SoundEffect snd = SoundEffect.FromStream(audioFile);
                 audio = snd.CreateInstance();
@@ -289,7 +296,7 @@ namespace NonsensicalVideoGenerator
             {
                 if(audio != null)
                 {
-                    if(!audioPlaying)
+                    if(!audioPlaying && frames.Count == 0)
                     {
                         audio.Play();
                         Global.generatorFactory.progressText = "Playing media...";

@@ -54,7 +54,7 @@ namespace NonsensicalVideoGenerator
                     SaveData.Save();
                     // Restart software through steam
                     ProcessStartInfo startInfo = new ProcessStartInfo();
-                    startInfo.FileName = "steam://rungameid/" + Global.appId;
+                    startInfo.FileName = "steam://rungameid/" + Global.appId.ToString();
                     startInfo.UseShellExecute = true;
                     startInfo.Verb = "open";
                     Process.Start(startInfo);

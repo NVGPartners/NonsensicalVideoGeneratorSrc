@@ -231,7 +231,7 @@ namespace NonsensicalVideoGenerator
                     SaveData.Save();
                 return false;
             }));
-            controller.Add("ClipCount", new TextEntry("Clip Count", "How many clips to generate.", SaveData.saveValues["MaxClipCount"], new Vector2(139, 60+19*2), 24, 4, 1, (int i) => {
+            controller.Add("ClipCount", new TextEntry("Clip Segment Count", "How many clips to generate.", SaveData.saveValues["MaxClipCount"], new Vector2(139, 60+19*2), 24, 4, 1, (int i) => {
                 string oldValue = SaveData.saveValues["MaxClipCount"];
                 SaveData.saveValues["MaxClipCount"] = controller.interactables["ClipCount"].Tooltip;
                 if(oldValue != SaveData.saveValues["MaxClipCount"])

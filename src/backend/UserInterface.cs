@@ -109,7 +109,8 @@ namespace NonsensicalVideoGenerator
         {
             _musicActive = Global.generatorFactory.globalRandom.Next(0, GlobalContent.GetSongCount());
             MediaPlayer.Play(GlobalContent.GetSongByIndex(_musicActive));
-            MediaPlayer.Volume = 0f;
+            if(!Global.ready)
+                MediaPlayer.Volume = 0f;
         }
         protected override void Update(GameTime gameTime)
         {

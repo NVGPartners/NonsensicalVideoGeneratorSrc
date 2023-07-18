@@ -1,6 +1,10 @@
 using System;
 using System.Collections.Generic;
 using System.ComponentModel;
+using System.IO;
+using System.IO.Compression;
+using System.Net;
+using System.Reflection;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Audio;
 using Microsoft.Xna.Framework.Content;
@@ -20,7 +24,7 @@ namespace NonsensicalVideoGenerator
         /// The title of the screen. This is displayed on the header bar.
         /// </summary>
         public string title { get; } = "Initial Setup";
-        public int layer { get; } = 7;
+        public int layer { get; } = 9;
         public ScreenType screenType { get; set; } = ScreenType.Hidden;
         public int currentPlacement { get; set; } = -1;
         private bool hiding = false;
@@ -158,7 +162,7 @@ namespace NonsensicalVideoGenerator
                 " - magick: %IMAGEMAGICK%",
                 " - yt-dlp: %YTDLP%",
                 "",
-                "A restart may be required if you install any of these programs.",
+                "Click \"Next Page\" to re-check the status of each program.",
                 "",
                 "Need help? Create an issue or post on the GitHub issue tracker.",
                 "",
@@ -235,6 +239,20 @@ namespace NonsensicalVideoGenerator
                                     break;
                             }
                             spriteBatch.DrawString(GlobalGraphics.fontMunroSmall, "Not found", new Vector2(GlobalGraphics.Scale(offset+8+16+320*i), GlobalGraphics.Scale(60+offsetText)), Color.OrangeRed);
+                        }
+                        if(tutorialText[i][j].Contains("Downloading..."))
+                        {
+                            int offset = 0;
+                            switch(j)
+                            {
+                                case 3:
+                                    offset = 43;
+                                    break;
+                                case 4:
+                                    offset = 47;
+                                    break;
+                            }
+                            spriteBatch.DrawString(GlobalGraphics.fontMunroSmall, "Downloading...", new Vector2(GlobalGraphics.Scale(offset+8+16+320*i), GlobalGraphics.Scale(60+offsetText)), Color.BlueViolet);
                         }
                         if(tutorialText[i][j].Contains("Using system PATH"))
                         {
@@ -333,7 +351,9 @@ namespace NonsensicalVideoGenerator
                         if(!UpdateManager.ffmpegInstalled)
                             ffmpeg = "Not found";
                         else
+                        {
                             ffmpeg = "Using system PATH";
+                        }
                     }
                     if(Global.useSystemFFprobe)
                     {
@@ -341,6 +361,12 @@ namespace NonsensicalVideoGenerator
                             ffprobe = "Not found";
                         else
                             ffprobe = "Using system PATH";
+                    }
+                    if(Global.useSystemFFmpeg && Global.useSystemFFprobe
+                        && UpdateManager.ffmpegInstalled && UpdateManager.ffprobeInstalled)
+                    {
+                        // Remove ffmpeg button
+                        controller.Remove("ButtonFFmpeg");
                     }
                     if(Global.useSystemYtDlp)
                     {
@@ -362,6 +388,7 @@ namespace NonsensicalVideoGenerator
         }
         private bool check3 = false;
         private BackgroundWorker pluginWorker;
+        private BackgroundWorker ffmpegDownloadWorker;
         public void LoadContent(ContentManager contentManager, GraphicsDevice graphicsDevice)
         {
             // Tutorial window
@@ -439,6 +466,23 @@ namespace NonsensicalVideoGenerator
                 }
                 return false;
             }));
+            controller.Add("ButtonFFmpeg", new Button("Use gyan.dev build", "", new Vector2(28+32+320-4+135, 91+12-6), (int i) => {
+                switch(i)
+                {
+                    case 2: // left click
+                        GlobalContent.GetSound("Option").Play(int.Parse(SaveData.saveValues["SoundEffectVolume"]) / 100f, 0f, 0f);
+                        tutorialText[1][3] = " - ffmpeg: Downloading...";
+                        tutorialText[1][4] = " - ffprobe: Downloading...";
+                        controller.Remove("ButtonFFmpeg");
+                        ffmpegDownloadWorker = new BackgroundWorker();
+                        ffmpegDownloadWorker.DoWork += (object sender, DoWorkEventArgs e) => {
+                            DownloadFFmpegThread();
+                        };
+                        ffmpegDownloadWorker.RunWorkerAsync();
+                        return true;
+                }
+                return false;
+            }));
             // PAGE 3
             controller.Add("Button4", new Button("Previous Page", "", new Vector2(28+32+640-4, 217+12-6), (int i) => {
                 switch(i)
@@ -506,6 +550,92 @@ namespace NonsensicalVideoGenerator
                 }
             }
             controller.LoadContent(contentManager, graphicsDevice);
+        }
+        public void DownloadFFmpegThread()
+        {
+            // Create temp folder
+            Directory.CreateDirectory(Path.Combine(Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location), "temp"));
+
+            // Download ffmpeg essential release from gyan.dev
+            System.Uri url = new("https://www.gyan.dev/ffmpeg/builds/ffmpeg-release-essentials.zip");
+            string path = Path.Combine(Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location), "temp", "ffmpeg-release-essentials.zip");
+
+            // Delete file if it exists
+            if(File.Exists(Path.Combine(Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location), "temp", "ffmpeg-release-essentials.zip")))
+            {
+                File.Delete(Path.Combine(Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location), "temp", "ffmpeg-release-essentials.zip"));
+            }
+
+            // Download ffmpeg
+            using (WebClient client = new WebClient())
+            {
+                client.DownloadFile(url, path);
+            }
+            // Extract ffmpeg to temp folder
+            ZipFile.ExtractToDirectory(path, Path.Combine(Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location), "temp"), true);
+
+            // Check to see if ffmpeg-*.*-release-build folder exists inside temp folder
+            string[] directories = Directory.GetDirectories(Path.Combine(Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location), "temp"));
+            string ffmpegPath = "";
+            foreach(string directory in directories)
+            {
+                if(directory.Contains("ffmpeg-"))
+                {
+                    ffmpegPath = directory;
+                    break;
+                }
+            }
+            
+            // Check to see if bin folder exists inside ffmpeg-*.*-release-build folder
+            directories = Directory.GetDirectories(ffmpegPath);
+            string ffmpegBinPath = "";
+            foreach(string directory in directories)
+            {
+                if(directory.Contains("bin"))
+                {
+                    ffmpegBinPath = directory;
+                    break;
+                }
+            }
+
+            // Check to see if ffmpeg.exe exists inside bin folder
+            string[] files = Directory.GetFiles(ffmpegBinPath);
+            string ffmpegExePath = "";
+            string ffprobeExePath = "";
+            foreach(string file in files)
+            {
+                if(file.Contains("ffmpeg.exe"))
+                {
+                    ffmpegExePath = file;
+                }
+                else if(file.Contains("ffprobe.exe"))
+                {
+                    ffprobeExePath = file;
+                }
+                if (ffmpegExePath != "" && ffprobeExePath != "")
+                {
+                    break;
+                }
+            }
+
+            // Move ffmpeg.exe and ffprobe.exe to the root folder
+            File.Move(ffmpegExePath, Path.Combine(Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location), "ffmpeg.exe"));
+            File.Move(ffprobeExePath, Path.Combine(Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location), "ffprobe.exe"));
+
+            // Re-scan for ffmpeg
+            for(int h = 0; h < baseTutorialText.Length; h++)
+            {
+                tutorialText[h] = new List<string>();
+                for(int j = 0; j < baseTutorialText[h].Count; j++)
+                {
+                    tutorialText[h].Add(baseTutorialText[h][j]);
+                }
+            }
+            check = true;
+            dependencyWorker = new BackgroundWorker();
+            dependencyWorker.DoWork += DependencyCheckThread;
+            dependencyWorker.RunWorkerAsync();
+            GlobalContent.GetSound("RenderComplete").Play(int.Parse(SaveData.saveValues["SoundEffectVolume"]) / 100f, 0f, 0f);
         }
     }
 }

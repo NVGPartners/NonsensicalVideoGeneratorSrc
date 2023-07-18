@@ -18,7 +18,7 @@ namespace NonsensicalVideoGenerator
         /// The title of the screen. This is displayed on the header bar.
         /// </summary>
         public string title { get; } = "Main Menu";
-        public int layer { get; } = 6;
+        public int layer { get; } = 8;
         public ScreenType screenType { get; set; } = ScreenType.Hidden;
         public int currentPlacement { get; set; } = -1;
         private bool hiding = false;
@@ -178,10 +178,38 @@ namespace NonsensicalVideoGenerator
                         // Get click
                         if (MouseInput.LastMouseState.LeftButton == ButtonState.Released && MouseInput.MouseState.LeftButton == ButtonState.Pressed)
                         {
-                            // Set pagination
-                            Pagination.SetPage(segment);
                             // Play sound
                             GlobalContent.GetSound("Select").Play(int.Parse(SaveData.saveValues["SoundEffectVolume"]) / 100f, 0f, 0f);    
+                            if(Pagination.DrawnPage != segment)
+                            {
+                                if(segment == Pagination.GetPageCount() - 3)
+                                {
+                                    ScreenManager.PushNavigation("Pastime Game");
+                                    ScreenManager.GetScreen<PastimeGameScreen>("Pastime Game")?.Show();
+                                    ScreenManager.GetScreen<HeaderScreen>("Header")?.Hide();
+                                    ScreenManager.GetScreen<ContentScreen>("Content")?.Hide();
+                                    ScreenManager.GetScreen<VideoScreen>("Video")?.Hide();
+                                    ScreenManager.GetScreen<TutorialScreen>("Initial Setup")?.Hide();
+                                    ScreenManager.GetScreen<SocialScreen>("Socials")?.Hide();
+                                }
+                                else
+                                {
+                                    if(Pagination.DrawnPage == Pagination.GetPageCount() - 3)
+                                    {
+                                        ScreenManager.GetScreen<PastimeGameScreen>("Pastime Game")?.Hide();
+                                        ScreenManager.PushNavigation("Video");
+                                        ScreenManager.GetScreen<VideoScreen>("Video")?.Show();
+                                        ScreenManager.PushNavigation("Content");
+                                        ScreenManager.GetScreen<ContentScreen>("Content")?.Show();
+                                        ScreenManager.PushNavigation("Header");
+                                        ScreenManager.GetScreen<HeaderScreen>("Header")?.Show();
+                                        ScreenManager.PushNavigation("Socials");
+                                        ScreenManager.GetScreen<SocialScreen>("Socials")?.Show();
+                                    }
+                                }
+                                // Set pagination
+                                Pagination.SetPage(segment);
+                            }
                             return true;
                         }
                     }

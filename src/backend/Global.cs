@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Reflection;
+using Steamworks;
 
 namespace NonsensicalVideoGenerator
 {
@@ -28,7 +29,7 @@ namespace NonsensicalVideoGenerator
         public static bool useSystemFFprobe = false;
         public static bool useSystemYtDlp = false;
         public static string editing = "";
-        public static string appId = "2516360";
+        public static AppId_t appId = new(2516360);
         public static string videoTitle = "Render1";
         public static GeneratorFactory generatorFactory = new GeneratorFactory();
     }

@@ -102,8 +102,8 @@ namespace NonsensicalVideoGenerator
                             // Play sound
                             GlobalContent.GetSound("Select").Play(int.Parse(SaveData.saveValues["SoundEffectVolume"]) / 100f, 0f, 0f); 
                             Hide();
-                            ScreenManager.PushNavigation("April Fools");
-                            ScreenManager.GetScreen<AprilFoolsScreen>("April Fools")?.Show();
+                            ScreenManager.PushNavigation("Pastime Game");
+                            ScreenManager.GetScreen<PastimeGameScreen>("Pastime Game")?.Show();
                             ScreenManager.GetScreen<HeaderScreen>("Header")?.Hide();
                             ScreenManager.GetScreen<ContentScreen>("Content")?.Hide();
                             ScreenManager.GetScreen<VideoScreen>("Video")?.Hide();

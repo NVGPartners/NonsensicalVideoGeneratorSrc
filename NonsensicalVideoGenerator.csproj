@@ -49,34 +49,21 @@
 
 	<ItemGroup>
     <BasePlugins Include="$(ProjectDir)baseplugins\**\*.*" />
+    <BaseTemplates Include="$(ProjectDir)basetemplates\*.*" />
  	</ItemGroup>
 	<Target Name="CopyPlugins" AfterTargets="Build">
 		<MakeDir Directories="$(ProjectDir)bin\x64\Release\net6.0-windows\plugins" />
     <MakeDir Directories="$(ProjectDir)bin\x64\Release\net6.0-windows\library" />
     <MakeDir Directories="$(ProjectDir)bin\x64\Release\net6.0-windows\library\audio" />
-    <MakeDir Directories="$(ProjectDir)bin\x64\Release\net6.0-windows\library\audio\music" />
-    <MakeDir Directories="$(ProjectDir)bin\x64\Release\net6.0-windows\library\audio\sfx" />
     <MakeDir Directories="$(ProjectDir)bin\x64\Release\net6.0-windows\library\video" />
-    <MakeDir Directories="$(ProjectDir)bin\x64\Release\net6.0-windows\library\video\intros" />
-    <MakeDir Directories="$(ProjectDir)bin\x64\Release\net6.0-windows\library\video\materials" />
-    <MakeDir Directories="$(ProjectDir)bin\x64\Release\net6.0-windows\library\video\outros" />
-    <MakeDir Directories="$(ProjectDir)bin\x64\Release\net6.0-windows\library\video\overlays" />
-    <MakeDir Directories="$(ProjectDir)bin\x64\Release\net6.0-windows\library\video\renders" />
-    <MakeDir Directories="$(ProjectDir)bin\x64\Release\net6.0-windows\library\video\transitions" />
 		<MakeDir Directories="$(ProjectDir)bin\x64\debug\net6.0-windows\plugins" />
     <MakeDir Directories="$(ProjectDir)bin\x64\debug\net6.0-windows\library" />
     <MakeDir Directories="$(ProjectDir)bin\x64\debug\net6.0-windows\library\audio" />
-    <MakeDir Directories="$(ProjectDir)bin\x64\debug\net6.0-windows\library\audio\music" />
-    <MakeDir Directories="$(ProjectDir)bin\x64\debug\net6.0-windows\library\audio\sfx" />
     <MakeDir Directories="$(ProjectDir)bin\x64\debug\net6.0-windows\library\video" />
-    <MakeDir Directories="$(ProjectDir)bin\x64\debug\net6.0-windows\library\video\intros" />
-    <MakeDir Directories="$(ProjectDir)bin\x64\debug\net6.0-windows\library\video\materials" />
-    <MakeDir Directories="$(ProjectDir)bin\x64\debug\net6.0-windows\library\video\outros" />
-    <MakeDir Directories="$(ProjectDir)bin\x64\debug\net6.0-windows\library\video\overlays" />
-    <MakeDir Directories="$(ProjectDir)bin\x64\debug\net6.0-windows\library\video\renders" />
-    <MakeDir Directories="$(ProjectDir)bin\x64\debug\net6.0-windows\library\video\transitions" />
 		<Copy SourceFiles="@(BasePlugins)" DestinationFiles="$(ProjectDir)bin\x64\Release\net6.0-windows\plugins\%(RecursiveDir)%(Filename)%(Extension)" />
 		<Copy SourceFiles="@(BasePlugins)" DestinationFiles="$(ProjectDir)bin\x64\debug\net6.0-windows\plugins\%(RecursiveDir)%(Filename)%(Extension)" />
+    <Copy SourceFiles="@(BaseTemplates)" DestinationFiles="$(ProjectDir)bin\x64\Release\net6.0-windows\templates\%(Filename)%(Extension)" />
+    <Copy SourceFiles="@(BaseTemplates)" DestinationFiles="$(ProjectDir)bin\x64\debug\net6.0-windows\templates\%(Filename)%(Extension)" />
     <!-- .\packages\Steamworks.NET\steam_api64.dll -->
     <Copy SourceFiles=".\packages\Steamworks.NET\steam_api64.dll" DestinationFiles="$(ProjectDir)bin\x64\Release\net6.0-windows\steam_api64.dll" />
     <Copy SourceFiles=".\packages\Steamworks.NET\steam_api64.dll" DestinationFiles="$(ProjectDir)bin\x64\debug\net6.0-windows\steam_api64.dll" />

@@ -16,13 +16,17 @@ namespace NonsensicalVideoGenerator
         {
             bool returnValue = false;
             List<string> names = new();
-            // Update all interactables.
-            foreach (KeyValuePair<string, IInteractable> interactable in interactables)
+            try
             {
-                names.Add(interactable.Value.Name + "Input");
-                if(interactable.Value.Update(gameTime, handleInput))
-                    returnValue = true;
+                // Update all interactables.
+                foreach (KeyValuePair<string, IInteractable> interactable in interactables)
+                {
+                    names.Add(interactable.Value.Name + "Input");
+                    if(interactable.Value.Update(gameTime, handleInput))
+                        returnValue = true;
+                }
             }
+            catch {} // modified
             // If editing is not in the name list, set it to ""
             if (Global.editing != "" && !names.Contains(Global.editing))
                 Global.editing = "";

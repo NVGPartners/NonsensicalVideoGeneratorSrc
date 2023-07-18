@@ -8,16 +8,12 @@ namespace NonsensicalVideoGenerator
     /// <summary>
     /// Generate page.
     /// </summary>
-    public class WorkshopPage : IPage
+    public class PastimePage : IPage
     {
-        public string Name { get; set; } = "Workshop";
-        public string Tooltip { get; } = "Create and upload effects.";
+        public string Name { get; set; } = "Pastime";
+        public string Tooltip { get; } = "Play a game while generating.";
         private readonly InteractableController controller = new();
-        private int currentType = 0;
-        private int previousTypeCount = 0;
-        private List<string> names = new();
-        private string clipUrl = "";
-        private bool downloading = false;
+        public bool active = false;
         public bool Update(GameTime gameTime, bool handleInput)
         {
             // Interactable
@@ -32,7 +28,6 @@ namespace NonsensicalVideoGenerator
         }
         public void LoadContent(ContentManager contentManager, GraphicsDevice graphicsDevice)
         {
-            controller.Add("Label", new Label("Workshop", new Vector2(139, 60)));
             // Interactable
             controller.LoadContent(contentManager, graphicsDevice);
         }

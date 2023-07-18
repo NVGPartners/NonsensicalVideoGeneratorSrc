@@ -50,7 +50,7 @@ namespace NonsensicalVideoGenerator
             if(SteamManager.initialized)
                 PluginHandler.LoadWorkshop();
             else
-                PluginHandler.LoadPlugins();
+                PluginHandler.LoadPluginsThreaded();
             UpdateManager.GetDependencyStatus();
             if(!UpdateManager.ffmpegInstalled || !UpdateManager.ffprobeInstalled)
             {
@@ -64,11 +64,11 @@ namespace NonsensicalVideoGenerator
             "when exposed to certain visual images, including flashing",
             "lights or patterns that may appear in generated content.",
             " ",
-            "When using this software, please be aware of",
-            "this and take any necessary precautions.",
-            " ",
             "If you are sensitive to flashing lights,",
             "please do not use this software.",
+            " ",
+            "Press F1 to access accessible keyboard navigation.",
+            "Press F2 to toggle text to speech for keyboard navigation.",
             " ",
             "Click anywhere or press any key to continue."
         };

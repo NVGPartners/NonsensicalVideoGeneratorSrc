@@ -39,6 +39,8 @@ namespace NonsensicalVideoGenerator
         public static bool waiting = false;
         private static KeyboardState oldKeyboardState;
         private static KeyboardState newKeyboardState;
+        private static KeyboardState oldKeyboardState2;
+        private static KeyboardState newKeyboardState2;
         public static SpeechSynthesizer synth = new SpeechSynthesizer();
         public static bool PreUpdate(GameTime gameTime)
         {
@@ -46,10 +48,10 @@ namespace NonsensicalVideoGenerator
                 return false;
             bool result = false;
             // Capture keyboard input
-            oldKeyboardState = newKeyboardState;
-            newKeyboardState = Keyboard.GetState();
+            oldKeyboardState2 = newKeyboardState2;
+            newKeyboardState2 = Keyboard.GetState();
             // Check if user pressed f1 key and disambiguation is not already showing.
-            if(newKeyboardState.IsKeyDown(Keys.F1) && !oldKeyboardState.IsKeyDown(Keys.F1))
+            if(newKeyboardState2.IsKeyDown(Keys.F1) && !oldKeyboardState2.IsKeyDown(Keys.F1))
             {
                 if(!showDisambiguation)
                 {
@@ -76,7 +78,7 @@ namespace NonsensicalVideoGenerator
                 }
             }
             // F2 toggle tts
-            if(newKeyboardState.IsKeyDown(Keys.F2) && !oldKeyboardState.IsKeyDown(Keys.F2))
+            if(newKeyboardState2.IsKeyDown(Keys.F2) && !oldKeyboardState2.IsKeyDown(Keys.F2))
             {
                 enableTts = !enableTts;
                 if(synth.State == SynthesizerState.Speaking)
@@ -95,7 +97,7 @@ namespace NonsensicalVideoGenerator
                 result = true;
             }
             // Check if user pressed escape key and disambiguation is already showing.
-            if(newKeyboardState.IsKeyDown(Keys.Escape) && !oldKeyboardState.IsKeyDown(Keys.Escape) && showDisambiguation)
+            if(newKeyboardState2.IsKeyDown(Keys.Escape) && !oldKeyboardState2.IsKeyDown(Keys.Escape) && showDisambiguation)
             {
                 GlobalContent.GetSound("Back").Play(int.Parse(SaveData.saveValues["SoundEffectVolume"]) / 100f, 0f, 0f);
                 showDisambiguation = false;
@@ -178,6 +180,9 @@ namespace NonsensicalVideoGenerator
                 return;
             if(showDisambiguation)
             {
+                // Capture keyboard input
+                oldKeyboardState = newKeyboardState;
+                newKeyboardState = Keyboard.GetState();
                 if(offset < -(disambiguationOptions.Count - 1))
                 {
                     offset = -(disambiguationOptions.Count - 1);

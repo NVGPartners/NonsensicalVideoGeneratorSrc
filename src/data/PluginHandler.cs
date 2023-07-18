@@ -12,6 +12,7 @@ using MoonSharp.Interpreter;
 using MoonSharp.Interpreter.Loaders;
 using Steamworks;
 using System.ComponentModel;
+using System.Threading;
 
 namespace NonsensicalVideoGenerator
 {
@@ -108,6 +109,7 @@ namespace NonsensicalVideoGenerator
                 UseShellExecute = false,
                 RedirectStandardOutput = true,
                 RedirectStandardError = true,
+                CreateNoWindow = true,
             };
             Process process = new()
             {
@@ -152,6 +154,7 @@ namespace NonsensicalVideoGenerator
         public string path { get; set; }
         public PluginType type { get; set; }
         public bool enabled { get; set; }
+        public string submittedId = "";
         public Script? luaScript;
         public string workshopId = "";
         public string rootPath = "";
@@ -566,6 +569,11 @@ namespace NonsensicalVideoGenerator
                         && Path.GetFileName(Path.GetDirectoryName(path)) != "user")
                     {
                         workshopId = Path.GetFileName(Path.GetDirectoryName(path));
+                        // check for .publish inside folder
+                        if (File.Exists(Path.Join(Path.GetDirectoryName(path), ".publish")))
+                        {
+                            submittedId = File.ReadAllText(Path.Join(Path.GetDirectoryName(path), ".publish")); // contains submitted workshopId
+                        }
                     }
                     // Moonsharp is used to run Lua plugins in a sandbox.
                     // Steam Workshop plugins are Lua.
@@ -697,6 +705,8 @@ namespace NonsensicalVideoGenerator
         public static string pluginSettingsPath = @".\PluginSettings.json";
         public static List<Command> commands = new();
         public static PublishedFileId_t[]? subscribedItems;
+        public static bool publishing = false;
+        public static bool updating = false;
         public static void LoadPluginSettings()
         {
             if (!File.Exists(pluginSettingsPath))
@@ -772,7 +782,11 @@ namespace NonsensicalVideoGenerator
                 {
                     key = $"{plugin.workshopId}/{key}";
                 }
-                pluginSettings.Add(key, pluginSetting);
+                // Already contains key?
+                if (!pluginSettings.ContainsKey(key))
+                {
+                    pluginSettings.Add(key, pluginSetting);
+                }
             }
             File.WriteAllText(pluginSettingsPath, JsonConvert.SerializeObject(pluginSettings, Formatting.Indented));
         }
@@ -899,6 +913,7 @@ namespace NonsensicalVideoGenerator
         {
             Global.pluginsLoaded = PluginHandler.LoadPlugins();
         }
+        public static Callback<DownloadItemResult_t>? downloadItemResult;
         public static void LoadWorkshop()
         {
             // Create "plugins\workshop" if they don't exist.
@@ -918,22 +933,24 @@ namespace NonsensicalVideoGenerator
                     if (download)
                     {
                         // Register callback.
-                        Callback<DownloadItemResult_t> downloadItemResult;
-                        downloadItemResult = Callback<DownloadItemResult_t>.Create((result) =>
+                        if(downloadItemResult == null)
                         {
-                            if (result.m_nPublishedFileId == item)
+                            downloadItemResult = Callback<DownloadItemResult_t>.Create((result) =>
                             {
-                                if (result.m_eResult == EResult.k_EResultOK)
+                                if (result.m_nPublishedFileId == item)
                                 {
-                                    ConsoleOutput.WriteLine($"Downloaded ID {item.m_PublishedFileId.ToString()} from workshop.", Color.RoyalBlue);
+                                    if (result.m_eResult == EResult.k_EResultOK)
+                                    {
+                                        ConsoleOutput.WriteLine($"Downloaded ID {item.m_PublishedFileId.ToString()} from workshop.", Color.RoyalBlue);
+                                    }
+                                    else
+                                    {
+                                        ConsoleOutput.WriteLine($"Failed to download ID {item.m_PublishedFileId.ToString()} from workshop.", Color.Red);
+                                    }
+                                    AllDone(subscribedItemCount);
                                 }
-                                else
-                                {
-                                    ConsoleOutput.WriteLine($"Failed to download ID {item.m_PublishedFileId.ToString()} from workshop.", Color.Red);
-                                }
-                                AllDone(subscribedItemCount);
-                            }
-                        });
+                            });
+                        }
                     }
                     else
                     {
@@ -947,10 +964,36 @@ namespace NonsensicalVideoGenerator
                 AllDone(0);
             }
         }
+        public static BackgroundWorker loadPluginsThread = new();
+        public static void LoadPluginsThreaded()
+        {
+            loadPluginsThread = new();
+            loadPluginsThread.DoWork += (sender, e) =>
+            {
+                LoadPlugins();
+            };
+            loadPluginsThread.RunWorkerCompleted += (sender, e) =>
+            {
+                Global.pluginsLoaded = true;
+            };
+            loadPluginsThread.RunWorkerAsync();
+        }
         public static bool LoadPlugins()
         {
+            // Find all custom library types and remove them
+            foreach (Plugin plugin in plugins)
+            {
+                foreach(LibraryType libtype in plugin.libraryTypes)
+                {
+                    DefaultLibraryTypes.AllTypes.Remove(libtype);
+                    LibraryData.libraryPaths.Remove(libtype);
+                    LibraryData.libraryFileTypes.Remove(libtype);
+                    LibraryData.libraryNames.Remove(libtype);
+                }
+            }
             // Clear plugins.
             plugins.Clear();
+            Global.pluginsLoaded = false;
             // Create plugin directory if it doesn't exist.
             if(Directory.Exists(pluginPath) == false)
             {
@@ -959,7 +1002,6 @@ namespace NonsensicalVideoGenerator
             ConsoleOutput.WriteLine($"Searching for plugins in {pluginPath}...", Color.LightBlue);
             List<string> pluginDirs = new()
             {
-                "stock",
                 "workshop",
                 "user"
             };
@@ -980,9 +1022,6 @@ namespace NonsensicalVideoGenerator
                     PluginType type = PluginType.None;
                     switch (dirName)
                     {
-                        case "stock":
-                            type = PluginType.PowerShell;
-                            break;
                         case "workshop":
                             type = PluginType.Lua;
                             break;
@@ -1002,6 +1041,8 @@ namespace NonsensicalVideoGenerator
             catch (Exception e)
             {
                 ConsoleOutput.WriteLine($"Error loading plugins: {e.Message}", Color.Red);
+                Global.generatorFactory.progressText = $"Error loading plugins!";
+                GlobalContent.GetSound("Error").Play(int.Parse(SaveData.saveValues["SoundEffectVolume"]) / 100f, 0f, 0f);
                 return false;
             }
             return true;
@@ -1030,8 +1071,304 @@ namespace NonsensicalVideoGenerator
             // Call the plugin.
             return plugin.Call(video);
         }
+        public static bool CreatePlugin(string filename, string prettyname, bool minimal, out string file)
+        {
+            try
+            {
+                // copy .\templates\minimal.lua or .\templates\effect.lua to .\plugins\user\filename\filename.lua
+                string template = minimal ? "minimal.lua" : "effect.lua";
+                string templatePath = Path.Combine("templates", template);
+                string pluginPath = Path.Combine("plugins", "user", filename);
+                string pluginFile = Path.Combine(pluginPath, filename + ".lua");
+                if(Directory.Exists(pluginPath) == false)
+                {
+                    Directory.CreateDirectory(pluginPath);
+                }
+                File.Copy(templatePath, pluginFile);
+                // Replace "effect" with filename in the file.
+                string fileContents = File.ReadAllText(pluginFile);
+                fileContents = fileContents.Replace("%filename%", filename + ".lua");
+                fileContents = fileContents.Replace("%prettyname%", prettyname);
+                File.WriteAllText(pluginFile, fileContents);
+                file = pluginFile;
+                return true;
+            }
+            catch(Exception e)
+            {
+                ConsoleOutput.WriteLine($"Error creating plugin: {e.Message}", Color.Red);
+                file = "";
+                return false;
+            }
+        }
+        public static Plugin? publishPlugin = null;
+        public static WorkshopTag flags = WorkshopTag.None;
+        public static string workshopIcon = "";
+        public static void PublishPlugin(Plugin plugin, WorkshopTag tagflags, string iconPath)
+        {
+            if(publishing)
+                return;
+            // Is Steam API available?
+            if(SteamAPI.IsSteamRunning() == false || !SteamManager.initialized)
+            {
+                Global.generatorFactory.progressText = "Steam is not running.";
+                GlobalContent.GetSound("Error").Play(int.Parse(SaveData.saveValues["SoundEffectVolume"]) / 100f, 0f, 0f);
+                ConsoleOutput.WriteLine("Steam is not running, cannot publish plugin.", Color.Red);
+                publishPlugin = null;
+                publishing = false;
+                return;
+            }
+            publishing = true;
+            publishPlugin = plugin;
+            flags = tagflags;
+            workshopIcon = iconPath;
+            // Delete .publish in the plugin's directory if it exists
+            string publishFile = Path.Combine(Path.GetDirectoryName(plugin.path), ".publish");
+            if(File.Exists(publishFile))
+            {
+                File.Delete(publishFile);
+            }
+            // Also delete non-lua files so Steam doesn't upload them
+            foreach(string file in Directory.GetFiles(Path.GetDirectoryName(plugin.path)))
+            {
+                if(Path.GetExtension(file) != ".lua")
+                {
+                    File.Delete(file);
+                }
+            }
+            if(createItemResult == null)
+            {
+                createItemResult = CallResult<CreateItemResult_t>.Create(OnWorkshopItemCreated);
+            }
+            if(updateItemResult == null)
+            {
+                updateItemResult = CallResult<SubmitItemUpdateResult_t>.Create(OnWorkshopItemUpdated);
+            }
+            if(publishPlugin.submittedId == "")
+            {
+                updating = false;
+                SteamAPICall_t call = SteamUGC.CreateItem(SteamUtils.GetAppID(), EWorkshopFileType.k_EWorkshopFileTypeCommunity);
+                createItemResult.Set(call);
+            }
+            else
+            {
+                updating = true;
+                UpdateWorkshopItem(new PublishedFileId_t(ulong.Parse(publishPlugin.submittedId)));
+            }
+        }
+        private static CallResult<CreateItemResult_t>? createItemResult;
+        private static CallResult<SubmitItemUpdateResult_t>? updateItemResult;
+        private static void OnWorkshopItemCreated(CreateItemResult_t param, bool bIOFailure)
+        {
+            if(!publishing)
+                return;
+            if (param.m_eResult != EResult.k_EResultOK || bIOFailure)
+            {
+                ConsoleOutput.WriteLine($"Error creating workshop item: {param.m_eResult}", Color.Red);
+                Global.generatorFactory.progressText = "Error creating workshop item.";
+                GlobalContent.GetSound("Error").Play(int.Parse(SaveData.saveValues["SoundEffectVolume"]) / 100f, 0f, 0f);
+                publishPlugin = null;
+                publishing = false;
+                return;
+            }
+            Global.generatorFactory.progressText = "Creating Workshop item...";
+            UpdateWorkshopItem(param.m_nPublishedFileId);
+        }
+        public static void UpdateWorkshopItem(PublishedFileId_t id)
+        {
+            if(!publishing)
+                return;
+            // Start updating.
+            UGCUpdateHandle_t handle = SteamUGC.StartItemUpdate(SteamUtils.GetAppID(), id);
+            if(handle.m_UGCUpdateHandle == 0)
+            {
+                ConsoleOutput.WriteLine($"Error updating workshop item: Invalid handle.", Color.Red);
+                Global.generatorFactory.progressText = "Error updating workshop item.";
+                GlobalContent.GetSound("Error").Play(int.Parse(SaveData.saveValues["SoundEffectVolume"]) / 100f, 0f, 0f);
+                publishPlugin = null;
+                publishing = false;
+                return;
+            }
+            // Set the title.
+            bool cont = true;
+            if(!updating)
+                cont = SteamUGC.SetItemTitle(handle, publishPlugin.GetDisplayName());
+            if(!cont)
+            {
+                ConsoleOutput.WriteLine($"Error updating workshop item: Invalid title.", Color.Red);
+                Global.generatorFactory.progressText = "Error updating workshop item.";
+                GlobalContent.GetSound("Error").Play(int.Parse(SaveData.saveValues["SoundEffectVolume"]) / 100f, 0f, 0f);
+                publishPlugin = null;
+                publishing = false;
+                return;
+            }
+            // Set the description if one exists
+            if(publishPlugin.settings.Count > 0)
+            {
+                string description = "";
+                List<string> extsettings = new();
+                foreach(KeyValuePair<string, object> setting in publishPlugin.settings)
+                {
+                    if(setting.Key.ToLower() == "description")
+                    {
+                        description = setting.Value.ToString();
+                    }
+                    // Hide display name and other labels
+                    else if(setting.Key.ToLower() != "display name"
+                        && (publishPlugin.settingTypes.ContainsKey(setting.Key) ?
+                            publishPlugin.settingTypes[setting.Key] != SettingType.Label : true))
+                    {
+                        extsettings.Add($"{setting.Key} (Default: \"{setting.Value}\")");
+                    }
+                }
+                if(extsettings.Count > 0)
+                {
+                    description += "\n\n";
+                    description += "Settings:\n";
+                    foreach(string setting in extsettings)
+                    {
+                        description += setting + "\n";
+                    }
+                }
+                if(description != "" && !updating)
+                    SteamUGC.SetItemDescription(handle, description);
+            }
+            // Set the visibility.
+            if(!updating)
+                cont = SteamUGC.SetItemVisibility(handle, ERemoteStoragePublishedFileVisibility.k_ERemoteStoragePublishedFileVisibilityPrivate);
+            if(!cont)
+            {
+                ConsoleOutput.WriteLine($"Error updating workshop item: Invalid visibility.", Color.Red);
+                Global.generatorFactory.progressText = "Error updating workshop item.";
+                GlobalContent.GetSound("Error").Play(int.Parse(SaveData.saveValues["SoundEffectVolume"]) / 100f, 0f, 0f);
+                publishPlugin = null;
+                publishing = false;
+                return;
+            }
+            // Set the content.
+            string contentPath = Path.GetDirectoryName(publishPlugin.path);
+            // Remove leading .\ and such
+            while(contentPath.StartsWith("."))
+            {
+                contentPath = contentPath.Substring(1);
+            }
+            while(contentPath.StartsWith("\\"))
+            {
+                contentPath = contentPath.Substring(1);
+            }
+            while(contentPath.StartsWith("/"))
+            {
+                contentPath = contentPath.Substring(1);
+            }
+            contentPath = contentPath.Replace("/", "\\");
+            // Get full path
+            contentPath = Path.Combine(Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location), contentPath);
+            ConsoleOutput.WriteLine($"Content path: {contentPath}");
+            cont = SteamUGC.SetItemContent(handle, contentPath);
+            if(!cont)
+            {
+                ConsoleOutput.WriteLine($"Error updating workshop item: Invalid content path.", Color.Red);
+                Global.generatorFactory.progressText = "Error updating workshop item.";
+                GlobalContent.GetSound("Error").Play(int.Parse(SaveData.saveValues["SoundEffectVolume"]) / 100f, 0f, 0f);
+                publishPlugin = null;
+                publishing = false;
+                return;
+            }
+            // Set the preview image
+            cont = SteamUGC.SetItemPreview(handle, workshopIcon);
+            if(!cont)
+            {
+                ConsoleOutput.WriteLine($"Error updating workshop item: Invalid preview path.", Color.Red);
+                Global.generatorFactory.progressText = "Error updating workshop item.";
+                GlobalContent.GetSound("Error").Play(int.Parse(SaveData.saveValues["SoundEffectVolume"]) / 100f, 0f, 0f);
+                publishPlugin = null;
+                publishing = false;
+                return;
+            }
+            // Set the tags.
+            List<string> tags = new();
+            if((flags & WorkshopTag.Effect_VideoOnly) != 0)
+            {
+                tags.Add("Video");
+            }
+            if((flags & WorkshopTag.Effect_AudioOnly) != 0)
+            {
+                tags.Add("Audio");
+            }
+            if((flags & WorkshopTag.Library_Material) != 0)
+            {
+                tags.Add("Material");
+            }
+            if((flags & WorkshopTag.Library_Transition) != 0)
+            {
+                tags.Add("Transition");
+            }
+            if((flags & WorkshopTag.Library_Overlay) != 0)
+            {
+                tags.Add("Overlay");
+            }
+            if((flags & WorkshopTag.Library_SFX) != 0)
+            {
+                tags.Add("Sound FX");
+            }
+            if((flags & WorkshopTag.Library_Music) != 0)
+            {
+                tags.Add("Music");
+            }
+            if((flags & WorkshopTag.Library_Intro) != 0)
+            {
+                tags.Add("Intro");
+            }
+            if((flags & WorkshopTag.Library_Outro) != 0)
+            {
+                tags.Add("Outro");
+            }
+            if((flags & WorkshopTag.Library_Custom) != 0)
+            {
+                tags.Add("Custom");
+            }
+            // Submit tags
+            cont = SteamUGC.SetItemTags(handle, tags.ToArray());
+            if(!cont)
+            {
+                ConsoleOutput.WriteLine($"Error updating workshop item: Invalid tags.", Color.Red);
+                Global.generatorFactory.progressText = "Error updating workshop item.";
+                GlobalContent.GetSound("Error").Play(int.Parse(SaveData.saveValues["SoundEffectVolume"]) / 100f, 0f, 0f);
+                publishPlugin = null;
+                publishing = false;
+                return;
+            }
+            // Submit the update.
+            SteamAPICall_t call = SteamUGC.SubmitItemUpdate(handle, "Updated plugin.");
+            updateItemResult.Set(call);
+            Global.generatorFactory.progressText = "Publishing...";
+        }
+        public static void OnWorkshopItemUpdated(SubmitItemUpdateResult_t param, bool bIOFailure)
+        {
+            if(!publishing)
+                return;
+            if (param.m_eResult != EResult.k_EResultOK || bIOFailure)
+            {
+                Global.generatorFactory.progressText = "Error publishing.";
+                GlobalContent.GetSound("Error").Play(int.Parse(SaveData.saveValues["SoundEffectVolume"]) / 100f, 0f, 0f);
+                ConsoleOutput.WriteLine($"Error updating workshop item: {param.m_eResult}", Color.Red);
+                publishPlugin = null;
+                publishing = false;
+                return;
+            }
+            Global.generatorFactory.progressText = "Successfully published.";
+            GlobalContent.GetSound("RenderComplete").Play(int.Parse(SaveData.saveValues["SoundEffectVolume"]) / 100f, 0f, 0f);
+            ConsoleOutput.WriteLine($"Successfully published plugin {publishPlugin.GetDisplayName()} to the workshop.", Color.Green);
+            publishPlugin.submittedId = param.m_nPublishedFileId.ToString();
+            // Write the plugin's workshop id to .publish in the plugin's directory.
+            string publishFile = Path.Combine(Path.GetDirectoryName(publishPlugin.path), ".publish");
+            File.WriteAllText(publishFile, publishPlugin.submittedId.ToString());
+            publishPlugin = null;
+            publishing = false;
+        }
         public static int GetPluginCount()
         {
+            if(!Global.pluginsLoaded)
+                return 0;
             return plugins.Count;
         }
     }

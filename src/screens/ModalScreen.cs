@@ -19,7 +19,7 @@ namespace NonsensicalVideoGenerator
         /// The title of the screen. This is displayed on the header bar.
         /// </summary>
         public string title { get; } = "Modal";
-        public int layer { get; } = 8;
+        public int layer { get; } = 10;
         public ScreenType screenType { get; set; } = ScreenType.Hidden;
         public int currentPlacement { get; set; } = -1;
         public Action<int>? callback { get; set; } = null;

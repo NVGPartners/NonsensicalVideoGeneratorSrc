@@ -196,8 +196,8 @@ namespace NonsensicalVideoGenerator
                     MouseInput._mouseState = Mouse.GetState();
                 }
             }
-            bool handleInput = UserInterface.instance.IsActive && MouseInput.MouseState.X >= 0 && MouseInput.MouseState.X <= GlobalGraphics.scaledWidth &&
-                MouseInput.MouseState.Y >= 0 && MouseInput.MouseState.Y <= GlobalGraphics.scaledHeight && !Global.dragDrop;
+            bool handleInput = Accessibility.showDisambiguation || (UserInterface.instance.IsActive && MouseInput.MouseState.X >= 0 && MouseInput.MouseState.X <= GlobalGraphics.scaledWidth &&
+                MouseInput.MouseState.Y >= 0 && MouseInput.MouseState.Y <= GlobalGraphics.scaledHeight && !Global.dragDrop);
             if(Accessibility.PreUpdate(gameTime))
                 handleInput = false;
             // Update the drawn screens in layer order and reversed.

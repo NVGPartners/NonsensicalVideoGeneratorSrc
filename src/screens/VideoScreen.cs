@@ -109,11 +109,14 @@ namespace NonsensicalVideoGenerator
                     else
                     {
                         FramePlayer.currentFrame = -1;
-                        FramePlayer.canPlayBgMusic = true;
                     }
                     if(FramePlayer.audio != null)
                     {
                         FramePlayer.audio.Stop();
+                        FramePlayer.currentAudioTime = 0;
+                        FramePlayer.audioPlaying = false;
+                        FramePlayer.canPlayBgMusic = true;
+                        Global.generatorFactory.progressText = "Stopped playback.";
                         GlobalContent.GetSound("Option").Play(int.Parse(SaveData.saveValues["SoundEffectVolume"]) / 100f, 0f, 0f);
                     }
                     else
@@ -138,11 +141,14 @@ namespace NonsensicalVideoGenerator
                             else
                             {
                                 FramePlayer.currentFrame = -1;
-                                FramePlayer.canPlayBgMusic = true;
                             }
                             if(FramePlayer.audio != null)
                             {
                                 FramePlayer.audio.Stop();
+                                FramePlayer.currentAudioTime = 0;
+                                FramePlayer.audioPlaying = false;
+                                FramePlayer.canPlayBgMusic = true;
+                                Global.generatorFactory.progressText = "Stopped playback.";
                                 GlobalContent.GetSound("Option").Play(int.Parse(SaveData.saveValues["SoundEffectVolume"]) / 100f, 0f, 0f);
                             }
                             else
@@ -159,6 +165,10 @@ namespace NonsensicalVideoGenerator
                         {
                             FramePlayer.currentFrame = -1;
                             FramePlayer.audio.Stop();
+                            FramePlayer.currentAudioTime = 0;
+                            FramePlayer.audioPlaying = false;
+                            FramePlayer.canPlayBgMusic = true;
+                            Global.generatorFactory.progressText = "Stopped playback.";
                             FramePlayer.canPlayBgMusic = true;
                         }
                         ProcessStartInfo startInfo = new()

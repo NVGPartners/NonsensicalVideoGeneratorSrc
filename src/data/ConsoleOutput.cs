@@ -109,24 +109,21 @@ namespace NonsensicalVideoGenerator
             Color c = Color.White;
             if (color != null)
                 c = (Color)color;
-            else
+            // Look for color identifiers (plugins).
+            // <[255,255,255]>This is one line.
+            if(line.StartsWith("<["))
             {
-                // Look for color identifiers (plugins).
-                // <[255,255,255]>This is one line.
-                if(line.StartsWith("<["))
+                int end = line.IndexOf("]>");
+                if(end > 0)
                 {
-                    int end = line.IndexOf("]>");
-                    if(end > 0)
+                    string colorString = line.Substring(2, end - 2);
+                    string[] colorValues = colorString.Split(',');
+                    if(colorValues.Length == 3)
                     {
-                        string colorString = line.Substring(2, end - 2);
-                        string[] colorValues = colorString.Split(',');
-                        if(colorValues.Length == 3)
+                        if (int.TryParse(colorValues[0], out int r) && int.TryParse(colorValues[1], out int g) && int.TryParse(colorValues[2], out int b))
                         {
-                            if (int.TryParse(colorValues[0], out int r) && int.TryParse(colorValues[1], out int g) && int.TryParse(colorValues[2], out int b))
-                            {
-                                c = new Color(r, g, b);
-                                line = line.Substring(end + 2);
-                            }
+                            c = new Color(r, g, b);
+                            line = line.Substring(end + 2);
                         }
                     }
                 }

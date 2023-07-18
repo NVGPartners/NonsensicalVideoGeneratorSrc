@@ -11,6 +11,22 @@ using MonoGame.Extended.Tweening;
 
 namespace NonsensicalVideoGenerator
 {
+    [Flags]
+    public enum WorkshopTag
+    {
+        None = 0,
+        Effect_AudioOnly = 1,
+        Effect_VideoOnly = 2,
+        Library_SFX = 4,
+        Library_Music = 8,
+        Library_Material = 16,
+        Library_Transition = 32,
+        Library_Intro = 64,
+        Library_Outro = 128,
+        Library_Overlay = 256,
+        Library_Render = 512,
+        Library_Custom = 1024,
+    }
     /// <summary>
     /// Generate page.
     /// </summary>
@@ -23,10 +39,16 @@ namespace NonsensicalVideoGenerator
         private bool dragging = false;
         private int dragOffset = 0;
         private bool editingSettings = false;
+        private bool pluginCreation = false;
         private int settingsIndex = 0;
         private int setting = 0;
         private string internalTooltip = "";
+        public string customPluginName = "My Effect";
+        public string customPluginFileName = "myeffect";
+        public bool customPluginMinimal = false;
+        public WorkshopTag selectedFlagsWorkshop = WorkshopTag.None;
         private readonly InteractableController controller = new();
+        private readonly InteractableController controllerPluginCreation = new();
         public void Draw(GameTime gameTime, SpriteBatch spriteBatch)
         {
             // 135, 56 PluginPage
@@ -34,6 +56,7 @@ namespace NonsensicalVideoGenerator
             // 294, 69-214 ScrollHandle (9x9)
             Texture2D pluginPage = GlobalContent.GetTexture("PluginPage");
             Texture2D pluginSettings = GlobalContent.GetTexture("PluginSettings");
+            Texture2D createPlugin = GlobalContent.GetTexture("CreatePlugin");
             Texture2D pluginEntry = GlobalContent.GetTexture("PluginEntry");
             Texture2D scrollHandle = GlobalContent.GetTexture("ScrollHandle");
             Texture2D interactiveSwitchOn = GlobalContent.GetTexture("InteractiveSwitchOn");
@@ -56,32 +79,43 @@ namespace NonsensicalVideoGenerator
                 RasterizerState rasterizerState = new RasterizerState();
                 rasterizerState.ScissorTestEnable = true;
                 spriteBatch.Begin(SpriteSortMode.Deferred, BlendState.AlphaBlend, SamplerState.PointClamp, null, rasterizerState, null, Matrix.CreateTranslation(GlobalGraphics.Scale(ScreenManager.GetScreen<ContentScreen>("Content").offset.X / GlobalGraphics.scale), GlobalGraphics.Scale((ScreenManager.GetScreen<ContentScreen>("Content").offset.Y / GlobalGraphics.scale) + -scrollOffset), 0));
-                for(int i = 0; i < PluginHandler.GetPluginCount(); i++)
+                int plcount = PluginHandler.GetPluginCount() + 1;
+                for(int i = 0; i < plcount; i++)
                 {
                     spriteBatch.Draw(pluginEntry, new Rectangle(GlobalGraphics.Scale(136), GlobalGraphics.Scale(57 + i * pluginEntry.Height + i), pluginEntry.Width * GlobalGraphics.scale, pluginEntry.Height * GlobalGraphics.scale), Color.White);
-                    if(PluginHandler.plugins[i].settings.Count > 0 && Global.canRender)
+                    if(i < plcount-1)
                     {
-                        // Don't show custom name value
-                        int reqcount = 0;
-                        if(PluginHandler.plugins[i].settings.Keys.ElementAt(0) == "Display Name")
-                            reqcount = 1;
-                        if(PluginHandler.plugins[i].settings.Count > reqcount)
+                        if(PluginHandler.plugins[i].settings.Count > 0 && Global.canRender)
                         {
-                            spriteBatch.Draw(pluginSettings, new Rectangle(GlobalGraphics.Scale(226), GlobalGraphics.Scale(59 + i * pluginEntry.Height + i), pluginSettings.Width * GlobalGraphics.scale, pluginSettings.Height * GlobalGraphics.scale), Color.White);
-                            spriteBatch.DrawString(munroSmall, "Settings", new Vector2(GlobalGraphics.Scale(233+1), GlobalGraphics.Scale(58+1 + i * pluginEntry.Height + i)), Color.Black);
-                            spriteBatch.DrawString(munroSmall, "Settings", new Vector2(GlobalGraphics.Scale(233), GlobalGraphics.Scale(58 + i * pluginEntry.Height + i)), Color.White);
+                            // Don't show custom name value
+                            int reqcount = 0;
+                            if(PluginHandler.plugins[i].settings.Keys.ElementAt(0) == "Display Name")
+                                reqcount = 1;
+                            if(PluginHandler.plugins[i].settings.Count > reqcount)
+                            {
+                                spriteBatch.Draw(pluginSettings, new Rectangle(GlobalGraphics.Scale(226), GlobalGraphics.Scale(59 + i * pluginEntry.Height + i), pluginSettings.Width * GlobalGraphics.scale, pluginSettings.Height * GlobalGraphics.scale), Color.White);
+                                spriteBatch.DrawString(munroSmall, "Settings", new Vector2(GlobalGraphics.Scale(233+1), GlobalGraphics.Scale(58+1 + i * pluginEntry.Height + i)), Color.Black);
+                                spriteBatch.DrawString(munroSmall, "Settings", new Vector2(GlobalGraphics.Scale(233), GlobalGraphics.Scale(58 + i * pluginEntry.Height + i)), Color.White);
+                            }
                         }
-                    }
-                    spriteBatch.DrawString(munroSmall, PluginHandler.plugins[i].GetDisplayName(), new Vector2(GlobalGraphics.Scale(141+1), GlobalGraphics.Scale(58+1 + i * pluginEntry.Height + i)), Color.Black);
-                    spriteBatch.DrawString(munroSmall, PluginHandler.plugins[i].GetDisplayName(), new Vector2(GlobalGraphics.Scale(141), GlobalGraphics.Scale(58 + i * pluginEntry.Height + i)), Color.White);
-                    if(Global.canRender)
-                    {
-                        spriteBatch.Draw(PluginHandler.plugins[i].enabled ? interactiveSwitchOn : interactiveSwitchOff, new Rectangle(GlobalGraphics.Scale(271), GlobalGraphics.Scale(60 + i * pluginEntry.Height + i), interactiveSwitchOn.Width * GlobalGraphics.scale, interactiveSwitchOn.Height * GlobalGraphics.scale), Color.White);
+                        spriteBatch.DrawString(munroSmall, PluginHandler.plugins[i].GetDisplayName(), new Vector2(GlobalGraphics.Scale(141+1), GlobalGraphics.Scale(58+1 + i * pluginEntry.Height + i)), Color.Black);
+                        spriteBatch.DrawString(munroSmall, PluginHandler.plugins[i].GetDisplayName(), new Vector2(GlobalGraphics.Scale(141), GlobalGraphics.Scale(58 + i * pluginEntry.Height + i)), Color.White);
+                        if(Global.canRender)
+                        {
+                            spriteBatch.Draw(PluginHandler.plugins[i].enabled ? interactiveSwitchOn : interactiveSwitchOff, new Rectangle(GlobalGraphics.Scale(271), GlobalGraphics.Scale(60 + i * pluginEntry.Height + i), interactiveSwitchOn.Width * GlobalGraphics.scale, interactiveSwitchOn.Height * GlobalGraphics.scale), Color.White);
+                        }
+                        else
+                        {
+                            spriteBatch.DrawString(munroSmall, "...", new Vector2(GlobalGraphics.Scale(277+1), GlobalGraphics.Scale(58 + 1 + i * pluginEntry.Height + i)), Color.Black);
+                            spriteBatch.DrawString(munroSmall, "...", new Vector2(GlobalGraphics.Scale(277), GlobalGraphics.Scale(58 + i * pluginEntry.Height + i)), Color.White);
+                        }
                     }
                     else
                     {
-                        spriteBatch.DrawString(munroSmall, "...", new Vector2(GlobalGraphics.Scale(277+1), GlobalGraphics.Scale(58 + 1 + i * pluginEntry.Height + i)), Color.Black);
-                        spriteBatch.DrawString(munroSmall, "...", new Vector2(GlobalGraphics.Scale(277), GlobalGraphics.Scale(58 + i * pluginEntry.Height + i)), Color.White);
+                        // create plugin
+                        spriteBatch.Draw(createPlugin, new Rectangle(GlobalGraphics.Scale(265), GlobalGraphics.Scale(59 + i * pluginEntry.Height + i), createPlugin.Width * GlobalGraphics.scale, createPlugin.Height * GlobalGraphics.scale), Color.White);
+                        spriteBatch.DrawString(munroSmall, "Workshop Effect Creation", new Vector2(GlobalGraphics.Scale(141+1), GlobalGraphics.Scale(58+1 + i * pluginEntry.Height + i)), Color.Black);
+                        spriteBatch.DrawString(munroSmall, "Workshop Effect Creation", new Vector2(GlobalGraphics.Scale(141), GlobalGraphics.Scale(58 + i * pluginEntry.Height + i)), Color.White);
                     }
                 }
                 // End offset
@@ -96,8 +130,16 @@ namespace NonsensicalVideoGenerator
                 spriteBatch.Draw(GlobalContent.GetTexture("Pixel"), new Rectangle(GlobalGraphics.Scale(304-1), GlobalGraphics.Scale(57), GlobalGraphics.Scale(1), GlobalGraphics.Scale(179)), new Color(0, 0, 0, 96));
                 spriteBatch.Draw(GlobalContent.GetTexture("Pixel"), new Rectangle(GlobalGraphics.Scale(135), GlobalGraphics.Scale(58), GlobalGraphics.Scale(1), GlobalGraphics.Scale(178)), new Color(0, 0, 0, 96));
                 spriteBatch.Draw(GlobalContent.GetTexture("Pixel"), new Rectangle(GlobalGraphics.Scale(305-1), GlobalGraphics.Scale(58), GlobalGraphics.Scale(1), GlobalGraphics.Scale(178)), new Color(0, 0, 0, 96));
-                // Interactable
-                controller.Draw(gameTime, spriteBatch);
+                if(pluginCreation)
+                {
+                    // Interactable
+                    controllerPluginCreation.Draw(gameTime, spriteBatch);
+                }
+                else
+                {
+                    // Interactable
+                    controller.Draw(gameTime, spriteBatch);
+                }
             }
             if (internalTooltip != "")
             {
@@ -118,7 +160,8 @@ namespace NonsensicalVideoGenerator
         }
         public bool Update(GameTime gameTime, bool handleInput)
         {
-            int tempMaxScrollOffset = PluginHandler.GetPluginCount();
+            int plcount = PluginHandler.GetPluginCount() + 1;
+            int tempMaxScrollOffset = plcount;
             tempMaxScrollOffset -= 11;
             if(tempMaxScrollOffset <= 0)
             {
@@ -130,36 +173,51 @@ namespace NonsensicalVideoGenerator
                 internalTooltip = "";
                 if(!editingSettings)
                 {
-                    for (int i = 0; i < PluginHandler.GetPluginCount(); i++)
+                    for (int i = 0; i < plcount; i++)
                     {
-                        if (MouseInput.MouseState.X >= GlobalGraphics.Scale(269) && MouseInput.MouseState.X < GlobalGraphics.Scale(290)
-                            && MouseInput.MouseState.Y >= GlobalGraphics.Scale(59 + (i * 16) - scrollOffset) && MouseInput.MouseState.Y < GlobalGraphics.Scale(70 + (i * 16) - scrollOffset))
+                        if(i < plcount-1)
                         {
-                            internalTooltip = Global.canRender ?"Click to toggle plugin." : "Loading...";
-                        }
-                        int inRange = 228;
-                        if(PluginHandler.plugins[i].settings.Count <= 0 || !Global.canRender)
-                        {
-                            inRange = 267; // No settings button
-                        }
-                        if (MouseInput.MouseState.X >= GlobalGraphics.Scale(138) && MouseInput.MouseState.X < GlobalGraphics.Scale(inRange)
-                            && MouseInput.MouseState.Y >= GlobalGraphics.Scale(59 + (i * 16) - scrollOffset) && MouseInput.MouseState.Y < GlobalGraphics.Scale(70 + (i * 16) - scrollOffset))
-                        {
-                            // Is this a workshop plugin?
-                            // If so, tooltip should be "Open workshop page."
-                            // Otherwise, tooltip should be "Open plugin directory."
-                            if (PluginHandler.plugins[i].workshopId != ""
-                                && PluginHandler.plugins[i].rootPath.Contains("workshop"))
-                                internalTooltip = "Open workshop page.";
-                            else
-                                internalTooltip = "Open plugin directory.";
-                        }
-                        if(PluginHandler.plugins[i].settings.Count > 0 && Global.canRender)
-                        {
-                            if (MouseInput.MouseState.X >= GlobalGraphics.Scale(230) && MouseInput.MouseState.X < GlobalGraphics.Scale(267)
+                            if (MouseInput.MouseState.X >= GlobalGraphics.Scale(269) && MouseInput.MouseState.X < GlobalGraphics.Scale(290)
                                 && MouseInput.MouseState.Y >= GlobalGraphics.Scale(59 + (i * 16) - scrollOffset) && MouseInput.MouseState.Y < GlobalGraphics.Scale(70 + (i * 16) - scrollOffset))
                             {
-                                internalTooltip = "Edit plugin settings.";
+                                internalTooltip = Global.canRender ?"Click to toggle plugin." : "Loading...";
+                            }
+                            int inRange = 228;
+                            if(PluginHandler.plugins[i].settings.Count <= 0 || !Global.canRender)
+                            {
+                                inRange = 267; // No settings button
+                            }
+                            if (MouseInput.MouseState.X >= GlobalGraphics.Scale(138) && MouseInput.MouseState.X < GlobalGraphics.Scale(inRange)
+                                && MouseInput.MouseState.Y >= GlobalGraphics.Scale(59 + (i * 16) - scrollOffset) && MouseInput.MouseState.Y < GlobalGraphics.Scale(70 + (i * 16) - scrollOffset))
+                            {
+                                // Is this a workshop plugin?
+                                // If so, tooltip should be "Open workshop page."
+                                // Otherwise, tooltip should be "Open plugin directory."
+                                if (PluginHandler.plugins[i].workshopId != ""
+                                    && PluginHandler.plugins[i].rootPath.Contains("workshop"))
+                                    internalTooltip = "Open workshop page.";
+                                else if(PluginHandler.plugins[i].workshopId != ""
+                                    && PluginHandler.plugins[i].workshopId != "stock")
+                                    internalTooltip = "Open in code editor.";
+                                else
+                                    internalTooltip = "Open stock directory.";
+                            }
+                            if(PluginHandler.plugins[i].settings.Count > 0 && Global.canRender)
+                            {
+                                if (MouseInput.MouseState.X >= GlobalGraphics.Scale(230) && MouseInput.MouseState.X < GlobalGraphics.Scale(267)
+                                    && MouseInput.MouseState.Y >= GlobalGraphics.Scale(59 + (i * 16) - scrollOffset) && MouseInput.MouseState.Y < GlobalGraphics.Scale(70 + (i * 16) - scrollOffset))
+                                {
+                                    internalTooltip = "Edit plugin settings.";
+                                }
+                            }
+                        }
+                        else
+                        {
+                            // create plugin
+                            if (MouseInput.MouseState.X >= GlobalGraphics.Scale(138) && MouseInput.MouseState.X < GlobalGraphics.Scale(290)
+                                && MouseInput.MouseState.Y >= GlobalGraphics.Scale(59 + (i * 16) - scrollOffset) && MouseInput.MouseState.Y < GlobalGraphics.Scale(70 + (i * 16) - scrollOffset))
+                            {
+                                internalTooltip = "Create custom effects.";
                             }
                         }
                     }
@@ -300,207 +358,435 @@ namespace NonsensicalVideoGenerator
                     // Accessibility
                     Accessibility.CompatAccessibility(new Rectangle(GlobalGraphics.Scale(294), GlobalGraphics.Scale(57), GlobalGraphics.Scale(11), GlobalGraphics.Scale(11)), "Scroll Up");
                     Accessibility.CompatAccessibility(new Rectangle(GlobalGraphics.Scale(294), GlobalGraphics.Scale(224), GlobalGraphics.Scale(11), GlobalGraphics.Scale(11)), "Scroll Down");
-                    for (int i = 0; i < PluginHandler.GetPluginCount(); i++)
+                    for (int i = 0; i < plcount; i++)
                     {
-                        int inRange = 228;
-                        if(PluginHandler.plugins[i].settings.Count <= 0 || !Global.canRender)
+                        if(i < plcount-1)
                         {
-                            inRange = 267; // No settings button
-                        }
-                        // Toggle Button
-                        Accessibility.CompatAccessibility(new Rectangle(GlobalGraphics.Scale(269), GlobalGraphics.Scale(59 + (i * 16) - scrollOffset), GlobalGraphics.Scale(21), GlobalGraphics.Scale((70 + (i * 16) - scrollOffset) - (59 + (i * 16) - scrollOffset))), (PluginHandler.plugins[i].enabled ? "Disable " : "Enable ") + "\"" + PluginHandler.plugins[i].GetDisplayName() + "\"");
-                        if(PluginHandler.plugins[i].settings.Count > 0 && Global.canRender)
-                        {
-                            // Settings Button
-                            Accessibility.CompatAccessibility(new Rectangle(GlobalGraphics.Scale(230), GlobalGraphics.Scale(59 + (i * 16) - scrollOffset), GlobalGraphics.Scale(37), GlobalGraphics.Scale((70 + (i * 16) - scrollOffset) - (59 + (i * 16) - scrollOffset))), "Settings for \"" + PluginHandler.plugins[i].GetDisplayName() + "\"");
-                        }
-                        // Main Button
-                        Accessibility.CompatAccessibility(new Rectangle(GlobalGraphics.Scale(138), GlobalGraphics.Scale(59 + (i * 16) - scrollOffset), GlobalGraphics.Scale(inRange-138), GlobalGraphics.Scale((70 + (i * 16) - scrollOffset) - (59 + (i * 16) - scrollOffset))), "Open container for \"" + PluginHandler.plugins[i].GetDisplayName() + "\"");
-                    }
-                    if(MouseInput.MouseState.LeftButton == ButtonState.Pressed && MouseInput.LastMouseState.LeftButton == ButtonState.Released)
-                    {
-                        // Plugin entries
-                        for (int i = 0; i < PluginHandler.GetPluginCount(); i++)
-                        {
-                            // Toggle button
-                            if (MouseInput.MouseState.X >= GlobalGraphics.Scale(269) && MouseInput.MouseState.X < GlobalGraphics.Scale(290)
-                                && MouseInput.MouseState.Y >= GlobalGraphics.Scale(59 + (i * 16) - scrollOffset) && MouseInput.MouseState.Y < GlobalGraphics.Scale(70 + (i * 16) - scrollOffset))
-                            {
-                                if(Global.canRender)
-                                {
-                                    PluginHandler.plugins[i].enabled = !PluginHandler.plugins[i].enabled;
-                                    PluginHandler.SavePluginSettings();
-                                    GlobalContent.GetSound("Option").Play(int.Parse(SaveData.saveValues["SoundEffectVolume"]) / 100f, 0f, 0f);
-                                }
-                                else
-                                {
-                                    GlobalContent.GetSound("Error").Play(int.Parse(SaveData.saveValues["SoundEffectVolume"]) / 100f, 0f, 0f);
-                                }
-                                return true;
-                            }
-                            // Open folder containing plugin
                             int inRange = 228;
                             if(PluginHandler.plugins[i].settings.Count <= 0 || !Global.canRender)
                             {
                                 inRange = 267; // No settings button
                             }
-                            if (MouseInput.MouseState.X >= GlobalGraphics.Scale(138) && MouseInput.MouseState.X < GlobalGraphics.Scale(inRange)
-                                && MouseInput.MouseState.Y >= GlobalGraphics.Scale(59 + (i * 16) - scrollOffset) && MouseInput.MouseState.Y < GlobalGraphics.Scale(70 + (i * 16) - scrollOffset))
-                            {
-                                GlobalContent.GetSound("Option").Play(int.Parse(SaveData.saveValues["SoundEffectVolume"]) / 100f, 0f, 0f);
-                                ConsoleOutput.WriteLine(PluginHandler.plugins[i].rootPath);
-                                // Open directory and select file
-                                ProcessStartInfo startInfo = new();
-                                // Workshop plugin should open workshop page
-                                if(PluginHandler.plugins[i].workshopId != ""
-                                    && PluginHandler.plugins[i].rootPath.Contains("workshop"))
-                                {
-                                    startInfo.FileName = "https://steamcommunity.com/sharedfiles/filedetails/?id=" + PluginHandler.plugins[i].workshopId;
-                                    startInfo.UseShellExecute = true;
-                                }
-                                else
-                                {
-                                    startInfo.FileName = "explorer.exe";
-                                    startInfo.Arguments = "/select, \"" + Path.GetFullPath(PluginHandler.plugins[i].path) + "\"";
-                                }
-                                Process.Start(startInfo);
-                                return true;
-                            }
-                            // Settings button
+                            // Toggle Button
+                            Accessibility.CompatAccessibility(new Rectangle(GlobalGraphics.Scale(269), GlobalGraphics.Scale(59 + (i * 16) - scrollOffset), GlobalGraphics.Scale(21), GlobalGraphics.Scale((70 + (i * 16) - scrollOffset) - (59 + (i * 16) - scrollOffset))), (PluginHandler.plugins[i].enabled ? "Disable " : "Enable ") + "\"" + PluginHandler.plugins[i].GetDisplayName() + "\"");
                             if(PluginHandler.plugins[i].settings.Count > 0 && Global.canRender)
                             {
-                                if (MouseInput.MouseState.X >= GlobalGraphics.Scale(230) && MouseInput.MouseState.X < GlobalGraphics.Scale(267)
+                                // Settings Button
+                                Accessibility.CompatAccessibility(new Rectangle(GlobalGraphics.Scale(230), GlobalGraphics.Scale(59 + (i * 16) - scrollOffset), GlobalGraphics.Scale(37), GlobalGraphics.Scale((70 + (i * 16) - scrollOffset) - (59 + (i * 16) - scrollOffset))), "Settings for \"" + PluginHandler.plugins[i].GetDisplayName() + "\"");
+                            }
+                            // Main Button
+                            Accessibility.CompatAccessibility(new Rectangle(GlobalGraphics.Scale(138), GlobalGraphics.Scale(59 + (i * 16) - scrollOffset), GlobalGraphics.Scale(inRange-138), GlobalGraphics.Scale((70 + (i * 16) - scrollOffset) - (59 + (i * 16) - scrollOffset))), "Open container for \"" + PluginHandler.plugins[i].GetDisplayName() + "\"");
+                        }
+                        else
+                        {
+                            // create plugin
+                            Accessibility.CompatAccessibility(new Rectangle(GlobalGraphics.Scale(138), GlobalGraphics.Scale(59 + (i * 16) - scrollOffset), GlobalGraphics.Scale(152), GlobalGraphics.Scale((70 + (i * 16) - scrollOffset) - (59 + (i * 16) - scrollOffset))), "Workshop Effect Creation (Create custom effects.)");
+                        }
+                    }
+                    if(MouseInput.MouseState.LeftButton == ButtonState.Pressed && MouseInput.LastMouseState.LeftButton == ButtonState.Released)
+                    {
+                        // Plugin entries
+                        for (int i = 0; i < plcount; i++)
+                        {
+                            if(i < plcount-1)
+                            {
+                                // Toggle button
+                                if (MouseInput.MouseState.X >= GlobalGraphics.Scale(269) && MouseInput.MouseState.X < GlobalGraphics.Scale(290)
                                     && MouseInput.MouseState.Y >= GlobalGraphics.Scale(59 + (i * 16) - scrollOffset) && MouseInput.MouseState.Y < GlobalGraphics.Scale(70 + (i * 16) - scrollOffset))
                                 {
-                                    GlobalContent.GetSound("Select").Play(int.Parse(SaveData.saveValues["SoundEffectVolume"]) / 100f, 0f, 0f);
-                                    // Open settings
-                                    controller.Clear();
-                                    settingsIndex = i;
-                                    editingSettings = true;
-                                    controller.Add("Back", new Button("Back", "Go back to effect plugin list.", new Vector2(119+36, 60+10+19*8), (int i) => {
-                                        switch(i)
-                                        {
-                                            case 2: // left click
-                                                GlobalContent.GetSound("Select").Play(int.Parse(SaveData.saveValues["SoundEffectVolume"]) / 100f, 0f, 0f);
-                                                controller.Clear();
-                                                Name = "Effects";
-                                                editingSettings = false;
-                                                return true;
-                                        }
-                                        return false;
-                                    }));
-                                    Name = PluginHandler.plugins[i].GetDisplayName();
-                                    controller.Add("ErrorLabel", new Label("Error sound means it didn't save.", new Vector2(139, 60)));
-                                    int sindex = 0;
-                                    List<IInteractable> tes = new();
-                                    foreach(KeyValuePair<string, object> s in PluginHandler.plugins[i].settings)
+                                    if(Global.canRender)
                                     {
-                                        // if s is Display Name, skip
-                                        if(s.Key == "Display Name")
-                                            continue;
-                                        if(!PluginHandler.plugins[i].settingTypes.Keys.Contains(s.Key))
-                                            continue;
-                                        SettingType type = PluginHandler.plugins[i].settingTypes[s.Key];
-                                        IInteractable te;
-                                        int ty = 6;
-                                        switch(type)
-                                        {
-                                            case SettingType.TextInputNumbers:
-                                                ty = 1;
-                                                goto default;
-                                            case SettingType.TextInputDecimals:
-                                                ty = 2;
-                                                goto default;
-                                            case SettingType.TextInputLetters:
-                                                ty = 3;
-                                                goto default;
-                                            case SettingType.TextInputLettersNumbers:
-                                                ty = 4;
-                                                goto default;
-                                            case SettingType.TextInputLettersNumbersSpaces:
-                                                ty = 5;
-                                                goto default;
-                                            case SettingType.Label:
-                                                te = new Label((string)PluginHandler.plugins[i].settings[s.Key], new Vector2(139, 51+4+19+19*sindex));
-                                                break;
-                                            case SettingType.Switch:
-                                                te = new Switch(s.Key, PluginHandler.plugins[i].settingTooltips[s.Key], new Vector2(139, 51+19+19*sindex), (int i) => {
-                                                    bool switchState = (i & 256) != 0;
-                                                    if((i & 1) != 0)
-                                                    {
-                                                        // Set "setting" to the setting index where mouse cursor y is
-                                                        int y = MouseInput.MouseState.Y / GlobalGraphics.scale;
-                                                        Rectangle source = new(139, 70, 25, 15);
-                                                        int separator = 4;
-                                                        setting = (y - source.Y - separator) / (source.Height + separator);
-                                                        if(setting < 0)
-                                                            setting = 0;
-                                                        while(PluginHandler.plugins[settingsIndex].settingTypes.ElementAt(setting).Value == SettingType.Label)
-                                                            setting++;
-                                                        if(setting >= PluginHandler.plugins[settingsIndex].settings.Count)
-                                                            setting = PluginHandler.plugins[settingsIndex].settings.Count - 1;
-                                                    }
-                                                    if((i & 2) != 0)
-                                                    {
-                                                        // Use "setting" to get the key of the setting
-                                                        string keyFromIndex = PluginHandler.plugins[settingsIndex].settings.Keys.ElementAt(setting);
-                                                        string oldValue = PluginHandler.plugins[settingsIndex].settings[keyFromIndex].ToString();
-                                                        PluginHandler.plugins[settingsIndex].settings[keyFromIndex] = switchState ? "1" : "0";
-                                                        if(oldValue != PluginHandler.plugins[settingsIndex].settings[keyFromIndex].ToString())
-                                                            PluginHandler.SavePluginSettings();
-                                                        else
-                                                            GlobalContent.GetSound("Error").Play(int.Parse(SaveData.saveValues["SoundEffectVolume"]) / 100f, 0f, 0f);
-                                                    }
-                                                    return switchState;
-                                                }, PluginHandler.plugins[i].settings[s.Key].ToString() == "1");
-                                                break;
-                                            case SettingType.TextInput:
-                                            default:
-                                                te = new TextEntry(s.Key, PluginHandler.plugins[i].settingTooltips[s.Key], PluginHandler.plugins[i].settings[s.Key].ToString(), new Vector2(139, 51+19+19*sindex), 50, 25, ty, (int i) => {
-                                                    if(i == 1)
-                                                    {
-                                                        // Set "setting" to the setting index where mouse cursor y is
-                                                        int y = MouseInput.MouseState.Y / GlobalGraphics.scale;
-                                                        Rectangle source = new(139, 70, 53, 15);
-                                                        int separator = 4;
-                                                        setting = (y - source.Y - separator) / (source.Height + separator);
-                                                        if(setting < 0)
-                                                            setting = 0;
-                                                        while(PluginHandler.plugins[settingsIndex].settingTypes.ElementAt(setting).Value == SettingType.Label)
-                                                            setting++;
-                                                        if(setting >= PluginHandler.plugins[settingsIndex].settings.Count)
-                                                            setting = PluginHandler.plugins[settingsIndex].settings.Count - 1;
-                                                        return false;
-                                                    }
-                                                    else if(i == 0)
-                                                    {
-                                                        // Use "setting" to get the key of the setting
-                                                        string keyFromIndex = PluginHandler.plugins[settingsIndex].settings.Keys.ElementAt(setting);
-                                                        string oldValue = PluginHandler.plugins[settingsIndex].settings[keyFromIndex].ToString();
-                                                        PluginHandler.plugins[settingsIndex].settings[keyFromIndex] = controller.interactables[keyFromIndex].Tooltip;
-                                                        if(oldValue != PluginHandler.plugins[settingsIndex].settings[keyFromIndex].ToString())
-                                                            PluginHandler.SavePluginSettings();
-                                                        else
-                                                            GlobalContent.GetSound("Error").Play(int.Parse(SaveData.saveValues["SoundEffectVolume"]) / 100f, 0f, 0f);
-                                                    }
-                                                    return false;
-                                                }).Register();
-                                                break;
-                                        }
-                                        tes.Add(te);
-                                        sindex++;
+                                        PluginHandler.plugins[i].enabled = !PluginHandler.plugins[i].enabled;
+                                        PluginHandler.SavePluginSettings();
+                                        GlobalContent.GetSound("Option").Play(int.Parse(SaveData.saveValues["SoundEffectVolume"]) / 100f, 0f, 0f);
                                     }
-                                    for(int i2 = tes.Count-1; i2 >= 0; i2--)
+                                    else
                                     {
-                                        // Get name
-                                        string name = tes[i2].Name;
-                                        controller.Add(name, tes[i2]);
+                                        GlobalContent.GetSound("Error").Play(int.Parse(SaveData.saveValues["SoundEffectVolume"]) / 100f, 0f, 0f);
                                     }
                                     return true;
+                                }
+                                // Open folder containing plugin
+                                int inRange = 228;
+                                if(PluginHandler.plugins[i].settings.Count <= 0 || !Global.canRender)
+                                {
+                                    inRange = 267; // No settings button
+                                }
+                                if (MouseInput.MouseState.X >= GlobalGraphics.Scale(138) && MouseInput.MouseState.X < GlobalGraphics.Scale(inRange)
+                                    && MouseInput.MouseState.Y >= GlobalGraphics.Scale(59 + (i * 16) - scrollOffset) && MouseInput.MouseState.Y < GlobalGraphics.Scale(70 + (i * 16) - scrollOffset))
+                                {
+                                    GlobalContent.GetSound("Option").Play(int.Parse(SaveData.saveValues["SoundEffectVolume"]) / 100f, 0f, 0f);
+                                    // Open directory and select file
+                                    ProcessStartInfo startInfo = new();
+                                    // Workshop plugin should open workshop page
+                                    if(PluginHandler.plugins[i].workshopId != ""
+                                        && PluginHandler.plugins[i].rootPath.Contains("workshop"))
+                                    {
+                                        startInfo.FileName = "https://steamcommunity.com/sharedfiles/filedetails/?id=" + PluginHandler.plugins[i].workshopId;
+                                        startInfo.UseShellExecute = true;
+                                        Process.Start(startInfo);
+                                    }
+                                    else if(PluginHandler.plugins[i].workshopId != ""
+                                        && PluginHandler.plugins[i].workshopId != "stock")
+                                    {
+                                        try
+                                        {
+                                            startInfo.FileName = "code";
+                                            startInfo.Arguments = "\"" + Path.GetFullPath(PluginHandler.plugins[i].path) + "\"";
+                                            startInfo.UseShellExecute = true;
+                                            startInfo.CreateNoWindow = true;
+                                            Process.Start(startInfo);
+                                        }
+                                        catch
+                                        {
+                                            startInfo.FileName = "explorer.exe";
+                                            startInfo.Arguments = "/select, \"" + Path.GetFullPath(PluginHandler.plugins[i].path) + "\"";
+                                            Process.Start(startInfo);
+                                        }
+                                    }
+                                    else
+                                    {
+                                        startInfo.FileName = "explorer.exe";
+                                        startInfo.Arguments = "/select, \"" + Path.GetFullPath(PluginHandler.plugins[i].path) + "\"";
+                                        Process.Start(startInfo);
+                                    }
+                                    return true;
+                                }
+                                // Settings button
+                                if(PluginHandler.plugins[i].settings.Count > 0 && Global.canRender)
+                                {
+                                    if (MouseInput.MouseState.X >= GlobalGraphics.Scale(230) && MouseInput.MouseState.X < GlobalGraphics.Scale(267)
+                                        && MouseInput.MouseState.Y >= GlobalGraphics.Scale(59 + (i * 16) - scrollOffset) && MouseInput.MouseState.Y < GlobalGraphics.Scale(70 + (i * 16) - scrollOffset))
+                                    {
+                                        GlobalContent.GetSound("Select").Play(int.Parse(SaveData.saveValues["SoundEffectVolume"]) / 100f, 0f, 0f);
+                                        // Open settings
+                                        controller.Clear();
+                                        settingsIndex = i;
+                                        editingSettings = true;
+                                        if(PluginHandler.plugins[i].workshopId != ""
+                                            && PluginHandler.plugins[i].workshopId != "stock")
+                                        {
+                                            if(PluginHandler.plugins[i].submittedId != "")
+                                            {
+                                                controller.Add("VisitWorkshopPage", new Button("View Workshop", "View this effect on the Workshop.", new Vector2(119+100, 60+10+19*7), (int i) => {
+                                                    switch(i)
+                                                    {
+                                                        case 2:
+                                                            GlobalContent.GetSound("Select").Play(int.Parse(SaveData.saveValues["SoundEffectVolume"]) / 100f, 0f, 0f);
+                                                            ProcessStartInfo startInfo = new();
+                                                            startInfo.FileName = "https://steamcommunity.com/sharedfiles/filedetails/?id=" + PluginHandler.plugins[settingsIndex].submittedId;
+                                                            startInfo.UseShellExecute = true;
+                                                            Process.Start(startInfo);
+                                                            return true;
+                                                    }
+                                                    return false;
+                                                }));
+                                            }
+                                            controller.Add("Publish", new Button("Publish", "Publish to Steam Workshop.", new Vector2(139+139, 60+10+19*8), (int i) => {
+                                                switch(i)
+                                                {
+                                                    case 2: // left click
+                                                        GlobalContent.GetSound("Select").Play(int.Parse(SaveData.saveValues["SoundEffectVolume"]) / 100f, 0f, 0f);
+                                                        Name = "Workshop Tags: " + PluginHandler.plugins[settingsIndex].GetDisplayName();
+                                                        controller.Clear();
+                                                        controller.Add("LibraryCustom", new Switch("Custom Library", "Uses a custom library type.", new Vector2(139, 60+19*8), (int i) => {
+                                                            bool switchState = (i & 256) != 0;
+                                                            if((i & 2) != 0)
+                                                            {
+                                                                if(switchState)
+                                                                    selectedFlagsWorkshop |= WorkshopTag.Library_Custom;
+                                                                else
+                                                                    selectedFlagsWorkshop &= ~WorkshopTag.Library_Custom;
+                                                            }
+                                                            return switchState;
+                                                        }, (selectedFlagsWorkshop & WorkshopTag.Library_Custom) != 0));
+                                                        controller.Add("LibraryOverlay", new Switch("Overlay Library", "Uses the overlay library type.", new Vector2(139, 60+19*7), (int i) => {
+                                                            bool switchState = (i & 256) != 0;
+                                                            if((i & 2) != 0)
+                                                            {
+                                                                if(switchState)
+                                                                    selectedFlagsWorkshop |= WorkshopTag.Library_Overlay;
+                                                                else
+                                                                    selectedFlagsWorkshop &= ~WorkshopTag.Library_Overlay;
+                                                            }
+                                                            return switchState;
+                                                        }, (selectedFlagsWorkshop & WorkshopTag.Library_Overlay) != 0));
+                                                        controller.Add("LibraryOutro", new Switch("Outro Library", "Uses the outro library type.", new Vector2(139, 60+19*6), (int i) => {
+                                                            bool switchState = (i & 256) != 0;
+                                                            if((i & 2) != 0)
+                                                            {
+                                                                if(switchState)
+                                                                    selectedFlagsWorkshop |= WorkshopTag.Library_Outro;
+                                                                else
+                                                                    selectedFlagsWorkshop &= ~WorkshopTag.Library_Outro;
+                                                            }
+                                                            return switchState;
+                                                        }, (selectedFlagsWorkshop & WorkshopTag.Library_Outro) != 0));
+                                                        controller.Add("LibraryIntro", new Switch("Intro Library", "Uses the intro library type.", new Vector2(139, 60+19*5), (int i) => {
+                                                            bool switchState = (i & 256) != 0;
+                                                            if((i & 2) != 0)
+                                                            {
+                                                                if(switchState)
+                                                                    selectedFlagsWorkshop |= WorkshopTag.Library_Intro;
+                                                                else
+                                                                    selectedFlagsWorkshop &= ~WorkshopTag.Library_Intro;
+                                                            }
+                                                            return switchState;
+                                                        }, (selectedFlagsWorkshop & WorkshopTag.Library_Intro) != 0));
+                                                        controller.Add("LibraryTransition", new Switch("Transition Library", "Uses the transition library type.", new Vector2(139, 60+19*4), (int i) => {
+                                                            bool switchState = (i & 256) != 0;
+                                                            if((i & 2) != 0)
+                                                            {
+                                                                if(switchState)
+                                                                    selectedFlagsWorkshop |= WorkshopTag.Library_Transition;
+                                                                else
+                                                                    selectedFlagsWorkshop &= ~WorkshopTag.Library_Transition;
+                                                            }
+                                                            return switchState;
+                                                        }, (selectedFlagsWorkshop & WorkshopTag.Library_Transition) != 0));
+                                                        controller.Add("LibraryMaterial", new Switch("Material Library", "Uses the material library type.", new Vector2(139, 60+19*3), (int i) => {
+                                                            bool switchState = (i & 256) != 0;
+                                                            if((i & 2) != 0)
+                                                            {
+                                                                if(switchState)
+                                                                    selectedFlagsWorkshop |= WorkshopTag.Library_Material;
+                                                                else
+                                                                    selectedFlagsWorkshop &= ~WorkshopTag.Library_Material;
+                                                            }
+                                                            return switchState;
+                                                        }, (selectedFlagsWorkshop & WorkshopTag.Library_Material) != 0));
+                                                        controller.Add("LibraryMusic", new Switch("Music Library", "Uses the music library type.", new Vector2(139, 60+19*2), (int i) => {
+                                                            bool switchState = (i & 256) != 0;
+                                                            if((i & 2) != 0)
+                                                            {
+                                                                if(switchState)
+                                                                    selectedFlagsWorkshop |= WorkshopTag.Library_Music;
+                                                                else
+                                                                    selectedFlagsWorkshop &= ~WorkshopTag.Library_Music;
+                                                            }
+                                                            return switchState;
+                                                        }, (selectedFlagsWorkshop & WorkshopTag.Library_Music) != 0));
+                                                        controller.Add("LibrarySFX", new Switch("Sound FX Library", "Uses the sound fx library type.", new Vector2(139, 60+19), (int i) => {
+                                                            bool switchState = (i & 256) != 0;
+                                                            if((i & 2) != 0)
+                                                            {
+                                                                if(switchState)
+                                                                    selectedFlagsWorkshop |= WorkshopTag.Library_SFX;
+                                                                else
+                                                                    selectedFlagsWorkshop &= ~WorkshopTag.Library_SFX;
+                                                            }
+                                                            return switchState;
+                                                        }, (selectedFlagsWorkshop & WorkshopTag.Library_SFX) != 0));
+                                                        controller.Add("Audio", new Switch("Audio", "Applies audio effects.", new Vector2(139+55, 60), (int i) => {
+                                                            bool switchState = (i & 256) != 0;
+                                                            if((i & 2) != 0)
+                                                            {
+                                                                if(switchState)
+                                                                    selectedFlagsWorkshop |= WorkshopTag.Effect_AudioOnly;
+                                                                else
+                                                                    selectedFlagsWorkshop &= ~WorkshopTag.Effect_AudioOnly;
+                                                            }
+                                                            return switchState;
+                                                        }, (selectedFlagsWorkshop & WorkshopTag.Effect_AudioOnly) != 0));
+                                                        controller.Add("Video", new Switch("Video", "Applies video effects.", new Vector2(139, 60), (int i) => {
+                                                            bool switchState = (i & 256) != 0;
+                                                            if((i & 2) != 0)
+                                                            {
+                                                                // add or remove WorkshopTag.Video to flags
+                                                                if(switchState)
+                                                                    selectedFlagsWorkshop |= WorkshopTag.Effect_VideoOnly;
+                                                                else
+                                                                    selectedFlagsWorkshop &= ~WorkshopTag.Effect_VideoOnly;
+                                                            }
+                                                            return switchState;
+                                                        }, (selectedFlagsWorkshop & WorkshopTag.Effect_VideoOnly) != 0));
+                                                        controller.Add("Submit", new Button("Submit", "Submit to Steam Workshop.", new Vector2(139+139, 60+10+19*7), (int i) => {
+                                                            switch(i)
+                                                            {
+                                                                case 2: // left click
+                                                                    GlobalContent.GetSound("Option").Play(int.Parse(SaveData.saveValues["SoundEffectVolume"]) / 100f, 0f, 0f);
+                                                                    // Select png, jpg, or gif icon with file dialog
+                                                                    System.Windows.Forms.OpenFileDialog fileDialog = new System.Windows.Forms.OpenFileDialog();
+                                                                    fileDialog.Filter = "Image Files (*.png;*.jpg;*.gif)|*.png;*.jpg;*.gif";
+                                                                    fileDialog.Title = "Select Workshop Icon";
+                                                                    fileDialog.InitialDirectory = Path.GetFullPath(@"templates");
+                                                                    fileDialog.FileName = "workshop.jpg";
+                                                                    if(fileDialog.ShowDialog() == System.Windows.Forms.DialogResult.OK)
+                                                                    {
+                                                                        Name = "Effects";
+                                                                        editingSettings = false;
+                                                                        controller.Clear();
+                                                                        Global.generatorFactory.progressText = "Uploading...";
+                                                                        ConsoleOutput.WriteLine("Publishing " + Path.GetFileName(PluginHandler.plugins[settingsIndex].path) + " with icon " + Path.GetFileName(fileDialog.FileName), Color.RoyalBlue);
+                                                                        PluginHandler.PublishPlugin(PluginHandler.plugins[settingsIndex], selectedFlagsWorkshop, fileDialog.FileName);
+                                                                    }
+                                                                    return true;
+                                                            }
+                                                            return false;
+                                                        }));
+                                                        controller.Add("Back", new Button("Back", "Go back to effect plugin list.", new Vector2(119+167, 60+10+19*8), (int i) => {
+                                                            switch(i)
+                                                            {
+                                                                case 2: // left click
+                                                                    GlobalContent.GetSound("Back").Play(int.Parse(SaveData.saveValues["SoundEffectVolume"]) / 100f, 0f, 0f);
+                                                                    controller.Clear();
+                                                                    Name = "Effects";
+                                                                    editingSettings = false;
+                                                                    return true;
+                                                            }
+                                                            return false;
+                                                        }));
+                                                        return true;
+                                                }
+                                                return false;
+                                            }));
+                                        }
+                                        controller.Add("Back", new Button("Back", "Go back to effect plugin list.", new Vector2(119+36, 60+10+19*8), (int i) => {
+                                            switch(i)
+                                            {
+                                                case 2: // left click
+                                                    GlobalContent.GetSound("Back").Play(int.Parse(SaveData.saveValues["SoundEffectVolume"]) / 100f, 0f, 0f);
+                                                    controller.Clear();
+                                                    Name = "Effects";
+                                                    editingSettings = false;
+                                                    return true;
+                                            }
+                                            return false;
+                                        }));
+                                        Name = PluginHandler.plugins[i].GetDisplayName();
+                                        controller.Add("ErrorLabel", new Label("Error sound means try again.", new Vector2(139, 60)));
+                                        int sindex = 0;
+                                        List<IInteractable> tes = new();
+                                        foreach(KeyValuePair<string, object> s in PluginHandler.plugins[i].settings)
+                                        {
+                                            // if s is Display Name, skip
+                                            if(s.Key == "Display Name")
+                                                continue;
+                                            if(!PluginHandler.plugins[i].settingTypes.Keys.Contains(s.Key))
+                                                continue;
+                                            SettingType type = PluginHandler.plugins[i].settingTypes[s.Key];
+                                            IInteractable te;
+                                            int ty = 6;
+                                            switch(type)
+                                            {
+                                                case SettingType.TextInputNumbers:
+                                                    ty = 1;
+                                                    goto default;
+                                                case SettingType.TextInputDecimals:
+                                                    ty = 2;
+                                                    goto default;
+                                                case SettingType.TextInputLetters:
+                                                    ty = 3;
+                                                    goto default;
+                                                case SettingType.TextInputLettersNumbers:
+                                                    ty = 4;
+                                                    goto default;
+                                                case SettingType.TextInputLettersNumbersSpaces:
+                                                    ty = 5;
+                                                    goto default;
+                                                case SettingType.Label:
+                                                    te = new Label((string)PluginHandler.plugins[i].settings[s.Key], new Vector2(139, 51+4+19+19*sindex));
+                                                    break;
+                                                case SettingType.Switch:
+                                                    te = new Switch(s.Key, PluginHandler.plugins[i].settingTooltips[s.Key], new Vector2(139, 51+19+19*sindex), (int i) => {
+                                                        bool switchState = (i & 256) != 0;
+                                                        if((i & 1) != 0)
+                                                        {
+                                                            // Set "setting" to the setting index where mouse cursor y is
+                                                            int y = MouseInput.MouseState.Y / GlobalGraphics.scale;
+                                                            Rectangle source = new(139, 70, 25, 15);
+                                                            int separator = 4;
+                                                            setting = (y - source.Y - separator) / (source.Height + separator);
+                                                            if(setting < 0)
+                                                                setting = 0;
+                                                            while(PluginHandler.plugins[settingsIndex].settingTypes.ElementAt(setting).Value == SettingType.Label)
+                                                                setting++;
+                                                            if(setting >= PluginHandler.plugins[settingsIndex].settings.Count)
+                                                                setting = PluginHandler.plugins[settingsIndex].settings.Count - 1;
+                                                        }
+                                                        if((i & 2) != 0)
+                                                        {
+                                                            // Use "setting" to get the key of the setting
+                                                            string keyFromIndex = PluginHandler.plugins[settingsIndex].settings.Keys.ElementAt(setting);
+                                                            string oldValue = PluginHandler.plugins[settingsIndex].settings[keyFromIndex].ToString();
+                                                            PluginHandler.plugins[settingsIndex].settings[keyFromIndex] = switchState ? "1" : "0";
+                                                            if(oldValue != PluginHandler.plugins[settingsIndex].settings[keyFromIndex].ToString())
+                                                                PluginHandler.SavePluginSettings();
+                                                            else
+                                                                GlobalContent.GetSound("Error").Play(int.Parse(SaveData.saveValues["SoundEffectVolume"]) / 100f, 0f, 0f);
+                                                        }
+                                                        return switchState;
+                                                    }, PluginHandler.plugins[i].settings[s.Key].ToString() == "1");
+                                                    break;
+                                                case SettingType.TextInput:
+                                                default:
+                                                    te = new TextEntry(s.Key, PluginHandler.plugins[i].settingTooltips[s.Key], PluginHandler.plugins[i].settings[s.Key].ToString(), new Vector2(139, 51+19+19*sindex), 50, 25, ty, (int i) => {
+                                                        if(i == 1)
+                                                        {
+                                                            // Set "setting" to the setting index where mouse cursor y is
+                                                            int y = MouseInput.MouseState.Y / GlobalGraphics.scale;
+                                                            Rectangle source = new(139, 70, 53, 15);
+                                                            int separator = 4;
+                                                            setting = (y - source.Y - separator) / (source.Height + separator);
+                                                            if(setting < 0)
+                                                                setting = 0;
+                                                            while(PluginHandler.plugins[settingsIndex].settingTypes.ElementAt(setting).Value == SettingType.Label)
+                                                                setting++;
+                                                            if(setting >= PluginHandler.plugins[settingsIndex].settings.Count)
+                                                                setting = PluginHandler.plugins[settingsIndex].settings.Count - 1;
+                                                            return false;
+                                                        }
+                                                        else if(i == 0)
+                                                        {
+                                                            // Use "setting" to get the key of the setting
+                                                            string keyFromIndex = PluginHandler.plugins[settingsIndex].settings.Keys.ElementAt(setting);
+                                                            string oldValue = PluginHandler.plugins[settingsIndex].settings[keyFromIndex].ToString();
+                                                            PluginHandler.plugins[settingsIndex].settings[keyFromIndex] = controller.interactables[keyFromIndex].Tooltip;
+                                                            if(oldValue != PluginHandler.plugins[settingsIndex].settings[keyFromIndex].ToString())
+                                                                PluginHandler.SavePluginSettings();
+                                                            else
+                                                                GlobalContent.GetSound("Error").Play(int.Parse(SaveData.saveValues["SoundEffectVolume"]) / 100f, 0f, 0f);
+                                                        }
+                                                        return false;
+                                                    }).Register();
+                                                    break;
+                                            }
+                                            tes.Add(te);
+                                            sindex++;
+                                        }
+                                        for(int i2 = tes.Count-1; i2 >= 0; i2--)
+                                        {
+                                            // Get name
+                                            string name = tes[i2].Name;
+                                            controller.Add(name, tes[i2]);
+                                        }
+                                        return true;
+                                    }
+                                }
+                            }
+                            else
+                            {
+                                // create plugin
+                                if (MouseInput.MouseState.X >= GlobalGraphics.Scale(138) && MouseInput.MouseState.X < GlobalGraphics.Scale(290)
+                                    && MouseInput.MouseState.Y >= GlobalGraphics.Scale(59 + (i * 16) - scrollOffset) && MouseInput.MouseState.Y < GlobalGraphics.Scale(70 + (i * 16) - scrollOffset))
+                                {
+                                    if (MouseInput.MouseState.LeftButton == ButtonState.Pressed && MouseInput.LastMouseState.LeftButton == ButtonState.Released)
+                                    {
+                                        pluginCreation = true;
+                                        editingSettings = true;
+                                        GlobalContent.GetSound("Select").Play(int.Parse(SaveData.saveValues["SoundEffectVolume"]) / 100f, 0f, 0f);
+                                        return true;
+                                    }
                                 }
                             }
                         }
                     }
+                }
+                else if(pluginCreation)
+                {
+                    // Interactable
+                    if(controllerPluginCreation.Update(gameTime, handleInput))
+                        return true;
                 }
                 else
                 {
@@ -515,10 +801,77 @@ namespace NonsensicalVideoGenerator
         {
             GlobalContent.AddTexture("PluginPage", contentManager.Load<Texture2D>("graphics/pluginpage"));
             GlobalContent.AddTexture("PluginSettings", contentManager.Load<Texture2D>("graphics/pluginsettings"));
+            GlobalContent.AddTexture("CreatePlugin", contentManager.Load<Texture2D>("graphics/createplugin"));
             GlobalContent.AddTexture("PluginEntry", contentManager.Load<Texture2D>("graphics/pluginentry"));
             GlobalContent.AddTexture("ScrollHandle", contentManager.Load<Texture2D>("graphics/scrollhandle"));
+            controllerPluginCreation.Add("PluginMinimal", new Switch("Minimal Template", "Use a minimal effect file template.", new Vector2(139, 60+19*2), (int i) => {
+                bool switchState = (i & 256) != 0;
+                if((i & 2) != 0)
+                {
+                    customPluginMinimal = switchState;
+                }
+                return switchState;
+            }, customPluginMinimal));
+            controllerPluginCreation.Add("PluginName", new TextEntry("Effect File Name", "The internal file name of the effect.", customPluginFileName, new Vector2(139, 60+19), 50, 25, 4, (int i) => {
+                controllerPluginCreation.interactables["PluginName"].Tooltip = controllerPluginCreation.interactables["PluginName"].Tooltip.ToLower();
+                customPluginFileName = controllerPluginCreation.interactables["PluginName"].Tooltip;
+                return false;
+            }));
+            controllerPluginCreation.Add("PluginPrettyName", new TextEntry("Effect Name", "The human-readable name of the effect.", customPluginName, new Vector2(139, 60), 50, 25, 5, (int i) => {
+                customPluginName = controllerPluginCreation.interactables["PluginPrettyName"].Tooltip;
+                return false;
+            }));
+            controllerPluginCreation.Add("Back", new Button("Back", "Go back.", new Vector2(119+36, 60+10+19*8), (int i) => {
+                switch(i)
+                {
+                    case 2: // left click
+                        GlobalContent.GetSound("Back").Play(int.Parse(SaveData.saveValues["SoundEffectVolume"]) / 100f, 0f, 0f);
+                        editingSettings = false;
+                        pluginCreation = false;
+                        return true;
+                }
+                return false;
+            }));
+            controllerPluginCreation.Add("ReloadPlugins", new Button("Reload All", "Force reload all effects.", new Vector2(119+100, 60+10+19*7), (int i) => {
+                switch(i)
+                {
+                    case 2:
+                        if(Global.pluginsLoaded)
+                        {
+                            GlobalContent.GetSound("Option").Play(int.Parse(SaveData.saveValues["SoundEffectVolume"]) / 100f, 0f, 0f);
+                            PluginHandler.LoadPluginsThreaded();
+                        }
+                        else
+                        {
+                            GlobalContent.GetSound("Error").Play(int.Parse(SaveData.saveValues["SoundEffectVolume"]) / 100f, 0f, 0f);
+                        }
+                        return true;
+                }
+                return false;
+            }));
+            controllerPluginCreation.Add("CreatePlugin", new Button("Create", "Create the effect as specified.", new Vector2(139+141, 60+10+19*8), (int i) => {
+                switch(i)
+                {
+                    case 2:
+                        pluginCreation = false;
+                        editingSettings = false;
+                        if(PluginHandler.CreatePlugin(customPluginFileName, customPluginName, customPluginMinimal, out string file))
+                        {
+                            GlobalContent.GetSound("Select").Play(int.Parse(SaveData.saveValues["SoundEffectVolume"]) / 100f, 0f, 0f);
+                            // load plugins
+                            PluginHandler.LoadPluginsThreaded();
+                        }
+                        else
+                        {
+                            GlobalContent.GetSound("Error").Play(int.Parse(SaveData.saveValues["SoundEffectVolume"]) / 100f, 0f, 0f);
+                        }
+                        return true;
+                }
+                return false;
+            }));
             // Interactable
             controller.LoadContent(contentManager, graphicsDevice);
+            controllerPluginCreation.LoadContent(contentManager, graphicsDevice);
         }
     }
 }
