@@ -475,187 +475,190 @@ namespace NonsensicalVideoGenerator
                                                     return false;
                                                 }));
                                             }
-                                            controller.Add("Delete", new Button("Delete", "", new Vector2(119+100, 60+10+19*8), (int i) => {
-                                                switch(i)
-                                                {
-                                                    case 2:
-                                                        // Delete and reload plugins
-                                                        try
-                                                        {
-                                                            Directory.Delete(Path.GetDirectoryName(PluginHandler.plugins[settingsIndex].path), true);
+                                            if(PluginHandler.plugins[i].rootPath.Contains("user"))
+                                            {
+                                                controller.Add("Delete", new Button("Delete", "", new Vector2(119+100, 60+10+19*8), (int i) => {
+                                                    switch(i)
+                                                    {
+                                                        case 2:
+                                                            // Delete and reload plugins
+                                                            try
+                                                            {
+                                                                Directory.Delete(Path.GetDirectoryName(PluginHandler.plugins[settingsIndex].path), true);
+                                                                GlobalContent.GetSound("Select").Play(int.Parse(SaveData.saveValues["SoundEffectVolume"]) / 100f, 0f, 0f);
+                                                                if(SteamManager.initialized)
+                                                                    PluginHandler.LoadWorkshop();
+                                                                else
+                                                                    PluginHandler.LoadPluginsThreaded();
+                                                                editingSettings = false;
+                                                            }
+                                                            catch
+                                                            {
+                                                                GlobalContent.GetSound("Error").Play(int.Parse(SaveData.saveValues["SoundEffectVolume"]) / 100f, 0f, 0f);
+                                                            }
+                                                            return true;
+                                                    }
+                                                    return false;
+                                                }));
+                                                controller.Add("Publish", new Button("Publish", "Publish to Steam Workshop.", new Vector2(139+139, 60+10+19*8), (int i) => {
+                                                    switch(i)
+                                                    {
+                                                        case 2: // left click
                                                             GlobalContent.GetSound("Select").Play(int.Parse(SaveData.saveValues["SoundEffectVolume"]) / 100f, 0f, 0f);
-                                                            if(SteamManager.initialized)
-                                                                PluginHandler.LoadWorkshop();
-                                                            else
-                                                                PluginHandler.LoadPluginsThreaded();
-                                                            editingSettings = false;
-                                                        }
-                                                        catch
-                                                        {
-                                                            GlobalContent.GetSound("Error").Play(int.Parse(SaveData.saveValues["SoundEffectVolume"]) / 100f, 0f, 0f);
-                                                        }
-                                                        return true;
-                                                }
-                                                return false;
-                                            }));
-                                            controller.Add("Publish", new Button("Publish", "Publish to Steam Workshop.", new Vector2(139+139, 60+10+19*8), (int i) => {
-                                                switch(i)
-                                                {
-                                                    case 2: // left click
-                                                        GlobalContent.GetSound("Select").Play(int.Parse(SaveData.saveValues["SoundEffectVolume"]) / 100f, 0f, 0f);
-                                                        Name = "Workshop Tags: " + PluginHandler.plugins[settingsIndex].GetDisplayName();
-                                                        controller.Clear();
-                                                        controller.Add("LibraryCustom", new Switch("Custom Library", "Uses a custom library type.", new Vector2(139, 60+19*8), (int i) => {
-                                                            bool switchState = (i & 256) != 0;
-                                                            if((i & 2) != 0)
-                                                            {
-                                                                if(switchState)
-                                                                    selectedFlagsWorkshop |= WorkshopTag.Library_Custom;
-                                                                else
-                                                                    selectedFlagsWorkshop &= ~WorkshopTag.Library_Custom;
-                                                            }
-                                                            return switchState;
-                                                        }, (selectedFlagsWorkshop & WorkshopTag.Library_Custom) != 0));
-                                                        controller.Add("LibraryOverlay", new Switch("Overlay Library", "Uses the overlay library type.", new Vector2(139, 60+19*7), (int i) => {
-                                                            bool switchState = (i & 256) != 0;
-                                                            if((i & 2) != 0)
-                                                            {
-                                                                if(switchState)
-                                                                    selectedFlagsWorkshop |= WorkshopTag.Library_Overlay;
-                                                                else
-                                                                    selectedFlagsWorkshop &= ~WorkshopTag.Library_Overlay;
-                                                            }
-                                                            return switchState;
-                                                        }, (selectedFlagsWorkshop & WorkshopTag.Library_Overlay) != 0));
-                                                        controller.Add("LibraryOutro", new Switch("Outro Library", "Uses the outro library type.", new Vector2(139, 60+19*6), (int i) => {
-                                                            bool switchState = (i & 256) != 0;
-                                                            if((i & 2) != 0)
-                                                            {
-                                                                if(switchState)
-                                                                    selectedFlagsWorkshop |= WorkshopTag.Library_Outro;
-                                                                else
-                                                                    selectedFlagsWorkshop &= ~WorkshopTag.Library_Outro;
-                                                            }
-                                                            return switchState;
-                                                        }, (selectedFlagsWorkshop & WorkshopTag.Library_Outro) != 0));
-                                                        controller.Add("LibraryIntro", new Switch("Intro Library", "Uses the intro library type.", new Vector2(139, 60+19*5), (int i) => {
-                                                            bool switchState = (i & 256) != 0;
-                                                            if((i & 2) != 0)
-                                                            {
-                                                                if(switchState)
-                                                                    selectedFlagsWorkshop |= WorkshopTag.Library_Intro;
-                                                                else
-                                                                    selectedFlagsWorkshop &= ~WorkshopTag.Library_Intro;
-                                                            }
-                                                            return switchState;
-                                                        }, (selectedFlagsWorkshop & WorkshopTag.Library_Intro) != 0));
-                                                        controller.Add("LibraryTransition", new Switch("Transition Library", "Uses the transition library type.", new Vector2(139, 60+19*4), (int i) => {
-                                                            bool switchState = (i & 256) != 0;
-                                                            if((i & 2) != 0)
-                                                            {
-                                                                if(switchState)
-                                                                    selectedFlagsWorkshop |= WorkshopTag.Library_Transition;
-                                                                else
-                                                                    selectedFlagsWorkshop &= ~WorkshopTag.Library_Transition;
-                                                            }
-                                                            return switchState;
-                                                        }, (selectedFlagsWorkshop & WorkshopTag.Library_Transition) != 0));
-                                                        controller.Add("LibraryMaterial", new Switch("Material Library", "Uses the material library type.", new Vector2(139, 60+19*3), (int i) => {
-                                                            bool switchState = (i & 256) != 0;
-                                                            if((i & 2) != 0)
-                                                            {
-                                                                if(switchState)
-                                                                    selectedFlagsWorkshop |= WorkshopTag.Library_Material;
-                                                                else
-                                                                    selectedFlagsWorkshop &= ~WorkshopTag.Library_Material;
-                                                            }
-                                                            return switchState;
-                                                        }, (selectedFlagsWorkshop & WorkshopTag.Library_Material) != 0));
-                                                        controller.Add("LibraryMusic", new Switch("Music Library", "Uses the music library type.", new Vector2(139, 60+19*2), (int i) => {
-                                                            bool switchState = (i & 256) != 0;
-                                                            if((i & 2) != 0)
-                                                            {
-                                                                if(switchState)
-                                                                    selectedFlagsWorkshop |= WorkshopTag.Library_Music;
-                                                                else
-                                                                    selectedFlagsWorkshop &= ~WorkshopTag.Library_Music;
-                                                            }
-                                                            return switchState;
-                                                        }, (selectedFlagsWorkshop & WorkshopTag.Library_Music) != 0));
-                                                        controller.Add("LibrarySFX", new Switch("Sound FX Library", "Uses the sound fx library type.", new Vector2(139, 60+19), (int i) => {
-                                                            bool switchState = (i & 256) != 0;
-                                                            if((i & 2) != 0)
-                                                            {
-                                                                if(switchState)
-                                                                    selectedFlagsWorkshop |= WorkshopTag.Library_SFX;
-                                                                else
-                                                                    selectedFlagsWorkshop &= ~WorkshopTag.Library_SFX;
-                                                            }
-                                                            return switchState;
-                                                        }, (selectedFlagsWorkshop & WorkshopTag.Library_SFX) != 0));
-                                                        controller.Add("Audio", new Switch("Audio", "Applies audio effects.", new Vector2(139+55, 60), (int i) => {
-                                                            bool switchState = (i & 256) != 0;
-                                                            if((i & 2) != 0)
-                                                            {
-                                                                if(switchState)
-                                                                    selectedFlagsWorkshop |= WorkshopTag.Effect_AudioOnly;
-                                                                else
-                                                                    selectedFlagsWorkshop &= ~WorkshopTag.Effect_AudioOnly;
-                                                            }
-                                                            return switchState;
-                                                        }, (selectedFlagsWorkshop & WorkshopTag.Effect_AudioOnly) != 0));
-                                                        controller.Add("Video", new Switch("Video", "Applies video effects.", new Vector2(139, 60), (int i) => {
-                                                            bool switchState = (i & 256) != 0;
-                                                            if((i & 2) != 0)
-                                                            {
-                                                                // add or remove WorkshopTag.Video to flags
-                                                                if(switchState)
-                                                                    selectedFlagsWorkshop |= WorkshopTag.Effect_VideoOnly;
-                                                                else
-                                                                    selectedFlagsWorkshop &= ~WorkshopTag.Effect_VideoOnly;
-                                                            }
-                                                            return switchState;
-                                                        }, (selectedFlagsWorkshop & WorkshopTag.Effect_VideoOnly) != 0));
-                                                        controller.Add("Submit", new Button("Submit", "Submit to Steam Workshop.", new Vector2(139+139, 60+10+19*7), (int i) => {
-                                                            switch(i)
-                                                            {
-                                                                case 2: // left click
-                                                                    GlobalContent.GetSound("Option").Play(int.Parse(SaveData.saveValues["SoundEffectVolume"]) / 100f, 0f, 0f);
-                                                                    // Select png, jpg, or gif icon with file dialog
-                                                                    System.Windows.Forms.OpenFileDialog fileDialog = new System.Windows.Forms.OpenFileDialog();
-                                                                    fileDialog.Filter = "Image Files (*.png;*.jpg;*.gif)|*.png;*.jpg;*.gif";
-                                                                    fileDialog.Title = "Select Workshop Icon";
-                                                                    fileDialog.InitialDirectory = Path.GetFullPath(@"templates");
-                                                                    fileDialog.FileName = "workshop.jpg";
-                                                                    if(fileDialog.ShowDialog() == System.Windows.Forms.DialogResult.OK)
-                                                                    {
+                                                            Name = "Workshop Tags: " + PluginHandler.plugins[settingsIndex].GetDisplayName();
+                                                            controller.Clear();
+                                                            controller.Add("LibraryCustom", new Switch("Custom Library", "Uses a custom library type.", new Vector2(139, 60+19*8), (int i) => {
+                                                                bool switchState = (i & 256) != 0;
+                                                                if((i & 2) != 0)
+                                                                {
+                                                                    if(switchState)
+                                                                        selectedFlagsWorkshop |= WorkshopTag.Library_Custom;
+                                                                    else
+                                                                        selectedFlagsWorkshop &= ~WorkshopTag.Library_Custom;
+                                                                }
+                                                                return switchState;
+                                                            }, (selectedFlagsWorkshop & WorkshopTag.Library_Custom) != 0));
+                                                            controller.Add("LibraryOverlay", new Switch("Overlay Library", "Uses the overlay library type.", new Vector2(139, 60+19*7), (int i) => {
+                                                                bool switchState = (i & 256) != 0;
+                                                                if((i & 2) != 0)
+                                                                {
+                                                                    if(switchState)
+                                                                        selectedFlagsWorkshop |= WorkshopTag.Library_Overlay;
+                                                                    else
+                                                                        selectedFlagsWorkshop &= ~WorkshopTag.Library_Overlay;
+                                                                }
+                                                                return switchState;
+                                                            }, (selectedFlagsWorkshop & WorkshopTag.Library_Overlay) != 0));
+                                                            controller.Add("LibraryOutro", new Switch("Outro Library", "Uses the outro library type.", new Vector2(139, 60+19*6), (int i) => {
+                                                                bool switchState = (i & 256) != 0;
+                                                                if((i & 2) != 0)
+                                                                {
+                                                                    if(switchState)
+                                                                        selectedFlagsWorkshop |= WorkshopTag.Library_Outro;
+                                                                    else
+                                                                        selectedFlagsWorkshop &= ~WorkshopTag.Library_Outro;
+                                                                }
+                                                                return switchState;
+                                                            }, (selectedFlagsWorkshop & WorkshopTag.Library_Outro) != 0));
+                                                            controller.Add("LibraryIntro", new Switch("Intro Library", "Uses the intro library type.", new Vector2(139, 60+19*5), (int i) => {
+                                                                bool switchState = (i & 256) != 0;
+                                                                if((i & 2) != 0)
+                                                                {
+                                                                    if(switchState)
+                                                                        selectedFlagsWorkshop |= WorkshopTag.Library_Intro;
+                                                                    else
+                                                                        selectedFlagsWorkshop &= ~WorkshopTag.Library_Intro;
+                                                                }
+                                                                return switchState;
+                                                            }, (selectedFlagsWorkshop & WorkshopTag.Library_Intro) != 0));
+                                                            controller.Add("LibraryTransition", new Switch("Transition Library", "Uses the transition library type.", new Vector2(139, 60+19*4), (int i) => {
+                                                                bool switchState = (i & 256) != 0;
+                                                                if((i & 2) != 0)
+                                                                {
+                                                                    if(switchState)
+                                                                        selectedFlagsWorkshop |= WorkshopTag.Library_Transition;
+                                                                    else
+                                                                        selectedFlagsWorkshop &= ~WorkshopTag.Library_Transition;
+                                                                }
+                                                                return switchState;
+                                                            }, (selectedFlagsWorkshop & WorkshopTag.Library_Transition) != 0));
+                                                            controller.Add("LibraryMaterial", new Switch("Material Library", "Uses the material library type.", new Vector2(139, 60+19*3), (int i) => {
+                                                                bool switchState = (i & 256) != 0;
+                                                                if((i & 2) != 0)
+                                                                {
+                                                                    if(switchState)
+                                                                        selectedFlagsWorkshop |= WorkshopTag.Library_Material;
+                                                                    else
+                                                                        selectedFlagsWorkshop &= ~WorkshopTag.Library_Material;
+                                                                }
+                                                                return switchState;
+                                                            }, (selectedFlagsWorkshop & WorkshopTag.Library_Material) != 0));
+                                                            controller.Add("LibraryMusic", new Switch("Music Library", "Uses the music library type.", new Vector2(139, 60+19*2), (int i) => {
+                                                                bool switchState = (i & 256) != 0;
+                                                                if((i & 2) != 0)
+                                                                {
+                                                                    if(switchState)
+                                                                        selectedFlagsWorkshop |= WorkshopTag.Library_Music;
+                                                                    else
+                                                                        selectedFlagsWorkshop &= ~WorkshopTag.Library_Music;
+                                                                }
+                                                                return switchState;
+                                                            }, (selectedFlagsWorkshop & WorkshopTag.Library_Music) != 0));
+                                                            controller.Add("LibrarySFX", new Switch("Sound FX Library", "Uses the sound fx library type.", new Vector2(139, 60+19), (int i) => {
+                                                                bool switchState = (i & 256) != 0;
+                                                                if((i & 2) != 0)
+                                                                {
+                                                                    if(switchState)
+                                                                        selectedFlagsWorkshop |= WorkshopTag.Library_SFX;
+                                                                    else
+                                                                        selectedFlagsWorkshop &= ~WorkshopTag.Library_SFX;
+                                                                }
+                                                                return switchState;
+                                                            }, (selectedFlagsWorkshop & WorkshopTag.Library_SFX) != 0));
+                                                            controller.Add("Audio", new Switch("Audio", "Applies audio effects.", new Vector2(139+55, 60), (int i) => {
+                                                                bool switchState = (i & 256) != 0;
+                                                                if((i & 2) != 0)
+                                                                {
+                                                                    if(switchState)
+                                                                        selectedFlagsWorkshop |= WorkshopTag.Effect_AudioOnly;
+                                                                    else
+                                                                        selectedFlagsWorkshop &= ~WorkshopTag.Effect_AudioOnly;
+                                                                }
+                                                                return switchState;
+                                                            }, (selectedFlagsWorkshop & WorkshopTag.Effect_AudioOnly) != 0));
+                                                            controller.Add("Video", new Switch("Video", "Applies video effects.", new Vector2(139, 60), (int i) => {
+                                                                bool switchState = (i & 256) != 0;
+                                                                if((i & 2) != 0)
+                                                                {
+                                                                    // add or remove WorkshopTag.Video to flags
+                                                                    if(switchState)
+                                                                        selectedFlagsWorkshop |= WorkshopTag.Effect_VideoOnly;
+                                                                    else
+                                                                        selectedFlagsWorkshop &= ~WorkshopTag.Effect_VideoOnly;
+                                                                }
+                                                                return switchState;
+                                                            }, (selectedFlagsWorkshop & WorkshopTag.Effect_VideoOnly) != 0));
+                                                            controller.Add("Submit", new Button("Submit", "Submit to Steam Workshop.", new Vector2(139+139, 60+10+19*7), (int i) => {
+                                                                switch(i)
+                                                                {
+                                                                    case 2: // left click
+                                                                        GlobalContent.GetSound("Option").Play(int.Parse(SaveData.saveValues["SoundEffectVolume"]) / 100f, 0f, 0f);
+                                                                        // Select png, jpg, or gif icon with file dialog
+                                                                        System.Windows.Forms.OpenFileDialog fileDialog = new System.Windows.Forms.OpenFileDialog();
+                                                                        fileDialog.Filter = "Image Files (*.png;*.jpg;*.gif)|*.png;*.jpg;*.gif";
+                                                                        fileDialog.Title = "Select Workshop Icon";
+                                                                        fileDialog.InitialDirectory = Path.GetFullPath(@"templates");
+                                                                        fileDialog.FileName = "workshop.jpg";
+                                                                        if(fileDialog.ShowDialog() == System.Windows.Forms.DialogResult.OK)
+                                                                        {
+                                                                            Name = "Effects";
+                                                                            editingSettings = false;
+                                                                            controller.Clear();
+                                                                            Global.generatorFactory.progressText = "Uploading...";
+                                                                            ConsoleOutput.WriteLine("Publishing " + Path.GetFileName(PluginHandler.plugins[settingsIndex].path) + " with icon " + Path.GetFileName(fileDialog.FileName), Color.RoyalBlue);
+                                                                            PluginHandler.PublishPlugin(PluginHandler.plugins[settingsIndex], selectedFlagsWorkshop, fileDialog.FileName);
+                                                                        }
+                                                                        return true;
+                                                                }
+                                                                return false;
+                                                            }));
+                                                            controller.Add("Back", new Button("Back", "Go back to effect plugin list.", new Vector2(119+167, 60+10+19*8), (int i) => {
+                                                                switch(i)
+                                                                {
+                                                                    case 2: // left click
+                                                                        GlobalContent.GetSound("Back").Play(int.Parse(SaveData.saveValues["SoundEffectVolume"]) / 100f, 0f, 0f);
+                                                                        controller.Clear();
                                                                         Name = "Effects";
                                                                         editingSettings = false;
-                                                                        controller.Clear();
-                                                                        Global.generatorFactory.progressText = "Uploading...";
-                                                                        ConsoleOutput.WriteLine("Publishing " + Path.GetFileName(PluginHandler.plugins[settingsIndex].path) + " with icon " + Path.GetFileName(fileDialog.FileName), Color.RoyalBlue);
-                                                                        PluginHandler.PublishPlugin(PluginHandler.plugins[settingsIndex], selectedFlagsWorkshop, fileDialog.FileName);
-                                                                    }
-                                                                    return true;
-                                                            }
-                                                            return false;
-                                                        }));
-                                                        controller.Add("Back", new Button("Back", "Go back to effect plugin list.", new Vector2(119+167, 60+10+19*8), (int i) => {
-                                                            switch(i)
-                                                            {
-                                                                case 2: // left click
-                                                                    GlobalContent.GetSound("Back").Play(int.Parse(SaveData.saveValues["SoundEffectVolume"]) / 100f, 0f, 0f);
-                                                                    controller.Clear();
-                                                                    Name = "Effects";
-                                                                    editingSettings = false;
-                                                                    return true;
-                                                            }
-                                                            return false;
-                                                        }));
-                                                        return true;
-                                                }
-                                                return false;
-                                            }));
+                                                                        return true;
+                                                                }
+                                                                return false;
+                                                            }));
+                                                            return true;
+                                                    }
+                                                    return false;
+                                                }));
+                                            }
                                         }
                                         controller.Add("Back", new Button("Back", "Go back to effect plugin list.", new Vector2(119+36, 60+10+19*8), (int i) => {
                                             switch(i)

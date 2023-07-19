@@ -29,7 +29,7 @@ namespace NonsensicalVideoGenerator
         public void LoadContent(ContentManager contentManager, GraphicsDevice graphicsDevice)
         {
             // Add dials
-            controller.Add("MotionDisable", new Switch("Disable Motion", "Turns off screen tweening and other elements.", new Vector2(139, 60+19*5), (int i) => {
+            controller.Add("MotionDisable", new Switch("Disable Motion", "Turns off screen tweening and other elements.", new Vector2(139, 60+19*4), (int i) => {
                 bool switchState = (i & 256) != 0;
                 if((i & 2) != 0)
                 {
@@ -40,18 +40,6 @@ namespace NonsensicalVideoGenerator
                 }
                 return switchState;
             }, SaveData.saveValues["DisableMotion"] == "true"));
-            controller.Add("BGSaturation", new TextEntry("Background Saturation", "Adjust color in the animated background, from 0-255.", SaveData.saveValues["BackgroundSaturation"], new Vector2(139, 60+19*4), 24, 3, 1, (int i) => {
-                int oldValue = int.Parse(SaveData.saveValues["BackgroundSaturation"]);
-                // Range: 0-255
-                if(int.Parse(controller.interactables["BGSaturation"].Tooltip) < 0)
-                    controller.interactables["BGSaturation"].Tooltip = "0";
-                if(int.Parse(controller.interactables["BGSaturation"].Tooltip) > 255)
-                    controller.interactables["BGSaturation"].Tooltip = "255";
-                SaveData.saveValues["BackgroundSaturation"] = controller.interactables["BGSaturation"].Tooltip;
-                if(oldValue != int.Parse(SaveData.saveValues["BackgroundSaturation"]))
-                    SaveData.Save();
-                return false;
-            }));
             controller.Add("Scale", new TextEntry("Screen Resolution Multiplier", "2, 3, or 4. A restart will be performed.", SaveData.saveValues["ScreenScale"], new Vector2(139, 60+19*3), 24, 3, 1, (int i) => {
                 int oldValue = int.Parse(SaveData.saveValues["ScreenScale"]);
                 // Range: 1-4

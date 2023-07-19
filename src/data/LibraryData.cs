@@ -227,6 +227,7 @@ namespace NonsensicalVideoGenerator
                     string path = Path.Combine(libraryRootPath, libraryPaths[type]);
                     if (!Directory.Exists(path))
                         Directory.CreateDirectory(path);
+                    Global.videoTitle = "Render1";
                     LoadRecursive(path, type);
                 }
             }
@@ -279,9 +280,12 @@ namespace NonsensicalVideoGenerator
             }
             file.Path = newfile;
             libraryFiles.Add(file);
-            string achievement = "ACHIEVEMENT_LIBRARY_IMPORT";
-            ConsoleOutput.WriteLine("Awarding achievement: "+achievement, Color.LightBlue);
-            SteamUserStats.SetAchievement(achievement);
+            if(file.Type != DefaultLibraryTypes.Render)
+            {
+                string achievement = "ACHIEVEMENT_LIBRARY_IMPORT";
+                ConsoleOutput.WriteLine("Awarding achievement: "+achievement, Color.LightBlue);
+                SteamUserStats.SetAchievement(achievement);
+            }
             SequentialName(file);
             return file;
         }
@@ -536,6 +540,12 @@ namespace NonsensicalVideoGenerator
             downloadCallback(true);
             libraryFiles.Add(file);
             SequentialName(file);
+            if(file.Type != DefaultLibraryTypes.Render)
+            {
+                string achievement = "ACHIEVEMENT_LIBRARY_IMPORT";
+                ConsoleOutput.WriteLine("Awarding achievement: "+achievement, Color.LightBlue);
+                SteamUserStats.SetAchievement(achievement);
+            }
             Global.justCompletedRender = true; // Refresh the library.
             ConsoleOutput.WriteLine("Downloaded clip to library: " + path, Color.Green);
         }

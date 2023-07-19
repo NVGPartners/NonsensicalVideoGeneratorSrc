@@ -555,7 +555,8 @@ namespace NonsensicalVideoGenerator
             if (gameTime.TotalGameTime.TotalMilliseconds - lastAnimTime > 66.666)
             {
                 // Update animation
-                staticAnim++;
+                if(!bool.Parse(SaveData.saveValues["DisableMotion"]))
+                    staticAnim++;
                 if(staticAnim > 12)
                     staticAnim = 0;
                 // Update lastAnimTime
@@ -565,7 +566,8 @@ namespace NonsensicalVideoGenerator
             if(gameTime.TotalGameTime.TotalMilliseconds - lastAnimTimeAudio > 250)
             {
                 // Update animation
-                audioAnim++;
+                if(!bool.Parse(SaveData.saveValues["DisableMotion"]))
+                    audioAnim++;
                 if(audioAnim > 1)
                     audioAnim = 0;
                 // Update lastAnimTimeAudio
@@ -612,6 +614,8 @@ namespace NonsensicalVideoGenerator
             // Standard input
             if(handleInput && !organizing)
             {
+                oldKeyboardState = newKeyboardState;
+                newKeyboardState = Keyboard.GetState();
                 // Accessibility
                 for(int i = 0; i < rects.Count; i++)
                 {
@@ -1006,8 +1010,22 @@ namespace NonsensicalVideoGenerator
                                         // Remove video button
                                         if (libraryFileCache[currentLibraryType].Count > position)
                                         {
-                                            deleteConfirmPos = position;
-                                            GlobalContent.GetSound("Prompt").Play(int.Parse(SaveData.saveValues["SoundEffectVolume"]) / 100f, 0f, 0f);
+                                            // If holding shift, delete video immediately
+                                            if (newKeyboardState.IsKeyDown(Keys.LeftShift) || newKeyboardState.IsKeyDown(Keys.RightShift))
+                                            {
+                                                // Remove video
+                                                LibraryFile file = libraryFileCache[currentLibraryType][position];
+                                                LibraryData.Unload(file);
+                                                libraryFileCache[currentLibraryType].RemoveAt(position);
+                                                demandChange = true;
+                                                GlobalContent.GetSound("Option").Play(int.Parse(SaveData.saveValues["SoundEffectVolume"]) / 100f, 0f, 0f);
+                                            }
+                                            else
+                                            {
+                                                // Delete confirm
+                                                deleteConfirmPos = position;
+                                                GlobalContent.GetSound("Prompt").Play(int.Parse(SaveData.saveValues["SoundEffectVolume"]) / 100f, 0f, 0f);
+                                            }
                                             return true;
                                         }
                                         else

@@ -196,7 +196,7 @@ namespace NonsensicalVideoGenerator
                             GlobalContent.GetSound("Select").Play(int.Parse(SaveData.saveValues["SoundEffectVolume"]) / 100f, 0f, 0f);    
                             if(Pagination.DrawnPage != segment)
                             {
-                                if(segment == Pagination.GetPageCount() - 3)
+                                if(segment == Pagination.GetPageCount() - 2)
                                 {
                                     ScreenManager.PushNavigation("Pastime Game");
                                     ScreenManager.GetScreen<PastimeGameScreen>("Pastime Game")?.Show();
@@ -204,7 +204,7 @@ namespace NonsensicalVideoGenerator
                                 }
                                 else
                                 {
-                                    if(Pagination.DrawnPage == Pagination.GetPageCount() - 3)
+                                    if(Pagination.DrawnPage == Pagination.GetPageCount() - 2)
                                     {
                                         ScreenManager.GetScreen<PastimeGameScreen>("Pastime Game")?.Hide();
                                         ScreenManager.PushNavigation("Content");
