@@ -131,15 +131,39 @@ namespace NonsensicalVideoGenerator
                         progressText = "Completed!";
                         progressState = ProgressState.Completed;
                         generatorActive = false;
-                        // award achievement
-                        try
+                        // award achievements
+                        if (SteamManager.initialized && Global.canAchieve)
                         {
-                            if (SteamManager.initialized && Global.canAchieve)
+                            List<string> achievements = new()
                             {
-                                ConsoleOutput.WriteLine("Awarding achievement: ACHIEVEMENT_FIRST_RENDER", Color.LightBlue);
-                                SteamUserStats.SetAchievement("ACHIEVEMENT_FIRST_RENDER");
+                                "ACHIEVEMENT_FIRST_RENDER",
+                            };
+                            if(Global.usedWorkshopPlugin)
+                            {
+                                Global.usedWorkshopPlugin = false;
+                                achievements.Add("ACHIEVEMENT_WORKSHOP_USAGE");
                             }
-                        } catch {}
+                            if(Global.rolledForOverlay)
+                            {
+                                Global.rolledForOverlay = false;
+                                achievements.Add("ACHIEVEMENT_CHROMA_KEY");
+                            }
+                            if(Global.usedAllEffectChance)
+                            {
+                                Global.usedAllEffectChance = false;
+                                achievements.Add("ACHIEVEMENT_ALL_EFFECTS");
+                            }
+                            if(Global.usedDifferentOutro)
+                            {
+                                Global.usedDifferentOutro = false;
+                                achievements.Add("ACHIEVEMENT_OUTRO_OVERRIDE");
+                            }
+                            foreach(string achievement in achievements)
+                            {
+                                ConsoleOutput.WriteLine("Awarding achievement: "+achievement, Color.LightBlue);
+                                SteamUserStats.SetAchievement(achievement);
+                            }
+                        }
                         GlobalContent.GetSound("RenderComplete").Play(int.Parse(SaveData.saveValues["SoundEffectVolume"]) / 100f, 0f, 0f);
                         /*
                         // Open the video in the default video player if the user has that option enabled.
@@ -275,8 +299,8 @@ namespace NonsensicalVideoGenerator
                         return;
                     if(!intro)
                     {
-                        bool rolledForOverlay = RandomInt(0, 101) < int.Parse(SaveData.saveValues["OverlayChance"]);
-                        bool rolledForTransition = RandomInt(0, 101) < int.Parse(SaveData.saveValues["TransitionChance"]);
+                        bool rolledForOverlay = RandomInt(0, 100) < int.Parse(SaveData.saveValues["OverlayChance"]);
+                        bool rolledForTransition = RandomInt(0, 100) < int.Parse(SaveData.saveValues["TransitionChance"]);
                         string overlayPath = "";
                         progress = Convert.ToInt32(((float)i / (float)maxClips));
                         progressText = "Clipping... (" + (i + 1) + "/" + maxClips + ")";
@@ -370,13 +394,17 @@ namespace NonsensicalVideoGenerator
                             if(numberOfPlugins > 0)
                             {
                                 // Roll for effect
-                                if(RandomInt(0, 101) < (rolledForTransition ? int.Parse(SaveData.saveValues["TransitionEffectChance"]) : int.Parse(SaveData.saveValues["EffectChance"])))
+                                if(RandomInt(0, 100) < (rolledForTransition ? int.Parse(SaveData.saveValues["TransitionEffectChance"]) : int.Parse(SaveData.saveValues["EffectChance"])))
                                 {
                                     progressText = (rolledForTransition ? "Boiling" : "Baking") + " effects... (" + (i + 1) + "/" + maxClips + ")";
                                     // We rolled for an effect, let's pick one.
                                     PluginReturnValue effect = PluginHandler.PickRandom(globalRandom, Path.Combine(Utilities.temporaryDirectory, "video" + i + ".mp4"));
                                     if(effect.success)
                                     {
+                                        if(!rolledForTransition && int.Parse(SaveData.saveValues["EffectChance"]) >= 100)
+                                        {
+                                            Global.usedAllEffectChance = true;
+                                        }
                                         // Check if effect job path contains output.mp4, if so, plugin was indeed successful.
                                         // so move to videoi.mp4
                                         // Search for output.mp4 in job folder.
@@ -537,6 +565,9 @@ namespace NonsensicalVideoGenerator
         }
         public void StartGeneration(ProgressChangedEventHandler progressReporter, RunWorkerCompletedEventHandler completedReporter)
         {
+            Global.usedWorkshopPlugin = false;
+            Global.rolledForOverlay = false;
+            Global.usedAllEffectChance = false;
             FramePlayer.Stop();
             try
             {

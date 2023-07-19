@@ -8,6 +8,7 @@ using System.ComponentModel;
 using System.Net;
 using System.Diagnostics;
 using System.Linq;
+using Steamworks;
 
 namespace NonsensicalVideoGenerator
 {
@@ -278,6 +279,16 @@ namespace NonsensicalVideoGenerator
             }
             file.Path = newfile;
             libraryFiles.Add(file);
+            if (file.Type.FileType != LibraryFileType.Custom
+             && !Global.librariesAddedTo.Contains(file.Type))
+                Global.librariesAddedTo.Add(file.Type);
+            if(Global.librariesAddedTo.Count >= 7)
+            {
+                Global.librariesAddedTo.Clear();
+                string achievement = "ACHIEVEMENT_LIBRARY_IMPORT";
+                ConsoleOutput.WriteLine("Awarding achievement: "+achievement, Color.LightBlue);
+                SteamUserStats.SetAchievement(achievement);
+            }
             SequentialName(file);
             return file;
         }

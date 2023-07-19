@@ -19,7 +19,6 @@ namespace NonsensicalVideoGenerator
     public enum PluginType
     {
         None,
-        PowerShell,
         Lua,
     }
     public class PluginReturnValue
@@ -298,67 +297,6 @@ namespace NonsensicalVideoGenerator
             ConsoleOutput.WriteLine($"Calling plugin {Path.GetFileName(path)}", Color.LightBlue);
             switch (type)
             {
-                case PluginType.PowerShell:
-                    // ps1 plugins use Set-ExecutionPolicy Bypass -Scope Process; path
-                    List<string> psArgs = new()
-                    {
-                        "Set-ExecutionPolicy", "Bypass",
-                        "-Scope", "Process;",
-                        path,
-                        video,
-                        SaveData.saveValues["VideoWidth"],
-                        SaveData.saveValues["VideoHeight"],
-                        jobPath + @"\",
-                        Global.useSystemFFmpeg ? "ffmpeg" : @".\ffmpeg.exe",
-                        Global.useSystemFFprobe ? "ffprobe" : @".\ffprobe.exe",
-                        "magick",
-                        LibraryData.libraryRootPath + @"\", // legacy resource path
-                        @".\" +Path.Join("library", "audio", "sfx") + @"\",
-                        @".\" +Path.Join("library", "videos", "transitions") + @"\",
-                        @".\" +Path.Join("library", "audio", "music") + @"\",
-                        LibraryData.libraryRootPath + @"\",
-                        SaveData.saveFileName, // powershell plugins can access the JSON save file
-                        jobPath + @"\output.mp4",
-                        settings.Count.ToString(), // number of settings
-                    };
-                    // Add settings to args
-                    foreach (KeyValuePair<string, object> setting in settings)
-                    {
-                        psArgs.Add(setting.Key);
-                        psArgs.Add(setting.Value.ToString());
-                    }
-                    string psArgsString = string.Join(" ", psArgs);
-                    ProcessStartInfo psStartInfo = new()
-                    {
-                        FileName = "powershell",
-                        Arguments = psArgsString,
-                        WorkingDirectory = Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location),
-                        UseShellExecute = false,
-                        RedirectStandardOutput = true,
-                        RedirectStandardError = true,
-                        CreateNoWindow = true
-                    };
-                    Process psProcess = new()
-                    {
-                        StartInfo = psStartInfo
-                    };
-                    psProcess.OutputDataReceived += (sender, e) =>
-                    {
-                        ConsoleOutput.WriteLine(e.Data, Color.LightBlue);
-                    };
-                    psProcess.ErrorDataReceived += (sender, e) =>
-                    {
-                        ConsoleOutput.WriteLine(e.Data, Color.Transparent);
-                    };
-                    psProcess.Start();
-                    psProcess.BeginOutputReadLine();
-                    psProcess.BeginErrorReadLine();
-                    psProcess.WaitForExit();
-                    if (psProcess.ExitCode == 0)
-                    {
-                        return new PluginReturnValue(true, Path.GetFileName(path), jobPath + @"\");
-                    }
-                    return new PluginReturnValue(false, Path.GetFileName(path));
                 case PluginType.Lua:
                     if(luaScript == null)
                         return new PluginReturnValue(false, Path.GetFileName(path));
@@ -437,122 +375,6 @@ namespace NonsensicalVideoGenerator
             {
                 default:
                     return true;
-                case PluginType.PowerShell:
-                    // Call plugin with query argument.
-                    string fileName = path;
-                    List<string> batchArgs = new();
-                    if(type == PluginType.PowerShell)
-                    {
-                        fileName = "powershell";
-                        batchArgs.Add("Set-ExecutionPolicy");
-                        batchArgs.Add("Bypass");
-                        batchArgs.Add("-Scope");
-                        batchArgs.Add("Process;");
-                        batchArgs.Add(path);
-                    }
-                    batchArgs.Add("query");
-                    string batchArgsString = string.Join(" ", batchArgs);
-                    ProcessStartInfo batchStartInfo = new()
-                    {
-                        FileName = fileName,
-                        Arguments = batchArgsString,
-                        WorkingDirectory = Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location),
-                        UseShellExecute = false,
-                        RedirectStandardOutput = true,
-                        RedirectStandardError = true,
-                        CreateNoWindow = true
-                    };
-                    Process batchProcess = new()
-                    {
-                        StartInfo = batchStartInfo
-                    };
-                    string output = "";
-                    batchProcess.OutputDataReceived += (sender, e) =>
-                    {
-                        output += e.Data;
-                    };
-                    batchProcess.ErrorDataReceived += (sender, e) =>
-                    {
-                        ConsoleOutput.WriteLine(e.Data, Color.Transparent);
-                    };
-                    batchProcess.Start();
-                    batchProcess.BeginOutputReadLine();
-                    batchProcess.BeginErrorReadLine();
-                    batchProcess.WaitForExit();
-                    if (batchProcess.ExitCode != 0)
-                    {
-                        ConsoleOutput.WriteLine(output, Color.Red);
-                        return false;
-                    }
-                    // Parse output.
-                    string[] outputarray = output.Replace("\r", "").Replace("\n", "").Split("|");
-                    if(outputarray.Length < 1)
-                    {
-                        return true; // no query results
-                    }
-                    string[] query = outputarray[0].Split(';');
-                    int count = 0;
-                    for(int i = 0; i < query.Length; i++)
-                    {
-                        // First character is either a 0 or 1 for video/audio
-                        // Second character is a colon for separation
-                        // Rest is the pretty name, then a colon, then the base name.
-                        string[] split = query[i].Split(':');
-                        if (split.Length < 3)
-                        {
-                            continue;
-                        }
-                        LibraryRootType rootType = split[0] == "0" ? LibraryRootType.Video : LibraryRootType.Audio;
-                        // split[3] is description
-                        string description = split.Length >= 4 ? split[3] : "";
-                        LibraryType dummyType = new(rootType, split[2], description);
-                        string libPath = Path.Join(rootType == LibraryRootType.Video ? "video" : "audio", split[2]);
-                        string[] fileExts = LibraryData.libraryFileTypes[rootType == LibraryRootType.Video ? DefaultLibraryTypes.Video : DefaultLibraryTypes.Audio];
-                        // Check to see if library already exists.
-                        if (LibraryData.libraryPaths.ContainsKey(dummyType))
-                        {
-                            continue;
-                        }
-                        DefaultLibraryTypes.AllTypes.Add(dummyType);
-                        LibraryData.libraryPaths.Add(dummyType, libPath);
-                        LibraryData.libraryFileTypes.Add(dummyType, fileExts);
-                        LibraryData.libraryNames.Add(dummyType, split[1]);
-                        libraryTypes.Add(dummyType);
-                        Global.justCompletedRender = true; // demand a refresh
-                        // Print to console.
-                        ConsoleOutput.WriteLine($"Added {(rootType == LibraryRootType.Video ? "video" : "audio")} library {split[1]} from plugin {Path.GetFileName(path)}.", Color.LightBlue);
-                        count++;
-                    }
-                    // Print count
-                    //if (count > 0)
-                        //ConsoleOutput.WriteLine($"Plugin {Path.GetFileName(path)} added {count} libraries.", Color.LightBlue);
-                    // Library query successful, check for settings query.
-                    if (outputarray.Length < 2)
-                    {
-                        return true; // no settings query results
-                    }
-                    // Format: setting_name:default_setting_value:tooltip;setting_name:default_setting_value:tooltip
-                    string[] settingsQuery = outputarray[1].Split(';');
-                    count = 0;
-                    for(int i = 0; i < settingsQuery.Length; i++)
-                    {
-                        string[] split = settingsQuery[i].Split(':');
-                        if (split.Length < 2)
-                        {
-                            continue;
-                        }
-                        string settingName = split[0];
-                        string settingValue = split[1];
-                        string settingTooltip = split.Length >= 3 ? split[2] : "";
-                        settings.Add(settingName, settingValue);
-                        settingTooltips.Add(settingName, settingTooltip);
-                        settingTypes.Add(settingName, SettingType.TextInput);
-                        count++;
-                    }
-                    // Print count
-                    //if (count > 0)
-                        //ConsoleOutput.WriteLine($"Plugin {Path.GetFileName(path)} added {count} settings.", Color.LightBlue);
-                    return true;
                 case PluginType.Lua:
                     // If root is not "workshop", set workshopId to name of plugin folder.
                     if (Path.GetFileName(Path.GetDirectoryName(path)) != "workshop"
@@ -570,7 +392,20 @@ namespace NonsensicalVideoGenerator
                     luaScript = new Script(CoreModules.Preset_SoftSandbox);
                     luaScript.Options.ScriptLoader = new CustomScriptLoader();
                     luaScript.Options.DebugPrint = (s) => ConsoleOutput.WriteLine(s, Color.DarkCyan);
-                    luaScript.DoFile(path);
+                    try
+                    {
+                        luaScript.DoFile(path);
+                    }
+                    catch(Exception e)
+                    {
+                        if(workshopId != "" && rootPath.Contains("user"))
+                        {
+                            string achievement = "ACHIEVEMENT_LUA_ERROR";
+                            ConsoleOutput.WriteLine("Awarding achievement: "+achievement, Color.LightBlue);
+                            SteamUserStats.SetAchievement(achievement);
+                        }
+                        throw e;
+                    }
                     // Call plugin with query argument.
                     if(luaScript.Globals["Query"] != null)
                     {
@@ -820,12 +655,6 @@ namespace NonsensicalVideoGenerator
             {
                 switch(type)
                 {
-                    case PluginType.PowerShell:
-                        if (file.EndsWith(".ps1"))
-                        {
-                            LoadPlugin(file, type, root);
-                        }
-                        break;
                     case PluginType.Lua:
                         if (file.EndsWith(".lua"))
                         {
@@ -1083,7 +912,16 @@ namespace NonsensicalVideoGenerator
             }
             Plugin plugin = enabledPlugins[rnd.Next(enabledPlugins.Count)];
             // Call the plugin.
-            return plugin.Call(video);
+            PluginReturnValue called = plugin.Call(video);
+            if(called.success)
+            {
+                if(plugin.workshopId != ""
+                    && plugin.rootPath.Contains("workshop"))
+                {
+                    Global.usedWorkshopPlugin = true;
+                }
+            }
+            return called;
         }
         public static bool CreatePlugin(string filename, string prettyname, bool minimal, out string file)
         {
@@ -1185,6 +1023,11 @@ namespace NonsensicalVideoGenerator
                 return;
             }
             Global.generatorFactory.progressText = "Creating Workshop item...";
+        
+            string achievement = "ACHIEVEMENT_WORKSHOP_SUBMIT";
+            ConsoleOutput.WriteLine("Awarding achievement: "+achievement, Color.LightBlue);
+            SteamUserStats.SetAchievement(achievement);
+
             UpdateWorkshopItem(param.m_nPublishedFileId);
         }
         public static void UpdateWorkshopItem(PublishedFileId_t id)
@@ -1222,16 +1065,17 @@ namespace NonsensicalVideoGenerator
                 List<string> extsettings = new();
                 foreach(KeyValuePair<string, object> setting in publishPlugin.settings)
                 {
-                    if(setting.Key.ToLower() == "description")
+                    // Hide display name and create description, add options too
+                    if(setting.Key.ToLower() != "display name" && publishPlugin.settingTypes.ContainsKey(setting.Key))
                     {
-                        description = setting.Value.ToString();
-                    }
-                    // Hide display name and other labels
-                    else if(setting.Key.ToLower() != "display name"
-                        && (publishPlugin.settingTypes.ContainsKey(setting.Key) ?
-                            publishPlugin.settingTypes[setting.Key] != SettingType.Label : true))
-                    {
-                        extsettings.Add($"{setting.Key} (Default: \"{setting.Value}\")");
+                        if(publishPlugin.settingTypes[setting.Key] == SettingType.Label)
+                        {
+                            description += $"{setting.Value.ToString()}\n";
+                        }
+                        else
+                        {
+                            extsettings.Add($"{setting.Key} (\"{setting.Value}\")");
+                        }
                     }
                 }
                 if(extsettings.Count > 0)

@@ -232,6 +232,8 @@ namespace NonsensicalVideoGenerator
                     }
                     else
                     {
+                        if(!outroPath.Contains("defaultoutro.mp4"))
+                            Global.usedDifferentOutro = true;
                         Global.generatorFactory.progressText = "Closing the film spool... (" + count + "/" + count + ")";
                         ConsoleOutput.WriteLine("Outro clip enabled, adding 1 to max clips. New max clips is " + count, Color.Gray);
                         Utilities.CopyVideo(outroPath, Path.Combine(Utilities.temporaryDirectory, "video" + count + ".mp4"));
@@ -371,6 +373,7 @@ namespace NonsensicalVideoGenerator
                 process.Start();
                 process.BeginErrorReadLine();
                 process.WaitForExit();
+                Global.rolledForOverlay = true;
 
                 // Rename the temporary file to the original file
                 File.Delete(video);

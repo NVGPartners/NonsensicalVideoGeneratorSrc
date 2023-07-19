@@ -32,6 +32,12 @@ namespace NonsensicalVideoGenerator
         public static string editing = "";
         public static AppId_t appId = new(2516360);
         public static string videoTitle = "Render1";
+        public static bool rolledForOverlay = false;
+        public static bool usedWorkshopPlugin = false;
+        public static bool usedAllEffectChance = false;
+        public static bool usedDifferentOutro = false;
+        public static bool highScore50 = false;
+        public static List<LibraryType> librariesAddedTo = new();
         public static GeneratorFactory generatorFactory = new GeneratorFactory();
     }
 }

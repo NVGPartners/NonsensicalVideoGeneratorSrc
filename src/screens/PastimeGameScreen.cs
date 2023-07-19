@@ -7,6 +7,7 @@ using Microsoft.Xna.Framework.Graphics;
 using Microsoft.Xna.Framework.Input;
 using Microsoft.Xna.Framework.Media;
 using MonoGame.Extended.Tweening;
+using Steamworks;
 
 namespace NonsensicalVideoGenerator
 {
@@ -356,6 +357,13 @@ namespace NonsensicalVideoGenerator
                                 // get random high score tease
                                 int rand = Global.generatorFactory.globalRandom.Next(0, highScoreTeases.Count);
                                 ConsoleOutput.WriteLine(highScoreTeases[rand] + " New high score: " + highScore, Color.Cyan);
+                            }
+                            if(player.points == 50 && !Global.highScore50)
+                            {
+                                Global.highScore50 = true;
+                                string achievement = "ACHIEVEMENT_HIGH_SCORE";
+                                ConsoleOutput.WriteLine("Awarding achievement: "+achievement, Color.LightBlue);
+                                SteamUserStats.SetAchievement(achievement);
                             }
                         }
                     }

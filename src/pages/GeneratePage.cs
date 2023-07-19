@@ -1,3 +1,4 @@
+using System.Collections.Generic;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Content;
 using Microsoft.Xna.Framework.Graphics;
@@ -217,11 +218,38 @@ namespace NonsensicalVideoGenerator
                             {
                                 try
                                 {
-                                    // award achievement
+                                    // award achievements
                                     if (SteamManager.initialized && Global.canAchieve)
                                     {
-                                        ConsoleOutput.WriteLine("Awarding achievement: ACHIEVEMENT_FIRST_RENDER", Color.LightBlue);
-                                        SteamUserStats.SetAchievement("ACHIEVEMENT_FIRST_RENDER");
+                                        List<string> achievements = new()
+                                        {
+                                            "ACHIEVEMENT_FIRST_RENDER",
+                                        };
+                                        if(Global.usedWorkshopPlugin)
+                                        {
+                                            Global.usedWorkshopPlugin = false;
+                                            achievements.Add("ACHIEVEMENT_WORKSHOP_USAGE");
+                                        }
+                                        if(Global.rolledForOverlay)
+                                        {
+                                            Global.rolledForOverlay = false;
+                                            achievements.Add("ACHIEVEMENT_CHROMA_KEY");
+                                        }
+                                        if(Global.usedAllEffectChance)
+                                        {
+                                            Global.usedAllEffectChance = false;
+                                            achievements.Add("ACHIEVEMENT_ALL_EFFECTS");
+                                        }
+                                        if(Global.usedDifferentOutro)
+                                        {
+                                            Global.usedDifferentOutro = false;
+                                            achievements.Add("ACHIEVEMENT_OUTRO_OVERRIDE");
+                                        }
+                                        foreach(string achievement in achievements)
+                                        {
+                                            ConsoleOutput.WriteLine("Awarding achievement: "+achievement, Color.LightBlue);
+                                            SteamUserStats.SetAchievement(achievement);
+                                        }
                                     }
                                 }
                                 catch {}
