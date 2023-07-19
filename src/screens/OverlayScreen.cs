@@ -54,7 +54,10 @@ namespace NonsensicalVideoGenerator
                 exitOpacity += 0.0075f;
                 if(exitOpacity >= 1)
                 {
-                    SteamAPI.Shutdown();
+                    try
+                    {
+                        SteamAPI.Shutdown();
+                    } catch {}
                     if(UserInterface.instance != null)
                         UserInterface.instance.Exit();
                 }

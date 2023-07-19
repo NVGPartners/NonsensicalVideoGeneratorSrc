@@ -160,6 +160,12 @@ namespace NonsensicalVideoGenerator
             }));
             controllerAdvanced.Add("Height", new TextEntry("Output Resolution", "Height: how tall the result is.", SaveData.saveValues["VideoHeight"], new Vector2(170, 60), 24, 4, 1, (int i) => {
                 string oldValue = SaveData.saveValues["VideoHeight"];
+                // minimum must be 240
+                if(int.Parse(controllerAdvanced.interactables["Height"].Tooltip) < 240)
+                    controllerAdvanced.interactables["Height"].Tooltip = "240";
+                // maximum must be 2160
+                if(int.Parse(controllerAdvanced.interactables["Height"].Tooltip) > 2160)
+                    controllerAdvanced.interactables["Height"].Tooltip = "2160";
                 // height must be a multiple of 2
                 if(int.Parse(controllerAdvanced.interactables["Height"].Tooltip) % 2 != 0)
                     controllerAdvanced.interactables["Height"].Tooltip = (int.Parse(controllerAdvanced.interactables["Height"].Tooltip) - 1).ToString();
@@ -170,6 +176,12 @@ namespace NonsensicalVideoGenerator
             }));
             controllerAdvanced.Add("Width", new TextEntry("", "Width: how wide the result is.", SaveData.saveValues["VideoWidth"], new Vector2(139, 60), 24, 4, 1, (int i) => {
                 string oldValue = SaveData.saveValues["VideoWidth"];
+                // minimum must be 320
+                if(int.Parse(controllerAdvanced.interactables["Width"].Tooltip) < 320)
+                    controllerAdvanced.interactables["Width"].Tooltip = "320";
+                // maximum must be 3840
+                if(int.Parse(controllerAdvanced.interactables["Width"].Tooltip) > 3840)
+                    controllerAdvanced.interactables["Width"].Tooltip = "3840";
                 // width must be a multiple of 2
                 if(int.Parse(controllerAdvanced.interactables["Width"].Tooltip) % 2 != 0)
                     controllerAdvanced.interactables["Width"].Tooltip = (int.Parse(controllerAdvanced.interactables["Width"].Tooltip) - 1).ToString();
@@ -202,9 +214,23 @@ namespace NonsensicalVideoGenerator
                         GlobalContent.GetSound("Select").Play(int.Parse(SaveData.saveValues["SoundEffectVolume"]) / 100f, 0f, 0f);
                         Global.generatorFactory.StartGeneration((sender, e) => {
                             if(e.ProgressPercentage == 100)
+                            {
+                                try
+                                {
+                                    // award achievement
+                                    if (SteamManager.initialized && Global.canAchieve)
+                                    {
+                                        ConsoleOutput.WriteLine("Awarding achievement: ACHIEVEMENT_FIRST_RENDER", Color.LightBlue);
+                                        SteamUserStats.SetAchievement("ACHIEVEMENT_FIRST_RENDER");
+                                    }
+                                }
+                                catch {}
                                 GlobalContent.GetSound("RenderComplete").Play(int.Parse(SaveData.saveValues["SoundEffectVolume"]) / 100f, 0f, 0f);
+                            }
                             else
+                            {
                                 GlobalContent.GetSound("Error").Play(int.Parse(SaveData.saveValues["SoundEffectVolume"]) / 100f, 0f, 0f);
+                            }
                             Global.justCompletedRender = true;
                             //SteamUserStats.SetAchievement("RENDER_VIDEO");
                         }, (sender, e) => {});
@@ -231,8 +257,12 @@ namespace NonsensicalVideoGenerator
                     SaveData.Save();
                 return false;
             }));
-            controller.Add("ClipCount", new TextEntry("Clip Segment Count", "How many clips to generate.", SaveData.saveValues["MaxClipCount"], new Vector2(139, 60+19*2), 24, 4, 1, (int i) => {
+            controller.Add("ClipCount", new TextEntry("Clip Segment Count", "How many clips to generate.", SaveData.saveValues["MaxClipCount"], new Vector2(139, 60+19*2), 24, 3, 1, (int i) => {
                 string oldValue = SaveData.saveValues["MaxClipCount"];
+                if(int.Parse(controller.interactables["ClipCount"].Tooltip) < 0)
+                    controller.interactables["ClipCount"].Tooltip = "0";
+                if(int.Parse(controller.interactables["ClipCount"].Tooltip) > 100)
+                    controller.interactables["ClipCount"].Tooltip = "100";
                 SaveData.saveValues["MaxClipCount"] = controller.interactables["ClipCount"].Tooltip;
                 if(oldValue != SaveData.saveValues["MaxClipCount"])
                     SaveData.Save();

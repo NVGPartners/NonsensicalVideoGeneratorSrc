@@ -22,6 +22,7 @@ namespace NonsensicalVideoGenerator
         public static bool pluginsLoaded = true;
         public static bool dragDrop = false;
         public static bool ready = false;
+        public static bool canAchieve = false;
         public static double readyTime = 0;
         public static bool canRender = false;
         public static List<string> dragDropFiles = new();

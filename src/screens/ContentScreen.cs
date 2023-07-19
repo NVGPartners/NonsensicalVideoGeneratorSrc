@@ -30,17 +30,31 @@ namespace NonsensicalVideoGenerator
         public void Show()
         {
             toggle = true;
-            offset = new(0, GlobalGraphics.Scale(240)); // from bottom to top
-            tween.TweenTo(this, t => t.offset, new Vector2(0, 0), 0.5f)
-                .Easing(EasingFunctions.ExponentialOut);
+            if(!bool.Parse(SaveData.saveValues["DisableMotion"]))
+            {
+                offset = new(0, GlobalGraphics.Scale(240)); // from bottom to top
+                tween.TweenTo(this, t => t.offset, new Vector2(0, 0), 0.5f)
+                    .Easing(EasingFunctions.ExponentialOut);
+            }
+            else
+            {
+                offset = new(0, 0);
+            }
             showing = true;
         }
         public void Hide()
         {
             toggle = false;
-            offset = new(0, 0); // from top to bottom
-            tween.TweenTo(this, t => t.offset, new Vector2(0, GlobalGraphics.Scale(240)), 0.5f)
-                .Easing(EasingFunctions.ExponentialOut);
+            if(!bool.Parse(SaveData.saveValues["DisableMotion"]))
+            {
+                offset = new(0, 0); // from top to bottom
+                tween.TweenTo(this, t => t.offset, new Vector2(0, GlobalGraphics.Scale(240)), 0.5f)
+                    .Easing(EasingFunctions.ExponentialOut);
+            }
+            else
+            {
+                offset = new(0, GlobalGraphics.Scale(240));
+            }
             hiding = true;
         }
         public bool Toggle(bool useBool = false, bool toggleTo = false)

@@ -28,7 +28,7 @@ namespace NonsensicalVideoGenerator
             {"OutrosEnabled", "true"},
             {"PlayAutomatically", "true"},
             {"GameHighScore", "0"},
-            {"MusicVolume", "100"},
+            {"MusicVolume", "25"},
             {"SoundEffectVolume", "100"},
             {"VideoVolume", "100"},
             {"TransitionChance", "20"},
@@ -38,6 +38,8 @@ namespace NonsensicalVideoGenerator
             {"TransitionEffectChance", "30"},
             {"HiddenKeepTemporaryJobFolders", "false"},
             {"HiddenVerbose", "false"},
+            {"HideAnimatedBackground", "false"},
+            {"DisableMotion", "false"}
         };
         public static string saveFileName = "Options.json";
         public static bool Save()
@@ -58,35 +60,43 @@ namespace NonsensicalVideoGenerator
         {
             try
             {
+                bool go = true;
                 if (!File.Exists(saveFileName))
                 {
                     ConsoleOutput.WriteLine("Save file not found. Creating new one.", Color.Yellow);
-                    Save();
+                    go = Save();
                 }
-                string json = File.ReadAllText(saveFileName);
-                Dictionary<string, string>? loadedValues = JsonConvert.DeserializeObject<Dictionary<string, string>>(json);
-                if (loadedValues == null)
+                if(go)
                 {
-                    ConsoleOutput.WriteLine("Save file is corrupted.", Color.Red);
-                    loadedValues = new Dictionary<string, string>();
-                }
-                // Merge loaded values into save values.
-                foreach (KeyValuePair<string, string> pair in saveValues)
-                {
-                    if (loadedValues.ContainsKey(pair.Key))
+                    string json = File.ReadAllText(saveFileName);
+                    Dictionary<string, string>? loadedValues = JsonConvert.DeserializeObject<Dictionary<string, string>>(json);
+                    if (loadedValues == null)
                     {
-                        if (loadedValues[pair.Key] != pair.Value)
+                        ConsoleOutput.WriteLine("Save file is corrupted.", Color.Red);
+                        loadedValues = new Dictionary<string, string>();
+                    }
+                    // Merge loaded values into save values.
+                    foreach (KeyValuePair<string, string> pair in saveValues)
+                    {
+                        if (loadedValues.ContainsKey(pair.Key))
                         {
-                            saveValues[pair.Key] = loadedValues[pair.Key];
+                            if (loadedValues[pair.Key] != pair.Value)
+                            {
+                                saveValues[pair.Key] = loadedValues[pair.Key];
+                            }
+                        }
+                        else
+                        {
+                            saveValues[pair.Key] = pair.Value;
                         }
                     }
-                    else
-                    {
-                        saveValues[pair.Key] = pair.Value;
-                    }
+                    // Save the new values.
+                    Save();
                 }
-                // Save the new values.
-                Save();
+                else
+                {
+                    ConsoleOutput.WriteLine("Failed to load save file.", Color.Red);
+                }
                 return true;
             }
             catch(Exception e)

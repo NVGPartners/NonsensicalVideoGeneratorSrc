@@ -33,6 +33,7 @@ namespace NonsensicalVideoGenerator
         private int _musicActive = 0;
         public UserInterface()
         {
+            ConsoleOutput.WriteLine("Creating new UserInterface instance...");
             _graphics = new GraphicsDeviceManager(this);
             Content.RootDirectory = "Content";
             IsMouseVisible = true;
@@ -56,9 +57,11 @@ namespace NonsensicalVideoGenerator
         }
         protected override void Initialize()
         {
+            ConsoleOutput.WriteLine("Starting initialization for v" + Global.productVersion + "...");
             try
             {
                 SteamManager.Initialize();
+                ConsoleOutput.WriteLine("SteamManager initialized.");
             }
             catch(Exception ex)
             {
@@ -70,20 +73,21 @@ namespace NonsensicalVideoGenerator
             gameForm.DragEnter += new DragEventHandler(DragEnter);
             gameForm.DragDrop += new DragEventHandler(DragDrop);
             gameForm.DragLeave += new EventHandler(DragLeave);
+            ConsoleOutput.WriteLine("Form supports drag and drop.");
             // Set window title.
             Window.Title = "Nonsensical Video Generator";
             // Disable anti-aliasing.
             _graphics.PreferMultiSampling = false;
             GraphicsDevice.SamplerStates[0] = SamplerState.PointClamp;
             // Set screen resolution.
+            ConsoleOutput.WriteLine("Setting screen resolution...");
             int scale = int.Parse(SaveData.saveValues["ScreenScale"]);
             _graphics.PreferredBackBufferWidth = (int)(int.Parse(SaveData.saveValues["ScreenWidth"]) * scale);
             _graphics.PreferredBackBufferHeight = (int)(int.Parse(SaveData.saveValues["ScreenHeight"]) * scale);
             _graphics.ApplyChanges();
-            ConsoleOutput.Clear();
-            // Load all screens.
+            ConsoleOutput.WriteLine("Screen resolution set.");
             ScreenManager.LoadScreens();
-            ConsoleOutput.WriteLine("Initialization complete for v" + Global.productVersion + ".");
+            ConsoleOutput.WriteLine("Initialization complete.");
             base.Initialize();
         }
         protected override void LoadContent()
@@ -114,7 +118,12 @@ namespace NonsensicalVideoGenerator
         }
         protected override void Update(GameTime gameTime)
         {
-            SteamManager.Update();
+            try
+            {
+                if(SteamManager.initialized)
+                    SteamManager.Update();
+            }
+            catch {}
             FramePlayer.Update(gameTime);
             // Play music after 500ms.
             if(gameTime.TotalGameTime.TotalMilliseconds > Global.readyTime + 2500 && Global.ready)
@@ -198,7 +207,8 @@ namespace NonsensicalVideoGenerator
         protected override void OnExiting(object sender, EventArgs args)
         {
             base.OnExiting(sender, args);
-            SteamManager.Shutdown();
+            if(SteamManager.initialized)
+                SteamManager.Shutdown();
         }
     }
 }

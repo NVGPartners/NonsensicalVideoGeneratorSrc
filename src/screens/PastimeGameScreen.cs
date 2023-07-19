@@ -207,17 +207,31 @@ namespace NonsensicalVideoGenerator
         public void Show()
         {
             toggle = true;
-            offset = new(GlobalGraphics.scaledWidth, 0); // from bottom to top
-            tween.TweenTo(this, t => t.offset, new Vector2(0, 0), 0.5f)
-                .Easing(EasingFunctions.ExponentialOut);
+            if(!bool.Parse(SaveData.saveValues["DisableMotion"]))
+            {
+                offset = new(GlobalGraphics.scaledWidth, 0); // from bottom to top
+                tween.TweenTo(this, t => t.offset, new Vector2(0, 0), 0.5f)
+                    .Easing(EasingFunctions.ExponentialOut);
+            }
+            else
+            {
+                offset = new(0, 0);
+            }
             showing = true;
         }
         public void Hide()
         {
             toggle = false;
-            offset = new(0, 0); // from top to bottom
-            tween.TweenTo(this, t => t.offset, new Vector2(GlobalGraphics.scaledWidth, 0), 0.5f)
-                .Easing(EasingFunctions.ExponentialOut);
+            if(!bool.Parse(SaveData.saveValues["DisableMotion"]))
+            {
+                offset = new(0, 0); // from top to bottom
+                tween.TweenTo(this, t => t.offset, new Vector2(GlobalGraphics.scaledWidth, 0), 0.5f)
+                    .Easing(EasingFunctions.ExponentialOut);
+            }
+            else
+            {
+                offset = new(GlobalGraphics.scaledWidth, 0);
+            }
             hiding = true;
         }
         public bool Toggle(bool useBool = false, bool toggleTo = false)
@@ -312,8 +326,11 @@ namespace NonsensicalVideoGenerator
                         player.dead = true;
                         // timer in 0.05 seconds
                         timer = (float)gameTime.TotalGameTime.TotalMilliseconds + 50f;
-                        tween.TweenTo(this, t => t.offset, new Vector2(0, GlobalGraphics.Scale(10)), 0.01f)
-                            .Easing(EasingFunctions.Linear);
+                        if(!bool.Parse(SaveData.saveValues["DisableMotion"]))
+                        {
+                            tween.TweenTo(this, t => t.offset, new Vector2(0, GlobalGraphics.Scale(10)), 0.01f)
+                                .Easing(EasingFunctions.Linear);
+                        }
                         phase = 1;
                         break;
                     }
@@ -348,8 +365,11 @@ namespace NonsensicalVideoGenerator
                         player.dead = true;
                         // timer in 0.05 seconds
                         timer = (float)gameTime.TotalGameTime.TotalMilliseconds + 50f;
-                        tween.TweenTo(this, t => t.offset, new Vector2(0, GlobalGraphics.Scale(10)), 0.01f)
-                            .Easing(EasingFunctions.Linear);
+                        if(!bool.Parse(SaveData.saveValues["DisableMotion"]))
+                        {
+                            tween.TweenTo(this, t => t.offset, new Vector2(0, GlobalGraphics.Scale(10)), 0.01f)
+                                .Easing(EasingFunctions.Linear);
+                        }
                         phase = 1;
                     }
                 }
@@ -362,39 +382,64 @@ namespace NonsensicalVideoGenerator
                 {
                     case 1:
                         if(!hiding && !showing)
-                            tween.TweenTo(this, t => t.offset, new Vector2(0, -GlobalGraphics.Scale(10)), 0.05f)
-                                .Easing(EasingFunctions.Linear);
+                        {
+                            if(!bool.Parse(SaveData.saveValues["DisableMotion"]))
+                            {
+                                tween.TweenTo(this, t => t.offset, new Vector2(0, -GlobalGraphics.Scale(10)), 0.05f)
+                                    .Easing(EasingFunctions.Linear);
+                            }
+                        }
                         phase = 2;
                         timer = (float)gameTime.TotalGameTime.TotalMilliseconds + 50f;
                         break;
                     case 2:
                         if(!hiding && !showing)
-                            tween.TweenTo(this, t => t.offset, new Vector2(0, GlobalGraphics.Scale(10)), 0.05f)
-                            .Easing(EasingFunctions.Linear);
+                        {
+                            if(!bool.Parse(SaveData.saveValues["DisableMotion"]))
+                            {
+                                tween.TweenTo(this, t => t.offset, new Vector2(0, GlobalGraphics.Scale(10)), 0.05f)
+                                    .Easing(EasingFunctions.Linear);
+                            }
+                        }
                         timer = (float)gameTime.TotalGameTime.TotalMilliseconds + 50f;
                         phase = 6;
                         break;
                     case 6:
                         if(!hiding && !showing)
-                            tween.TweenTo(this, t => t.offset, new Vector2(0, GlobalGraphics.Scale(0)), 0.05f)
-                            .Easing(EasingFunctions.ExponentialInOut);
+                        {
+                            if(!bool.Parse(SaveData.saveValues["DisableMotion"]))
+                            {
+                                tween.TweenTo(this, t => t.offset, new Vector2(0, GlobalGraphics.Scale(0)), 0.05f)
+                                    .Easing(EasingFunctions.ExponentialInOut);
+                            }
+                        }
                         timer = (float)gameTime.TotalGameTime.TotalMilliseconds + 50f;
                         phase = 0;
                         break;
                     case 3:
                         if(!hiding && !showing)
-                            tween.TweenTo(this, t => t.offset, new Vector2(GlobalGraphics.Scale(-320*2), GlobalGraphics.Scale(0)), 0.5f)
-                            .Easing(EasingFunctions.ExponentialInOut);
+                        {
+                            if(!bool.Parse(SaveData.saveValues["DisableMotion"]))
+                            {
+                                tween.TweenTo(this, t => t.offset, new Vector2(GlobalGraphics.Scale(-320*2), GlobalGraphics.Scale(0)), 0.5f)
+                                    .Easing(EasingFunctions.ExponentialInOut);
+                            }
+                        }
                         phase = 4;
                         timer = (float)gameTime.TotalGameTime.TotalMilliseconds + 500f;
                         break;
                     case 4:
                         player = new PastimeGamePlayer();
                         obstacles.Clear();
-                        offset = new Vector2(GlobalGraphics.Scale(320*2), GlobalGraphics.Scale(0));
                         if(!hiding && !showing)
-                            tween.TweenTo(this, t => t.offset, new Vector2(GlobalGraphics.Scale(0), GlobalGraphics.Scale(0)), 0.5f)
-                            .Easing(EasingFunctions.ExponentialInOut);
+                        {
+                            if(!bool.Parse(SaveData.saveValues["DisableMotion"]))
+                            {
+                                offset = new Vector2(GlobalGraphics.Scale(320*2), GlobalGraphics.Scale(0));
+                                tween.TweenTo(this, t => t.offset, new Vector2(GlobalGraphics.Scale(0), GlobalGraphics.Scale(0)), 0.5f)
+                                    .Easing(EasingFunctions.ExponentialInOut);
+                            }
+                        }
                         phase = 5;
                         timer = (float)gameTime.TotalGameTime.TotalMilliseconds + 500f;
                         break;

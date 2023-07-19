@@ -1,5 +1,11 @@
 function Query()
-    return {}
+    return {
+        {
+            ["name"] = "Display Name",
+            ["value"] = "%prettyname%",
+            ["type"] = "label"
+        },
+    }
 end
 
 function StartGeneration(options, pluginSettings, functions)

@@ -39,17 +39,31 @@ namespace NonsensicalVideoGenerator
         public void Show()
         {
             toggle = true;
-            offset = new(0, GlobalGraphics.Scale(240)); // from left to right
-            tween.TweenTo(this, t => t.offset, new Vector2(0, 0), 0.5f)
-                .Easing(EasingFunctions.ExponentialOut);
+            if(!bool.Parse(SaveData.saveValues["DisableMotion"]))
+            {
+                offset = new(0, GlobalGraphics.Scale(240)); // from left to right
+                tween.TweenTo(this, t => t.offset, new Vector2(0, 0), 0.5f)
+                    .Easing(EasingFunctions.ExponentialOut);
+            }
+            else
+            {
+                offset = new(0, 0);
+            }
             showing = true;
         }
         public void Hide()
         {
             toggle = false;
-            offset = new(0, 0); // from right to left
-            tween.TweenTo(this, t => t.offset, new Vector2(0, GlobalGraphics.Scale(240)), 0.5f)
-                .Easing(EasingFunctions.ExponentialOut);
+            if(!bool.Parse(SaveData.saveValues["DisableMotion"]))
+            {
+                offset = new(0, 0); // from right to left
+                tween.TweenTo(this, t => t.offset, new Vector2(0, GlobalGraphics.Scale(240)), 0.5f)
+                    .Easing(EasingFunctions.ExponentialOut);
+            }
+            else
+            {
+                offset = new(0, GlobalGraphics.Scale(240));
+            }
             hiding = true;
         }
         public bool Toggle(bool useBool = false, bool toggleTo = false)
@@ -122,7 +136,7 @@ namespace NonsensicalVideoGenerator
                                     break;
                                 case 1:
                                     // Steam
-                                    tooltip = "Find us on Steam!";
+                                    tooltip = "View the Steam Workshop!";
                                     break;
                                 case 2:
                                     // GitHub
@@ -141,7 +155,7 @@ namespace NonsensicalVideoGenerator
                                         break;
                                     case 1:
                                         // Steam
-                                        psi.FileName = "https://store.steampowered.com/app/2516360/Nonsensical_Video_Generator/";
+                                        psi.FileName = "https://steamcommunity.com/app/2516360/workshop/";
                                         break;
                                     case 2:
                                         // GitHub

@@ -11,6 +11,7 @@ using System.Threading;
 using System.Linq;
 using System.Text.RegularExpressions;
 using System.Reflection;
+using Steamworks;
 
 namespace NonsensicalVideoGenerator
 {
@@ -130,6 +131,15 @@ namespace NonsensicalVideoGenerator
                         progressText = "Completed!";
                         progressState = ProgressState.Completed;
                         generatorActive = false;
+                        // award achievement
+                        try
+                        {
+                            if (SteamManager.initialized && Global.canAchieve)
+                            {
+                                ConsoleOutput.WriteLine("Awarding achievement: ACHIEVEMENT_FIRST_RENDER", Color.LightBlue);
+                                SteamUserStats.SetAchievement("ACHIEVEMENT_FIRST_RENDER");
+                            }
+                        } catch {}
                         GlobalContent.GetSound("RenderComplete").Play(int.Parse(SaveData.saveValues["SoundEffectVolume"]) / 100f, 0f, 0f);
                         /*
                         // Open the video in the default video player if the user has that option enabled.

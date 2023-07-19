@@ -29,6 +29,28 @@ namespace NonsensicalVideoGenerator
         public void LoadContent(ContentManager contentManager, GraphicsDevice graphicsDevice)
         {
             // Add dials
+            controller.Add("MotionDisable", new Switch("Disable Motion", "Turns off screen tweening motion.", new Vector2(139, 60+19*6), (int i) => {
+                bool switchState = (i & 256) != 0;
+                if((i & 2) != 0)
+                {
+                    string oldValue = SaveData.saveValues["DisableMotion"];
+                    SaveData.saveValues["DisableMotion"] = switchState.ToString().ToLower();
+                    if(oldValue != SaveData.saveValues["DisableMotion"])
+                        SaveData.Save();
+                }
+                return switchState;
+            }, SaveData.saveValues["DisableMotion"] == "true"));
+            controller.Add("BGDisable", new Switch("Hide Animated Background", "Hides animated tiles.", new Vector2(139, 60+19*5), (int i) => {
+                bool switchState = (i & 256) != 0;
+                if((i & 2) != 0)
+                {
+                    string oldValue = SaveData.saveValues["HideAnimatedBackground"];
+                    SaveData.saveValues["HideAnimatedBackground"] = switchState.ToString().ToLower();
+                    if(oldValue != SaveData.saveValues["HideAnimatedBackground"])
+                        SaveData.Save();
+                }
+                return switchState;
+            }, SaveData.saveValues["HideAnimatedBackground"] == "true"));
             controller.Add("BGSaturation", new TextEntry("Background Saturation", "Adjust color in the animated background, from 0-255.", SaveData.saveValues["BackgroundSaturation"], new Vector2(139, 60+19*4), 24, 3, 1, (int i) => {
                 int oldValue = int.Parse(SaveData.saveValues["BackgroundSaturation"]);
                 // Range: 0-255
@@ -41,11 +63,11 @@ namespace NonsensicalVideoGenerator
                     SaveData.Save();
                 return false;
             }));
-            controller.Add("Scale", new TextEntry("Screen Resolution Multiplier", "A restart will be performed when set.", SaveData.saveValues["ScreenScale"], new Vector2(139, 60+19*3), 24, 3, 1, (int i) => {
+            controller.Add("Scale", new TextEntry("Screen Resolution Multiplier", "2, 3, or 4. A restart will be performed.", SaveData.saveValues["ScreenScale"], new Vector2(139, 60+19*3), 24, 3, 1, (int i) => {
                 int oldValue = int.Parse(SaveData.saveValues["ScreenScale"]);
                 // Range: 1-4
-                if(int.Parse(controller.interactables["Scale"].Tooltip) < 1)
-                    controller.interactables["Scale"].Tooltip = "1";
+                if(int.Parse(controller.interactables["Scale"].Tooltip) < 2)
+                    controller.interactables["Scale"].Tooltip = "2";
                 if(int.Parse(controller.interactables["Scale"].Tooltip) > 4)
                     controller.interactables["Scale"].Tooltip = "4";
                 SaveData.saveValues["ScreenScale"] = controller.interactables["Scale"].Tooltip;
@@ -59,12 +81,15 @@ namespace NonsensicalVideoGenerator
                     startInfo.Verb = "open";
                     Process.Start(startInfo);
                     // Close software
-                    SteamAPI.Shutdown();
+                    try
+                    {
+                        SteamAPI.Shutdown();
+                    } catch {}
                     UserInterface.instance.Exit();
                 }
                 return false;
             }));
-            controller.Add("VideoVolume", new TextEntry("Media Playback Volume", "In-app media volume level.", SaveData.saveValues["VideoVolume"], new Vector2(139, 60+19*2), 24, 3, 1, (int i) => {
+            controller.Add("VideoVolume", new TextEntry("Media Playback Volume", "In-app media volume level, from 0-100.", SaveData.saveValues["VideoVolume"], new Vector2(139, 60+19*2), 24, 3, 1, (int i) => {
                 string oldValue = SaveData.saveValues["VideoVolume"];
                 if(int.Parse(controller.interactables["VideoVolume"].Tooltip) < 0)
                     controller.interactables["VideoVolume"].Tooltip = "0";
@@ -75,7 +100,7 @@ namespace NonsensicalVideoGenerator
                     SaveData.Save();
                 return false;
             }));
-            controller.Add("SFXVolume", new TextEntry("Sound Effect Volume", "Sound effect volume level.", SaveData.saveValues["SoundEffectVolume"], new Vector2(139, 60+19), 24, 3, 1, (int i) => {
+            controller.Add("SFXVolume", new TextEntry("Sound Effect Volume", "Sound effect volume level, from 0-100.", SaveData.saveValues["SoundEffectVolume"], new Vector2(139, 60+19), 24, 3, 1, (int i) => {
                 string oldValue = SaveData.saveValues["SoundEffectVolume"];
                 if(int.Parse(controller.interactables["SFXVolume"].Tooltip) < 0)
                     controller.interactables["SFXVolume"].Tooltip = "0";
@@ -86,7 +111,7 @@ namespace NonsensicalVideoGenerator
                     SaveData.Save();
                 return false;
             }));
-            controller.Add("MusicVolume", new TextEntry("Music Volume", "Background music volume level.", SaveData.saveValues["MusicVolume"], new Vector2(139, 60), 24, 3, 1, (int i) => {
+            controller.Add("MusicVolume", new TextEntry("Music Volume", "Background music volume level, from 0-100.", SaveData.saveValues["MusicVolume"], new Vector2(139, 60), 24, 3, 1, (int i) => {
                 string oldValue = SaveData.saveValues["MusicVolume"];
                 if(int.Parse(controller.interactables["MusicVolume"].Tooltip) < 0)
                     controller.interactables["MusicVolume"].Tooltip = "0";

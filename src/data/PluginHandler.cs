@@ -178,13 +178,7 @@ namespace NonsensicalVideoGenerator
             }
             else
             {
-                // Workshop ID is prepended
-                string key = Path.GetFileName(path);
-                if (workshopId != "")
-                {
-                    key = workshopId + "/" + key;
-                }
-                return key;
+                return Path.GetFileName(path);
             }
         }
         public static bool ValidateInput(string args)
@@ -373,10 +367,6 @@ namespace NonsensicalVideoGenerator
                     {
                         try
                         {
-                            luaScript = new Script();
-                            luaScript.Options.ScriptLoader = new CustomScriptLoader();
-                            luaScript.Options.DebugPrint = (s) => ConsoleOutput.WriteLine(s, Color.DarkCyan);
-                            luaScript.DoFile(path);
                             // Create videoOptions table
                             Table videoOptions = new(luaScript);
                             videoOptions["inputVideo"] = video;
@@ -577,7 +567,7 @@ namespace NonsensicalVideoGenerator
                     }
                     // Moonsharp is used to run Lua plugins in a sandbox.
                     // Steam Workshop plugins are Lua.
-                    luaScript = new Script();
+                    luaScript = new Script(CoreModules.Preset_SoftSandbox);
                     luaScript.Options.ScriptLoader = new CustomScriptLoader();
                     luaScript.Options.DebugPrint = (s) => ConsoleOutput.WriteLine(s, Color.DarkCyan);
                     luaScript.DoFile(path);
@@ -914,8 +904,32 @@ namespace NonsensicalVideoGenerator
             Global.pluginsLoaded = PluginHandler.LoadPlugins();
         }
         public static Callback<DownloadItemResult_t>? downloadItemResult;
+        public static Callback<UserStatsReceived_t>? m_UserStatsReceived;
         public static void LoadWorkshop()
         {
+            if(SteamUserStats.RequestCurrentStats())
+            {
+                // Add callback
+                if(m_UserStatsReceived == null)
+                {
+                    m_UserStatsReceived = Callback<UserStatsReceived_t>.Create((param) => {
+                        if(param.m_eResult != EResult.k_EResultOK)
+                        {
+                            ConsoleOutput.WriteLine("Error getting user stats.", Color.Red);
+                            return;
+                        }
+                        if (param.m_nGameID == SteamUtils.GetAppID().m_AppId)
+                        {
+                            ConsoleOutput.WriteLine("Got user stats.", Color.LightBlue);
+                            Global.canAchieve = true;
+                        }
+                    });
+                }
+            }
+            else
+            {
+                Console.WriteLine("Error requesting user stats.");
+            }
             // Create "plugins\workshop" if they don't exist.
             Directory.CreateDirectory(Path.Combine(pluginPath, "workshop"));
             // Load subscribed workshop items.

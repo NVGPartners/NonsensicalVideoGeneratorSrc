@@ -30,17 +30,31 @@ namespace NonsensicalVideoGenerator
         public void Show()
         {
             toggle = true;
-            offset = new(GlobalGraphics.Scale(-320), 0); // from left to right
-            tween.TweenTo(this, t => t.offset, new Vector2(0, 0), 0.5f)
-                .Easing(EasingFunctions.ExponentialOut);
+            if(!bool.Parse(SaveData.saveValues["DisableMotion"]))
+            {
+                offset = new(GlobalGraphics.Scale(-320), 0); // from left to right
+                tween.TweenTo(this, t => t.offset, new Vector2(0, 0), 0.5f)
+                    .Easing(EasingFunctions.ExponentialOut);
+            }
+            else
+            {
+                offset = new(0, 0);
+            }
             showing = true;
         }
         public void Hide()
         {
             toggle = false;
-            offset = new(0, 0); // from right to left
-            tween.TweenTo(this, t => t.offset, new Vector2(GlobalGraphics.Scale(-320), 0), 0.5f)
-                .Easing(EasingFunctions.ExponentialOut);
+            if(!bool.Parse(SaveData.saveValues["DisableMotion"]))
+            {
+                offset = new(0, 0); // from right to left
+                tween.TweenTo(this, t => t.offset, new Vector2(GlobalGraphics.Scale(-320), 0), 0.5f)
+                    .Easing(EasingFunctions.ExponentialOut);
+            }
+            else
+            {
+                offset = new(GlobalGraphics.Scale(-320), 0);
+            }
             hiding = true;
         }
         public bool Toggle(bool useBool = false, bool toggleTo = false)
@@ -90,35 +104,6 @@ namespace NonsensicalVideoGenerator
             tween.Update((float)gameTime.ElapsedGameTime.TotalSeconds);
             if(hiding || screenType == ScreenType.Hidden)
                 return false;
-            if(handleInput)
-            {
-                //Accessibility.CompatAccessibility(new Rectangle(GlobalGraphics.Scale(4), GlobalGraphics.Scale(7), GlobalGraphics.Scale(81-4), GlobalGraphics.Scale(33-7)));
-                if(MouseInput.MouseState.X >= GlobalGraphics.Scale(4) && MouseInput.MouseState.X <= GlobalGraphics.Scale(81) && MouseInput.MouseState.Y >= GlobalGraphics.Scale(7) && MouseInput.MouseState.Y <= GlobalGraphics.Scale(33))
-                {
-                    if(MouseInput.LastMouseState.LeftButton == ButtonState.Released && MouseInput.MouseState.LeftButton == ButtonState.Pressed)
-                    {
-                        if(Global.pluginsLoaded || !UpdateManager.ffmpegInstalled || !UpdateManager.ffprobeInstalled)
-                        {
-                            // Play sound
-                            GlobalContent.GetSound("Select").Play(int.Parse(SaveData.saveValues["SoundEffectVolume"]) / 100f, 0f, 0f); 
-                            Hide();
-                            ScreenManager.PushNavigation("Pastime Game");
-                            ScreenManager.GetScreen<PastimeGameScreen>("Pastime Game")?.Show();
-                            ScreenManager.GetScreen<HeaderScreen>("Header")?.Hide();
-                            ScreenManager.GetScreen<ContentScreen>("Content")?.Hide();
-                            ScreenManager.GetScreen<VideoScreen>("Video")?.Hide();
-                            ScreenManager.GetScreen<MenuScreen>("Main Menu")?.Hide();
-                            ScreenManager.GetScreen<TutorialScreen>("Initial Setup")?.Hide();
-                            ScreenManager.GetScreen<SocialScreen>("Socials")?.Hide();
-                        }
-                        else
-                        {
-                            GlobalContent.GetSound("Error").Play(int.Parse(SaveData.saveValues["SoundEffectVolume"]) / 100f, 0f, 0f); 
-                        }
-                        return true;
-                    }
-                }
-            }
             return false;
         }
         public void Draw(GameTime gameTime, SpriteBatch spriteBatch)

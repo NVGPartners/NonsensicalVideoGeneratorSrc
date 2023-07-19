@@ -48,7 +48,7 @@ end
 -- Default settings
 local randomTimeMin = 0.15
 local randomTimeMax = 0.2
-local noMusicChance = 50
+local noMusicChance = 25
 local musicSeekStart = 1
 local musicSeekEnd = 5
 

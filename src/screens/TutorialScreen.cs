@@ -37,17 +37,31 @@ namespace NonsensicalVideoGenerator
         public void Show()
         {
             toggle = true;
-            offset = new(0, GlobalGraphics.Scale(240)); // from bottom to top
-            tween.TweenTo(this, t => t.offset, new Vector2(0, 0), 0.5f)
-                .Easing(EasingFunctions.ExponentialOut);
+            if(!bool.Parse(SaveData.saveValues["DisableMotion"]))
+            {
+                offset = new(0, GlobalGraphics.Scale(240)); // from bottom to top
+                tween.TweenTo(this, t => t.offset, new Vector2(0, 0), 0.5f)
+                    .Easing(EasingFunctions.ExponentialOut);
+            }
+            else
+            {
+                offset = new(0, 0);
+            }
             showing = true;
         }
         public void Hide()
         {
             toggle = false;
-            offset = new(0, 0); // from top to bottom
-            tween.TweenTo(this, t => t.offset, new Vector2(0, GlobalGraphics.Scale(240)), 0.5f)
-                .Easing(EasingFunctions.ExponentialOut);
+            if(!bool.Parse(SaveData.saveValues["DisableMotion"]))
+            {
+                offset = new(0, 0); // from top to bottom
+                tween.TweenTo(this, t => t.offset, new Vector2(0, GlobalGraphics.Scale(240)), 0.5f)
+                    .Easing(EasingFunctions.ExponentialOut);
+            }
+            else
+            {
+                offset = new(0, GlobalGraphics.Scale(240));
+            }
             hiding = true;
         }
         public bool Toggle(bool useBool = false, bool toggleTo = false)
@@ -254,6 +268,20 @@ namespace NonsensicalVideoGenerator
                             }
                             spriteBatch.DrawString(GlobalGraphics.fontMunroSmall, "Downloading...", new Vector2(GlobalGraphics.Scale(offset+8+16+320*i), GlobalGraphics.Scale(60+offsetText)), Color.BlueViolet);
                         }
+                        if(tutorialText[i][j].Contains("Extracting..."))
+                        {
+                            int offset = 0;
+                            switch(j)
+                            {
+                                case 3:
+                                    offset = 43;
+                                    break;
+                                case 4:
+                                    offset = 47;
+                                    break;
+                            }
+                            spriteBatch.DrawString(GlobalGraphics.fontMunroSmall, "Extracting...", new Vector2(GlobalGraphics.Scale(offset+8+16+320*i), GlobalGraphics.Scale(60+offsetText)), Color.BlueViolet);
+                        }
                         if(tutorialText[i][j].Contains("Using system PATH"))
                         {
                             int offset = 0;
@@ -399,41 +427,10 @@ namespace NonsensicalVideoGenerator
                 {
                     case 2: // left click
                         // Get dependencies.
-                        GlobalContent.GetSound("Option").Play(int.Parse(SaveData.saveValues["SoundEffectVolume"]) / 100f, 0f, 0f);
-                        if(!check)
-                        {
-                            for(int h = 0; h < baseTutorialText.Length; h++)
-                            {
-                                tutorialText[h] = new List<string>();
-                                for(int j = 0; j < baseTutorialText[h].Count; j++)
-                                {
-                                    tutorialText[h].Add(baseTutorialText[h][j]);
-                                }
-                            }
-                            check = true;
-                            dependencyWorker = new BackgroundWorker();
-                            dependencyWorker.DoWork += DependencyCheckThread;
-                            dependencyWorker.RunWorkerAsync();
-                        }
-                        tween.TweenTo(this, t => t.offset, new Vector2(GlobalGraphics.Scale(-320), 0), 0.5f)
-                            .Easing(EasingFunctions.ExponentialOut);
-                        return true;
-                }
-                return false;
-            }));
-            // PAGE 2
-            controller.Add("Button2", new Button("Next Page", "", new Vector2(237+32+320+2, 217+12-6), (int i) => {
-                switch(i)
-                {
-                    case 2: // left click
-                        if(UpdateManager.ffmpegInstalled && UpdateManager.ffprobeInstalled)
+                        if(!Global.generatorFactory.progressText.ToLower().Contains("extract")
+                            && !Global.generatorFactory.progressText.ToLower().Contains("downloading"))
                         {
                             GlobalContent.GetSound("Option").Play(int.Parse(SaveData.saveValues["SoundEffectVolume"]) / 100f, 0f, 0f);
-                            tween.TweenTo(this, t => t.offset, new Vector2(GlobalGraphics.Scale(-640), 0), 0.5f)
-                                .Easing(EasingFunctions.ExponentialOut);
-                        }
-                        else
-                        {
                             if(!check)
                             {
                                 for(int h = 0; h < baseTutorialText.Length; h++)
@@ -449,6 +446,67 @@ namespace NonsensicalVideoGenerator
                                 dependencyWorker.DoWork += DependencyCheckThread;
                                 dependencyWorker.RunWorkerAsync();
                             }
+                            if(!bool.Parse(SaveData.saveValues["DisableMotion"]))
+                            {
+                                tween.TweenTo(this, t => t.offset, new Vector2(GlobalGraphics.Scale(-320), 0), 0.5f)
+                                    .Easing(EasingFunctions.ExponentialOut);
+                            }
+                            else
+                            {
+                                offset = new Vector2(GlobalGraphics.Scale(-320), 0);
+                            }
+                        }
+                        else
+                        {
+                            GlobalContent.GetSound("Error").Play(int.Parse(SaveData.saveValues["SoundEffectVolume"]) / 100f, 0f, 0f);
+                        }
+                        return true;
+                }
+                return false;
+            }));
+            // PAGE 2
+            controller.Add("Button2", new Button("Next Page", "", new Vector2(237+32+320+2, 217+12-6), (int i) => {
+                switch(i)
+                {
+                    case 2: // left click
+                        if(!Global.generatorFactory.progressText.ToLower().Contains("extract")
+                            && !Global.generatorFactory.progressText.ToLower().Contains("downloading"))
+                        {
+                            if(UpdateManager.ffmpegInstalled && UpdateManager.ffprobeInstalled)
+                            {
+                                GlobalContent.GetSound("Option").Play(int.Parse(SaveData.saveValues["SoundEffectVolume"]) / 100f, 0f, 0f);
+                                if(!bool.Parse(SaveData.saveValues["DisableMotion"]))
+                                {
+                                    tween.TweenTo(this, t => t.offset, new Vector2(GlobalGraphics.Scale(-640), 0), 0.5f)
+                                        .Easing(EasingFunctions.ExponentialOut);
+                                }
+                                else
+                                {
+                                    offset = new Vector2(GlobalGraphics.Scale(-640), 0);
+                                }
+                            }
+                            else
+                            {
+                                if(!check)
+                                {
+                                    for(int h = 0; h < baseTutorialText.Length; h++)
+                                    {
+                                        tutorialText[h] = new List<string>();
+                                        for(int j = 0; j < baseTutorialText[h].Count; j++)
+                                        {
+                                            tutorialText[h].Add(baseTutorialText[h][j]);
+                                        }
+                                    }
+                                    check = true;
+                                    dependencyWorker = new BackgroundWorker();
+                                    dependencyWorker.DoWork += DependencyCheckThread;
+                                    dependencyWorker.RunWorkerAsync();
+                                }
+                                GlobalContent.GetSound("Error").Play(int.Parse(SaveData.saveValues["SoundEffectVolume"]) / 100f, 0f, 0f);
+                            }
+                        }
+                        else
+                        {
                             GlobalContent.GetSound("Error").Play(int.Parse(SaveData.saveValues["SoundEffectVolume"]) / 100f, 0f, 0f);
                         }
                         return true;
@@ -459,9 +517,24 @@ namespace NonsensicalVideoGenerator
                 switch(i)
                 {
                     case 2: // left click
-                        GlobalContent.GetSound("Option").Play(int.Parse(SaveData.saveValues["SoundEffectVolume"]) / 100f, 0f, 0f);
-                        tween.TweenTo(this, t => t.offset, new Vector2(GlobalGraphics.Scale(0), 0), 0.5f)
-                            .Easing(EasingFunctions.ExponentialOut);
+                        if(!Global.generatorFactory.progressText.ToLower().Contains("extract")
+                            && !Global.generatorFactory.progressText.ToLower().Contains("downloading"))
+                        {
+                            GlobalContent.GetSound("Option").Play(int.Parse(SaveData.saveValues["SoundEffectVolume"]) / 100f, 0f, 0f);
+                            if(!bool.Parse(SaveData.saveValues["DisableMotion"]))
+                            {
+                                tween.TweenTo(this, t => t.offset, new Vector2(GlobalGraphics.Scale(0), 0), 0.5f)
+                                    .Easing(EasingFunctions.ExponentialOut);
+                            }
+                            else
+                            {
+                                offset = new Vector2(GlobalGraphics.Scale(0), 0);
+                            }
+                        }
+                        else
+                        {
+                            GlobalContent.GetSound("Error").Play(int.Parse(SaveData.saveValues["SoundEffectVolume"]) / 100f, 0f, 0f);
+                        }
                         return true;
                 }
                 return false;
@@ -470,15 +543,69 @@ namespace NonsensicalVideoGenerator
                 switch(i)
                 {
                     case 2: // left click
+                        Global.generatorFactory.progressText = "Starting download...";
+
                         GlobalContent.GetSound("Option").Play(int.Parse(SaveData.saveValues["SoundEffectVolume"]) / 100f, 0f, 0f);
                         tutorialText[1][3] = " - ffmpeg: Downloading...";
                         tutorialText[1][4] = " - ffprobe: Downloading...";
                         controller.Remove("ButtonFFmpeg");
-                        ffmpegDownloadWorker = new BackgroundWorker();
-                        ffmpegDownloadWorker.DoWork += (object sender, DoWorkEventArgs e) => {
-                            DownloadFFmpegThread();
-                        };
-                        ffmpegDownloadWorker.RunWorkerAsync();
+
+                        // Create temp folder
+                        Directory.CreateDirectory(Path.Combine(Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location), "temp"));
+
+                        // Download ffmpeg essential release from gyan.dev
+                        System.Uri url = new("https://www.gyan.dev/ffmpeg/builds/ffmpeg-release-essentials.zip");
+                        string path = Path.Combine(Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location), "temp", "ffmpeg-release-essentials.zip");
+
+                        // Delete file if it exists
+                        if(File.Exists(Path.Combine(Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location), "temp", "ffmpeg-release-essentials.zip")))
+                        {
+                            File.Delete(Path.Combine(Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location), "temp", "ffmpeg-release-essentials.zip"));
+                        }
+                        
+                        // Download ffmpeg
+                        try
+                        {
+                            using (WebClient client = new WebClient())
+                            {
+                                client.DownloadProgressChanged += (sender, e) => {
+                                    Global.generatorFactory.progressText = "Downloading... (" + e.ProgressPercentage + "%)";
+                                    tutorialText[1][3] = " - ffmpeg: Downloading... (" + e.ProgressPercentage + "%)";
+                                    tutorialText[1][4] = " - ffprobe: Downloading... (" + e.ProgressPercentage + "%)";
+                                };
+                                client.DownloadFileCompleted += (sender, e) => {
+                                    Global.generatorFactory.progressText = "Extracting...";
+                                    tutorialText[1][3] = " - ffmpeg: Extracting...";
+                                    tutorialText[1][4] = " - ffprobe: Extracting...";
+                                    ffmpegDownloadWorker = new BackgroundWorker();
+                                    ffmpegDownloadWorker.DoWork += (object sender, DoWorkEventArgs e) => {
+                                        DownloadFFmpegThread();
+                                    };
+                                    ffmpegDownloadWorker.RunWorkerAsync();
+                                };
+                                client.DownloadFileAsync(url, path);
+                            }
+                        }
+                        catch
+                        {
+                            ConsoleOutput.WriteLine("Failed to download ffmpeg-release-essentials.zip", Color.Red);
+                            // Re-scan for ffmpeg
+                            for(int h = 0; h < baseTutorialText.Length; h++)
+                            {
+                                tutorialText[h] = new List<string>();
+                                for(int j = 0; j < baseTutorialText[h].Count; j++)
+                                {
+                                    tutorialText[h].Add(baseTutorialText[h][j]);
+                                }
+                            }
+                            check = true;
+                            dependencyWorker = new BackgroundWorker();
+                            dependencyWorker.DoWork += DependencyCheckThread;
+                            dependencyWorker.RunWorkerAsync();
+                            Global.generatorFactory.progressText = "Failed to download.";
+                            // Play sound effect
+                            GlobalContent.GetSound("Error").Play(int.Parse(SaveData.saveValues["SoundEffectVolume"]) / 100f, 0f, 0f);
+                        }
                         return true;
                 }
                 return false;
@@ -488,9 +615,21 @@ namespace NonsensicalVideoGenerator
                 switch(i)
                 {
                     case 2: // left click
-                        GlobalContent.GetSound("Option").Play(int.Parse(SaveData.saveValues["SoundEffectVolume"]) / 100f, 0f, 0f);
-                        tween.TweenTo(this, t => t.offset, new Vector2(GlobalGraphics.Scale(-320), 0), 0.5f)
-                            .Easing(EasingFunctions.ExponentialOut);
+                        // Get dependencies.
+                        if(!Global.generatorFactory.progressText.ToLower().Contains("extract")
+                            && !Global.generatorFactory.progressText.ToLower().Contains("downloading"))
+                        {
+                            GlobalContent.GetSound("Option").Play(int.Parse(SaveData.saveValues["SoundEffectVolume"]) / 100f, 0f, 0f);
+                            if(!bool.Parse(SaveData.saveValues["DisableMotion"]))
+                            {
+                                tween.TweenTo(this, t => t.offset, new Vector2(GlobalGraphics.Scale(-320), 0), 0.5f)
+                                    .Easing(EasingFunctions.ExponentialOut);
+                            }
+                            else
+                            {
+                                offset = new Vector2(GlobalGraphics.Scale(-320), 0);
+                            }
+                        }
                         return true;
                 }
                 return false;
@@ -499,24 +638,36 @@ namespace NonsensicalVideoGenerator
                 switch(i)
                 {
                     case 2: // left click
-                        GlobalContent.GetSound("Option").Play(int.Parse(SaveData.saveValues["SoundEffectVolume"]) / 100f, 0f, 0f);
-                        if(!check3)
+                        if(!Global.generatorFactory.progressText.ToLower().Contains("extract")
+                            && !Global.generatorFactory.progressText.ToLower().Contains("downloading"))
                         {
-                            check3 = true;
-                            SaveData.Save();
-                            GlobalContent.GetSound("Back").Play(int.Parse(SaveData.saveValues["SoundEffectVolume"]) / 100f, 0f, 0f);
-                            toggle = false;
-                            tween.TweenTo(this, t => t.offset, new Vector2(GlobalGraphics.Scale(-640), GlobalGraphics.Scale(240)), 0.5f)
-                                .Easing(EasingFunctions.ExponentialOut);
-                            hiding = true;
-                            ScreenManager.PushNavigation("Main Menu");
-                            ScreenManager.GetScreen<MenuScreen>("Main Menu")?.Show();
-                            ScreenManager.PushNavigation("Video");
-                            ScreenManager.GetScreen<VideoScreen>("Video")?.Show();
-                            ScreenManager.PushNavigation("Content");
-                            ScreenManager.GetScreen<ContentScreen>("Content")?.Show();
-                            ScreenManager.PushNavigation("Socials");
-                            ScreenManager.GetScreen<SocialScreen>("Socials")?.Show();
+                            GlobalContent.GetSound("Option").Play(int.Parse(SaveData.saveValues["SoundEffectVolume"]) / 100f, 0f, 0f);
+                            if(!check3)
+                            {
+                                check3 = true;
+                                SaveData.Save();
+                                GlobalContent.GetSound("Back").Play(int.Parse(SaveData.saveValues["SoundEffectVolume"]) / 100f, 0f, 0f);
+                                toggle = false;
+                                if(!bool.Parse(SaveData.saveValues["DisableMotion"]))
+                                {
+                                    tween.TweenTo(this, t => t.offset, new Vector2(GlobalGraphics.Scale(-640), GlobalGraphics.Scale(240)), 0.5f)
+                                        .Easing(EasingFunctions.ExponentialOut);
+                                }
+                                else
+                                {
+                                    offset = new Vector2(GlobalGraphics.Scale(-640), GlobalGraphics.Scale(240));
+                                }
+                                hiding = true;
+                                FramePlayer.canPlayBgMusic = true;
+                                ScreenManager.PushNavigation("Main Menu");
+                                ScreenManager.GetScreen<MenuScreen>("Main Menu")?.Show();
+                                ScreenManager.PushNavigation("Video");
+                                ScreenManager.GetScreen<VideoScreen>("Video")?.Show();
+                                ScreenManager.PushNavigation("Content");
+                                ScreenManager.GetScreen<ContentScreen>("Content")?.Show();
+                                ScreenManager.PushNavigation("Socials");
+                                ScreenManager.GetScreen<SocialScreen>("Socials")?.Show();
+                            }
                         }
                         return true;
                 }
@@ -553,30 +704,25 @@ namespace NonsensicalVideoGenerator
         }
         public void DownloadFFmpegThread()
         {
-            // Create temp folder
-            Directory.CreateDirectory(Path.Combine(Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location), "temp"));
-
-            // Download ffmpeg essential release from gyan.dev
-            System.Uri url = new("https://www.gyan.dev/ffmpeg/builds/ffmpeg-release-essentials.zip");
             string path = Path.Combine(Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location), "temp", "ffmpeg-release-essentials.zip");
 
-            // Delete file if it exists
-            if(File.Exists(Path.Combine(Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location), "temp", "ffmpeg-release-essentials.zip")))
-            {
-                File.Delete(Path.Combine(Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location), "temp", "ffmpeg-release-essentials.zip"));
-            }
-
-            // Download ffmpeg
-            using (WebClient client = new WebClient())
-            {
-                client.DownloadFile(url, path);
-            }
             // Extract ffmpeg to temp folder
-            ZipFile.ExtractToDirectory(path, Path.Combine(Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location), "temp"), true);
+            try
+            {
+                ZipFile.ExtractToDirectory(path, Path.Combine(Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location), "temp"), true);
+            }
+            catch
+            {
+                ConsoleOutput.WriteLine("Failed to extract ffmpeg-release-essentials.zip", Color.Red);
+            }
 
+            string ffmpegPath = "";
+            string ffmpegBinPath = "";
+            string ffmpegExePath = "";
+            string ffprobeExePath = "";
+            
             // Check to see if ffmpeg-*.*-release-build folder exists inside temp folder
             string[] directories = Directory.GetDirectories(Path.Combine(Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location), "temp"));
-            string ffmpegPath = "";
             foreach(string directory in directories)
             {
                 if(directory.Contains("ffmpeg-"))
@@ -587,40 +733,49 @@ namespace NonsensicalVideoGenerator
             }
             
             // Check to see if bin folder exists inside ffmpeg-*.*-release-build folder
-            directories = Directory.GetDirectories(ffmpegPath);
-            string ffmpegBinPath = "";
-            foreach(string directory in directories)
+            if(ffmpegPath != "")
             {
-                if(directory.Contains("bin"))
+                directories = Directory.GetDirectories(ffmpegPath);
+                foreach(string directory in directories)
                 {
-                    ffmpegBinPath = directory;
-                    break;
+                    if(directory.Contains("bin"))
+                    {
+                        ffmpegBinPath = directory;
+                        break;
+                    }
                 }
             }
 
             // Check to see if ffmpeg.exe exists inside bin folder
-            string[] files = Directory.GetFiles(ffmpegBinPath);
-            string ffmpegExePath = "";
-            string ffprobeExePath = "";
-            foreach(string file in files)
+            if(ffmpegBinPath != "")
             {
-                if(file.Contains("ffmpeg.exe"))
+                string[] files = Directory.GetFiles(ffmpegBinPath);
+                foreach(string file in files)
                 {
-                    ffmpegExePath = file;
-                }
-                else if(file.Contains("ffprobe.exe"))
-                {
-                    ffprobeExePath = file;
-                }
-                if (ffmpegExePath != "" && ffprobeExePath != "")
-                {
-                    break;
+                    if(file.Contains("ffmpeg.exe"))
+                    {
+                        ffmpegExePath = file;
+                    }
+                    else if(file.Contains("ffprobe.exe"))
+                    {
+                        ffprobeExePath = file;
+                    }
+                    if (ffmpegExePath != "" && ffprobeExePath != "")
+                    {
+                        break;
+                    }
                 }
             }
 
-            // Move ffmpeg.exe and ffprobe.exe to the root folder
-            File.Move(ffmpegExePath, Path.Combine(Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location), "ffmpeg.exe"));
-            File.Move(ffprobeExePath, Path.Combine(Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location), "ffprobe.exe"));
+            if(ffmpegExePath != "")
+            {
+                // Move ffmpeg.exe and ffprobe.exe to the root folder
+                File.Move(ffmpegExePath, Path.Combine(Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location), "ffmpeg.exe"));
+            }
+            if(ffprobeExePath != "")
+            {
+                File.Move(ffprobeExePath, Path.Combine(Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location), "ffprobe.exe"));
+            }
 
             // Re-scan for ffmpeg
             for(int h = 0; h < baseTutorialText.Length; h++)
@@ -635,7 +790,18 @@ namespace NonsensicalVideoGenerator
             dependencyWorker = new BackgroundWorker();
             dependencyWorker.DoWork += DependencyCheckThread;
             dependencyWorker.RunWorkerAsync();
-            GlobalContent.GetSound("RenderComplete").Play(int.Parse(SaveData.saveValues["SoundEffectVolume"]) / 100f, 0f, 0f);
+            
+            // Play sound effect
+            if(ffmpegExePath != "" && ffprobeExePath != "")
+            {
+                Global.generatorFactory.progressText = "Download complete.";
+                GlobalContent.GetSound("RenderComplete").Play(int.Parse(SaveData.saveValues["SoundEffectVolume"]) / 100f, 0f, 0f);
+            }
+            else
+            {
+                Global.generatorFactory.progressText = "Failed to download.";
+                GlobalContent.GetSound("Error").Play(int.Parse(SaveData.saveValues["SoundEffectVolume"]) / 100f, 0f, 0f);
+            }
         }
     }
 }

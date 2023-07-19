@@ -31,17 +31,31 @@ namespace NonsensicalVideoGenerator
         public void Show()
         {
             toggle = true;
-            offset = new(GlobalGraphics.Scale(-124), 0); // from left to right
-            tween.TweenTo(this, t => t.offset, new Vector2(0, 0), 0.5f)
-                .Easing(EasingFunctions.ExponentialOut);
+            if(!bool.Parse(SaveData.saveValues["DisableMotion"]))
+            {
+                offset = new(GlobalGraphics.Scale(-124), 0); // from left to right
+                tween.TweenTo(this, t => t.offset, new Vector2(0, 0), 0.5f)
+                    .Easing(EasingFunctions.ExponentialOut);
+            }
+            else
+            {
+                offset = new(0, 0);
+            }
             showing = true;
         }
         public void Hide()
         {
             toggle = false;
-            offset = new(0, 0); // from right to left
-            tween.TweenTo(this, t => t.offset, new Vector2(GlobalGraphics.Scale(-124), 0), 0.5f)
-                .Easing(EasingFunctions.ExponentialOut);
+            if(!bool.Parse(SaveData.saveValues["DisableMotion"]))
+            {
+                offset = new(0, 0); // from right to left
+                tween.TweenTo(this, t => t.offset, new Vector2(GlobalGraphics.Scale(-124), 0), 0.5f)
+                    .Easing(EasingFunctions.ExponentialOut);
+            }
+            else
+            {
+                offset = new(GlobalGraphics.Scale(-124), 0);
+            }
             hiding = true;
         }
         public bool Toggle(bool useBool = false, bool toggleTo = false)
@@ -189,7 +203,6 @@ namespace NonsensicalVideoGenerator
                                     ScreenManager.GetScreen<HeaderScreen>("Header")?.Hide();
                                     ScreenManager.GetScreen<ContentScreen>("Content")?.Hide();
                                     ScreenManager.GetScreen<VideoScreen>("Video")?.Hide();
-                                    ScreenManager.GetScreen<TutorialScreen>("Initial Setup")?.Hide();
                                     ScreenManager.GetScreen<SocialScreen>("Socials")?.Hide();
                                 }
                                 else

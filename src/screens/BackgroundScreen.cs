@@ -157,29 +157,32 @@ namespace NonsensicalVideoGenerator
         {
             // Draw background with new hue.
             spriteBatch.Draw(GlobalGraphics.pixel, new Rectangle(0, 0, GlobalGraphics.scaledWidth, GlobalGraphics.scaledHeight), backgroundColor);
-            // Draw circles indicating misclicks.
-            foreach(MisclickCircle circle in circles)
+            if(!bool.Parse(SaveData.saveValues["HideAnimatedBackground"]))
             {
-                Color circleColor = Color.Black;
-                HSVToRGB((int)hueColor, 50, circle.circleRGB, out circleColor);
-                GlobalGraphics.DrawCircle(spriteBatch, circle.circleClick, circle.circleSize, circleColor);
-            }
-            // Draw the tiled background.
-            // This is done by drawing four background layers, each with a different direction for the illusion of infinite scrolling.
-            Texture2D tile = GlobalContent.GetTexture("Tile");
-            for(int x = 0; x < totalCount; x += tile.Width)
-            {
-                for(int y = 0; y < totalCount; y += tile.Height)
+                // Draw circles indicating misclicks.
+                foreach(MisclickCircle circle in circles)
                 {
-                    spriteBatch.Draw(tile, new Rectangle(GlobalGraphics.Scale(x + scrollX), GlobalGraphics.Scale(y + scrollY), GlobalGraphics.Scale(tile.Width), GlobalGraphics.Scale(tile.Height)), tileColor);
+                    Color circleColor = Color.Black;
+                    HSVToRGB((int)hueColor, 50, circle.circleRGB, out circleColor);
+                    GlobalGraphics.DrawCircle(spriteBatch, circle.circleClick, circle.circleSize, circleColor);
                 }
+                // Draw the tiled background.
+                // This is done by drawing four background layers, each with a different direction for the illusion of infinite scrolling.
+                Texture2D tile = GlobalContent.GetTexture("Tile");
+                for(int x = 0; x < totalCount; x += tile.Width)
+                {
+                    for(int y = 0; y < totalCount; y += tile.Height)
+                    {
+                        spriteBatch.Draw(tile, new Rectangle(GlobalGraphics.Scale(x + scrollX), GlobalGraphics.Scale(y + scrollY), GlobalGraphics.Scale(tile.Width), GlobalGraphics.Scale(tile.Height)), tileColor);
+                    }
+                }
+                // (DEBUG) Draw scroll position.
+                //spriteBatch.DrawString(GlobalContent.GetFont("MunroSmall"), $"{scrollX}, {scrollY}", new Vector2(GlobalGraphics.Scale(16), GlobalGraphics.Scale(16)), Color.White);
+                // (DEBUG) Draw count of circles.
+                //spriteBatch.DrawString(GlobalContent.GetFont("MunroSmall"), $"{circles.Count}", new Vector2(GlobalGraphics.Scale(16), GlobalGraphics.Scale(32)), Color.White);
+                // (DEBUG) Draw mouse click state.
+                // spriteBatch.DrawString(GlobalContent.GetFont("MunroSmall"), $"{mouseReleased}", new Vector2(GlobalGraphics.Scale(16), GlobalGraphics.Scale(48)), Color.White);
             }
-            // (DEBUG) Draw scroll position.
-            //spriteBatch.DrawString(GlobalContent.GetFont("MunroSmall"), $"{scrollX}, {scrollY}", new Vector2(GlobalGraphics.Scale(16), GlobalGraphics.Scale(16)), Color.White);
-            // (DEBUG) Draw count of circles.
-            //spriteBatch.DrawString(GlobalContent.GetFont("MunroSmall"), $"{circles.Count}", new Vector2(GlobalGraphics.Scale(16), GlobalGraphics.Scale(32)), Color.White);
-            // (DEBUG) Draw mouse click state.
-            // spriteBatch.DrawString(GlobalContent.GetFont("MunroSmall"), $"{mouseReleased}", new Vector2(GlobalGraphics.Scale(16), GlobalGraphics.Scale(48)), Color.White);
         }
         public void LoadContent(ContentManager contentManager, GraphicsDevice graphicsDevice)
         {

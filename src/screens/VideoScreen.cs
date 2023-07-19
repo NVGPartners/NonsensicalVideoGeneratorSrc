@@ -36,17 +36,31 @@ namespace NonsensicalVideoGenerator
         public void Show()
         {
             toggle = true;
-            offset = new(GlobalGraphics.Scale(-124), 0); // from left to right
-            tween.TweenTo(this, t => t.offset, new Vector2(0, 0), 0.5f)
-                .Easing(EasingFunctions.ExponentialOut);
+            if(!bool.Parse(SaveData.saveValues["DisableMotion"]))
+            {
+                offset = new(GlobalGraphics.Scale(-124), 0); // from left to right
+                tween.TweenTo(this, t => t.offset, new Vector2(0, 0), 0.5f)
+                    .Easing(EasingFunctions.ExponentialOut);
+            }
+            else
+            {
+                offset = new(0, 0);
+            }
             showing = true;
         }
         public void Hide()
         {
             toggle = false;
-            offset = new(0, 0); // from right to left
-            tween.TweenTo(this, t => t.offset, new Vector2(GlobalGraphics.Scale(-124), 0), 0.5f)
-                .Easing(EasingFunctions.ExponentialOut);
+            if(!bool.Parse(SaveData.saveValues["DisableMotion"]))
+            {
+                offset = new(0, 0); // from right to left
+                tween.TweenTo(this, t => t.offset, new Vector2(GlobalGraphics.Scale(-124), 0), 0.5f)
+                    .Easing(EasingFunctions.ExponentialOut);
+            }
+            else
+            {
+                offset = new(GlobalGraphics.Scale(-124), 0);
+            }
             hiding = true;
         }
         public bool Toggle(bool useBool = false, bool toggleTo = false)
@@ -218,12 +232,20 @@ namespace NonsensicalVideoGenerator
             // Draw flashing box in vidbg bounds if FramePlayer.processing is true
             if(FramePlayer.processing)
             {
-                // Flash using FramePlayer.startedProcessing (seconds) and gameTime seconds
-                // 0-255
-                flash = (int)(Math.Sin((FramePlayer.startedProcessing + gameTime.TotalGameTime.TotalSeconds)*6) * 64);
-                // Absolute value
-                if(flash < 0)
-                    flash *= -1;
+                if(!bool.Parse(SaveData.saveValues["DisableMotion"]))
+                {
+                    // Flash using FramePlayer.startedProcessing (seconds) and gameTime seconds
+                    // 0-255
+                    flash = (int)(Math.Sin((FramePlayer.startedProcessing + gameTime.TotalGameTime.TotalSeconds)*6) * 64);
+                    // Absolute value
+                    if(flash < 0)
+                        flash *= -1;
+                }
+                else
+                {
+                    // Set to middle
+                    flash = 48;
+                }
                 spriteBatch.Draw(pixel, new Rectangle(GlobalGraphics.Scale(0), GlobalGraphics.Scale(43), GlobalGraphics.Scale(104), GlobalGraphics.Scale(78)), new Color(flash, flash, flash, 255));
             }
             /*

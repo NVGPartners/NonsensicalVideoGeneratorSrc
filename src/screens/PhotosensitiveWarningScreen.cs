@@ -36,6 +36,7 @@ namespace NonsensicalVideoGenerator
             if(ScreenManager.GetScreen<TutorialScreen>("Initial Setup")?.screenType == ScreenType.Hidden)
             {
                 ScreenManager.PushNavigation("Initial Setup");
+                FramePlayer.canPlayBgMusic = false;
                 ScreenManager.GetScreen<TutorialScreen>("Initial Setup")?.Show();
                 ScreenManager.GetScreen<ContentScreen>("Content")?.Hide();
                 ScreenManager.GetScreen<MenuScreen>("Main Menu")?.Hide();
@@ -47,10 +48,18 @@ namespace NonsensicalVideoGenerator
         }
         private void UpdateCheckThread(object? sender, DoWorkEventArgs e)
         {
-            if(SteamManager.initialized)
-                PluginHandler.LoadWorkshop();
-            else
+            try
+            {
+                if(SteamManager.initialized)
+                    PluginHandler.LoadWorkshop();
+                else
+                    PluginHandler.LoadPluginsThreaded();
+            }
+            catch
+            {
+                ConsoleOutput.WriteLine("Failed to load Workshop plugins.");
                 PluginHandler.LoadPluginsThreaded();
+            }
             UpdateManager.GetDependencyStatus();
             if(!UpdateManager.ffmpegInstalled || !UpdateManager.ffprobeInstalled)
             {
@@ -151,13 +160,20 @@ namespace NonsensicalVideoGenerator
                     overlayOpacity = 255;
                     lastTextOpacity = 0;
                     ConsoleOutput.WriteLine("User acknowledged photosensitive warning.", Color.LightGreen);
-                    if(SteamManager.initialized)
+                    try
                     {
-                        ConsoleOutput.WriteLine("Steam initialized.", Color.LightGreen);
+                        if(SteamManager.initialized)
+                        {
+                            ConsoleOutput.WriteLine("Steam initialized.", Color.LightGreen);
+                        }
+                        else
+                        {
+                            ConsoleOutput.WriteLine("Steam is not running, skipping workshop initialization.", Color.LightGreen);
+                        }
                     }
-                    else
+                    catch
                     {
-                        ConsoleOutput.WriteLine("Steam is not running, skipping workshop initialization.", Color.LightGreen);
+                        ConsoleOutput.WriteLine("Steam failed, skipping workshop initialization.", Color.LightGreen);
                     }
                     updateWorker = new BackgroundWorker();
                     updateWorker.DoWork += UpdateCheckThread;

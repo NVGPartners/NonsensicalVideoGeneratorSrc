@@ -85,18 +85,11 @@ namespace NonsensicalVideoGenerator
                     spriteBatch.Draw(pluginEntry, new Rectangle(GlobalGraphics.Scale(136), GlobalGraphics.Scale(57 + i * pluginEntry.Height + i), pluginEntry.Width * GlobalGraphics.scale, pluginEntry.Height * GlobalGraphics.scale), Color.White);
                     if(i < plcount-1)
                     {
-                        if(PluginHandler.plugins[i].settings.Count > 0 && Global.canRender)
+                        if(Global.canRender)
                         {
-                            // Don't show custom name value
-                            int reqcount = 0;
-                            if(PluginHandler.plugins[i].settings.Keys.ElementAt(0) == "Display Name")
-                                reqcount = 1;
-                            if(PluginHandler.plugins[i].settings.Count > reqcount)
-                            {
-                                spriteBatch.Draw(pluginSettings, new Rectangle(GlobalGraphics.Scale(226), GlobalGraphics.Scale(59 + i * pluginEntry.Height + i), pluginSettings.Width * GlobalGraphics.scale, pluginSettings.Height * GlobalGraphics.scale), Color.White);
-                                spriteBatch.DrawString(munroSmall, "Settings", new Vector2(GlobalGraphics.Scale(233+1), GlobalGraphics.Scale(58+1 + i * pluginEntry.Height + i)), Color.Black);
-                                spriteBatch.DrawString(munroSmall, "Settings", new Vector2(GlobalGraphics.Scale(233), GlobalGraphics.Scale(58 + i * pluginEntry.Height + i)), Color.White);
-                            }
+                            spriteBatch.Draw(pluginSettings, new Rectangle(GlobalGraphics.Scale(226), GlobalGraphics.Scale(59 + i * pluginEntry.Height + i), pluginSettings.Width * GlobalGraphics.scale, pluginSettings.Height * GlobalGraphics.scale), Color.White);
+                            spriteBatch.DrawString(munroSmall, "Settings", new Vector2(GlobalGraphics.Scale(233+1), GlobalGraphics.Scale(58+1 + i * pluginEntry.Height + i)), Color.Black);
+                            spriteBatch.DrawString(munroSmall, "Settings", new Vector2(GlobalGraphics.Scale(233), GlobalGraphics.Scale(58 + i * pluginEntry.Height + i)), Color.White);
                         }
                         spriteBatch.DrawString(munroSmall, PluginHandler.plugins[i].GetDisplayName(), new Vector2(GlobalGraphics.Scale(141+1), GlobalGraphics.Scale(58+1 + i * pluginEntry.Height + i)), Color.Black);
                         spriteBatch.DrawString(munroSmall, PluginHandler.plugins[i].GetDisplayName(), new Vector2(GlobalGraphics.Scale(141), GlobalGraphics.Scale(58 + i * pluginEntry.Height + i)), Color.White);
@@ -183,7 +176,7 @@ namespace NonsensicalVideoGenerator
                                 internalTooltip = Global.canRender ?"Click to toggle plugin." : "Loading...";
                             }
                             int inRange = 228;
-                            if(PluginHandler.plugins[i].settings.Count <= 0 || !Global.canRender)
+                            if(!Global.canRender)
                             {
                                 inRange = 267; // No settings button
                             }
@@ -202,7 +195,7 @@ namespace NonsensicalVideoGenerator
                                 else
                                     internalTooltip = "Open stock directory.";
                             }
-                            if(PluginHandler.plugins[i].settings.Count > 0 && Global.canRender)
+                            if(Global.canRender)
                             {
                                 if (MouseInput.MouseState.X >= GlobalGraphics.Scale(230) && MouseInput.MouseState.X < GlobalGraphics.Scale(267)
                                     && MouseInput.MouseState.Y >= GlobalGraphics.Scale(59 + (i * 16) - scrollOffset) && MouseInput.MouseState.Y < GlobalGraphics.Scale(70 + (i * 16) - scrollOffset))
@@ -363,13 +356,13 @@ namespace NonsensicalVideoGenerator
                         if(i < plcount-1)
                         {
                             int inRange = 228;
-                            if(PluginHandler.plugins[i].settings.Count <= 0 || !Global.canRender)
+                            if(!Global.canRender)
                             {
                                 inRange = 267; // No settings button
                             }
                             // Toggle Button
                             Accessibility.CompatAccessibility(new Rectangle(GlobalGraphics.Scale(269), GlobalGraphics.Scale(59 + (i * 16) - scrollOffset), GlobalGraphics.Scale(21), GlobalGraphics.Scale((70 + (i * 16) - scrollOffset) - (59 + (i * 16) - scrollOffset))), (PluginHandler.plugins[i].enabled ? "Disable " : "Enable ") + "\"" + PluginHandler.plugins[i].GetDisplayName() + "\"");
-                            if(PluginHandler.plugins[i].settings.Count > 0 && Global.canRender)
+                            if(Global.canRender)
                             {
                                 // Settings Button
                                 Accessibility.CompatAccessibility(new Rectangle(GlobalGraphics.Scale(230), GlobalGraphics.Scale(59 + (i * 16) - scrollOffset), GlobalGraphics.Scale(37), GlobalGraphics.Scale((70 + (i * 16) - scrollOffset) - (59 + (i * 16) - scrollOffset))), "Settings for \"" + PluginHandler.plugins[i].GetDisplayName() + "\"");
@@ -408,7 +401,7 @@ namespace NonsensicalVideoGenerator
                                 }
                                 // Open folder containing plugin
                                 int inRange = 228;
-                                if(PluginHandler.plugins[i].settings.Count <= 0 || !Global.canRender)
+                                if(!Global.canRender)
                                 {
                                     inRange = 267; // No settings button
                                 }
@@ -453,7 +446,7 @@ namespace NonsensicalVideoGenerator
                                     return true;
                                 }
                                 // Settings button
-                                if(PluginHandler.plugins[i].settings.Count > 0 && Global.canRender)
+                                if(Global.canRender)
                                 {
                                     if (MouseInput.MouseState.X >= GlobalGraphics.Scale(230) && MouseInput.MouseState.X < GlobalGraphics.Scale(267)
                                         && MouseInput.MouseState.Y >= GlobalGraphics.Scale(59 + (i * 16) - scrollOffset) && MouseInput.MouseState.Y < GlobalGraphics.Scale(70 + (i * 16) - scrollOffset))
@@ -482,6 +475,26 @@ namespace NonsensicalVideoGenerator
                                                     return false;
                                                 }));
                                             }
+                                            controller.Add("Delete", new Button("Delete", "", new Vector2(119+100, 60+10+19*8), (int i) => {
+                                                switch(i)
+                                                {
+                                                    case 2:
+                                                        // Delete and reload plugins
+                                                        try
+                                                        {
+                                                            Directory.Delete(Path.GetDirectoryName(PluginHandler.plugins[settingsIndex].path), true);
+                                                            GlobalContent.GetSound("Select").Play(int.Parse(SaveData.saveValues["SoundEffectVolume"]) / 100f, 0f, 0f);
+                                                            PluginHandler.LoadPluginsThreaded();
+                                                            editingSettings = false;
+                                                        }
+                                                        catch
+                                                        {
+                                                            GlobalContent.GetSound("Error").Play(int.Parse(SaveData.saveValues["SoundEffectVolume"]) / 100f, 0f, 0f);
+                                                        }
+                                                        return true;
+                                                }
+                                                return false;
+                                            }));
                                             controller.Add("Publish", new Button("Publish", "Publish to Steam Workshop.", new Vector2(139+139, 60+10+19*8), (int i) => {
                                                 switch(i)
                                                 {
@@ -854,16 +867,17 @@ namespace NonsensicalVideoGenerator
                 {
                     case 2:
                         pluginCreation = false;
-                        editingSettings = false;
                         if(PluginHandler.CreatePlugin(customPluginFileName, customPluginName, customPluginMinimal, out string file))
                         {
                             GlobalContent.GetSound("Select").Play(int.Parse(SaveData.saveValues["SoundEffectVolume"]) / 100f, 0f, 0f);
                             // load plugins
                             PluginHandler.LoadPluginsThreaded();
+                            editingSettings = false;
                         }
                         else
                         {
                             GlobalContent.GetSound("Error").Play(int.Parse(SaveData.saveValues["SoundEffectVolume"]) / 100f, 0f, 0f);
+                            editingSettings = false;
                         }
                         return true;
                 }
