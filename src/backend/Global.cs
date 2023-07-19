@@ -37,7 +37,6 @@ namespace NonsensicalVideoGenerator
         public static bool usedAllEffectChance = false;
         public static bool usedDifferentOutro = false;
         public static bool highScore50 = false;
-        public static List<LibraryType> librariesAddedTo = new();
         public static GeneratorFactory generatorFactory = new GeneratorFactory();
     }
 }

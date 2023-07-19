@@ -265,7 +265,7 @@ namespace NonsensicalVideoGenerator
                 int frame = FramePlayer.currentFrame >= 0 ? FramePlayer.currentFrame : 0;
                 if(frame >= FramePlayer.frames.Count)
                     frame = 0;
-                spriteBatch.Draw(FramePlayer.frames[frame], new Rectangle(GlobalGraphics.Scale(0), GlobalGraphics.Scale(45-7), GlobalGraphics.Scale(vidwindow.Width-24), GlobalGraphics.Scale(vidwindow.Height-43)), Color.White);
+                spriteBatch.Draw(FramePlayer.frames[frame], new Rectangle(GlobalGraphics.Scale(2), GlobalGraphics.Scale(41), GlobalGraphics.Scale(104), GlobalGraphics.Scale(82)), Color.White);
             }
             // Video Window
             spriteBatch.Draw(vidwindow, new Rectangle(GlobalGraphics.Scale(0), GlobalGraphics.Scale(36), GlobalGraphics.Scale(vidwindow.Width), GlobalGraphics.Scale(vidwindow.Height)), Color.White);

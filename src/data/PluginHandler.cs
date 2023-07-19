@@ -184,28 +184,30 @@ namespace NonsensicalVideoGenerator
         {
             bool illegal = false;
             // We're only going to allow special characters if they're inside of quotes and not exposed to the shell
-            if (args.Contains("|"))
-            {
-                // Match everything outside of quotes
-                Regex regex = new Regex(@"[^\s""]+|""([^""]*)""");
-                MatchCollection matches = regex.Matches(args);
-                foreach (Match match in matches)
-                {   
-                    string matchString = match.ToString();
-                    // If the match is not inside of quotes, check for pipes
-                    if (!matchString.StartsWith("\"") && !matchString.EndsWith("\""))
+            // Match everything outside of quotes
+            Regex regex = new Regex(@"[^\s""]+|""([^""]*)""");
+            MatchCollection matches = regex.Matches(args);
+            foreach (Match match in matches)
+            {   
+                string matchString = match.ToString();
+                // If the match is not inside of quotes, check for pipes
+                if (!matchString.StartsWith("\"") && !matchString.EndsWith("\""))
+                {
+                    // FFmpeg uses pipes to separate filters
+                    if (matchString.Contains("|")
+                        || matchString.Contains("&")
+                        || matchString.Contains(">")
+                        || matchString.Contains("<"))
                     {
-                        // FFmpeg uses pipes to separate filters
-                        if (matchString.Contains("|")
-                            || matchString.Contains("&")
-                            || matchString.Contains(">")
-                            || matchString.Contains("<"))
-                        {
-                            illegal = true;
-                            break;
-                        }
+                        illegal = true;
+                        break;
                     }
                 }
+            }
+            // Disallow directory and drive traversal
+            if (args.Contains("..") || args.Contains(":\\"))
+            {
+                illegal = true;
             }
             if (illegal)
             {

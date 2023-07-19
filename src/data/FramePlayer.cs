@@ -59,8 +59,8 @@ namespace NonsensicalVideoGenerator
                 }
                 if(worker.CancellationPending || !processing)
                     return;
-                int w = GlobalGraphics.Scale(100);
-                int h = GlobalGraphics.Scale(78);
+                int w = GlobalGraphics.Scale(104);
+                int h = GlobalGraphics.Scale(82);
                 ProcessStartInfo startInfo = new()
                 {
                     FileName = "ffmpeg",
