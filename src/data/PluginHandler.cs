@@ -1080,7 +1080,7 @@ namespace NonsensicalVideoGenerator
                 }
                 if(extsettings.Count > 0)
                 {
-                    description += "\n\n";
+                    description += "\n";
                     description += "Settings:\n";
                     foreach(string setting in extsettings)
                     {

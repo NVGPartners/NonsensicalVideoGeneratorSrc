@@ -157,7 +157,7 @@ namespace NonsensicalVideoGenerator
         {
             // Draw background with new hue.
             spriteBatch.Draw(GlobalGraphics.pixel, new Rectangle(0, 0, GlobalGraphics.scaledWidth, GlobalGraphics.scaledHeight), backgroundColor);
-            if(!bool.Parse(SaveData.saveValues["HideAnimatedBackground"]))
+            if(!bool.Parse(SaveData.saveValues["DisableMotion"]))
             {
                 // Draw circles indicating misclicks.
                 foreach(MisclickCircle circle in circles)

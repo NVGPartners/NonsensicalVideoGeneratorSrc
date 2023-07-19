@@ -29,7 +29,7 @@ namespace NonsensicalVideoGenerator
         public void LoadContent(ContentManager contentManager, GraphicsDevice graphicsDevice)
         {
             // Add dials
-            controller.Add("MotionDisable", new Switch("Disable Motion", "Turns off screen tweening motion.", new Vector2(139, 60+19*6), (int i) => {
+            controller.Add("MotionDisable", new Switch("Disable Motion", "Turns off screen tweening and other elements.", new Vector2(139, 60+19*5), (int i) => {
                 bool switchState = (i & 256) != 0;
                 if((i & 2) != 0)
                 {
@@ -40,17 +40,6 @@ namespace NonsensicalVideoGenerator
                 }
                 return switchState;
             }, SaveData.saveValues["DisableMotion"] == "true"));
-            controller.Add("BGDisable", new Switch("Hide Animated Background", "Hides animated tiles.", new Vector2(139, 60+19*5), (int i) => {
-                bool switchState = (i & 256) != 0;
-                if((i & 2) != 0)
-                {
-                    string oldValue = SaveData.saveValues["HideAnimatedBackground"];
-                    SaveData.saveValues["HideAnimatedBackground"] = switchState.ToString().ToLower();
-                    if(oldValue != SaveData.saveValues["HideAnimatedBackground"])
-                        SaveData.Save();
-                }
-                return switchState;
-            }, SaveData.saveValues["HideAnimatedBackground"] == "true"));
             controller.Add("BGSaturation", new TextEntry("Background Saturation", "Adjust color in the animated background, from 0-255.", SaveData.saveValues["BackgroundSaturation"], new Vector2(139, 60+19*4), 24, 3, 1, (int i) => {
                 int oldValue = int.Parse(SaveData.saveValues["BackgroundSaturation"]);
                 // Range: 0-255

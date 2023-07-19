@@ -200,24 +200,15 @@ namespace NonsensicalVideoGenerator
                                 {
                                     ScreenManager.PushNavigation("Pastime Game");
                                     ScreenManager.GetScreen<PastimeGameScreen>("Pastime Game")?.Show();
-                                    ScreenManager.GetScreen<HeaderScreen>("Header")?.Hide();
                                     ScreenManager.GetScreen<ContentScreen>("Content")?.Hide();
-                                    ScreenManager.GetScreen<VideoScreen>("Video")?.Hide();
-                                    ScreenManager.GetScreen<SocialScreen>("Socials")?.Hide();
                                 }
                                 else
                                 {
                                     if(Pagination.DrawnPage == Pagination.GetPageCount() - 3)
                                     {
                                         ScreenManager.GetScreen<PastimeGameScreen>("Pastime Game")?.Hide();
-                                        ScreenManager.PushNavigation("Video");
-                                        ScreenManager.GetScreen<VideoScreen>("Video")?.Show();
                                         ScreenManager.PushNavigation("Content");
                                         ScreenManager.GetScreen<ContentScreen>("Content")?.Show();
-                                        ScreenManager.PushNavigation("Header");
-                                        ScreenManager.GetScreen<HeaderScreen>("Header")?.Show();
-                                        ScreenManager.PushNavigation("Socials");
-                                        ScreenManager.GetScreen<SocialScreen>("Socials")?.Show();
                                     }
                                 }
                                 // Set pagination

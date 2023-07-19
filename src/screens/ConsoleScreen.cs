@@ -14,7 +14,7 @@ namespace NonsensicalVideoGenerator
     public class ConsoleScreen : IScreen
     {
         public string title { get; } = "Console";
-        public int layer { get; } = 14;
+        public int layer { get; } = 100;
         public ScreenType screenType { get; set; } = ScreenType.Hidden;
         public int currentPlacement { get; set; } = -1;
         private bool hiding = true;

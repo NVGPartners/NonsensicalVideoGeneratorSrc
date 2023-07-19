@@ -38,8 +38,8 @@ namespace NonsensicalVideoGenerator
             {"TransitionEffectChance", "30"},
             {"HiddenKeepTemporaryJobFolders", "false"},
             {"HiddenVerbose", "false"},
-            {"HideAnimatedBackground", "false"},
-            {"DisableMotion", "false"}
+            {"DisableMotion", "false"},
+            {"FirstBoot", "true"}
         };
         public static string saveFileName = "Options.json";
         public static bool Save()

@@ -75,7 +75,7 @@ namespace NonsensicalVideoGenerator
         {
             distance = 32;
             spacingPlacementY = 120;
-            spacing = (320 / 2) - (5/2) - 1;
+            spacing =  (320 / 2) - (5/2) - 1;
             width = 5;
             height = 5;
         }
@@ -139,7 +139,7 @@ namespace NonsensicalVideoGenerator
         /// The title of the screen. This is displayed on the header bar.
         /// </summary>
         public string title { get; } = "Pastime Game";
-        public int layer { get; } = 7;
+        public int layer { get; } = 1;
         public ScreenType screenType { get; set; } = ScreenType.Hidden;
         public int currentPlacement { get; set; } = -1;
         private bool hiding = false;
@@ -202,7 +202,7 @@ namespace NonsensicalVideoGenerator
             "yt-dlp (Unlicense)",
             "Font Licenses:",
             "Munro (SIL Open Font License)",
-            "This is the end of the credits",
+            "End of credits",
         };
         private PastimeGamePlayer player = new();
         public void Show()
@@ -489,10 +489,10 @@ namespace NonsensicalVideoGenerator
             player.Draw(gameTime, spriteBatch);
             // Draw points
             SpriteFont font = GlobalContent.GetFont("MunroSmall");
+            Vector2 textSize = font.MeasureString(player.points.ToString());
             // Center horizontally
             if (!player.waiting)
             {
-                Vector2 textSize = font.MeasureString(player.points.ToString());
                 spriteBatch.DrawString(font, player.points.ToString(), new Vector2(GlobalGraphics.Scale(160) - (textSize.X / 2) + GlobalGraphics.Scale(1), GlobalGraphics.Scale(240) - textSize.Y - GlobalGraphics.Scale(8) + GlobalGraphics.Scale(1)), Color.Black);
                 spriteBatch.DrawString(font, player.points.ToString(), new Vector2(GlobalGraphics.Scale(160) - (textSize.X / 2), GlobalGraphics.Scale(240) - textSize.Y - GlobalGraphics.Scale(8)), Color.White);
                 // Draw score text
@@ -508,11 +508,6 @@ namespace NonsensicalVideoGenerator
             }
             else
             {
-                // Draw score text
-                Vector2 textSize = font.MeasureString("Click to start!");
-                // Center horizontally
-                spriteBatch.DrawString(font, "Click to start!", new Vector2(GlobalGraphics.Scale(160) - (textSize.X / 2) + GlobalGraphics.Scale(1), GlobalGraphics.Scale(8+16+8) + GlobalGraphics.Scale(1)), Color.Black);
-                spriteBatch.DrawString(font, "Click to start!", new Vector2(GlobalGraphics.Scale(160) - (textSize.X / 2), GlobalGraphics.Scale(8+16+8)), Color.White);
                 // Draw high score text
                 textSize = font.MeasureString("High Score");
                 // Center horizontally
@@ -524,19 +519,21 @@ namespace NonsensicalVideoGenerator
                 spriteBatch.DrawString(font, highScore.ToString(), new Vector2(GlobalGraphics.Scale(160) - (textSize.X / 2) + GlobalGraphics.Scale(1), GlobalGraphics.Scale(240) - textSize.Y - GlobalGraphics.Scale(8) + GlobalGraphics.Scale(1)), Color.Black);
                 spriteBatch.DrawString(font, highScore.ToString(), new Vector2(GlobalGraphics.Scale(160) - (textSize.X / 2), GlobalGraphics.Scale(240) - textSize.Y - GlobalGraphics.Scale(8)), Color.White);
             }
-            // Draw current credit
-            spriteBatch.DrawString(font, creditRoll[currentCredit], new Vector2(GlobalGraphics.Scale(9), GlobalGraphics.Scale(9)), Color.Black);
-            spriteBatch.DrawString(font, creditRoll[currentCredit], new Vector2(GlobalGraphics.Scale(8), GlobalGraphics.Scale(8)), Color.White);
+            textSize = font.MeasureString(creditRoll[currentCredit]);
+            spriteBatch.DrawString(font, creditRoll[currentCredit], new Vector2(GlobalGraphics.Scale(320) - textSize.X - GlobalGraphics.Scale(8), GlobalGraphics.Scale(9)), Color.Black);
+            spriteBatch.DrawString(font, creditRoll[currentCredit], new Vector2(GlobalGraphics.Scale(320) - textSize.X - GlobalGraphics.Scale(9), GlobalGraphics.Scale(8)), Color.White);
             // Draw render progress on right side (pastime)
+            /*
             if(Global.generatorFactory.progressText != "")
             {
-                Vector2 textSize = font.MeasureString(Global.videoTitle);
+                textSize = font.MeasureString(Global.videoTitle);
                 spriteBatch.DrawString(font, Global.videoTitle, new Vector2(GlobalGraphics.Scale(320) - textSize.X - GlobalGraphics.Scale(8), GlobalGraphics.Scale(9)), Color.Black);
                 spriteBatch.DrawString(font, Global.videoTitle, new Vector2(GlobalGraphics.Scale(320) - textSize.X - GlobalGraphics.Scale(9), GlobalGraphics.Scale(8)), Color.White);
                 Vector2 textSize2 = font.MeasureString(Global.generatorFactory.progressText);
                 spriteBatch.DrawString(font, Global.generatorFactory.progressText, new Vector2(GlobalGraphics.Scale(320) - textSize2.X - GlobalGraphics.Scale(8), GlobalGraphics.Scale(9) + textSize.Y), Color.Black);
                 spriteBatch.DrawString(font, Global.generatorFactory.progressText, new Vector2(GlobalGraphics.Scale(320) - textSize2.X - GlobalGraphics.Scale(9), GlobalGraphics.Scale(8) + textSize.Y), Color.White);
             }
+            */
             // End offset spritebatch
             spriteBatch.End();
             // Remake spritebatch

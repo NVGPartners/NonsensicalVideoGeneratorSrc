@@ -164,11 +164,8 @@ namespace NonsensicalVideoGenerator
         }
         public static string[] help = new string[]
         {
-            "Nonsensical Video Generator accessibility help:",
             "Press F1 to toggle keyboard navigation. Press F2 to toggle text to speech.",
-            "Press enter to select an option.",
-            "Press space to select and close keyboard navigation.",
-            "Use arrow keys or tab to cycle through options.",
+            "Press enter to select an option. Use arrow keys or tab to navigate.",
             ""
         };
         public static void PostDraw(GameTime gameTime, SpriteBatch spriteBatch)
@@ -273,12 +270,14 @@ namespace NonsensicalVideoGenerator
                 }
                 // Draw black overlay.
                 Texture2D pixel = GlobalContent.GetTexture("Pixel");
-                spriteBatch.Draw(pixel, new Rectangle(0, 0, GlobalGraphics.scaledWidth, GlobalGraphics.scaledHeight), Color.Black * 0.5f);
+                spriteBatch.Draw(pixel, new Rectangle(GlobalGraphics.Scale(4), GlobalGraphics.Scale(4), GlobalGraphics.scaledWidth - GlobalGraphics.Scale(8), GlobalGraphics.scaledHeight - GlobalGraphics.Scale(8)), Color.Black * 0.5f);
                 SpriteFont munroSmall = GlobalContent.GetFont("MunroSmall");
-                // Draw help text at the top of the screen.
-                spriteBatch.Draw(pixel, new Rectangle(GlobalGraphics.Scale(4), GlobalGraphics.Scale(4), GlobalGraphics.scaledWidth - GlobalGraphics.Scale(8), GlobalGraphics.Scale(1) + GlobalGraphics.Scale(9) * help.Length), Color.Black);
                 for(int i = 0; i < help.Length; i++)
                 {
+                    if(help[i] == "")
+                        continue;
+                    // Draw help text at the top of the screen.
+                    spriteBatch.Draw(pixel, new Rectangle(GlobalGraphics.Scale(4), GlobalGraphics.Scale(4+9*i), GlobalGraphics.scaledWidth - GlobalGraphics.Scale(8), GlobalGraphics.Scale(1) + GlobalGraphics.Scale(9)), Color.Black);
                     Vector2 size = munroSmall.MeasureString(help[i]);
                     // Center horizontally
                     Vector2 position = new(GlobalGraphics.Scale(6), GlobalGraphics.Scale(2 + i * 9));
@@ -338,16 +337,7 @@ namespace NonsensicalVideoGenerator
                         {
                             selectedDisambiguationOption = i;
                             showDisambiguation = false;
-                            if(newKeyboardState.IsKeyDown(Keys.Enter) && !oldKeyboardState.IsKeyDown(Keys.Enter))
-                            {
-                                //right = true;
-                                holdItForMe = true;
-                            }
-                            else
-                            {
-                                holdItForMe = false;
-                                //right = false;
-                            }
+                            holdItForMe = true;
                             GlobalContent.GetSound("CompatSelect").Play(int.Parse(SaveData.saveValues["SoundEffectVolume"]) / 100f, 0f, 0f);
                             TTS("Selected " + disambiguationOptions[i].tts);
                             return;

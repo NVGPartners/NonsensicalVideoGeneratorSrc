@@ -107,8 +107,8 @@ namespace NonsensicalVideoGenerator
                     {
                         // create plugin
                         spriteBatch.Draw(createPlugin, new Rectangle(GlobalGraphics.Scale(265), GlobalGraphics.Scale(59 + i * pluginEntry.Height + i), createPlugin.Width * GlobalGraphics.scale, createPlugin.Height * GlobalGraphics.scale), Color.White);
-                        spriteBatch.DrawString(munroSmall, "Workshop Effect Creation", new Vector2(GlobalGraphics.Scale(141+1), GlobalGraphics.Scale(58+1 + i * pluginEntry.Height + i)), Color.Black);
-                        spriteBatch.DrawString(munroSmall, "Workshop Effect Creation", new Vector2(GlobalGraphics.Scale(141), GlobalGraphics.Scale(58 + i * pluginEntry.Height + i)), Color.White);
+                        spriteBatch.DrawString(munroSmall, "Workshop Effect Management", new Vector2(GlobalGraphics.Scale(141+1), GlobalGraphics.Scale(58+1 + i * pluginEntry.Height + i)), Color.Black);
+                        spriteBatch.DrawString(munroSmall, "Workshop Effect Management", new Vector2(GlobalGraphics.Scale(141), GlobalGraphics.Scale(58 + i * pluginEntry.Height + i)), Color.White);
                     }
                 }
                 // End offset
@@ -373,7 +373,7 @@ namespace NonsensicalVideoGenerator
                         else
                         {
                             // create plugin
-                            Accessibility.CompatAccessibility(new Rectangle(GlobalGraphics.Scale(138), GlobalGraphics.Scale(59 + (i * 16) - scrollOffset), GlobalGraphics.Scale(152), GlobalGraphics.Scale((70 + (i * 16) - scrollOffset) - (59 + (i * 16) - scrollOffset))), "Workshop Effect Creation (Create custom effects.)");
+                            Accessibility.CompatAccessibility(new Rectangle(GlobalGraphics.Scale(138), GlobalGraphics.Scale(59 + (i * 16) - scrollOffset), GlobalGraphics.Scale(152), GlobalGraphics.Scale((70 + (i * 16) - scrollOffset) - (59 + (i * 16) - scrollOffset))), "Workshop Effect Management (Create custom effects.)");
                         }
                     }
                     if(MouseInput.MouseState.LeftButton == ButtonState.Pressed && MouseInput.LastMouseState.LeftButton == ButtonState.Released)
@@ -484,7 +484,10 @@ namespace NonsensicalVideoGenerator
                                                         {
                                                             Directory.Delete(Path.GetDirectoryName(PluginHandler.plugins[settingsIndex].path), true);
                                                             GlobalContent.GetSound("Select").Play(int.Parse(SaveData.saveValues["SoundEffectVolume"]) / 100f, 0f, 0f);
-                                                            PluginHandler.LoadPluginsThreaded();
+                                                            if(SteamManager.initialized)
+                                                                PluginHandler.LoadWorkshop();
+                                                            else
+                                                                PluginHandler.LoadPluginsThreaded();
                                                             editingSettings = false;
                                                         }
                                                         catch
@@ -852,7 +855,10 @@ namespace NonsensicalVideoGenerator
                         if(Global.pluginsLoaded)
                         {
                             GlobalContent.GetSound("Option").Play(int.Parse(SaveData.saveValues["SoundEffectVolume"]) / 100f, 0f, 0f);
-                            PluginHandler.LoadPluginsThreaded();
+                            if(SteamManager.initialized)
+                                PluginHandler.LoadWorkshop();
+                            else
+                                PluginHandler.LoadPluginsThreaded();
                         }
                         else
                         {
@@ -871,7 +877,10 @@ namespace NonsensicalVideoGenerator
                         {
                             GlobalContent.GetSound("Select").Play(int.Parse(SaveData.saveValues["SoundEffectVolume"]) / 100f, 0f, 0f);
                             // load plugins
-                            PluginHandler.LoadPluginsThreaded();
+                            if(SteamManager.initialized)
+                                PluginHandler.LoadWorkshop();
+                            else
+                                PluginHandler.LoadPluginsThreaded();
                             editingSettings = false;
                         }
                         else

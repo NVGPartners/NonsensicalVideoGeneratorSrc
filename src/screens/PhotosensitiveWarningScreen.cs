@@ -27,10 +27,12 @@ namespace NonsensicalVideoGenerator
         private bool fadingIn = false;
         private bool textFadedIn = false;
         private double timeText = 0;
+        private bool askAccessibility = false;
         private static KeyboardState oldKeyboardState;
         private static KeyboardState newKeyboardState;
         // shamelessly copied from tutorial screen
         private BackgroundWorker updateWorker;
+        private readonly InteractableController controller = new();
         private void ErrorOut()
         {
             if(ScreenManager.GetScreen<TutorialScreen>("Initial Setup")?.screenType == ScreenType.Hidden)
@@ -58,7 +60,10 @@ namespace NonsensicalVideoGenerator
             catch
             {
                 ConsoleOutput.WriteLine("Failed to load Workshop plugins.");
-                PluginHandler.LoadPluginsThreaded();
+                if(SteamManager.initialized)
+                    PluginHandler.LoadWorkshop();
+                else
+                    PluginHandler.LoadPluginsThreaded();
             }
             UpdateManager.GetDependencyStatus();
             if(!UpdateManager.ffmpegInstalled || !UpdateManager.ffprobeInstalled)
@@ -68,7 +73,24 @@ namespace NonsensicalVideoGenerator
         }
         private List<string> warningText = new List<string>()
         {
+            " ",
+            "Accessibility Help:",
+            "Press F1 to access accessible keyboard navigation.",
+            "Press F2 to toggle text to speech for keyboard navigation.",
+            " ",
+            "Disable Motion:",
+            " ",
+            "Mute Background Music:",
+            " ",
+            " ",
+            "Click anywhere or press any key to continue.",
+            " "
+        };
+        private List<string> accesibilityText = new List<string>()
+        {
+            " ",
             "WARNING:",
+            " ",
             "A very small percentage of people may experience a seizure",
             "when exposed to certain visual images, including flashing",
             "lights or patterns that may appear in generated content.",
@@ -76,10 +98,8 @@ namespace NonsensicalVideoGenerator
             "If you are sensitive to flashing lights,",
             "please do not use this software.",
             " ",
-            "Press F1 to access accessible keyboard navigation.",
-            "Press F2 to toggle text to speech for keyboard navigation.",
-            " ",
-            "Click anywhere or press any key to continue."
+            "Click anywhere or press any key to continue.",
+            " "
         };
         public void Show()
         {
@@ -105,6 +125,11 @@ namespace NonsensicalVideoGenerator
                     Vector2 textSize = fontMunro.MeasureString(text);
                     spriteBatch.DrawString(fontMunro, text, new Vector2(GlobalGraphics.scaledWidth / 2 - textSize.X / 2, GlobalGraphics.Scale(24 + i * 16)), Color.White);
                 }
+                if(!askAccessibility && !accepted)
+                {
+                    // Interactable
+                    controller.Draw(gameTime, spriteBatch);
+                }
             }
             // Draw overlay over last text.
             spriteBatch.Draw(GlobalGraphics.pixel, new Rectangle(0, GlobalGraphics.Scale(24 + (warningText.Count - 1) * 16), GlobalGraphics.scaledWidth, GlobalGraphics.Scale(16)), new Color(0, 0, 0, lastTextOpacity));
@@ -113,104 +138,157 @@ namespace NonsensicalVideoGenerator
         }
         public bool Update(GameTime gameTime, bool handleInput)
         {
-            if(!accepted)
+            if(handleInput)
             {
-                overlayOpacity -= 16;
-                if(overlayOpacity <= 0)
+                if(!askAccessibility && !accepted)
                 {
-                    overlayOpacity = 0;
-                    // Flash text.
-                    if(!textFadedIn)
+                    // Interactable
+                    if(controller.Update(gameTime, handleInput))
+                        return true;
+                }
+                if(!accepted)
+                {
+                    overlayOpacity -= 16;
+                    if(overlayOpacity <= 0 || askAccessibility)
                     {
-                        lastTextOpacity -= 16;
-                        if(lastTextOpacity <= 0)
+                        overlayOpacity = 0;
+                        // Flash text.
+                        if(!textFadedIn)
                         {
-                            lastTextOpacity = 0;
-                            textFadedIn = true;
-                            timeText = gameTime.TotalGameTime.TotalMilliseconds;
+                            lastTextOpacity -= 16;
+                            if(lastTextOpacity <= 0)
+                            {
+                                lastTextOpacity = 0;
+                                textFadedIn = true;
+                                timeText = gameTime.TotalGameTime.TotalMilliseconds;
+                            }
                         }
-                    }
-                    if(handleInput)
-                    {
-                        Accessibility.CompatAccessibility(new Rectangle(0, GlobalGraphics.Scale(24 + (warningText.Count - 1) * 16), GlobalGraphics.scaledWidth, GlobalGraphics.Scale(16)), "Click anywhere or press any key to continue.");
-                        if (MouseInput.MouseState.LeftButton == ButtonState.Pressed && MouseInput.LastMouseState.LeftButton == ButtonState.Released)
+                        if(handleInput)
                         {
-                            accepted = true;
-                            GlobalContent.GetSound("Select").Play(int.Parse(SaveData.saveValues["SoundEffectVolume"]) / 100f, 0f, 0f);
+                            // Keyboard input.
+                            newKeyboardState = Keyboard.GetState();
+                            oldKeyboardState = newKeyboardState;
+                            Accessibility.CompatAccessibility(new Rectangle(GlobalGraphics.Scale(4), GlobalGraphics.Scale(24 + (warningText.Count - 2) * 16), GlobalGraphics.scaledWidth - GlobalGraphics.Scale(8), GlobalGraphics.Scale(16)), "Click anywhere or press any key to continue.");
+                            if (MouseInput.MouseState.LeftButton == ButtonState.Pressed && MouseInput.LastMouseState.LeftButton == ButtonState.Released
+                                || newKeyboardState.GetPressedKeys().Length > 0 && oldKeyboardState.GetPressedKeys().Length == 0)
+                            {
+                                if(askAccessibility)
+                                {
+                                    SaveData.saveValues["FirstBoot"] = "false";
+                                    SaveData.Save();
+                                    askAccessibility = false;
+                                }
+                                else
+                                {
+                                    ConsoleOutput.WriteLine("User acknowledged photosensitive warning.", Color.LightGreen);
+                                }
+                                accepted = true;
+                                GlobalContent.GetSound("Select").Play(int.Parse(SaveData.saveValues["SoundEffectVolume"]) / 100f, 0f, 0f);
+                            }
                         }
-                        // Keyboard input.
-                        if(oldKeyboardState == null)
-                            oldKeyboardState = Keyboard.GetState();
-                        newKeyboardState = Keyboard.GetState();
-                        if(newKeyboardState.GetPressedKeys().Length > 0 && oldKeyboardState.GetPressedKeys().Length == 0)
-                        {
-                            accepted = true;
-                            GlobalContent.GetSound("Select").Play(int.Parse(SaveData.saveValues["SoundEffectVolume"]) / 100f, 0f, 0f);
-                        }
-                        oldKeyboardState = newKeyboardState;
                     }
                 }
-            }
-            else
-            {
-                lastTextOpacity -= 16;
-                overlayOpacity += 16;
-                if (overlayOpacity >= 255)
+                else if(!askAccessibility)
                 {
-                    overlayOpacity = 255;
-                    lastTextOpacity = 0;
-                    ConsoleOutput.WriteLine("User acknowledged photosensitive warning.", Color.LightGreen);
-                    try
+                    lastTextOpacity -= 16;
+                    overlayOpacity += 16;
+                    if (overlayOpacity >= 255)
                     {
-                        if(SteamManager.initialized)
+                        overlayOpacity = 255;
+                        lastTextOpacity = 0;
+                        if(bool.Parse(SaveData.saveValues["FirstBoot"]))
                         {
-                            ConsoleOutput.WriteLine("Steam initialized.", Color.LightGreen);
+                            askAccessibility = true;
+                            warningText = new List<string>(accesibilityText);
                         }
                         else
                         {
-                            ConsoleOutput.WriteLine("Steam is not running, skipping workshop initialization.", Color.LightGreen);
+                            try
+                            {
+                                if(SteamManager.initialized)
+                                {
+                                    ConsoleOutput.WriteLine("Steam initialized.", Color.LightGreen);
+                                }
+                                else
+                                {
+                                    ConsoleOutput.WriteLine("Steam is not running, skipping workshop initialization.", Color.LightGreen);
+                                }
+                            }
+                            catch
+                            {
+                                ConsoleOutput.WriteLine("Steam failed, skipping workshop initialization.", Color.LightGreen);
+                            }
+                            updateWorker = new BackgroundWorker();
+                            updateWorker.DoWork += UpdateCheckThread;
+                            updateWorker.RunWorkerAsync();
+                            ScreenManager.PushNavigation("Main Menu");
+                            ScreenManager.PushNavigation("Content");
+                            ScreenManager.PushNavigation("Video");
+                            ScreenManager.PushNavigation("Background");
+                            ScreenManager.PushNavigation("Socials");
+                            ScreenManager.GetScreen<ContentScreen>("Content")?.Show();
+                            ScreenManager.GetScreen<MenuScreen>("Main Menu")?.Show();
+                            ScreenManager.GetScreen<VideoScreen>("Video")?.Show();
+                            ScreenManager.GetScreen<BackgroundScreen>("Background")?.Show();
+                            ScreenManager.GetScreen<HeaderScreen>("Header")?.Show();
+                            ScreenManager.GetScreen<SocialScreen>("Socials")?.Show();
+                            Global.ready = true;
+                            Global.readyTime = gameTime.TotalGameTime.TotalMilliseconds;
+                            // Play startup sound.
+                            GlobalContent.GetSound("Start").Play(int.Parse(SaveData.saveValues["SoundEffectVolume"]) / 100f, 0f, 0f);
+                            fadingIn = true;
                         }
+                        accepted = false;
                     }
-                    catch
-                    {
-                        ConsoleOutput.WriteLine("Steam failed, skipping workshop initialization.", Color.LightGreen);
-                    }
-                    updateWorker = new BackgroundWorker();
-                    updateWorker.DoWork += UpdateCheckThread;
-                    updateWorker.RunWorkerAsync();
-                    ScreenManager.PushNavigation("Main Menu");
-                    ScreenManager.PushNavigation("Content");
-                    ScreenManager.PushNavigation("Video");
-                    ScreenManager.PushNavigation("Background");
-                    ScreenManager.PushNavigation("Socials");
-                    ScreenManager.GetScreen<ContentScreen>("Content")?.Show();
-                    ScreenManager.GetScreen<MenuScreen>("Main Menu")?.Show();
-                    ScreenManager.GetScreen<VideoScreen>("Video")?.Show();
-                    ScreenManager.GetScreen<BackgroundScreen>("Background")?.Show();
-                    ScreenManager.GetScreen<HeaderScreen>("Header")?.Show();
-                    ScreenManager.GetScreen<SocialScreen>("Socials")?.Show();
-                    Global.ready = true;
-                    Global.readyTime = gameTime.TotalGameTime.TotalMilliseconds;
-                    // Play startup sound.
-                    GlobalContent.GetSound("Start").Play(int.Parse(SaveData.saveValues["SoundEffectVolume"]) / 100f, 0f, 0f);
-                    fadingIn = true;
-                    accepted = false;
                 }
             }
-            if (fadingIn)
+            if (fadingIn || askAccessibility)
             {
                 overlayOpacity -= 16;
                 if (overlayOpacity <= 0)
                 {
                     overlayOpacity = 0;
-                    screenType = ScreenType.Hidden;
-                    return false;
+                    if(!askAccessibility)
+                    {
+                        screenType = ScreenType.Hidden;
+                        return false;
+                    }
                 }
             }
             return true;
         }
         public void LoadContent(ContentManager contentManager, GraphicsDevice graphicsDevice)
         {
+            if(!bool.Parse(SaveData.saveValues["FirstBoot"]))
+            {
+                askAccessibility = false;
+                overlayOpacity = 255;
+                accepted = true;
+            }
+            controller.Add("Mute", new Switch("", "Mutes in-app background music.", new Vector2(147, 60-4+19*5), (int i) => {
+                bool switchState = (i & 256) != 0;
+                if((i & 2) != 0)
+                {
+                    string oldValue = SaveData.saveValues["MusicVolume"];
+                    SaveData.saveValues["MusicVolume"] = switchState ? "0" : "25";
+                    if(oldValue != SaveData.saveValues["MusicVolume"])
+                        SaveData.Save();
+                }
+                return switchState;
+            }, SaveData.saveValues["MusicVolume"] == "0"));
+            controller.Add("MotionDisable", new Switch("", "Turns off screen tweening and other elements.", new Vector2(147, 60+2+19*3), (int i) => {
+                bool switchState = (i & 256) != 0;
+                if((i & 2) != 0)
+                {
+                    string oldValue = SaveData.saveValues["DisableMotion"];
+                    SaveData.saveValues["DisableMotion"] = switchState.ToString().ToLower();
+                    if(oldValue != SaveData.saveValues["DisableMotion"])
+                        SaveData.Save();
+                }
+                return switchState;
+            }, SaveData.saveValues["DisableMotion"] == "true"));
+            // Interactable
+            controller.LoadContent(contentManager, graphicsDevice);
         }
     }
 }
