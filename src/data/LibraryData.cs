@@ -234,11 +234,22 @@ namespace NonsensicalVideoGenerator
                     if(type.Special)
                         continue; // Skip special types for now.
                     string path = Path.Combine(libraryRootPath, libraryPaths[type]);
-                    ConsoleOutput.WriteLine("Loading library files from " + path + "...");
                     if (!Directory.Exists(path))
                         Directory.CreateDirectory(path);
                     LoadRecursive(path, type);
                 }
+                // Once complete, re-make SaveData.saveValues["DisabledMedia"] with disabled media
+                List<string> disabled = new();
+                foreach (LibraryFile file in libraryFiles)
+                {
+                    if (!file.Enabled)
+                    {
+                        if (!disabled.Contains(file.Path))
+                            disabled.Add(file.Path);
+                    }
+                }
+                SaveData.saveValues["DisabledMedia"] = JsonConvert.SerializeObject(disabled);
+                SaveData.Save();
             }
             catch (Exception e)
             {

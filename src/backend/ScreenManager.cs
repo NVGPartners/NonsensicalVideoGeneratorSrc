@@ -18,6 +18,9 @@ namespace NonsensicalVideoGenerator
         /// Navigation stack of all screen names.
         /// </summary>
         public static Stack<string> navigationStack { get; set; } = new Stack<string>();
+        public static KeyboardState lastKeyboardState;
+        public static KeyboardState keyboardState;
+        public static bool hideEverything = false;
         public static void LoadScreens()
         {
             // Clear existing screens.
@@ -66,24 +69,6 @@ namespace NonsensicalVideoGenerator
             {
                 drawnScreens[i].LoadContent(contentManager, graphicsDevice);
             }
-        }
-        public static string GetTitle()
-        {
-            // Get the current screen from the navigation stack.
-            if(navigationStack.Count > 0)
-            {
-                if(navigationStack.Peek() == "Modal")
-                {
-                    ModalScreen? screen = (ModalScreen?)drawnScreens.Find(x => x.title == "Modal");
-                    if(screen != null)
-                    {
-                        return screen.modalTitle;
-                    }
-                }
-                return navigationStack.Peek();
-            }
-            else
-                return "Main Menu";
         }
         public static void PushNavigation(string name)
         {
@@ -186,12 +171,16 @@ namespace NonsensicalVideoGenerator
         }
         public static void Update(GameTime gameTime)
         {
+            lastKeyboardState = keyboardState;
+            keyboardState = Keyboard.GetState();
             // Handle mouse input, so that screens don't have to do that.
             // Only change if the window is active and the mouse is over the window.
             if(UserInterface.instance != null)
             {
                 MouseInput.LastMouseState = MouseInput.MouseState;
-                if(!Accessibility.showDisambiguation)
+                if((Accessibility.allowAccessibility && !Accessibility.showDisambiguation)
+                    || (UserInterface.instance.IsActive && MouseInput.MouseState.X >= 0 && MouseInput.MouseState.X <= GlobalGraphics.scaledWidth
+                    && MouseInput.MouseState.Y >= 0 && MouseInput.MouseState.Y <= GlobalGraphics.scaledHeight && !Global.dragDrop))
                 {
                     MouseInput._mouseState = Mouse.GetState();
                 }
@@ -210,6 +199,35 @@ namespace NonsensicalVideoGenerator
                     handleInput = false;
                 }
             }
+            // Ctrl+F5 will toggle all UI elements
+            if(keyboardState.IsKeyDown(Keys.LeftControl) && keyboardState.IsKeyDown(Keys.F5) && lastKeyboardState.IsKeyUp(Keys.F5))
+            {
+                if(bool.Parse(SaveData.saveValues["HiddenVerbose"]))
+                {
+                    hideEverything = !hideEverything;
+                    if(hideEverything)
+                    {
+                        GetScreen<ContentScreen>("Content")?.Hide();
+                        GetScreen<HeaderScreen>("Header")?.Hide();
+                        GetScreen<VideoScreen>("Video")?.Hide();
+                        GetScreen<MenuScreen>("Main Menu")?.Hide();
+                        GetScreen<SocialScreen>("Socials")?.Hide();
+                    }
+                    else
+                    {
+                        PushNavigation("Content");
+                        PushNavigation("Header");
+                        PushNavigation("Video");
+                        PushNavigation("Main Menu");
+                        PushNavigation("Socials");
+                        GetScreen<ContentScreen>("Content")?.Show();
+                        GetScreen<HeaderScreen>("Header")?.Show();
+                        GetScreen<VideoScreen>("Video")?.Show();
+                        GetScreen<MenuScreen>("Main Menu")?.Show();
+                        GetScreen<SocialScreen>("Socials")?.Show();
+                    }
+                }
+            }
             Accessibility.PostUpdate(gameTime);
         }
         public static void Draw(GameTime gameTime, SpriteBatch spriteBatch)
@@ -225,26 +243,6 @@ namespace NonsensicalVideoGenerator
                 }
             }
             Accessibility.PostDraw(gameTime, spriteBatch);
-        }
-        public static void ShowModal(string title, string[] message, string[] buttons, int defaultButton, Action<int> callback)
-        {
-            // Push modal screen.
-            PushNavigation("Modal");
-            // Set the modal screen's properties.
-            ModalScreen? modalScreen = (ModalScreen?)drawnScreens.Find(s => s.title == "Modal");
-            if(modalScreen != null)
-            {
-                modalScreen.modalTitle = title;
-                modalScreen.modalText = message;
-                modalScreen.buttons = buttons;
-                modalScreen.defaultButton = defaultButton;
-                modalScreen.callback = callback;
-            }
-        }
-        public static void ShowError(string title, string[] message, string[] buttons, int defaultButton, Action<int> callback)
-        {
-            GlobalContent.GetSound("Error").Play(int.Parse(SaveData.saveValues["SoundEffectVolume"]) / 100f, 0f, 0f);
-            ShowModal(title, message, buttons, defaultButton, callback);
         }
     }
 }
