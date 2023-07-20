@@ -57,7 +57,7 @@ function Query()
         -- If your effect would like to use a custom media directory, you can set it up here.
         -- Libraries are displayed in the Library tab of the program and store a specific type of media.
         -- When uploading an effect using this feature, make sure to tick the "Custom Library" tag.
-        -- Remove the --[[ and ]]-- below to enable this feature.
+        -- Remove the --[[ and ]] below to enable this feature.
         --[[
         ["libraries"] = {
             -- This sets up the "example" library to accept video files.
@@ -73,7 +73,7 @@ function Query()
                 ["type"] = "video",
             }
         }
-        ]]--
+        ]]
     }
 end
 
@@ -82,7 +82,7 @@ end
 local chance = 50
 
 -- Temporary files
-local temp = ""
+local temp = "temp.mp4"
 
 -- Variables for the effect to use and modify.
 local speedUpOrDown = false
@@ -117,9 +117,6 @@ function StartGeneration(options, pluginSettings, functions)
     -- Using the chance variable, the user can select the weight of how
     -- often the effect will be applied within the settings menu.
     speedUpOrDown = functions.randomInt(1, 100) <= chance and true or false
-    
-    -- Also, the temporary directory will be set.
-    temp = "temp.mp4"
 
     -- Choose which effect to apply.
     -- Because this effect flips between two types of effects,

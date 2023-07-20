@@ -60,10 +60,7 @@ namespace NonsensicalVideoGenerator
             catch
             {
                 ConsoleOutput.WriteLine("Failed to load Workshop plugins.");
-                if(SteamManager.initialized)
-                    PluginHandler.LoadWorkshop();
-                else
-                    PluginHandler.LoadPluginsThreaded();
+                PluginHandler.LoadPluginsThreaded();
             }
             UpdateManager.GetDependencyStatus();
             if(!UpdateManager.ffmpegInstalled || !UpdateManager.ffprobeInstalled)

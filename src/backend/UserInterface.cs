@@ -33,7 +33,7 @@ namespace NonsensicalVideoGenerator
         private int _musicActive = 0;
         public UserInterface()
         {
-            ConsoleOutput.WriteLine("Creating new UserInterface instance...");
+            ConsoleOutput.WriteLine("Creating new UserInterface instance...", Color.Transparent);
             _graphics = new GraphicsDeviceManager(this);
             Content.RootDirectory = "Content";
             IsMouseVisible = true;
@@ -57,15 +57,14 @@ namespace NonsensicalVideoGenerator
         }
         protected override void Initialize()
         {
-            ConsoleOutput.WriteLine("Starting initialization for v" + Global.productVersion + "...");
+            ConsoleOutput.WriteLine("Starting initialization for v" + Global.productVersion + "...", Color.Transparent);
             try
             {
                 SteamManager.Initialize();
-                ConsoleOutput.WriteLine("SteamManager initialized.");
             }
             catch(Exception ex)
             {
-                ConsoleOutput.WriteLine("SteamManager failed to initialize: " + ex.Message);
+                ConsoleOutput.WriteLine("SteamManager failed to initialize: " + ex.Message, Color.Red);
             }
             // File drag and drop support.
             Form gameForm = (Form)Form.FromHandle(Window.Handle);
@@ -73,21 +72,21 @@ namespace NonsensicalVideoGenerator
             gameForm.DragEnter += new DragEventHandler(DragEnter);
             gameForm.DragDrop += new DragEventHandler(DragDrop);
             gameForm.DragLeave += new EventHandler(DragLeave);
-            ConsoleOutput.WriteLine("Form supports drag and drop.");
+            ConsoleOutput.WriteLine("Form supports drag and drop.", Color.Transparent);
             // Set window title.
             Window.Title = "Nonsensical Video Generator";
             // Disable anti-aliasing.
             _graphics.PreferMultiSampling = false;
             GraphicsDevice.SamplerStates[0] = SamplerState.PointClamp;
             // Set screen resolution.
-            ConsoleOutput.WriteLine("Setting screen resolution...");
+            ConsoleOutput.WriteLine("Setting screen resolution...", Color.Transparent);
             int scale = int.Parse(SaveData.saveValues["ScreenScale"]);
             _graphics.PreferredBackBufferWidth = (int)(int.Parse(SaveData.saveValues["ScreenWidth"]) * scale);
             _graphics.PreferredBackBufferHeight = (int)(int.Parse(SaveData.saveValues["ScreenHeight"]) * scale);
             _graphics.ApplyChanges();
-            ConsoleOutput.WriteLine("Screen resolution set.");
+            ConsoleOutput.WriteLine("Screen resolution set.", Color.Transparent);
             ScreenManager.LoadScreens();
-            ConsoleOutput.WriteLine("Initialization complete.");
+            ConsoleOutput.WriteLine("Initialization complete.", Color.Transparent);
             base.Initialize();
         }
         protected override void LoadContent()

@@ -24,37 +24,27 @@ function Query()
 end
 
 -- Temp files
-local black = ""
-local distort = ""
-local distort0 = ""
-local distort1 = ""
-local distort2 = ""
-local distort3 = ""
-local distort4 = ""
-local distort5 = ""
+local black = "black.png"
+local distort0 = "distort0.png"
+local distort1 = "distort1.png"
+local distort2 = "distort2.png"
+local distort3 = "distort3.png"
+local distort4 = "distort4.png"
+local distort5 = "distort5.png"
 local concatdistort = "concatdistort.txt"
+local distorts = {
+    distort1,
+    distort2,
+    distort3,
+    distort4,
+    distort5
+}
 
 -- Variables
-local distorts = {}
 local distortmusic = ""
 
 function StartGeneration(options, pluginSettings, functions)
-    -- Set temp files
-    black = "black.png"
-    distort0 = "distort0.png"
-    distort1 = "distort1.png"
-    distort2 = "distort2.png"
-    distort3 = "distort3.png"
-    distort4 = "distort4.png"
-    distort5 = "distort5.png"
     -- Set variables
-    distorts = {
-        distort1,
-        distort2,
-        distort3,
-        distort4,
-        distort5
-    }
     distortmusic = functions.getRandomLibraryFile("audio", "distort")
     -- Apply effect
     if functions.magickInstalled() then

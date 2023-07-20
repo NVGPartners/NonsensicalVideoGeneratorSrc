@@ -53,8 +53,8 @@ local musicSeekStart = 1
 local musicSeekEnd = 5
 
 -- Temp files
-local temp2 = ""
-local temp3 = ""
+local temp2 = "temp2.mp4"
+local temp3 = "temp3.mp4"
 
 -- Variables
 local segmentLength = 0.2
@@ -80,9 +80,6 @@ function StartGeneration(options, pluginSettings, functions)
     if pluginSettings["Music Seek End"] != nil then
         musicSeekEnd = tonumber(pluginSettings["Music Seek End"])
     end
-    -- Set temp files
-    temp2 = "temp2.mp4"
-    temp3 = "temp3.mp4"
     -- Set variables
     runCount = 0
     segmentLength = functions.randomDouble(randomTimeMin, randomTimeMax)

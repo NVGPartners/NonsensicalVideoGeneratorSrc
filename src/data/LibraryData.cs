@@ -195,6 +195,8 @@ namespace NonsensicalVideoGenerator
         };
         private static void LoadRecursive(string path, LibraryType type)
         {
+            if (!Directory.Exists(path))
+                Directory.CreateDirectory(path);
             // sort by date
             foreach (string file in Directory.GetFiles(path).OrderByDescending(f => new FileInfo(f).CreationTime))
             {
@@ -226,6 +228,7 @@ namespace NonsensicalVideoGenerator
                     if(type.Special)
                         continue; // Skip special types for now.
                     string path = Path.Combine(libraryRootPath, libraryPaths[type]);
+                    ConsoleOutput.WriteLine("Loading library files from " + path + "...");
                     if (!Directory.Exists(path))
                         Directory.CreateDirectory(path);
                     LoadRecursive(path, type);
@@ -291,8 +294,12 @@ namespace NonsensicalVideoGenerator
         }
         public static void SequentialName()
         {
+            string pa = Path.Combine(libraryRootPath, libraryPaths[DefaultLibraryTypes.Render]);
+            // does the directory exist?
+            if (!Directory.Exists(pa))
+                Directory.CreateDirectory(pa);
             // Set Global.videoTitle to next sequential render name
-            string[] files = Directory.GetFiles(Path.Combine(libraryRootPath, libraryPaths[DefaultLibraryTypes.Render]));
+            string[] files = Directory.GetFiles(pa);
             int max = 0;
             foreach(string f in files)
             {
@@ -304,7 +311,6 @@ namespace NonsensicalVideoGenerator
                         max = Math.Max(max, num);
                 }
             }
-            ConsoleOutput.WriteLine("Setting next render name to Render" + (max + 1), Color.Yellow);
             Global.videoTitle = "Render" + (max + 1);
         }
         public static void Unload(LibraryFile file)

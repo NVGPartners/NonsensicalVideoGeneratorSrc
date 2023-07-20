@@ -25,8 +25,8 @@ end
 local chance = 50
 
 -- Temp files
-local temp2 = ""
-local temp3 = ""
+local temp2 = "temp2.mp4"
+local temp3 = "temp3.mp4"
 
 -- Variables
 local forwardNormal = false
@@ -39,8 +39,6 @@ function StartGeneration(options, pluginSettings, functions)
         chance = tonumber(pluginSettings["Chance Roll"])
     end
     -- Set temp files
-    temp2 = "temp2.mp4"
-    temp3 = "temp3.mp4"
     -- Set variables
     forwardNormal = functions.randomInt(1, 100) <= chance and true or false
     length = 0
