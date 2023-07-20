@@ -39,7 +39,8 @@ namespace NonsensicalVideoGenerator
             {"HiddenKeepTemporaryJobFolders", "false"},
             {"HiddenVerbose", "false"},
             {"DisableMotion", "false"},
-            {"FirstBoot", "true"}
+            {"FirstBoot", "true"},
+            {"DisabledMedia", "[]"}
         };
         public static string saveFileName = "Options.json";
         public static bool Save()

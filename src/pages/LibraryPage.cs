@@ -668,11 +668,11 @@ namespace NonsensicalVideoGenerator
                             Rectangle toggleButtonRect = new Rectangle(videoHolderRect.X + GlobalGraphics.Scale(11), videoHolderRect.Y + GlobalGraphics.Scale(27), GlobalGraphics.Scale(videoOn.Width), GlobalGraphics.Scale(videoOn.Height));
                             if(libraryFileCache[currentLibraryType].Count > position)
                             {
-                                Accessibility.CompatAccessibility(button1Rect, (deleteConfirmPos == position ? "Confirm delete " : "Organize ") + "\"" + Path.GetFileName(libraryFileCache[currentLibraryType][position].Path).Replace(".disabled","") + "\"");
-                                Accessibility.CompatAccessibility(button2Rect, (deleteConfirmPos == position ? "Cancel delete " : "Delete ") + "\"" + Path.GetFileName(libraryFileCache[currentLibraryType][position].Path).Replace(".disabled","") + "\"");
+                                Accessibility.CompatAccessibility(button1Rect, (deleteConfirmPos == position ? "Confirm delete " : "Organize ") + "\"" + Path.GetFileName(libraryFileCache[currentLibraryType][position].Path) + "\"");
+                                Accessibility.CompatAccessibility(button2Rect, (deleteConfirmPos == position ? "Cancel delete " : "Delete ") + "\"" + Path.GetFileName(libraryFileCache[currentLibraryType][position].Path) + "\"");
                                 if(currentLibraryType != DefaultLibraryTypes.Render)
-                                    Accessibility.CompatAccessibility(toggleButtonRect, (libraryFileCache[currentLibraryType][position].Enabled ? "Disable " : "Enable ") + "\"" + Path.GetFileName(libraryFileCache[currentLibraryType][position].Path).Replace(".disabled","") + "\"");
-                                Accessibility.CompatAccessibility(staticRect, "Open \"" + Path.GetFileName(libraryFileCache[currentLibraryType][position].Path).Replace(".disabled","") + "\"");
+                                    Accessibility.CompatAccessibility(toggleButtonRect, (libraryFileCache[currentLibraryType][position].Enabled ? "Disable " : "Enable ") + "\"" + Path.GetFileName(libraryFileCache[currentLibraryType][position].Path) + "\"");
+                                Accessibility.CompatAccessibility(staticRect, "Open \"" + Path.GetFileName(libraryFileCache[currentLibraryType][position].Path) + "\"");
                             }
                             else
                             {

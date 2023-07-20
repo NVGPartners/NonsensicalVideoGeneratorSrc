@@ -206,8 +206,14 @@ namespace NonsensicalVideoGenerator
                     {
                         LibraryFile libFile = new LibraryFile(Path.GetFileNameWithoutExtension(file), file, type);
                         // If path is disabled, disable it.
-                        if (libFile.Path.Contains(@".disabled"))
-                            libFile.Enabled = false;
+                        // SaveData.saveValues["DisabledMedia"] is a string-stored json object
+                        // that contains a list of disabled media paths.
+                        if (SaveData.saveValues["DisabledMedia"] != "")
+                        {
+                            List<string> disabled = JsonConvert.DeserializeObject<List<string>>(SaveData.saveValues["DisabledMedia"]);
+                            if (disabled.Contains(file))
+                                libFile.Enabled = false;
+                        }
                         libraryFiles.Add(libFile);
                         break;
                     }
@@ -323,6 +329,17 @@ namespace NonsensicalVideoGenerator
             }
             try
             {
+                // if disabled and in library, remove from SaveData.saveValues["DisabledMedia"]
+                // a string-stored json object
+                // that contains a list of disabled media paths.
+                if (SaveData.saveValues["DisabledMedia"] != "")
+                {
+                    List<string> disabled = JsonConvert.DeserializeObject<List<string>>(SaveData.saveValues["DisabledMedia"]);
+                    if (disabled.Contains(file.Path))
+                        disabled.Remove(file.Path);
+                    SaveData.saveValues["DisabledMedia"] = JsonConvert.SerializeObject(disabled);
+                    SaveData.Save();
+                }
                 File.Delete(file.Path);
                 //if(FileOperationAPIWrapper.Send(file.Path))
                     //libraryFiles.Remove(file);
@@ -347,21 +364,17 @@ namespace NonsensicalVideoGenerator
                             ConsoleOutput.WriteLine("Cannot enable library file: path is null.", Color.Red);
                             return;
                         }
-                        // Enable: rename and remove .disabled from extension prefix
-                        string newpath = Path.Combine(Path.GetDirectoryName(file.Path), Path.GetFileNameWithoutExtension(file.Path).Replace(".disabled", "") + Path.GetExtension(file.Path));
-                        // If a file already exists in the new path, delete it.
-                        if (File.Exists(newpath))
-                            File.Delete(newpath);
-                        try
+                        // Enable: Remove from SaveData.saveValues["DisabledMedia"]
+                        // a string-stored json object
+                        // that contains a list of disabled media paths.
+                        if (SaveData.saveValues["DisabledMedia"] != "")
                         {
-                            File.Move(file.Path, newpath);
+                            List<string> disabled = JsonConvert.DeserializeObject<List<string>>(SaveData.saveValues["DisabledMedia"]);
+                            if (disabled.Contains(file.Path))
+                                disabled.Remove(file.Path);
+                            SaveData.saveValues["DisabledMedia"] = JsonConvert.SerializeObject(disabled);
+                            SaveData.Save();
                         }
-                        catch (Exception e)
-                        {
-                            ConsoleOutput.WriteLine("Failed to enable library file: " + e.Message, Color.Red);
-                            return;
-                        }
-                        file.Path = newpath;
                     }
                     else
                     {
@@ -370,21 +383,17 @@ namespace NonsensicalVideoGenerator
                             ConsoleOutput.WriteLine("Cannot disable library file: path is null.", Color.Red);
                             return;
                         }
-                        // Rename and add .disabled to extension prefix
-                        string newpath = Path.Combine(Path.GetDirectoryName(file.Path), Path.GetFileNameWithoutExtension(file.Path) + ".disabled" + Path.GetExtension(file.Path));
-                        // If a file already exists in disabled/, delete it.
-                        if (File.Exists(newpath))
-                            File.Delete(newpath);
-                        try
+                        // Disable: Add to SaveData.saveValues["DisabledMedia"]
+                        // a string-stored json object
+                        // that contains a list of disabled media paths.
+                        if (SaveData.saveValues["DisabledMedia"] != "")
                         {
-                            File.Move(file.Path, newpath);
+                            List<string> disabled = JsonConvert.DeserializeObject<List<string>>(SaveData.saveValues["DisabledMedia"]);
+                            if (!disabled.Contains(file.Path))
+                                disabled.Add(file.Path);
+                            SaveData.saveValues["DisabledMedia"] = JsonConvert.SerializeObject(disabled);
+                            SaveData.Save();
                         }
-                        catch (Exception e)
-                        {
-                            ConsoleOutput.WriteLine("Failed to disable library file: " + e.Message, Color.Red);
-                            return;
-                        }
-                        file.Path = newpath;
                     }
                     libraryFiles[i] = file;
                     libraryFiles[i].Enabled = enabled;
