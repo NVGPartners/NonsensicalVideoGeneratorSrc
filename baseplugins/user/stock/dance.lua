@@ -81,8 +81,8 @@ function StartGeneration(options, pluginSettings, functions)
         musicSeekEnd = tonumber(pluginSettings["Music Seek End"])
     end
     -- Set temp files
-    temp2 = options.workingDirectory .. "temp2.mp4"
-    temp3 = options.workingDirectory .. "temp3.mp4"
+    temp2 = "temp2.mp4"
+    temp3 = "temp3.mp4"
     -- Set variables
     runCount = 0
     segmentLength = functions.randomDouble(randomTimeMin, randomTimeMax)

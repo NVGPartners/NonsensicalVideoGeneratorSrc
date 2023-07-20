@@ -207,18 +207,19 @@ namespace NonsensicalVideoGenerator
                         if (libFile.Path.Contains(@".disabled"))
                             libFile.Enabled = false;
                         libraryFiles.Add(libFile);
-                        SequentialName(libFile);
                         break;
                     }
                 }
             }
             foreach (string dir in Directory.GetDirectories(path))
                 LoadRecursive(dir, type);
+            SequentialName();
         }
         public static void Load()
         {
             try
             {
+                Global.videoTitle = "Render1";
                 libraryFiles.Clear();
                 foreach (LibraryType type in libraryPaths.Keys)
                 {
@@ -227,7 +228,6 @@ namespace NonsensicalVideoGenerator
                     string path = Path.Combine(libraryRootPath, libraryPaths[type]);
                     if (!Directory.Exists(path))
                         Directory.CreateDirectory(path);
-                    Global.videoTitle = "Render1";
                     LoadRecursive(path, type);
                 }
             }
@@ -286,28 +286,26 @@ namespace NonsensicalVideoGenerator
                 ConsoleOutput.WriteLine("Awarding achievement: "+achievement, Color.LightBlue);
                 SteamUserStats.SetAchievement(achievement);
             }
-            SequentialName(file);
+            SequentialName();
             return file;
         }
-        public static void SequentialName(LibraryFile file)
+        public static void SequentialName()
         {
-            // Set Global.videoTitle to next sequential render name if render
-            if(file.Type == DefaultLibraryTypes.Render)
+            // Set Global.videoTitle to next sequential render name
+            string[] files = Directory.GetFiles(Path.Combine(libraryRootPath, libraryPaths[DefaultLibraryTypes.Render]));
+            int max = 0;
+            foreach(string f in files)
             {
-                string[] files = Directory.GetFiles(Path.Combine(libraryRootPath, libraryPaths[file.Type]));
-                int max = 0;
-                foreach(string f in files)
+                string name = Path.GetFileNameWithoutExtension(f);
+                if (name.StartsWith("Render"))
                 {
-                    string name = Path.GetFileNameWithoutExtension(f);
-                    if (name.StartsWith("Render"))
-                    {
-                        int num = 0;
-                        if (int.TryParse(name.Substring(6), out num))
-                            max = Math.Max(max, num);
-                    }
+                    int num = 0;
+                    if (int.TryParse(name.Substring(6), out num))
+                        max = Math.Max(max, num);
                 }
-                Global.videoTitle = "Render" + (max + 1);
             }
+            ConsoleOutput.WriteLine("Setting next render name to Render" + (max + 1), Color.Yellow);
+            Global.videoTitle = "Render" + (max + 1);
         }
         public static void Unload(LibraryFile file)
         {
@@ -465,7 +463,7 @@ namespace NonsensicalVideoGenerator
             if(removed)
             {
                 libraryFiles.Add(source);
-                SequentialName(source);
+                SequentialName();
             }
             else
             {
@@ -539,7 +537,7 @@ namespace NonsensicalVideoGenerator
             // Run callback
             downloadCallback(true);
             libraryFiles.Add(file);
-            SequentialName(file);
+            SequentialName();
             if(file.Type != DefaultLibraryTypes.Render)
             {
                 string achievement = "ACHIEVEMENT_LIBRARY_IMPORT";

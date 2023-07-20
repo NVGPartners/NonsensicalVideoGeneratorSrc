@@ -39,8 +39,8 @@ function StartGeneration(options, pluginSettings, functions)
         chance = tonumber(pluginSettings["Chance Roll"])
     end
     -- Set temp files
-    temp2 = options.workingDirectory .. "temp2.mp4"
-    temp3 = options.workingDirectory .. "temp3.mp4"
+    temp2 = "temp2.mp4"
+    temp3 = "temp3.mp4"
     -- Set variables
     forwardNormal = functions.randomInt(1, 100) <= chance and true or false
     length = 0

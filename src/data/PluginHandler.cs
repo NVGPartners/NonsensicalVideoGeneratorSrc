@@ -46,6 +46,7 @@ namespace NonsensicalVideoGenerator
         public CommandType type;
         public string customCommand = "";
         public string? args;
+        public string? workingDirectory;
         public string command
         {
             get
@@ -87,15 +88,17 @@ namespace NonsensicalVideoGenerator
                 }
             }
         }
-        public Command(CommandType type, string? args = null)
+        public Command(CommandType type, string? args = null, string? workingDirectory = null)
         {
             this.type = type;
             this.args = args;
+            this.workingDirectory = workingDirectory;
         }
-        public Command(string command, string? args = null)
+        public Command(string command, string? args = null, string? workingDirectory = null)
         {
             this.command = command;
             this.args = args;
+            this.workingDirectory = workingDirectory;
         }
         public string[] Call()
         {
@@ -104,7 +107,7 @@ namespace NonsensicalVideoGenerator
             {
                 FileName = command,
                 Arguments = args,
-                WorkingDirectory = Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location),
+                WorkingDirectory = workingDirectory ?? Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location),
                 UseShellExecute = false,
                 RedirectStandardOutput = true,
                 RedirectStandardError = true,
@@ -161,6 +164,7 @@ namespace NonsensicalVideoGenerator
         public Dictionary<string, object> settings = new();
         public Dictionary<string, string> settingTooltips = new();
         public Dictionary<string, SettingType> settingTypes = new();
+        public static Dictionary<string, string> placeholders = new();
         public Plugin(string path, PluginType type, string rootPath, bool enabled = true)
         {
             this.path = path;
@@ -199,6 +203,7 @@ namespace NonsensicalVideoGenerator
                         || matchString.Contains(">")
                         || matchString.Contains("<"))
                     {
+                        ConsoleOutput.WriteLine("A plugin attempted to pipe or redirect output.", Color.Red);
                         illegal = true;
                         break;
                     }
@@ -207,38 +212,124 @@ namespace NonsensicalVideoGenerator
             // Disallow directory and drive traversal
             if (args.Contains("..") || args.Contains(":\\"))
             {
+                ConsoleOutput.WriteLine("A plugin attempted to perform directory traversal.", Color.Red);
                 illegal = true;
             }
-            if (illegal)
+            // Don't allow batch or ps1 files to be created
+            if (args.Contains(".bat") || args.Contains(".ps1"))
             {
-                ConsoleOutput.WriteLine("A plugin attempted to perform an illegal operation.", Color.Red);
-                return false;
+                ConsoleOutput.WriteLine("A plugin attempted to create a batch or powershell script.", Color.Red);
+                illegal = true;
             }
-            return true;
+            if(illegal)
+            {
+                ConsoleOutput.WriteLine("Offending command: "+args, Color.Red);
+            }
+            return !illegal;
+        }
+        public static string jobDirectory = "";
+        // Replace placeholders in args with values from settings
+        public static string ReplacePlaceholders(string args)
+        {
+            string result = args;
+            foreach(KeyValuePair<string, string> placeholder in placeholders)
+            {
+                result = args.Replace("{" + placeholder.Key + "}", placeholder.Value);
+            }
+            return result;
         }
         // RunFFmpeg for lua
         public static void RunFFmpeg(string args)
         {
             if(!ValidateInput(args)) return;
-            PluginHandler.commands.Add(new Command(CommandType.FFmpeg, args));
+            PluginHandler.commands.Add(new Command(CommandType.FFmpeg, ReplacePlaceholders(args), jobDirectory));
         }
         // RunFFprobe for lua
         public static void RunFFprobe(string args)
         {
             if(!ValidateInput(args)) return;
-            PluginHandler.commands.Add(new Command(CommandType.FFprobe, args));
+            PluginHandler.commands.Add(new Command(CommandType.FFprobe, ReplacePlaceholders(args), jobDirectory));
         }
         // RunMagick for lua
         public static void RunMagick(string args)
         {
             if(!ValidateInput(args)) return;
-            PluginHandler.commands.Add(new Command(CommandType.Magick, args));
+            PluginHandler.commands.Add(new Command(CommandType.Magick, ReplacePlaceholders(args), jobDirectory));
         }
         // RunYtDlp for lua
         public static void RunYtDlp(string args)
         {
             if(!ValidateInput(args)) return;
-            PluginHandler.commands.Add(new Command(CommandType.YtDlp, args));
+            PluginHandler.commands.Add(new Command(CommandType.YtDlp, ReplacePlaceholders(args), jobDirectory));
+        }
+        // FolderCreate for lua
+        public static void FolderCreate(string path)
+        {
+            if(!ValidateInput(path)) return;
+            string combinedPath = Path.Combine(jobDirectory, ReplacePlaceholders(path));
+            Directory.CreateDirectory(combinedPath);
+        }
+        // FileCopy for lua
+        public static void FileCopy(string source, string dest)
+        {
+            if(!ValidateInput(source)) return;
+            if(!ValidateInput(dest)) return;
+            string combinedSource = Path.Combine(jobDirectory, ReplacePlaceholders(source));
+            string combinedDest = Path.Combine(jobDirectory, ReplacePlaceholders(dest));
+            File.Copy(combinedSource, combinedDest);
+        }
+        // FileDelete for lua
+        public static void FileDelete(string path)
+        {
+            if(!ValidateInput(path)) return;
+            string combinedPath = Path.Combine(jobDirectory, ReplacePlaceholders(path));
+            if (File.Exists(combinedPath))
+                File.Delete(combinedPath);
+        }
+        // FileMove for lua
+        public static void FileMove(string source, string dest)
+        {
+            if(!ValidateInput(source)) return;
+            if(!ValidateInput(dest)) return;
+            string combinedSource = Path.Combine(jobDirectory, ReplacePlaceholders(source));
+            string combinedDest = Path.Combine(jobDirectory, ReplacePlaceholders(dest));
+            if (File.Exists(combinedSource))
+                File.Move(combinedSource, combinedDest);
+        }
+        // FileExists for lua
+        public static bool FileExists(string path)
+        {
+            if(!ValidateInput(path)) return false;
+            string combinedPath = Path.Combine(jobDirectory, ReplacePlaceholders(path));
+            return File.Exists(combinedPath);
+        }
+        // FolderExists for lua
+        public static bool FolderExists(string path)
+        {
+            if(!ValidateInput(path)) return false;
+            string combinedPath = Path.Combine(jobDirectory, ReplacePlaceholders(path));
+            return Directory.Exists(combinedPath);
+        }
+        // EnumerateFiles for lua
+        public static IEnumerable<string> EnumerateFiles(string path)
+        {
+            if(!ValidateInput(path)) return new List<string>();
+            string combinedPath = Path.Combine(jobDirectory, ReplacePlaceholders(path));
+            // use relative path
+            return Directory.EnumerateFiles(combinedPath, "*", SearchOption.AllDirectories).Select(file =>
+            {
+                return Path.GetRelativePath(combinedPath, file);
+            });
+
+        }
+        // WriteFile for lua
+        public static void WriteFile(string path, string contents)
+        {
+            if(!ValidateInput(path)) return;
+            string combinedPath = Path.Combine(jobDirectory, ReplacePlaceholders(path));
+            if (File.Exists(combinedPath))
+                File.Delete(combinedPath);
+            File.WriteAllText(combinedPath, contents);
         }
         // RandomDouble for lua (uses global random)
         public static double RandomDouble(double min, double max)
@@ -254,6 +345,26 @@ namespace NonsensicalVideoGenerator
         public static bool RandomBool()
         {
             return Global.generatorFactory.globalRandom.Next(2) == 0;
+        }
+        // FFmpeg installed for lua
+        public static bool FFmpegInstalled()
+        {
+            return Global.useSystemFFmpeg || File.Exists(Path.Combine(Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location), "ffmpeg.exe"));
+        }
+        // FFprobe installed for lua
+        public static bool FFprobeInstalled()
+        {
+            return Global.useSystemFFprobe || File.Exists(Path.Combine(Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location), "ffprobe.exe"));
+        }
+        // Magick installed for lua
+        public static bool MagickInstalled()
+        {
+            return UpdateManager.DoesCommandExist("magick");
+        }
+        // YtDlp installed for lua
+        public static bool YtDlpInstalled()
+        {
+            return Global.useSystemYtDlp || File.Exists(Path.Combine(Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location), "yt-dlp.exe"));
         }
         // GetRandomLibraryFile for lua
         public static string GetRandomLibraryFile(string rootType = "video", string subType = "materials")
@@ -276,7 +387,13 @@ namespace NonsensicalVideoGenerator
                 }
             }
             string[] files = Directory.GetFiles(Path.Join(LibraryData.libraryRootPath, rootType, subType));
-            return files[Global.generatorFactory.globalRandom.Next(files.Length)];
+            // remove placeholder if it already exists
+            if (placeholders.ContainsKey("randomLibraryFile"))
+            {
+                placeholders.Remove("randomLibraryFile");
+            }
+            placeholders.Add("randomLibraryFile", Path.Join("..", "..", files[Global.generatorFactory.globalRandom.Next(files.Length)]));
+            return "{randomLibraryFile}";
         }
         public PluginReturnValue Call(string video)
         {
@@ -289,9 +406,10 @@ namespace NonsensicalVideoGenerator
                 Directory.Delete(jobPath, true);
             }
             Directory.CreateDirectory(jobPath);
+            jobDirectory = Path.GetFullPath(jobPath) + @"\";
             // Copy video to job path as result.mp4
             File.Copy(video, Path.Join(jobPath, "result.mp4"));
-            video = Path.Join(jobPath, "result.mp4");            
+            video = Path.Join(jobPath, "result.mp4");
             if (enabled == false)
             {
                 return new PluginReturnValue(false, Path.GetFileName(path));
@@ -307,13 +425,18 @@ namespace NonsensicalVideoGenerator
                     {
                         try
                         {
+                            placeholders.Clear();
                             // Create videoOptions table
                             Table videoOptions = new(luaScript);
-                            videoOptions["inputVideo"] = video;
-                            videoOptions["workingDirectory"] = jobPath + @"\";
-                            videoOptions["videoOptionsFileName"] = SaveData.saveFileName;
-                            videoOptions["pluginSettingsFileName"] = PluginHandler.pluginSettingsPath;
-                            videoOptions["outputVideo"] = jobPath + @"\output.mp4";
+                            videoOptions["width"] = int.Parse(SaveData.saveValues["VideoWidth"]);
+                            videoOptions["height"] = int.Parse(SaveData.saveValues["VideoHeight"]);
+                            videoOptions["inputVideo"] = Path.GetFileName(video);
+                            videoOptions["outputVideo"] = "output.mp4";
+                            videoOptions["workingDirectory"] = "";
+                            foreach (KeyValuePair<string, string> placeholder in placeholders)
+                            {
+                                videoOptions[placeholder.Key] = "{" + placeholder.Key + "}";
+                            }
                             // Add settings to pluginSettings table
                             Table pluginSettings = new(luaScript);
                             foreach (KeyValuePair<string, object> setting in settings)
@@ -329,7 +452,19 @@ namespace NonsensicalVideoGenerator
                             functions["randomDouble"] = (Func<double, double, double>)RandomDouble;
                             functions["randomInt"] = (Func<int, int, int>)RandomInt;
                             functions["randomBool"] = (Func<bool>)RandomBool;
+                            functions["folderCreate"] = (Action<string>)FolderCreate;
+                            functions["fileCopy"] = (Action<string, string>)FileCopy;
+                            functions["fileDelete"] = (Action<string>)FileDelete;
+                            functions["fileMove"] = (Action<string, string>)FileMove;
+                            functions["fileExists"] = (Func<string, bool>)FileExists;
+                            functions["fileWrite"] = (Action<string, string>)WriteFile;
+                            functions["folderExists"] = (Func<string, bool>)FolderExists;
+                            functions["enumerateFiles"] = (Func<string, IEnumerable<string>>)EnumerateFiles;
                             functions["getRandomLibraryFile"] = (Func<string, string, string>)GetRandomLibraryFile;
+                            functions["ffmpegInstalled"] = (Func<bool>)FFmpegInstalled;
+                            functions["ffprobeInstalled"] = (Func<bool>)FFprobeInstalled;
+                            functions["magickInstalled"] = (Func<bool>)MagickInstalled;
+                            functions["ytdlpInstalled"] = (Func<bool>)YtDlpInstalled;
                             PluginHandler.commands.Clear();
                             // Call generation
                             DynValue result = luaScript.Call(luaScript.Globals["StartGeneration"], videoOptions, pluginSettings, functions);
@@ -880,8 +1015,9 @@ namespace NonsensicalVideoGenerator
                     LoadPluginsRecursive(file, type);
                 }
                 LoadPluginSettings();
-                Global.generatorFactory.progressText = $"{plugins.Count} plugins, check console for details.";
+                Global.generatorFactory.progressText = $"{plugins.Count} effects loaded.";
                 Global.canRender = true;
+                LibraryData.SequentialName();
             }
             catch (Exception e)
             {

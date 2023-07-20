@@ -119,7 +119,7 @@ function StartGeneration(options, pluginSettings, functions)
     speedUpOrDown = functions.randomInt(1, 100) <= chance and true or false
     
     -- Also, the temporary directory will be set.
-    temp = options.workingDirectory .. "temp.mp4"
+    temp = "temp.mp4"
 
     -- Choose which effect to apply.
     -- Because this effect flips between two types of effects,

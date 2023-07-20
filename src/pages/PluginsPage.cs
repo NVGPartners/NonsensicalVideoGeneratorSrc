@@ -855,18 +855,11 @@ namespace NonsensicalVideoGenerator
                 switch(i)
                 {
                     case 2:
-                        if(Global.pluginsLoaded)
-                        {
-                            GlobalContent.GetSound("Option").Play(int.Parse(SaveData.saveValues["SoundEffectVolume"]) / 100f, 0f, 0f);
-                            if(SteamManager.initialized)
-                                PluginHandler.LoadWorkshop();
-                            else
-                                PluginHandler.LoadPluginsThreaded();
-                        }
+                        GlobalContent.GetSound("Option").Play(int.Parse(SaveData.saveValues["SoundEffectVolume"]) / 100f, 0f, 0f);
+                        if(SteamManager.initialized)
+                            PluginHandler.LoadWorkshop();
                         else
-                        {
-                            GlobalContent.GetSound("Error").Play(int.Parse(SaveData.saveValues["SoundEffectVolume"]) / 100f, 0f, 0f);
-                        }
+                            PluginHandler.LoadPluginsThreaded();
                         return true;
                 }
                 return false;

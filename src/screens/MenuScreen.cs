@@ -167,8 +167,8 @@ namespace NonsensicalVideoGenerator
             if(handleInput)
             {
                 // Accessibility
-                // -1 because the exit button is not included
-                for(int i = 0; i < Pagination.GetTopPageCount()-1; i++)
+                // -2 because the exit and game buttons are not included
+                for(int i = 0; i < Pagination.GetTopPageCount()-2; i++)
                 {
                     string name = Pagination.GetPage(i).Name;
                     if(i == 2)

@@ -44,7 +44,6 @@ namespace NonsensicalVideoGenerator
             process.BeginOutputReadLine();
             process.WaitForExit();
             bool exists = output != "" && !output.Contains("Could not find");
-            ConsoleOutput.WriteLine(command + (exists ? " found." : " not found."), exists ? Microsoft.Xna.Framework.Color.Magenta : Microsoft.Xna.Framework.Color.Red);
             return exists;
         }
         public static void GetDependencyStatus()

@@ -346,13 +346,11 @@ namespace NonsensicalVideoGenerator
                         if (!rolledForOverlay && rolledForTransition && LibraryData.GetFileCount(DefaultLibraryTypes.Transition) > 0)
                         {
                             string transitionPath = LibraryData.PickRandom(DefaultLibraryTypes.Transition, globalRandom);
-                            if(transitionPath == "")
+                            if(transitionPath != "")
                             {
-                                ConsoleOutput.WriteLine("No transitions found in library.", Color.Yellow);
-                                continue;
+                                progressText = "Transitioning... (" + (i + 1) + "/" + maxClips + ")";
+                                Utilities.CopyVideo(transitionPath, Path.Combine(Utilities.temporaryDirectory, "video" + i + ".mp4"));
                             }
-                            progressText = "Transitioning... (" + (i + 1) + "/" + maxClips + ")";
-                            Utilities.CopyVideo(transitionPath, Path.Combine(Utilities.temporaryDirectory, "video" + i + ".mp4"));
                         }
                         else
                         {
@@ -364,27 +362,25 @@ namespace NonsensicalVideoGenerator
                         // Parse overlay if rolled.
                         if(rolledForOverlay)
                         {
-                            if(overlayPath == null)
+                            if(overlayPath != null)
                             {
-                                ConsoleOutput.WriteLine("No overlays found in library.", Color.Yellow);
-                                continue;
+                                progressText = "Chroma keying... (" + (i + 1) + "/" + maxClips + ")";
+                                ConsoleOutput.WriteLine("Rolled for overlay, adding overlay to clip " + i + ".", Color.Gray);
+                                // We snip the clip here in case it was a transition
+                                //if(!alreadySnipped)
+                                    //Utilities.SnipVideo(sourceToPick, startOfClip, endOfClip, Path.Combine(Utilities.temporaryDirectory, "video" + i + ".mp4"));
+                                // Now we'll snip the overlay with another random duration.
+                                float overlayDuration = float.Parse(Utilities.GetLength(overlayPath));
+                                float startOfOverlay = RandomFloat(0f, overlayDuration - float.Parse(SaveData.saveValues["MinStreamDuration"]));
+                                float endOfOverlay = startOfOverlay + RandomFloat(float.Parse(SaveData.saveValues["MinStreamDuration"]), float.Parse(SaveData.saveValues["MaxStreamDuration"]));
+                                // Make sure the start is not less than 0 and the end is not greater than the overlay length.
+                                if (startOfOverlay < 0)
+                                    startOfOverlay = 0;
+                                if (endOfOverlay > overlayDuration)
+                                    endOfOverlay = overlayDuration;
+                                Utilities.SnipVideo(overlayPath, startOfOverlay, endOfOverlay, Path.Combine(Utilities.temporaryDirectory, "video" + i + "_tempoverlay.mp4"));
+                                Utilities.OverlayVideo(Path.Combine(Utilities.temporaryDirectory, "video" + i + ".mp4"), Path.Combine(Utilities.temporaryDirectory, "video" + i + "_tempoverlay.mp4"));
                             }
-                            progressText = "Chroma keying... (" + (i + 1) + "/" + maxClips + ")";
-                            ConsoleOutput.WriteLine("Rolled for overlay, adding overlay to clip " + i + ".", Color.Gray);
-                            // We snip the clip here in case it was a transition
-                            //if(!alreadySnipped)
-                                //Utilities.SnipVideo(sourceToPick, startOfClip, endOfClip, Path.Combine(Utilities.temporaryDirectory, "video" + i + ".mp4"));
-                            // Now we'll snip the overlay with another random duration.
-                            float overlayDuration = float.Parse(Utilities.GetLength(overlayPath));
-                            float startOfOverlay = RandomFloat(0f, overlayDuration - float.Parse(SaveData.saveValues["MinStreamDuration"]));
-                            float endOfOverlay = startOfOverlay + RandomFloat(float.Parse(SaveData.saveValues["MinStreamDuration"]), float.Parse(SaveData.saveValues["MaxStreamDuration"]));
-                            // Make sure the start is not less than 0 and the end is not greater than the overlay length.
-                            if (startOfOverlay < 0)
-                                startOfOverlay = 0;
-                            if (endOfOverlay > overlayDuration)
-                                endOfOverlay = overlayDuration;
-                            Utilities.SnipVideo(overlayPath, startOfOverlay, endOfOverlay, Path.Combine(Utilities.temporaryDirectory, "video" + i + "_tempoverlay.mp4"));
-                            Utilities.OverlayVideo(Path.Combine(Utilities.temporaryDirectory, "video" + i + ".mp4"), Path.Combine(Utilities.temporaryDirectory, "video" + i + "_tempoverlay.mp4"));
                         }
                         if (vidThreadWorker?.CancellationPending == true)
                             return;
