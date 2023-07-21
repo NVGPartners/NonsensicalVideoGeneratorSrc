@@ -160,7 +160,6 @@ namespace NonsensicalVideoGenerator
         public Script? luaScript;
         public string workshopId = "";
         public string rootPath = "";
-        public List<LibraryType> libraryTypes = new List<LibraryType>();
         public Dictionary<string, object> settings = new();
         public Dictionary<string, string> settingTooltips = new();
         public Dictionary<string, SettingType> settingTypes = new();
@@ -563,7 +562,6 @@ namespace NonsensicalVideoGenerator
                         DynValue luaLibraries = luaQuery.Table.Get("libraries");
                         if (luaLibraries.Type == DataType.Table)
                         {
-                            int libraryCount = 0;
                             foreach (DynValue library in luaLibraries.Table.Values)
                             {
                                 if (library.Type != DataType.Table)
@@ -577,20 +575,7 @@ namespace NonsensicalVideoGenerator
                                 LibraryType dummyType = new(rootType, libraryName, libraryTooltip);
                                 string libPath = Path.Join(rootType == LibraryRootType.Video ? "video" : "audio", libraryName);
                                 string[] fileExts = LibraryData.libraryFileTypes[rootType == LibraryRootType.Video ? DefaultLibraryTypes.Video : DefaultLibraryTypes.Audio];
-                                // Check to see if library already exists.
-                                if (LibraryData.libraryPaths.ContainsKey(dummyType))
-                                {
-                                    continue;
-                                }
-                                DefaultLibraryTypes.AllTypes.Add(dummyType);
-                                LibraryData.libraryPaths.Add(dummyType, libPath);
-                                LibraryData.libraryFileTypes.Add(dummyType, fileExts);
-                                LibraryData.libraryNames.Add(dummyType, libraryPrettyName);
-                                libraryTypes.Add(dummyType);
-                                Global.justCompletedRender = true; // demand a refresh
-                                // Print to console.
-                                ConsoleOutput.WriteLine($"Added {(rootType == LibraryRootType.Video ? "video" : "audio")} library {libraryPrettyName} from plugin {Path.GetFileName(path)}.", Color.LightBlue);
-                                libraryCount++;
+                                PluginHandler.queriedLibraryTypes.Add(new LibraryCombinedType(dummyType, libraryPrettyName, libPath, fileExts));
                             }
                             // Print count
                             //if (libraryCount > 0)
@@ -664,11 +649,26 @@ namespace NonsensicalVideoGenerator
             }
         }
     }
+    public class LibraryCombinedType
+    {
+        public LibraryType type;
+        public string prettyName;
+        public string path;
+        public string[] fileExts;
+        public LibraryCombinedType(LibraryType type, string prettyName, string path, string[] fileExts)
+        {
+            this.type = type;
+            this.prettyName = prettyName;
+            this.path = path;
+            this.fileExts = fileExts;
+        }
+    }
     /// <summary>
     /// Plugin support.
     /// </summary>
     public static class PluginHandler
     {
+        public static List<LibraryCombinedType> queriedLibraryTypes = new();
         public static List<Plugin> plugins = new();
         private static string pluginPath = @".\plugins";
         public static string pluginSettingsPath = @".\PluginSettings.json";
@@ -974,14 +974,15 @@ namespace NonsensicalVideoGenerator
             // Find all custom library types and remove them
             foreach (Plugin plugin in plugins)
             {
-                foreach(LibraryType libtype in plugin.libraryTypes)
+                foreach(LibraryCombinedType libtype in queriedLibraryTypes)
                 {
-                    DefaultLibraryTypes.AllTypes.Remove(libtype);
-                    LibraryData.libraryPaths.Remove(libtype);
-                    LibraryData.libraryFileTypes.Remove(libtype);
-                    LibraryData.libraryNames.Remove(libtype);
+                    DefaultLibraryTypes.AllTypes.Remove(libtype.type);
+                    LibraryData.libraryPaths.Remove(libtype.type);
+                    LibraryData.libraryFileTypes.Remove(libtype.type);
+                    LibraryData.libraryNames.Remove(libtype.type);
                 }
             }
+            queriedLibraryTypes.Clear();
             // Clear plugins.
             plugins.Clear();
             Global.pluginsLoaded = false;
@@ -1025,6 +1026,23 @@ namespace NonsensicalVideoGenerator
                         continue;
                     LoadPluginsRecursive(file, type);
                 }
+                List<string> typesAdded = new();
+                foreach(LibraryCombinedType dummyType in queriedLibraryTypes)
+                {
+                    // Check to see if library already exists.
+                    if (typesAdded.Contains(dummyType.path))
+                    {
+                        continue;
+                    }
+                    DefaultLibraryTypes.AllTypes.Add(dummyType.type);
+                    LibraryData.libraryPaths.Add(dummyType.type, dummyType.path);
+                    LibraryData.libraryFileTypes.Add(dummyType.type, dummyType.fileExts);
+                    LibraryData.libraryNames.Add(dummyType.type, dummyType.prettyName);
+                    // Print to console.
+                    ConsoleOutput.WriteLine($"Added {(dummyType.type.RootType == LibraryRootType.Video ? "video" : "audio")} library {dummyType.prettyName}.", Color.LightBlue);
+                    typesAdded.Add(dummyType.path);
+                }
+                Global.justCompletedRender = true; // demand a refresh
                 LoadPluginSettings();
                 Global.generatorFactory.progressText = $"{plugins.Count} effects loaded.";
                 Global.canRender = true;

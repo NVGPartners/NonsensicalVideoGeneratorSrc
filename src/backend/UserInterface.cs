@@ -119,6 +119,7 @@ namespace NonsensicalVideoGenerator
             MediaPlayer.Play(GlobalContent.GetSongByIndex(_musicActive));
             if(!Global.ready)
                 MediaPlayer.Volume = 0f;
+            _musicState = MusicState.Playing;
         }
         protected override void Update(GameTime gameTime)
         {
@@ -156,8 +157,7 @@ namespace NonsensicalVideoGenerator
                     }
                     else if((_windowState == WindowState.Focused && _musicState == MusicState.Stopped) && FramePlayer.canPlayBgMusic)
                     {
-                        MediaPlayer.Play(GlobalContent.GetSongByIndex(_musicActive));
-                        _musicState = MusicState.Playing;
+                        FindMusic();
                     }
                     else if((_windowState == WindowState.Focused && _musicState == MusicState.Paused) && FramePlayer.canPlayBgMusic)
                     {
