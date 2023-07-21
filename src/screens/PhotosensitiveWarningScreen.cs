@@ -80,7 +80,7 @@ namespace NonsensicalVideoGenerator
             "Mute Background Music:",
             " ",
             " ",
-            "Click anywhere or press any key to continue.",
+            "Click anywhere to continue.",
             " "
         };
         private List<string> accesibilityText = new List<string>()
@@ -95,8 +95,73 @@ namespace NonsensicalVideoGenerator
             "If you are sensitive to flashing lights,",
             "please do not use this software.",
             " ",
-            "Click anywhere or press any key to continue.",
+            "Click anywhere to continue.",
             " "
+        };
+        private List<string> tipoftheday = new List<string>()
+        {
+            " ",
+            "Tip of the Day:",
+            "placeholder1",
+            "placeholder2",
+            " ",
+            "Total Stats:",
+            "0 videos rendered",
+            "0 media imported",
+            "0 clips trimmed",
+            " ",
+            "Click anywhere to continue.",
+            " "
+        };
+        private List<string[]> tips = new List<string[]>()
+        {
+#if WINDOWSDX
+            new string[]
+            {
+                "You can drag and drop media into",
+                "the library to import them."
+            },
+            new string[]
+            {
+                "You can download several URLs at a time by",
+                "pasting a list of URLs from the clipboard."
+            },
+#endif
+            new string[]
+            {
+                "You can right click on media in the library",
+                "to view them in the file explorer."
+            },
+            new string[]
+            {
+                "You can right click the media player to",
+                "start playing in an external player."
+            },
+            new string[]
+            {
+                "You can press F1 to access keyboard",
+                "navigation, which uses the arrow keys."
+            },
+            new string[]
+            {
+                "You can press F2 to toggle text to speech",
+                "while keyboard navigation is enabled."
+            },
+            new string[]
+            {
+                "You can press space to pause or re-play",
+                "the video in the media player."
+            },
+            new string[]
+            {
+                "The screen scale multiplier can be",
+                "set to change the program resolution."
+            },
+            new string[]
+            {
+                "You can hold shift while deleting media from",
+                "the library to instantly delete them."
+            },
         };
         public void Show()
         {
@@ -160,28 +225,25 @@ namespace NonsensicalVideoGenerator
                                 timeText = gameTime.TotalGameTime.TotalMilliseconds;
                             }
                         }
-                        if(handleInput)
+                        // Keyboard input.
+                        newKeyboardState = Keyboard.GetState();
+                        oldKeyboardState = newKeyboardState;
+                        Accessibility.CompatAccessibility(new Rectangle(GlobalGraphics.Scale(4), GlobalGraphics.Scale(24 + (warningText.Count - 2) * 16), GlobalGraphics.scaledWidth - GlobalGraphics.Scale(8), GlobalGraphics.Scale(16)), "Click anywhere to continue.");
+                        if (MouseInput.MouseState.LeftButton == ButtonState.Pressed && MouseInput.LastMouseState.LeftButton == ButtonState.Released
+                            || newKeyboardState.GetPressedKeys().Length > 0 && oldKeyboardState.GetPressedKeys().Length == 0)
                         {
-                            // Keyboard input.
-                            newKeyboardState = Keyboard.GetState();
-                            oldKeyboardState = newKeyboardState;
-                            Accessibility.CompatAccessibility(new Rectangle(GlobalGraphics.Scale(4), GlobalGraphics.Scale(24 + (warningText.Count - 2) * 16), GlobalGraphics.scaledWidth - GlobalGraphics.Scale(8), GlobalGraphics.Scale(16)), "Click anywhere or press any key to continue.");
-                            if (MouseInput.MouseState.LeftButton == ButtonState.Pressed && MouseInput.LastMouseState.LeftButton == ButtonState.Released
-                                || newKeyboardState.GetPressedKeys().Length > 0 && oldKeyboardState.GetPressedKeys().Length == 0)
+                            if(askAccessibility)
                             {
-                                if(askAccessibility)
-                                {
-                                    SaveData.saveValues["FirstBoot"] = "false";
-                                    SaveData.Save();
-                                    askAccessibility = false;
-                                }
-                                else
-                                {
-                                    ConsoleOutput.WriteLine("User acknowledged photosensitive warning.", Color.LightGreen);
-                                }
-                                accepted = true;
-                                GlobalContent.GetSound("Select").Play(int.Parse(SaveData.saveValues["SoundEffectVolume"]) / 100f, 0f, 0f);
+                                SaveData.saveValues["FirstBoot"] = "false";
+                                SaveData.Save();
+                                askAccessibility = false;
                             }
+                            else
+                            {
+                                ConsoleOutput.WriteLine("User acknowledged photosensitive warning.", Color.LightGreen);
+                            }
+                            accepted = true;
+                            GlobalContent.GetSound("Select").Play(int.Parse(SaveData.saveValues["SoundEffectVolume"]) / 100f, 0f, 0f);
                         }
                     }
                 }
@@ -260,30 +322,54 @@ namespace NonsensicalVideoGenerator
             {
                 askAccessibility = false;
                 overlayOpacity = 255;
-                accepted = true;
+                // tip of the day
+                warningText = new List<string>(tipoftheday);
+                // Get random tip.
+                string[] tip = tips[Global.generatorFactory.globalRandom.Next(tips.Count)];
+                warningText[2] = tip[0];
+                warningText[3] = tip[1];
+                // get stats
+                int[] stats = new int[3]
+                {
+                    int.Parse(SaveData.saveValues["TotalVideosRendered"]),
+                    int.Parse(SaveData.saveValues["TotalMediaImported"]),
+                    int.Parse(SaveData.saveValues["TotalClipsTrimmed"])
+                };
+                bool[] plural = new bool[3]
+                {
+                    stats[0] != 1,
+                    stats[1] != 1,
+                    stats[2] != 1
+                };
+                warningText[6] = $"{stats[0]} video{(plural[0] ? "s" : "")} rendered";
+                warningText[7] = $"{stats[1]} media imported";
+                warningText[8] = $"{stats[2]} clip{(plural[2] ? "s" : "")} trimmed";
             }
-            controller.Add("Mute", new Switch("", "Mutes in-app background music.", new Vector2(147, 60-4+19*5), (int i) => {
-                bool switchState = (i & 256) != 0;
-                if((i & 2) != 0)
-                {
-                    string oldValue = SaveData.saveValues["MusicVolume"];
-                    SaveData.saveValues["MusicVolume"] = switchState ? "0" : "25";
-                    if(oldValue != SaveData.saveValues["MusicVolume"])
-                        SaveData.Save();
-                }
-                return switchState;
-            }, SaveData.saveValues["MusicVolume"] == "0"));
-            controller.Add("MotionDisable", new Switch("", "Turns off screen tweening and other elements.", new Vector2(147, 60+2+19*3), (int i) => {
-                bool switchState = (i & 256) != 0;
-                if((i & 2) != 0)
-                {
-                    string oldValue = SaveData.saveValues["DisableMotion"];
-                    SaveData.saveValues["DisableMotion"] = switchState.ToString().ToLower();
-                    if(oldValue != SaveData.saveValues["DisableMotion"])
-                        SaveData.Save();
-                }
-                return switchState;
-            }, SaveData.saveValues["DisableMotion"] == "true"));
+            else
+            {
+                controller.Add("Mute", new Switch("", "Mutes in-app background music.", new Vector2(147, 60-4+19*5), (int i) => {
+                    bool switchState = (i & 256) != 0;
+                    if((i & 2) != 0)
+                    {
+                        string oldValue = SaveData.saveValues["MusicVolume"];
+                        SaveData.saveValues["MusicVolume"] = switchState ? "0" : "25";
+                        if(oldValue != SaveData.saveValues["MusicVolume"])
+                            SaveData.Save();
+                    }
+                    return switchState;
+                }, SaveData.saveValues["MusicVolume"] == "0"));
+                controller.Add("MotionDisable", new Switch("", "Turns off screen tweening and other elements.", new Vector2(147, 60+2+19*3), (int i) => {
+                    bool switchState = (i & 256) != 0;
+                    if((i & 2) != 0)
+                    {
+                        string oldValue = SaveData.saveValues["DisableMotion"];
+                        SaveData.saveValues["DisableMotion"] = switchState.ToString().ToLower();
+                        if(oldValue != SaveData.saveValues["DisableMotion"])
+                            SaveData.Save();
+                    }
+                    return switchState;
+                }, SaveData.saveValues["DisableMotion"] == "true"));
+            }
             // Interactable
             controller.LoadContent(contentManager, graphicsDevice);
         }

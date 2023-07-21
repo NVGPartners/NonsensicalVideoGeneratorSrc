@@ -40,7 +40,10 @@ namespace NonsensicalVideoGenerator
             {"HiddenVerbose", "false"},
             {"DisableMotion", "false"},
             {"FirstBoot", "true"},
-            {"DisabledMedia", "[]"}
+            {"DisabledMedia", "[]"},
+            {"TotalVideosRendered", "0"},
+            {"TotalMediaImported", "0"},
+            {"TotalClipsTrimmed", "0"},
         };
         public static string saveFileName = "Options.json";
         public static bool Save()

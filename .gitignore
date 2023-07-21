@@ -403,5 +403,7 @@ FodyWeavers.xsd
 # End of https://www.toptal.com/developers/gitignore/api/csharp
 
 # Nonsensical video generator
+cred.bat
 thumbs.db
 *.sfk
+steamcmdoutput/

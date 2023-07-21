@@ -11,6 +11,11 @@ function Query()
                 ["value"] = "Distorts still frames to the beat.",
                 ["type"] = "label",
             },
+            {
+                ["name"] = "Label1",
+                ["value"] = "Uses the Distort library.",
+                ["type"] = "label",
+            }
         },
         ["libraries"] = {
             {

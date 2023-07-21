@@ -673,7 +673,6 @@ namespace NonsensicalVideoGenerator
                                             return false;
                                         }));
                                         Name = PluginHandler.plugins[i].GetDisplayName();
-                                        controller.Add("ErrorLabel", new Label("Error sound means try again.", new Vector2(139, 60)));
                                         int sindex = 0;
                                         List<IInteractable> tes = new();
                                         foreach(KeyValuePair<string, object> s in PluginHandler.plugins[i].settings)
@@ -704,10 +703,10 @@ namespace NonsensicalVideoGenerator
                                                     ty = 5;
                                                     goto default;
                                                 case SettingType.Label:
-                                                    te = new Label((string)PluginHandler.plugins[i].settings[s.Key], new Vector2(139, 51+4+19+19*sindex));
+                                                    te = new Label((string)PluginHandler.plugins[i].settings[s.Key], new Vector2(139, 60+4+19*sindex));
                                                     break;
                                                 case SettingType.Switch:
-                                                    te = new Switch(s.Key, PluginHandler.plugins[i].settingTooltips[s.Key], new Vector2(139, 51+19+19*sindex), (int i) => {
+                                                    te = new Switch(s.Key, PluginHandler.plugins[i].settingTooltips[s.Key], new Vector2(139, 60+19*sindex), (int i) => {
                                                         bool switchState = (i & 256) != 0;
                                                         if((i & 1) != 0)
                                                         {
@@ -739,7 +738,7 @@ namespace NonsensicalVideoGenerator
                                                     break;
                                                 case SettingType.TextInput:
                                                 default:
-                                                    te = new TextEntry(s.Key, PluginHandler.plugins[i].settingTooltips[s.Key], PluginHandler.plugins[i].settings[s.Key].ToString(), new Vector2(139, 51+19+19*sindex), 50, 25, ty, (int i) => {
+                                                    te = new TextEntry(s.Key, PluginHandler.plugins[i].settingTooltips[s.Key], PluginHandler.plugins[i].settings[s.Key].ToString(), new Vector2(139, 60+19*sindex), 50, 25, ty, (int i) => {
                                                         if(i == 1)
                                                         {
                                                             // Set "setting" to the setting index where mouse cursor y is

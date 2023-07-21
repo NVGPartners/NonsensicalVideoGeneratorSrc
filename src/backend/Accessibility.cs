@@ -207,18 +207,17 @@ namespace NonsensicalVideoGenerator
                         // Only 46 possible keys, so shift until the last option is able to be selected.
                         if(offset < -(disambiguationOptions.Count - 1))
                         {
-                            GlobalContent.GetSound("Error").Play(int.Parse(SaveData.saveValues["SoundEffectVolume"]) / 100f, 0f, 0f);
-                            offset = -(disambiguationOptions.Count - 1);
+                            //GlobalContent.GetSound("Error").Play(int.Parse(SaveData.saveValues["SoundEffectVolume"]) / 100f, 0f, 0f);
+                            //offset = -(disambiguationOptions.Count - 1);
+                            offset = 0;
                         }
                         else if(offset > 0)
                         {
-                            GlobalContent.GetSound("Error").Play(int.Parse(SaveData.saveValues["SoundEffectVolume"]) / 100f, 0f, 0f);
-                            offset = 0;
+                            //GlobalContent.GetSound("Error").Play(int.Parse(SaveData.saveValues["SoundEffectVolume"]) / 100f, 0f, 0f);
+                            //offset = 0;
+                            offset = -(disambiguationOptions.Count - 1);
                         }
-                        else
-                        {
-                            GlobalContent.GetSound("Option").Play(int.Parse(SaveData.saveValues["SoundEffectVolume"]) / 100f, 0f, 0f);
-                        }
+                        GlobalContent.GetSound("Option").Play(int.Parse(SaveData.saveValues["SoundEffectVolume"]) / 100f, 0f, 0f);
                         TTS();
                     }
                 }
@@ -240,18 +239,17 @@ namespace NonsensicalVideoGenerator
                         // Only 46 possible keys, so shift until the last option is able to be selected.
                         if(offset < -(disambiguationOptions.Count - 1))
                         {
-                            GlobalContent.GetSound("Error").Play(int.Parse(SaveData.saveValues["SoundEffectVolume"]) / 100f, 0f, 0f);
-                            offset = -(disambiguationOptions.Count - 1);
+                            //GlobalContent.GetSound("Error").Play(int.Parse(SaveData.saveValues["SoundEffectVolume"]) / 100f, 0f, 0f);
+                            //offset = -(disambiguationOptions.Count - 1);
+                            offset = 0;
                         }
                         else if(offset > 0)
                         {
-                            GlobalContent.GetSound("Error").Play(int.Parse(SaveData.saveValues["SoundEffectVolume"]) / 100f, 0f, 0f);
-                            offset = 0;
+                            //GlobalContent.GetSound("Error").Play(int.Parse(SaveData.saveValues["SoundEffectVolume"]) / 100f, 0f, 0f);
+                            //offset = 0;
+                            offset = -(disambiguationOptions.Count - 1);
                         }
-                        else
-                        {
-                            GlobalContent.GetSound("Option").Play(int.Parse(SaveData.saveValues["SoundEffectVolume"]) / 100f, 0f, 0f);
-                        }
+                        GlobalContent.GetSound("Option").Play(int.Parse(SaveData.saveValues["SoundEffectVolume"]) / 100f, 0f, 0f);
                         TTS();
                     }
                     else

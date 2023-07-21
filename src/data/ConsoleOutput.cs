@@ -54,6 +54,8 @@ namespace NonsensicalVideoGenerator
             // Wrap lines.
             if((color == Color.Transparent && bool.Parse(SaveData.saveValues["HiddenVerbose"]) == true) || color != Color.Transparent)
             {
+                if(color == Color.Transparent)
+                    color = Color.White;
                 int lineCount = line.Length / lineLength;
                 if (line.Length % lineLength > 0)
                     lineCount++;

@@ -20,6 +20,7 @@
     <ApplicationHighDpiMode>true</ApplicationHighDpiMode>
     <Nullable>enable</Nullable>
     <UseWPF>true</UseWPF>
+    <DefineConstants>WINDOWSDX</DefineConstants>
   </PropertyGroup>
   <PropertyGroup>
     <ApplicationManifest>app.manifest</ApplicationManifest>
@@ -48,7 +49,7 @@
   </ItemGroup>
 
 	<ItemGroup>
-    <BasePlugins Include="$(ProjectDir)baseplugins\**\*.*" />
+    <BasePlugins Include="$(ProjectDir)baseplugins\user\stock\*.*" />
     <BaseTemplates Include="$(ProjectDir)basetemplates\*.*" />
  	</ItemGroup>
 	<Target Name="CopyPlugins" AfterTargets="Build">
@@ -60,8 +61,8 @@
     <MakeDir Directories="$(ProjectDir)bin\x64\debug\net6.0-windows\library" />
     <MakeDir Directories="$(ProjectDir)bin\x64\debug\net6.0-windows\library\audio" />
     <MakeDir Directories="$(ProjectDir)bin\x64\debug\net6.0-windows\library\video" />
-		<Copy SourceFiles="@(BasePlugins)" DestinationFiles="$(ProjectDir)bin\x64\Release\net6.0-windows\plugins\%(RecursiveDir)%(Filename)%(Extension)" />
-		<Copy SourceFiles="@(BasePlugins)" DestinationFiles="$(ProjectDir)bin\x64\debug\net6.0-windows\plugins\%(RecursiveDir)%(Filename)%(Extension)" />
+		<Copy SourceFiles="@(BasePlugins)" DestinationFiles="$(ProjectDir)bin\x64\Release\net6.0-windows\plugins\user\stock\%(Filename)%(Extension)" />
+		<Copy SourceFiles="@(BasePlugins)" DestinationFiles="$(ProjectDir)bin\x64\debug\net6.0-windows\plugins\user\stock\%(Filename)%(Extension)" />
     <Copy SourceFiles="@(BaseTemplates)" DestinationFiles="$(ProjectDir)bin\x64\Release\net6.0-windows\templates\%(Filename)%(Extension)" />
     <Copy SourceFiles="@(BaseTemplates)" DestinationFiles="$(ProjectDir)bin\x64\debug\net6.0-windows\templates\%(Filename)%(Extension)" />
     <!-- .\packages\Steamworks.NET\steam_api64.dll -->

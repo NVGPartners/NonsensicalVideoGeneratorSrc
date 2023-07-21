@@ -67,12 +67,16 @@ namespace NonsensicalVideoGenerator
                 ConsoleOutput.WriteLine("SteamManager failed to initialize: " + ex.Message, Color.Red);
             }
             // File drag and drop support.
+#if WINDOWSDX
             Form gameForm = (Form)Form.FromHandle(Window.Handle);
             gameForm.AllowDrop = true;
             gameForm.DragEnter += new DragEventHandler(DragEnter);
             gameForm.DragDrop += new DragEventHandler(DragDrop);
             gameForm.DragLeave += new EventHandler(DragLeave);
             ConsoleOutput.WriteLine("Form supports drag and drop.", Color.Transparent);
+#else
+            ConsoleOutput.WriteLine("Form does not support drag and drop.", Color.Transparent);
+#endif
             // Set window title.
             Window.Title = "Nonsensical Video Generator";
             // Disable anti-aliasing.
@@ -87,6 +91,7 @@ namespace NonsensicalVideoGenerator
             ConsoleOutput.WriteLine("Screen resolution set.", Color.Transparent);
             ScreenManager.LoadScreens();
             ConsoleOutput.WriteLine("Initialization complete.", Color.Transparent);
+            LibraryData.SequentialName();
             base.Initialize();
         }
         protected override void LoadContent()

@@ -253,6 +253,8 @@ namespace NonsensicalVideoGenerator
                                     }
                                 }
                                 catch {}
+                                SaveData.saveValues["TotalVideosRendered"] = (int.Parse(SaveData.saveValues["TotalVideosRendered"]) + 1).ToString();
+                                SaveData.Save();
                                 GlobalContent.GetSound("RenderComplete").Play(int.Parse(SaveData.saveValues["SoundEffectVolume"]) / 100f, 0f, 0f);
                             }
                             else

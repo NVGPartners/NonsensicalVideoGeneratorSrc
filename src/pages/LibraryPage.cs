@@ -46,7 +46,7 @@ namespace NonsensicalVideoGenerator
         private int organizeType = -1;
         private string tooltip = "";
         private string clipUrl = "";
-        private bool downloading = false;
+        private static bool downloading = false;
         private static KeyboardState oldKeyboardState;
         private static KeyboardState newKeyboardState;
         public void CacheLibrary()
@@ -121,7 +121,7 @@ namespace NonsensicalVideoGenerator
             // Interactable
             controller.LoadContent(contentManager, graphicsDevice);
         }
-        public void Done(bool success)
+        public static void Done(bool success)
         {
             downloading = false;
             if(success)
@@ -247,8 +247,10 @@ namespace NonsensicalVideoGenerator
             // Draw buttons
             spriteBatch.Draw(typeButton, rects["VideoButton"], Color.White);
             spriteBatch.Draw(typeButton, rects["AudioButton"], Color.White);
+#if WINDOWSDX
             if(currentLibraryType != DefaultLibraryTypes.Render)
                 spriteBatch.Draw(headerButton, rects["HeaderButton"], Color.White);
+#endif
             // Draw subtypes
             try
             {
@@ -299,6 +301,7 @@ namespace NonsensicalVideoGenerator
             spriteBatch.DrawString(munroSmall, "Next", new Vector2(GlobalGraphics.Scale(281 + 1), GlobalGraphics.Scale(223 + 1)), Color.Black);
             spriteBatch.DrawString(munroSmall, "Next", new Vector2(GlobalGraphics.Scale(281), GlobalGraphics.Scale(223)), Color.White);
             // Downloader
+#if WINDOWSDX
             if(currentLibraryType != DefaultLibraryTypes.Render)
             {
                 string totalIndicator = "Click to download media";
@@ -307,10 +310,11 @@ namespace NonsensicalVideoGenerator
                 if(downloading)
                     totalIndicator =    "Downloading...";
                 Vector2 totalIndicatorSize = munroSmall.MeasureString(totalIndicator);
-                Vector2 totalPosition = new Vector2((rects["HeaderButton"].X + rects["HeaderButton"].Width / 2 - totalIndicatorSize.X / 2) - GlobalGraphics.Scale(10), GlobalGraphics.Scale(56));
+                Vector2 totalPosition = new Vector2((rects["HeaderButton"].X + rects["HeaderButton"].Width / 2 - totalIndicatorSize.X / 2), GlobalGraphics.Scale(56));
                 spriteBatch.DrawString(munroSmall, totalIndicator, totalPosition + new Vector2(GlobalGraphics.Scale(1), GlobalGraphics.Scale(1)), Color.Black);
                 spriteBatch.DrawString(munroSmall, totalIndicator, totalPosition, Color.White);
             }
+#endif
             // Page indicator is centered
             if(libraryFileCache.Keys.Contains(currentLibraryType))
             {
@@ -466,13 +470,11 @@ namespace NonsensicalVideoGenerator
                         Global.generatorFactory.progressText = "Downloading...";
                         downloading = true;
                         string clipboard = Clipboard.GetText();
-                        // Remove newlines/invalid characters
-                        clipboard = clipboard.Replace("\n", "");
+                        // Remove invalid characters
                         clipboard = clipboard.Replace("\r", "");
                         clipboard = clipboard.Replace("\t", "");
                         clipboard = clipboard.Replace("\0", "");
-                        // Download
-                        if (!LibraryData.DownloadClip(clipboard, currentLibraryType, Done))
+                        if (!LibraryData.DownloadClip(clipboard.Split('\n'), currentLibraryType))
                         {
                             downloading = false;
                             Global.generatorFactory.progressText = "Failed to download media.";
@@ -618,8 +620,12 @@ namespace NonsensicalVideoGenerator
                 newKeyboardState = Keyboard.GetState();
                 // Accessibility
                 for(int i = 0; i < rects.Count; i++)
-                {
+                {   
+#if WINDOWSDX
                     if(currentLibraryType == DefaultLibraryTypes.Render && rects.Keys.ElementAt(i) == "HeaderButton")
+#else
+                    if(rects.Keys.ElementAt(i) == "HeaderButton")   
+#endif
                         continue;
                     if(rects.Keys.ElementAt(i).Contains("Audio") && rects.Keys.ElementAt(i) != "AudioButton" && currentRootType != LibraryRootType.Audio)
                         continue;
@@ -646,7 +652,7 @@ namespace NonsensicalVideoGenerator
                         selected = true;
                     if((selectedFlags & 4) == 4 && rects.Keys.ElementAt(i) == "HeaderButton")
                         selected = true;
-                    Accessibility.CompatAccessibility(rects.Values.ElementAt(i), tts + ", " + (selected ? "selected" : "not selected"));
+                    Accessibility.CompatAccessibility(rects.Values.ElementAt(i), tts);
                 }
                 // Video holders
                 if(libraryFileCache.Keys.Contains(currentLibraryType))
@@ -727,6 +733,7 @@ namespace NonsensicalVideoGenerator
                                         demandChange = true;
                                         GlobalContent.GetSound("Select").Play(int.Parse(SaveData.saveValues["SoundEffectVolume"]) / 100f, 0f, 0f);
                                         return true;
+#if WINDOWSDX
                                     case "HeaderButton":
                                         if(libraryFileCache.Keys.Contains(currentLibraryType))
                                         {
@@ -748,6 +755,7 @@ namespace NonsensicalVideoGenerator
                                             GlobalContent.GetSound("Error").Play(int.Parse(SaveData.saveValues["SoundEffectVolume"]) / 100f, 0f, 0f);
                                         }
                                         return true;
+#endif
                                     case "PageLeftButton":
                                         if(libraryFileCache.Keys.Contains(currentLibraryType))
                                         {
@@ -1171,7 +1179,11 @@ namespace NonsensicalVideoGenerator
                                 }
                                 else if(currentLibraryType != DefaultLibraryTypes.Render)
                                 {
+#if WINDOWSDX
                                     tooltip = "Add Media: Click or Drag and Drop";
+#else
+                                    tooltip = "Add Media";
+#endif
                                 }
                             }
                         }

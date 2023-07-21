@@ -22,6 +22,21 @@
                 "/property:GenerateFullPaths=true",
                 "/consoleloggerparameters:NoSummary",
                 "/p:Platform=x64",
+                "/p:DefineConstants=WINDOWSDX",
+            ],
+            "problemMatcher": "$msCompile"
+        },
+        {
+            "label": "buildgl",
+            "command": "dotnet",
+            "type": "process",
+            "args": [
+                "build",
+                "${workspaceFolder}\\DesktopGL.csproj",
+                "/property:GenerateFullPaths=true",
+                "/consoleloggerparameters:NoSummary",
+                "/p:Platform=x64",
+                "/p:DefineConstants=DESKTOPGL",
             ],
             "problemMatcher": "$msCompile"
         },
@@ -35,6 +50,92 @@
                 "/property:GenerateFullPaths=true",
                 "/consoleloggerparameters:NoSummary",
                 "/p:Configuration=Release",
+                "/p:Platform=x64",
+                "/p:DefineConstants=WINDOWSDX",
+            ],
+            "problemMatcher": "$msCompile"
+        },
+        {
+            "label": "publishgl",
+            "command": "dotnet",
+            "type": "process",
+            "args": [
+                "build",
+                "${workspaceFolder}\\DesktopGL.csproj",
+                "/property:GenerateFullPaths=true",
+                "/consoleloggerparameters:NoSummary",
+                "/p:Configuration=Release",
+                "/p:Platform=x64",
+                "/p:DefineConstants=DESKTOPGL",
+            ],
+            "problemMatcher": "$msCompile"
+        },
+        {
+            "label": "upload",
+            "command": "${workspaceFolder}\\publish.bat",
+            "type": "process",
+            "args": [
+                "${workspaceFolder}\\steamcmd.vdf",
+            ],
+            "problemMatcher": "$msCompile"
+        },
+        {
+            "label": "uploadgl",
+            "command": "${workspaceFolder}\\publish.bat",
+            "type": "process",
+            "args": [
+                "${workspaceFolder}\\steamcmdgl.vdf",
+            ],
+            "problemMatcher": "$msCompile"
+        },
+        {
+            "label": "restore",
+            "command": "dotnet",
+            "type": "process",
+            "args": [
+                "restore",
+                "${workspaceFolder}\\NonsensicalVideoGenerator.csproj",
+                "/property:GenerateFullPaths=true",
+                "/consoleloggerparameters:NoSummary",
+                "/p:Platform=x64",
+            ],
+            "problemMatcher": "$msCompile"
+        },
+        {
+            "label": "restoregl",
+            "command": "dotnet",
+            "type": "process",
+            "args": [
+                "restore",
+                "${workspaceFolder}\\DesktopGL.csproj",
+                "/property:GenerateFullPaths=true",
+                "/consoleloggerparameters:NoSummary",
+                "/p:Platform=x64",
+            ],
+            "problemMatcher": "$msCompile"
+        },
+        {
+            "label": "clean",
+            "command": "dotnet",
+            "type": "process",
+            "args": [
+                "clean",
+                "${workspaceFolder}\\NonsensicalVideoGenerator.csproj",
+                "/property:GenerateFullPaths=true",
+                "/consoleloggerparameters:NoSummary",
+                "/p:Platform=x64",
+            ],
+            "problemMatcher": "$msCompile"
+        },
+        {
+            "label": "cleangl",
+            "command": "dotnet",
+            "type": "process",
+            "args": [
+                "clean",
+                "${workspaceFolder}\\DesktopGL.csproj",
+                "/property:GenerateFullPaths=true",
+                "/consoleloggerparameters:NoSummary",
                 "/p:Platform=x64",
             ],
             "problemMatcher": "$msCompile"

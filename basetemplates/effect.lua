@@ -57,6 +57,7 @@ function Query()
         -- If your effect would like to use a custom media directory, you can set it up here.
         -- Libraries are displayed in the Library tab of the program and store a specific type of media.
         -- When uploading an effect using this feature, make sure to tick the "Custom Library" tag.
+        -- Use functions.getRandomLibraryFile("video", "example") to pick from this library.
         -- Remove the --[[ and ]] below to enable this feature.
         --[[
         ["libraries"] = {

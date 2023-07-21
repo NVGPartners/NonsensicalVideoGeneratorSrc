@@ -164,6 +164,8 @@ namespace NonsensicalVideoGenerator
                                 SteamUserStats.SetAchievement(achievement);
                             }
                         }
+                        SaveData.saveValues["TotalVideosRendered"] = (int.Parse(SaveData.saveValues["TotalVideosRendered"]) + 1).ToString();
+                        SaveData.Save();
                         GlobalContent.GetSound("RenderComplete").Play(int.Parse(SaveData.saveValues["SoundEffectVolume"]) / 100f, 0f, 0f);
                         /*
                         // Open the video in the default video player if the user has that option enabled.
@@ -356,6 +358,8 @@ namespace NonsensicalVideoGenerator
                         {
                             // No transition, just snip the video.
                             Utilities.SnipVideo(sourceToPick, startOfClip, endOfClip, Path.Combine(Utilities.temporaryDirectory, "video" + i + ".mp4"));
+                            SaveData.saveValues["TotalClipsTrimmed"] = (int.Parse(SaveData.saveValues["TotalClipsTrimmed"]) + 1).ToString();
+                            SaveData.Save();
                         }
                         if (vidThreadWorker?.CancellationPending == true)
                             return;

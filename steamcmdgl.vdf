@@ -1,0 +1,28 @@
+"AppBuild"
+{
+	"AppID" "2516360"
+	"Desc" "Upload Nonsensical Video Generator DesktopGL"
+	"ContentRoot" "D:\Libraries\Documents\NonsensicalVideoGenerator\bin\x64\Release\net6.0-windows\"
+	"BuildOutput" "D:\Libraries\Documents\NonsensicalVideoGenerator\steamcmdoutput"
+	"Depots"
+	{
+		"2516361"
+		{
+			"FileMapping"
+			{
+				"LocalPath" "*"
+				"DepotPath" "."
+				"recursive" "1"
+			}
+			"InstallScript" "redist\installscript.vdf"
+			"FileExclusion" "temp\*"
+			"FileExclusion" "*.pdb"
+			"FileExclusion" "*ffmpeg.exe*"
+			"FileExclusion" "*ffprobe.exe*"
+			"FileExclusion" "*console.txt*"
+			"FileExclusion" "*Options.json*"
+			"FileExclusion" "*steam_appid.txt*"
+			"FileExclusion" "*PluginSettings.json*"
+		}
+	}
+}

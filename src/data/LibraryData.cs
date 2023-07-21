@@ -221,13 +221,15 @@ namespace NonsensicalVideoGenerator
             }
             foreach (string dir in Directory.GetDirectories(path))
                 LoadRecursive(dir, type);
-            SequentialName();
+            if(!Global.generatorFactory.generatorActive)
+                SequentialName();
         }
         public static void Load()
         {
             try
             {
-                Global.videoTitle = "Render1";
+                if(!Global.generatorFactory.generatorActive)
+                    Global.videoTitle = "Render1";
                 libraryFiles.Clear();
                 foreach (LibraryType type in libraryPaths.Keys)
                 {
@@ -305,6 +307,8 @@ namespace NonsensicalVideoGenerator
                 string achievement = "ACHIEVEMENT_LIBRARY_IMPORT";
                 ConsoleOutput.WriteLine("Awarding achievement: "+achievement, Color.LightBlue);
                 SteamUserStats.SetAchievement(achievement);
+                SaveData.saveValues["TotalMediaImported"] = (int.Parse(SaveData.saveValues["TotalMediaImported"]) + 1).ToString();
+                SaveData.Save();
             }
             SequentialName();
             return file;
@@ -499,111 +503,140 @@ namespace NonsensicalVideoGenerator
         }
         // Download thread
         private static BackgroundWorker downloadWorker;
-        private static string downloadUrl = "";
+        public static List<string> downloadUrls = new();
         private static LibraryType downloadType;
-        private static bool youtube = false;
-        private static Action<bool> downloadCallback = (bool success) => { };
+        private static List<bool> youtubes = new();
         private static void DownloadWorker_DoWork(object sender, DoWorkEventArgs e)
         {
-            // Download the clip.
-            string filename = Path.GetFileName(downloadUrl);
-            string path = Path.Combine(libraryRootPath, libraryPaths[downloadType], filename);
-            try
+            for(int i = 0; i < downloadUrls.Count; i++)
             {
-                if(!Directory.Exists(Path.GetDirectoryName(path)))
-                    Directory.CreateDirectory(Path.GetDirectoryName(path));
-                if(File.Exists(path))
-                    File.Delete(path); // Delete the file if it already exists.
-                if(!youtube)
+                string downloadUrl = downloadUrls[i];
+                bool youtube = youtubes[i];
+                ConsoleOutput.WriteLine("Downloading clip from " + downloadUrl + "...", Color.Yellow);
+                // Download the clip.
+                string filename = Path.GetFileName(downloadUrl);
+                string path = Path.Combine(libraryRootPath, libraryPaths[downloadType], filename);
+                try
                 {
-                    using (WebClient client = new WebClient())
+                    if(!Directory.Exists(Path.GetDirectoryName(path)))
+                        Directory.CreateDirectory(Path.GetDirectoryName(path));
+                    if(File.Exists(path))
+                        File.Delete(path); // Delete the file if it already exists.
+                    if(!youtube)
                     {
-                        client.DownloadFile(downloadUrl, path);
+                        using (WebClient client = new WebClient())
+                        {
+                            client.DownloadFile(downloadUrl, path);
+                        }
+                    }
+                    else if(UpdateManager.ytDlpInstalled)
+                    {
+                        path = Path.Combine(libraryRootPath, libraryPaths[downloadType], "%(title)s.%(ext)s");
+                        string ytdlp = Global.useSystemYtDlp ? "yt-dlp" : @".\yt-dlp.exe";
+                        bool sound = downloadType.RootType == LibraryRootType.Audio;
+                        ProcessStartInfo startInfo = new ProcessStartInfo(ytdlp, "-o \"" + path + "\" " + (sound ? "--extract-audio --audio-format mp3 " : "--format mp4 ") + downloadUrl);
+                        startInfo.UseShellExecute = false;
+                        startInfo.RedirectStandardOutput = true;
+                        startInfo.RedirectStandardError = true;
+                        Process process = new Process();
+                        process.StartInfo = startInfo;
+                        process.OutputDataReceived += (object sender, DataReceivedEventArgs e) =>
+                        {
+                            ConsoleOutput.WriteLine(e.Data, Color.Transparent);
+                        };
+                        process.ErrorDataReceived += (object sender, DataReceivedEventArgs e) =>
+                        {
+                            ConsoleOutput.WriteLine(e.Data, Color.Red);
+                        };
+                        process.Start();
+                        process.BeginOutputReadLine();
+                        process.BeginErrorReadLine();
+                        process.WaitForExit();
+                    }
+                    else
+                    {
+                        ConsoleOutput.WriteLine("Failed to download clip: yt-dlp is not installed.", Color.Red);
+                        LibraryPage.Done(false);
+                        continue;
                     }
                 }
-                else if(UpdateManager.ytDlpInstalled)
+                catch (Exception ex)
                 {
-                    path = Path.Combine(libraryRootPath, libraryPaths[downloadType], "%(title)s.%(ext)s");
-                    string ytdlp = Global.useSystemYtDlp ? "yt-dlp" : @".\yt-dlp.exe";
-                    bool sound = downloadType.RootType == LibraryRootType.Audio;
-                    ProcessStartInfo startInfo = new ProcessStartInfo(ytdlp, "-o \"" + path + "\" " + (sound ? "--extract-audio --audio-format mp3 " : "--format mp4 ") + downloadUrl);
-                    startInfo.UseShellExecute = false;
-                    startInfo.RedirectStandardOutput = true;
-                    startInfo.RedirectStandardError = true;
-                    Process process = new Process();
-                    process.StartInfo = startInfo;
-                    process.OutputDataReceived += (object sender, DataReceivedEventArgs e) =>
-                    {
-                        ConsoleOutput.WriteLine(e.Data, Color.Transparent);
-                    };
-                    process.ErrorDataReceived += (object sender, DataReceivedEventArgs e) =>
-                    {
-                        ConsoleOutput.WriteLine(e.Data, Color.Red);
-                    };
-                    process.Start();
-                    process.BeginOutputReadLine();
-                    process.BeginErrorReadLine();
-                    process.WaitForExit();
+                    ConsoleOutput.WriteLine("Failed to download clip: " + ex.Message, Color.Red);
+                    LibraryPage.Done(false);
+                    continue;
                 }
-                else
-                {
-                    ConsoleOutput.WriteLine("Failed to download clip: yt-dlp is not installed.", Color.Red);
-                    downloadCallback(false);
-                    return;
-                }
+                // Add it to the library.
+                LibraryFile file = new(Path.GetFileNameWithoutExtension(path), path, downloadType);
+                // Run callback
+                LibraryPage.Done(true);
+                libraryFiles.Add(file);
+                Global.justCompletedRender = true; // Refresh the library.
+                ConsoleOutput.WriteLine("Downloaded clip to library: " + path, Color.Green);
             }
-            catch (Exception ex)
-            {
-                ConsoleOutput.WriteLine("Failed to download clip: " + ex.Message, Color.Red);
-                downloadCallback(false);
-                return;
-            }
-            // Add it to the library.
-            LibraryFile file = new(Path.GetFileNameWithoutExtension(path), path, downloadType);
-            // Run callback
-            downloadCallback(true);
-            libraryFiles.Add(file);
-            SequentialName();
-            if(file.Type != DefaultLibraryTypes.Render)
-            {
-                string achievement = "ACHIEVEMENT_LIBRARY_IMPORT";
-                ConsoleOutput.WriteLine("Awarding achievement: "+achievement, Color.LightBlue);
-                SteamUserStats.SetAchievement(achievement);
-            }
-            Global.justCompletedRender = true; // Refresh the library.
-            ConsoleOutput.WriteLine("Downloaded clip to library: " + path, Color.Green);
+            downloadUrls.Clear();
         }
-        internal static bool DownloadClip(string clipUrl, LibraryType key, Action<bool> callback)
+        internal static bool DownloadClip(string[] clipUrls, LibraryType key)
         {
-            // Download a clip from a URL and add it to the library.
-            string filename = Path.GetFileName(clipUrl);
-            string path = Path.Combine(libraryRootPath, libraryPaths[key], filename);
-            try
+            foreach(string clipUrl in clipUrls)
             {
+                // Download a clip from a URL and add it to the library.
+                string filename = Path.GetFileName(clipUrl);
+                string path = Path.Combine(libraryRootPath, libraryPaths[key], filename);
                 // Does it end in a file extension?
                 if (!filename.Contains("."))
                 {
                     // If not, is it a YouTube url?
-                    if (!clipUrl.Contains("youtube.com") || clipUrl.Contains("youtu.be"))
+                    if (!clipUrl.Contains("youtube.com") && !clipUrl.Contains("youtu.be"))
                     {
                         // Error: We don't know what to do with this.
                         ConsoleOutput.WriteLine("Failed to download clip: URL is unknown.", Color.Red);
                         return false;
                     }
                     // It's a YouTube url.
-                    youtube = true;
+                    youtubes.Add(true);
                 }
+                else
+                {
+                    // check against file extensions in libraryFileTypes[DefaultLibraryTypes.All]
+                    bool found = false;
+                    foreach(string filetype in libraryFileTypes[key])
+                    {
+                        if (filename.EndsWith(filetype))
+                        {
+                            found = true;
+                            break;
+                        }
+                    }
+                    if (!found)
+                    {
+                        // Error: We don't know what to do with this.
+                        ConsoleOutput.WriteLine("Failed to download clip: Invalid file extension.", Color.Red);
+                        return false;
+                    }
+                    youtubes.Add(false);
+                }
+                downloadUrls.Add(clipUrl);
+            }
+            try
+            {
                 // Start download thread
-                downloadUrl = clipUrl;
                 downloadType = key;
-                downloadCallback = callback;
                 if(downloadWorker == null)
                 {
                     downloadWorker = new BackgroundWorker();
                     downloadWorker.DoWork += DownloadWorker_DoWork;
                 }
                 downloadWorker.RunWorkerAsync();
-                ConsoleOutput.WriteLine("Downloading clip from " + clipUrl + "...", Color.Yellow);
+                SequentialName();
+                if(key != DefaultLibraryTypes.Render)
+                {
+                    string achievement = "ACHIEVEMENT_LIBRARY_IMPORT";
+                    ConsoleOutput.WriteLine("Awarding achievement: "+achievement, Color.LightBlue);
+                    SteamUserStats.SetAchievement(achievement);
+                    SaveData.saveValues["TotalMediaImported"] = (int.Parse(SaveData.saveValues["TotalMediaImported"]) + 1).ToString();
+                    SaveData.Save();
+                }
                 return true;
             }
             catch (Exception e)

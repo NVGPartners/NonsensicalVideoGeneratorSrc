@@ -1249,17 +1249,17 @@
 /processorParam:TextureFormat=Color
 /build:graphics/vidwindow.png
 
-#begin music/theme.mp3
-/importer:Mp3Importer
+#begin music/theme.ogg
+/importer:OggImporter
 /processor:SongProcessor
 /processorParam:Quality=Best
-/build:music/theme.mp3
+/build:music/theme.ogg
 
-#begin music/theme2.mp3
-/importer:Mp3Importer
+#begin music/theme2.ogg
+/importer:OggImporter
 /processor:SongProcessor
 /processorParam:Quality=Best
-/build:music/theme2.mp3
+/build:music/theme2.ogg
 
 #begin sound/addsource.wav
 /importer:WavImporter

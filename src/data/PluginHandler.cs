@@ -234,7 +234,7 @@ namespace NonsensicalVideoGenerator
             string result = args;
             foreach(KeyValuePair<string, string> placeholder in placeholders)
             {
-                result = args.Replace("{" + placeholder.Key + "}", placeholder.Value);
+                result = result.Replace(placeholder.Key, placeholder.Value);
             }
             return result;
         }
@@ -374,11 +374,13 @@ namespace NonsensicalVideoGenerator
             {
                 throw new Exception("Invalid rootType");
             }
+            LibraryType? dummyType = null;
             // Validate subType
             foreach (KeyValuePair<LibraryType, string> pair in LibraryData.libraryPaths)
             {
                 if (pair.Value == rootType + "\\" + subType)
                 {
+                    dummyType = pair.Key;
                     break;
                 }
                 if (pair.Key == LibraryData.libraryPaths.Last().Key)
@@ -386,14 +388,23 @@ namespace NonsensicalVideoGenerator
                     throw new Exception("Invalid subType");
                 }
             }
-            string[] files = Directory.GetFiles(Path.Join(LibraryData.libraryRootPath, rootType, subType));
-            // remove placeholder if it already exists
-            if (placeholders.ContainsKey("randomLibraryFile"))
+            if (dummyType == null)
             {
-                placeholders.Remove("randomLibraryFile");
+                throw new Exception("Invalid subType");
             }
-            placeholders.Add("randomLibraryFile", Path.Join("..", "..", files[Global.generatorFactory.globalRandom.Next(files.Length)]));
-            return "{randomLibraryFile}";
+            string file = LibraryData.PickRandom(dummyType, Global.generatorFactory.globalRandom);
+            // remove placeholder if it already exists
+            if (placeholders.ContainsKey("{LibraryFile_" + subType + "}"))
+            {
+                placeholders.Remove("{LibraryFile_" + subType + "}");
+            }
+            string thepath = Path.Join("..", "..", file);
+            if(thepath != "..\\..")
+            {
+                placeholders.Add("{LibraryFile_" + subType + "}", thepath);
+                return "{LibraryFile_" + subType + "}";
+            }
+            return "";
         }
         public PluginReturnValue Call(string video)
         {
@@ -433,10 +444,6 @@ namespace NonsensicalVideoGenerator
                             videoOptions["inputVideo"] = Path.GetFileName(video);
                             videoOptions["outputVideo"] = "output.mp4";
                             videoOptions["workingDirectory"] = "";
-                            foreach (KeyValuePair<string, string> placeholder in placeholders)
-                            {
-                                videoOptions[placeholder.Key] = "{" + placeholder.Key + "}";
-                            }
                             // Add settings to pluginSettings table
                             Table pluginSettings = new(luaScript);
                             foreach (KeyValuePair<string, object> setting in settings)
@@ -829,7 +836,7 @@ namespace NonsensicalVideoGenerator
         public static void AllDone(uint count)
         {
             allDoneCount++;
-            if(allDoneCount >= count)
+            if(count == 0 || allDoneCount == count)
             {
                 foreach (PublishedFileId_t item in subscribedItems)
                 {
@@ -838,6 +845,11 @@ namespace NonsensicalVideoGenerator
                     if (Directory.Exists(itemPath) == false)
                     {
                         Directory.CreateDirectory(itemPath);
+                    }
+                    // Delete files currently in plugin folder.
+                    foreach (string file in Directory.GetFiles(itemPath))
+                    {
+                        File.Delete(file);
                     }
                     // Copy files from workshop folder to plugin folder.
                     foreach (string file in Directory.GetFiles(folder))
@@ -869,7 +881,7 @@ namespace NonsensicalVideoGenerator
         {
             Global.pluginsLoaded = PluginHandler.LoadPlugins();
         }
-        public static Callback<DownloadItemResult_t>? downloadItemResult;
+        public static List<Callback<DownloadItemResult_t>> downloadItemResult = new();
         public static Callback<UserStatsReceived_t>? m_UserStatsReceived;
         public static void LoadWorkshop()
         {
@@ -896,6 +908,8 @@ namespace NonsensicalVideoGenerator
             {
                 Console.WriteLine("Error requesting user stats.");
             }
+            allDoneCount = 0;
+            downloadItemResult.Clear();
             // Create "plugins\workshop" if they don't exist.
             Directory.CreateDirectory(Path.Combine(pluginPath, "workshop"));
             // Load subscribed workshop items.
@@ -905,7 +919,7 @@ namespace NonsensicalVideoGenerator
             if(subscribedItemCount > 0)
             {
                 SteamUGC.GetSubscribedItems(subscribedItems, (uint)subscribedItems.Length);
-                ConsoleOutput.WriteLine("Updating subscribed workshop items...", Color.RoyalBlue);
+                ConsoleOutput.WriteLine("Updating " + subscribedItemCount + " subscribed workshop items...", Color.LightBlue);
                 foreach (PublishedFileId_t item in subscribedItems)
                 {
                     string itemPath = Path.Combine(pluginPath, "workshop", item.m_PublishedFileId.ToString());
@@ -913,24 +927,21 @@ namespace NonsensicalVideoGenerator
                     if (download)
                     {
                         // Register callback.
-                        if(downloadItemResult == null)
+                        downloadItemResult.Add(Callback<DownloadItemResult_t>.Create((result) =>
                         {
-                            downloadItemResult = Callback<DownloadItemResult_t>.Create((result) =>
+                            if (result.m_nPublishedFileId == item)
                             {
-                                if (result.m_nPublishedFileId == item)
+                                if (result.m_eResult == EResult.k_EResultOK)
                                 {
-                                    if (result.m_eResult == EResult.k_EResultOK)
-                                    {
-                                        ConsoleOutput.WriteLine($"Downloaded ID {item.m_PublishedFileId.ToString()} from workshop.", Color.RoyalBlue);
-                                    }
-                                    else
-                                    {
-                                        ConsoleOutput.WriteLine($"Failed to download ID {item.m_PublishedFileId.ToString()} from workshop.", Color.Red);
-                                    }
-                                    AllDone(subscribedItemCount);
+                                    ConsoleOutput.WriteLine($"Downloaded ID {item.m_PublishedFileId.ToString()} from workshop.", Color.RoyalBlue);
                                 }
-                            });
-                        }
+                                else
+                                {
+                                    ConsoleOutput.WriteLine($"Failed to download ID {item.m_PublishedFileId.ToString()} from workshop.", Color.Red);
+                                }
+                                AllDone(subscribedItemCount);
+                            }
+                        }));
                     }
                     else
                     {
@@ -1186,7 +1197,17 @@ namespace NonsensicalVideoGenerator
             // Set the title.
             bool cont = true;
             if(!updating)
-                cont = SteamUGC.SetItemTitle(handle, publishPlugin.GetDisplayName());
+            {
+                string nam = publishPlugin.GetDisplayName();
+                if(nam == "")
+                    nam = "My";
+                if(nam.Contains(".lua"))
+                    nam = nam.Replace(".lua", "");
+                // Capitalize first letter
+                nam = nam.First().ToString().ToUpper() + nam.Substring(1);
+                nam += " Effect";
+                cont = SteamUGC.SetItemTitle(handle, nam);
+            }
             if(!cont)
             {
                 ConsoleOutput.WriteLine($"Error updating workshop item: Invalid title.", Color.Red);
