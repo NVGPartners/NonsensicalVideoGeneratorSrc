@@ -204,7 +204,7 @@ namespace NonsensicalVideoGenerator
             }
             // Tween
             tween.Update((float)gameTime.ElapsedGameTime.TotalSeconds);
-            if(hiding || screenType == ScreenType.Hidden)
+            if(!inputHandled && (hiding || screenType == ScreenType.Hidden))
                 return false;
             return handleInput ? inputHandled : false;
         }

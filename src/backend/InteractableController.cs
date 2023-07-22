@@ -22,14 +22,24 @@ namespace NonsensicalVideoGenerator
                 foreach (KeyValuePair<string, IInteractable> interactable in interactables)
                 {
                     names.Add(interactable.Value.Name + "Input");
-                    if(interactable.Value.Update(gameTime, handleInput))
-                        returnValue = true;
                 }
             }
             catch {} // modified
             // If editing is not in the name list, set it to ""
             if (Global.editing != "" && !names.Contains(Global.editing))
+            {
                 Global.editing = "";
+                GlobalContent.GetSound("Back").Play(int.Parse(SaveData.saveValues["SoundEffectVolume"]) / 100f, 0f, 0f);
+            }
+            try {
+                // Update all interactables.
+                foreach (KeyValuePair<string, IInteractable> interactable in interactables)
+                {
+                    if(interactable.Value.Update(gameTime, handleInput))
+                        returnValue = true;
+                }
+            }
+            catch {} // modified
             return returnValue;
         }
         public void Draw(GameTime gameTime, SpriteBatch spriteBatch)

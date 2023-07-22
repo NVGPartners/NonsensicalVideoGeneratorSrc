@@ -71,7 +71,7 @@ namespace NonsensicalVideoGenerator
                 if((mouseButtonFlags & 2) == 2)
                     return true;
             }
-            return Global.editing != "";
+            return false;
         }
         public void Draw(GameTime gameTime, SpriteBatch spriteBatch)
         {

@@ -222,7 +222,7 @@ namespace NonsensicalVideoGenerator
                 "",
                 "If there are still issues, the continue button will be disabled.",
                 "In that case, broken plugins would have been detected.",
-                "Check console with ~ to see which plugins are broken, if so.",
+                "Check console with F5 to see which plugins are broken, if so.",
                 "",
                 "Click \"Continue\" to scan plugins and continue if successful."
             }
@@ -597,8 +597,11 @@ namespace NonsensicalVideoGenerator
                             FramePlayer.canPlayBgMusic = true;
                             ScreenManager.PushNavigation("Main Menu");
                             ScreenManager.GetScreen<MenuScreen>("Main Menu")?.Show();
-                            ScreenManager.PushNavigation("Video");
-                            ScreenManager.GetScreen<VideoScreen>("Video")?.Show();
+                            if(FramePlayer.audio != null)
+                            {
+                                ScreenManager.PushNavigation("Video");
+                                ScreenManager.GetScreen<VideoScreen>("Video")?.Show();
+                            }
                             ScreenManager.PushNavigation("Content");
                             ScreenManager.GetScreen<ContentScreen>("Content")?.Show();
                             ScreenManager.PushNavigation("Socials");

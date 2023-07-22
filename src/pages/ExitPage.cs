@@ -22,7 +22,9 @@ namespace NonsensicalVideoGenerator
                 Global.exiting = true;
                 GlobalContent.GetSound("Quit").Play(int.Parse(SaveData.saveValues["SoundEffectVolume"]) / 100f, 0f, 0f);
                 ScreenManager.GetScreen<MenuScreen>("Main Menu")?.Hide();
-                ScreenManager.GetScreen<VideoScreen>("Video")?.Hide();
+                VideoScreen video = ScreenManager.GetScreen<VideoScreen>("Video");
+                if(FramePlayer.audio != null)
+                    ScreenManager.GetScreen<VideoScreen>("Video")?.Hide();
                 ScreenManager.GetScreen<ContentScreen>("Content")?.Hide();
                 ScreenManager.GetScreen<HeaderScreen>("Header")?.Hide();
                 ScreenManager.GetScreen<SocialScreen>("Socials")?.Hide();

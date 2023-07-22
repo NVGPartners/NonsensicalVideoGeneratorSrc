@@ -107,6 +107,8 @@ namespace NonsensicalVideoGenerator
                 FileStream audioFile = File.OpenRead(".\\temp\\extracted\\audio.wav");
                 SoundEffect snd = SoundEffect.FromStream(audioFile);
                 audio = snd.CreateInstance();
+                ScreenManager.PushNavigation("Video");
+                ScreenManager.GetScreen<VideoScreen>("Video")?.Show();
                 audioFile.Close();
                 if(worker.CancellationPending || !processing)
                     return;
@@ -222,6 +224,7 @@ namespace NonsensicalVideoGenerator
                     audio.Stop();
                     audio.Dispose();
                     audio = null;
+                    ScreenManager.GetScreen<VideoScreen>("Video")?.Hide();
                     Global.generatorFactory.progressText = "Stopped playback.";
                 }
             }
@@ -270,6 +273,7 @@ namespace NonsensicalVideoGenerator
                     audio.Stop();
                     audio.Dispose();
                     audio = null;
+                    ScreenManager.GetScreen<VideoScreen>("Video")?.Hide();
                 }
                 FileStream audioFile = File.OpenRead(".\\temp\\extracted\\audio.wav");
                 SoundEffect snd = SoundEffect.FromStream(audioFile);

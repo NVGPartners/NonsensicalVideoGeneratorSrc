@@ -134,7 +134,7 @@ namespace NonsensicalVideoGenerator
                         return true;
                 }
             }
-            return Global.editing != "";
+            return false;
         }
         public void Draw(GameTime gameTime, SpriteBatch spriteBatch)
         {

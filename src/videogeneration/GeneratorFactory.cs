@@ -548,7 +548,7 @@ namespace NonsensicalVideoGenerator
                 catch(Exception ex)
                 {
                     progressState = ProgressState.Failed;
-                    failureReason = "Error: Press ~ to view console";
+                    failureReason = "Error: Press F5 to view console";
                     progressText = failureReason;
                     ConsoleOutput.WriteLine(ex.Message, Color.Red);
                     if(ex.StackTrace != null)
@@ -605,7 +605,7 @@ namespace NonsensicalVideoGenerator
             catch(Exception ex)
             {
                 progressState = ProgressState.Failed;
-                failureReason = "Error: Press ~ to view console";
+                failureReason = "Error: Press F5 to view console";
                 progressText = failureReason;
                 ConsoleOutput.WriteLine(ex.Message, Color.Red);
                 if(ex.StackTrace != null)

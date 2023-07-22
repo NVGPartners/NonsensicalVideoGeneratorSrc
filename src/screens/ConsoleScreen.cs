@@ -101,8 +101,10 @@ namespace NonsensicalVideoGenerator
             tween.Update((float)gameTime.ElapsedGameTime.TotalSeconds);
             bool overrideReturn = false;
             int scrollWeight = newKeyboardState.IsKeyDown(Keys.LeftShift) || newKeyboardState.IsKeyDown(Keys.RightShift) ? 5 : 1;
-            // Show/hide console when you press ` (tilde).
-            if (!oldKeyboardState.IsKeyDown(Keys.OemTilde) && newKeyboardState.IsKeyDown(Keys.OemTilde) && Global.ready)
+            // Show/hide console when you press f5
+            if ((newKeyboardState.IsKeyDown(Keys.F5) && !oldKeyboardState.IsKeyDown(Keys.F5))
+                || (newKeyboardState.IsKeyDown(Keys.OemTilde) && !oldKeyboardState.IsKeyDown(Keys.OemTilde))
+                && Global.ready)
             {
                 overrideReturn = true;
                 if(Toggle())
@@ -165,7 +167,7 @@ namespace NonsensicalVideoGenerator
             Texture2D pixel = GlobalContent.GetTexture("Pixel");
             spriteBatch.Draw(pixel, new Rectangle(0, 0, GlobalGraphics.scaledWidth, GlobalGraphics.scaledHeight), new Color(0, 0, 0, 255));
             // Draw the center title bar text.`
-            string newTitle = title + " - Toggle with ~ (tilde key)";
+            string newTitle = title + " - Toggle with F5";
             Vector2 titleSize = GlobalGraphics.fontMunroSmall.MeasureString(newTitle);
             spriteBatch.DrawString(GlobalGraphics.fontMunroSmall, newTitle, new Vector2(GlobalGraphics.scaledWidth / 2 - titleSize.X / 2, (6 * GlobalGraphics.scale) - GlobalGraphics.Scale(1)), Color.White);
             // Draw lines.

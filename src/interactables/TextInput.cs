@@ -56,7 +56,6 @@ namespace NonsensicalVideoGenerator
                         if(Global.editing == Name + "Input")
                         {
                             Global.editing = "";
-                            State = 0;
                             Callback(State);
                             Accessibility.allowAccessibility = true;
                             GlobalContent.GetSound("Option").Play(int.Parse(SaveData.saveValues["SoundEffectVolume"]) / 100f, 0f, 0f);
@@ -64,31 +63,26 @@ namespace NonsensicalVideoGenerator
                         else if(Global.editing == "")
                         {
                             Global.editing = Name + "Input";
-                            State = 1;
                             Callback(State);
                             Accessibility.allowAccessibility = false;
                             GlobalContent.GetSound("Option").Play(int.Parse(SaveData.saveValues["SoundEffectVolume"]) / 100f, 0f, 0f);
                         }
                         else
                         {
-                            GlobalContent.GetSound("Error").Play(int.Parse(SaveData.saveValues["SoundEffectVolume"]) / 100f, 0f, 0f);
+                            // If editing is not in the name list, set it to ""
+                            if (Global.editing != "")
+                                Global.editing = "";
+                            GlobalContent.GetSound("Back").Play(int.Parse(SaveData.saveValues["SoundEffectVolume"]) / 100f, 0f, 0f);
                         }
                         return true;
                     }
                 }
                 // If state is 1, we are entering text.
-                if(State == 1)
+                if(Global.editing == Name + "Input")
                 {
-                    if(Global.editing != Name + "Input")
-                    {
-                        State = 0;
-                        Callback(0);
-                        Accessibility.allowAccessibility = true;
-                    }
                     // Check for enter
                     if ((newKeyboardState.IsKeyDown(Keys.Enter) && !oldKeyboardState.IsKeyDown(Keys.Enter)) || (newKeyboardState.IsKeyDown(Keys.Escape) && !oldKeyboardState.IsKeyDown(Keys.Escape)))
                     {
-                        State = 0;
                         Callback(0);
                         Global.editing = "";
                         Accessibility.allowAccessibility = true;
@@ -147,7 +141,7 @@ namespace NonsensicalVideoGenerator
                     return true;
                 }
             }
-            return Name != "" && Global.editing == Name + "Input";
+            return false;
         }
         public void Draw(GameTime gameTime, SpriteBatch spriteBatch)
         {
@@ -159,9 +153,9 @@ namespace NonsensicalVideoGenerator
             spriteBatch.Draw(side, new Rectangle(GlobalGraphics.Scale(bounds.X + 1 + bounds.Width - 1 + side.Width/2), GlobalGraphics.Scale(bounds.Y + 1 - 1 + side.Height/2), GlobalGraphics.Scale(side.Width), GlobalGraphics.Scale(side.Height)), null, Color.Black, MathHelper.ToRadians(180), new Vector2(side.Width/2, side.Height/2), SpriteEffects.None, 0);
             spriteBatch.Draw(inner, new Rectangle(GlobalGraphics.Scale(bounds.X + 1+4), GlobalGraphics.Scale(bounds.Y + 1), GlobalGraphics.Scale(bounds.Width-5), GlobalGraphics.Scale(inner.Height)), Color.Black);
             // Normal
-            spriteBatch.Draw(side, new Rectangle(GlobalGraphics.Scale(bounds.X), GlobalGraphics.Scale(bounds.Y), GlobalGraphics.Scale(side.Width), GlobalGraphics.Scale(side.Height)), State == 0 ? Color.White : Color.LightBlue);
-            spriteBatch.Draw(side, new Rectangle(GlobalGraphics.Scale(bounds.X + bounds.Width - 1 + side.Width/2), GlobalGraphics.Scale(bounds.Y - 1 + side.Height/2), GlobalGraphics.Scale(side.Width), GlobalGraphics.Scale(side.Height)), null, State == 0 ? Color.White : Color.LightBlue, MathHelper.ToRadians(180), new Vector2(side.Width/2, side.Height/2), SpriteEffects.None, 0);
-            spriteBatch.Draw(inner, new Rectangle(GlobalGraphics.Scale(bounds.X+4), GlobalGraphics.Scale(bounds.Y), GlobalGraphics.Scale(bounds.Width-5), GlobalGraphics.Scale(inner.Height)), State == 0 ? Color.White : Color.LightBlue);
+            spriteBatch.Draw(side, new Rectangle(GlobalGraphics.Scale(bounds.X), GlobalGraphics.Scale(bounds.Y), GlobalGraphics.Scale(side.Width), GlobalGraphics.Scale(side.Height)), (Global.editing != Name + "Input") ? Color.White : Color.LightBlue);
+            spriteBatch.Draw(side, new Rectangle(GlobalGraphics.Scale(bounds.X + bounds.Width - 1 + side.Width/2), GlobalGraphics.Scale(bounds.Y - 1 + side.Height/2), GlobalGraphics.Scale(side.Width), GlobalGraphics.Scale(side.Height)), null, (Global.editing != Name + "Input") ? Color.White : Color.LightBlue, MathHelper.ToRadians(180), new Vector2(side.Width/2, side.Height/2), SpriteEffects.None, 0);
+            spriteBatch.Draw(inner, new Rectangle(GlobalGraphics.Scale(bounds.X+4), GlobalGraphics.Scale(bounds.Y), GlobalGraphics.Scale(bounds.Width-5), GlobalGraphics.Scale(inner.Height)), (Global.editing != Name + "Input") ? Color.White : Color.LightBlue);
             // Inner text
             try
             {
@@ -174,7 +168,7 @@ namespace NonsensicalVideoGenerator
                 Tooltip = Tooltip.Remove(Tooltip.Length - 1);
             }
             // Draw cursor every 500ms
-            if (State == 1 && gameTime.TotalGameTime.TotalMilliseconds % 500 < 250)
+            if ((Global.editing == Name + "Input") && gameTime.TotalGameTime.TotalMilliseconds % 500 < 250)
             {
                 int cursorX = (int)GlobalGraphics.fontMunro.MeasureString(Tooltip).X;
                 // could have just used a line here
@@ -242,7 +236,7 @@ namespace NonsensicalVideoGenerator
         // implementation of textinputeventargs
         private void TextInput(object? sender, TextInputEventArgs e)
         {
-            if (State == 1)
+            if ((Global.editing == Name + "Input"))
             {
                 if(e.Key == Keys.Tab || e.Key == Keys.Enter || e.Key == Keys.Escape)
                     return;

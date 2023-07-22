@@ -42,7 +42,8 @@ namespace NonsensicalVideoGenerator
                 ScreenManager.GetScreen<TutorialScreen>("Initial Setup")?.Show();
                 ScreenManager.GetScreen<ContentScreen>("Content")?.Hide();
                 ScreenManager.GetScreen<MenuScreen>("Main Menu")?.Hide();
-                ScreenManager.GetScreen<VideoScreen>("Video")?.Hide();
+                if(FramePlayer.audio != null)
+                    ScreenManager.GetScreen<VideoScreen>("Video")?.Hide();
                 ScreenManager.GetScreen<BackgroundScreen>("Background")?.Hide();
                 ScreenManager.GetScreen<SocialScreen>("Socials")?.Hide();
                 GlobalContent.GetSound("Prompt").Play(int.Parse(SaveData.saveValues["SoundEffectVolume"]) / 100f, 0f, 0f);
@@ -129,6 +130,16 @@ namespace NonsensicalVideoGenerator
 #endif
             new string[]
             {
+                "Press F5 to toggle the debug console.",
+                "This can be used to view errors."
+            },
+            new string[]
+            {
+                "Hold shift while scrolling in the console",
+                "to scroll faster. Also, try PG UP and PG DN."
+            },
+            new string[]
+            {
                 "You can right click on media in the library",
                 "to view them in the file explorer."
             },
@@ -200,6 +211,48 @@ namespace NonsensicalVideoGenerator
         }
         public bool Update(GameTime gameTime, bool handleInput)
         {
+            if(!accepted)
+            {
+                overlayOpacity -= 16;
+                if(overlayOpacity <= 0 || askAccessibility)
+                {
+                    overlayOpacity = 0;
+                    // Flash text.
+                    if(!textFadedIn)
+                    {
+                        lastTextOpacity -= 16;
+                        if(lastTextOpacity <= 0)
+                        {
+                            lastTextOpacity = 0;
+                            textFadedIn = true;
+                            timeText = gameTime.TotalGameTime.TotalMilliseconds;
+                        }
+                    }
+                }
+            }
+            else if(!askAccessibility)
+            {
+                lastTextOpacity -= 16;
+                overlayOpacity += 16;
+                if (overlayOpacity >= 255)
+                {
+                    overlayOpacity = 255;
+                    lastTextOpacity = 0;
+                }
+            }
+            if (fadingIn || askAccessibility)
+            {
+                overlayOpacity -= 16;
+                if (overlayOpacity <= 0)
+                {
+                    overlayOpacity = 0;
+                    if(!askAccessibility)
+                    {
+                        screenType = ScreenType.Hidden;
+                        return false;
+                    }
+                }
+            }
             if(handleInput)
             {
                 if(!askAccessibility && !accepted)
@@ -210,51 +263,31 @@ namespace NonsensicalVideoGenerator
                 }
                 if(!accepted)
                 {
-                    overlayOpacity -= 16;
-                    if(overlayOpacity <= 0 || askAccessibility)
+                    // Keyboard input.
+                    newKeyboardState = Keyboard.GetState();
+                    oldKeyboardState = newKeyboardState;
+                    Accessibility.CompatAccessibility(new Rectangle(GlobalGraphics.Scale(4), GlobalGraphics.Scale(24 + (warningText.Count - 2) * 16), GlobalGraphics.scaledWidth - GlobalGraphics.Scale(8), GlobalGraphics.Scale(16)), "Click anywhere to continue.");
+                    if (MouseInput.MouseState.LeftButton == ButtonState.Pressed && MouseInput.LastMouseState.LeftButton == ButtonState.Released
+                        || newKeyboardState.GetPressedKeys().Length > 0 && oldKeyboardState.GetPressedKeys().Length == 0)
                     {
-                        overlayOpacity = 0;
-                        // Flash text.
-                        if(!textFadedIn)
+                        if(askAccessibility)
                         {
-                            lastTextOpacity -= 16;
-                            if(lastTextOpacity <= 0)
-                            {
-                                lastTextOpacity = 0;
-                                textFadedIn = true;
-                                timeText = gameTime.TotalGameTime.TotalMilliseconds;
-                            }
+                            SaveData.saveValues["FirstBoot"] = "false";
+                            SaveData.Save();
+                            askAccessibility = false;
                         }
-                        // Keyboard input.
-                        newKeyboardState = Keyboard.GetState();
-                        oldKeyboardState = newKeyboardState;
-                        Accessibility.CompatAccessibility(new Rectangle(GlobalGraphics.Scale(4), GlobalGraphics.Scale(24 + (warningText.Count - 2) * 16), GlobalGraphics.scaledWidth - GlobalGraphics.Scale(8), GlobalGraphics.Scale(16)), "Click anywhere to continue.");
-                        if (MouseInput.MouseState.LeftButton == ButtonState.Pressed && MouseInput.LastMouseState.LeftButton == ButtonState.Released
-                            || newKeyboardState.GetPressedKeys().Length > 0 && oldKeyboardState.GetPressedKeys().Length == 0)
+                        else
                         {
-                            if(askAccessibility)
-                            {
-                                SaveData.saveValues["FirstBoot"] = "false";
-                                SaveData.Save();
-                                askAccessibility = false;
-                            }
-                            else
-                            {
-                                ConsoleOutput.WriteLine("User acknowledged photosensitive warning.", Color.LightGreen);
-                            }
-                            accepted = true;
-                            GlobalContent.GetSound("Select").Play(int.Parse(SaveData.saveValues["SoundEffectVolume"]) / 100f, 0f, 0f);
+                            ConsoleOutput.WriteLine("User acknowledged photosensitive warning.", Color.LightGreen);
                         }
+                        accepted = true;
+                        GlobalContent.GetSound("Select").Play(int.Parse(SaveData.saveValues["SoundEffectVolume"]) / 100f, 0f, 0f);
                     }
                 }
                 else if(!askAccessibility)
                 {
-                    lastTextOpacity -= 16;
-                    overlayOpacity += 16;
                     if (overlayOpacity >= 255)
                     {
-                        overlayOpacity = 255;
-                        lastTextOpacity = 0;
                         if(bool.Parse(SaveData.saveValues["FirstBoot"]))
                         {
                             askAccessibility = true;
@@ -282,12 +315,15 @@ namespace NonsensicalVideoGenerator
                             updateWorker.RunWorkerAsync();
                             ScreenManager.PushNavigation("Main Menu");
                             ScreenManager.PushNavigation("Content");
-                            ScreenManager.PushNavigation("Video");
                             ScreenManager.PushNavigation("Background");
                             ScreenManager.PushNavigation("Socials");
                             ScreenManager.GetScreen<ContentScreen>("Content")?.Show();
                             ScreenManager.GetScreen<MenuScreen>("Main Menu")?.Show();
-                            ScreenManager.GetScreen<VideoScreen>("Video")?.Show();
+                            if(FramePlayer.audio != null)
+                            {
+                                ScreenManager.PushNavigation("Video");
+                                ScreenManager.GetScreen<VideoScreen>("Video")?.Show();
+                            }
                             ScreenManager.GetScreen<BackgroundScreen>("Background")?.Show();
                             ScreenManager.GetScreen<HeaderScreen>("Header")?.Show();
                             ScreenManager.GetScreen<SocialScreen>("Socials")?.Show();
@@ -298,19 +334,6 @@ namespace NonsensicalVideoGenerator
                             fadingIn = true;
                         }
                         accepted = false;
-                    }
-                }
-            }
-            if (fadingIn || askAccessibility)
-            {
-                overlayOpacity -= 16;
-                if (overlayOpacity <= 0)
-                {
-                    overlayOpacity = 0;
-                    if(!askAccessibility)
-                    {
-                        screenType = ScreenType.Hidden;
-                        return false;
                     }
                 }
             }
