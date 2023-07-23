@@ -176,7 +176,7 @@ namespace NonsensicalVideoGenerator
                     SaveData.Save();
                 return false;
             }));
-            controllerAdvanced.Add("Width", new TextEntry("", "Width: how wide the result is.", SaveData.saveValues["VideoWidth"], new Vector2(139, 60), 24, 4, 1, (int i) => {
+            controllerAdvanced.Add("Width", new TextEntry("     ", "Width: how wide the result is.", SaveData.saveValues["VideoWidth"], new Vector2(139, 60), 24, 4, 1, (int i) => {
                 string oldValue = SaveData.saveValues["VideoWidth"];
                 // minimum must be 320
                 if(int.Parse(controllerAdvanced.interactables["Width"].Tooltip) < 320)
@@ -270,21 +270,21 @@ namespace NonsensicalVideoGenerator
                 return false;
             }));
             // Add text entries
+            controller.Add("MinStreamDuration", new TextEntry("  ", "Start of random length range.", SaveData.saveValues["MinStreamDuration"], new Vector2(139, 60+19*3), 26, 5, 2, (int i) => {
+                string oldValue = SaveData.saveValues["MinStreamDuration"];
+                if(float.Parse(controller.interactables["MinStreamDuration"].Tooltip) < 0.2)
+                    controller.interactables["MinStreamDuration"].Tooltip = "0.2";
+                SaveData.saveValues["MinStreamDuration"] = controller.interactables["MinStreamDuration"].Tooltip;
+                if(oldValue != SaveData.saveValues["MinStreamDuration"])
+                    SaveData.Save();
+                return false;
+            }));
             controller.Add("MaxStreamDuration", new TextEntry("Random Clip Length", "End of random length range.", SaveData.saveValues["MaxStreamDuration"], new Vector2(172, 60+19*3), 26, 5, 2, (int i) => {
                 string oldValue = SaveData.saveValues["MaxStreamDuration"];
                 if(float.Parse(controller.interactables["MaxStreamDuration"].Tooltip) < 0.2)
                     controller.interactables["MaxStreamDuration"].Tooltip = "0.2";
                 SaveData.saveValues["MaxStreamDuration"] = controller.interactables["MaxStreamDuration"].Tooltip;
                 if(oldValue != SaveData.saveValues["MaxStreamDuration"])
-                    SaveData.Save();
-                return false;
-            }));
-            controller.Add("MinStreamDuration", new TextEntry("", "Start of random length range.", SaveData.saveValues["MinStreamDuration"], new Vector2(139, 60+19*3), 26, 5, 2, (int i) => {
-                string oldValue = SaveData.saveValues["MinStreamDuration"];
-                if(float.Parse(controller.interactables["MinStreamDuration"].Tooltip) < 0.2)
-                    controller.interactables["MinStreamDuration"].Tooltip = "0.2";
-                SaveData.saveValues["MinStreamDuration"] = controller.interactables["MinStreamDuration"].Tooltip;
-                if(oldValue != SaveData.saveValues["MinStreamDuration"])
                     SaveData.Save();
                 return false;
             }));

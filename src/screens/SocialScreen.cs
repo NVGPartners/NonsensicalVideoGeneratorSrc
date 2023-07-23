@@ -160,7 +160,7 @@ namespace NonsensicalVideoGenerator
                                         break;
                                     case 2:
                                         // GitHub
-                                        psi.FileName = "https://github.com/KiwifruitDev/NonsensicalVideoGenerator/issues";
+                                        psi.FileName = "https://github.com/KiwifruitDev/NonsensicalVideoGenerator";
                                         break;
                                 }
                                 psi.UseShellExecute = true;
