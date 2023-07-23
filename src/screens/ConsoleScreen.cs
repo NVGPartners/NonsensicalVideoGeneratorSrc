@@ -107,6 +107,8 @@ namespace NonsensicalVideoGenerator
                 || (newKeyboardState.IsKeyDown(Keys.OemTilde) && !oldKeyboardState.IsKeyDown(Keys.OemTilde))
                 && Global.ready)
             {
+                Global.editing = "";
+                Accessibility.allowAccessibility = true;
                 overrideReturn = true;
                 if(Toggle())
                 {

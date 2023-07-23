@@ -32,6 +32,7 @@ namespace NonsensicalVideoGenerator
         private MusicState _musicState = MusicState.Paused;
         private int _musicActive = 0;
         private int music;
+        private bool tabbedOut = false;
         public UserInterface()
         {
             ConsoleOutput.WriteLine("Creating new UserInterface instance...", Color.Transparent);
@@ -125,6 +126,13 @@ namespace NonsensicalVideoGenerator
         }
         protected override void Update(GameTime gameTime)
         {
+            // fix text entries
+            tabbedOut = !IsActive;
+            if (tabbedOut && Global.editing != "")
+            {
+                Global.editing = "";
+                Accessibility.allowAccessibility = true;
+            }
             try
             {
                 if(SteamManager.initialized)
