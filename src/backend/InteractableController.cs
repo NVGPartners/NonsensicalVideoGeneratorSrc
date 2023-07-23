@@ -1,3 +1,4 @@
+#if MONOGAME
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Content;
 using Microsoft.Xna.Framework.Graphics;
@@ -16,7 +17,6 @@ namespace NonsensicalVideoGenerator
         {
             bool returnValue = false;
             List<string> names = new();
-            try
             {
                 // Update all interactables.
                 foreach (KeyValuePair<string, IInteractable> interactable in interactables)
@@ -24,14 +24,13 @@ namespace NonsensicalVideoGenerator
                     names.Add(interactable.Value.Name + "Input");
                 }
             }
-            catch {} // modified
             // If editing is not in the name list, set it to ""
             if (Global.editing != "" && !names.Contains(Global.editing))
             {
                 Global.editing = "";
                 GlobalContent.GetSound("Back").Play(int.Parse(SaveData.saveValues["SoundEffectVolume"]) / 100f, 0f, 0f);
             }
-            try {
+            {
                 // Update all interactables.
                 foreach (KeyValuePair<string, IInteractable> interactable in interactables)
                 {
@@ -39,7 +38,6 @@ namespace NonsensicalVideoGenerator
                         returnValue = true;
                 }
             }
-            catch {} // modified
             return returnValue;
         }
         public void Draw(GameTime gameTime, SpriteBatch spriteBatch)
@@ -75,3 +73,4 @@ namespace NonsensicalVideoGenerator
         }
     }
 }
+#endif

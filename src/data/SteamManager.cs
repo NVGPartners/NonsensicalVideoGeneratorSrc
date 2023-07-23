@@ -27,7 +27,11 @@ namespace NonsensicalVideoGenerator
                     bool drm = SteamAPI.RestartAppIfNecessary(Global.appId);
                     if (drm)
                     {
+#if MONOGAME
                         UserInterface.instance.Exit();
+#else
+                        Environment.Exit(0);
+#endif
                         return;
                     }
                 }

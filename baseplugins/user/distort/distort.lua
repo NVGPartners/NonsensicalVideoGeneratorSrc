@@ -24,6 +24,22 @@ function Query()
                 ["path"] = "distort",
                 ["type"] = "audio",
             }
+        },
+        ["userconsent"] = {
+            ["consents"] = {
+                {
+                    ["flag"] = "DownloadFiles",
+                    ["params"] = {
+                        "https://cdn.discordapp.com/attachments/1131731781402509362/1131860281253965864/gentle_breeze.mp3",
+                    }
+                },
+                {
+                    ["flag"] = "AddToLibrary",
+                    ["params"] = {
+                        "gentle_breeze.mp3"
+                    }
+                },
+            }
         }
     }
 end
@@ -44,27 +60,45 @@ local distorts = {
     distort4,
     distort5
 }
+local music = "music.wav"
 
 -- Variables
 local distortmusic = ""
+local indexoffset = 0
 
 function StartGeneration(options, pluginSettings, functions)
-    -- Set variables
-    distortmusic = functions.getRandomLibraryFile("audio", "distort")
-    -- Apply effect
-    if functions.magickInstalled() then
-        functions.runMagick("convert -size " .. options.width .. "x" .. options.height .. " canvas:black " .. black)
+    -- Download default media
+    if not functions.libraryHasFile("audio", "distort", "gentle_breeze.mp3") then
+        functions.downloadFile("https://cdn.discordapp.com/attachments/1131731781402509362/1131860281253965864/gentle_breeze.mp3", "audio", "distort")
+        indexoffset = 1
     else
-        -- one frame
-        functions.runFFmpeg("-f lavfi -i color=c=black:s=" .. options.width .. "x" .. options.height .. ":d=1 -update 1 -preset veryfast -y \"" .. black .. "\"")
+        -- Set variables
+        distortmusic = functions.getRandomLibraryFile("audio", "distort")
+        -- Apply effect
+        if functions.magickInstalled() then
+            functions.runMagick("convert -size " .. options.width .. "x" .. options.height .. " canvas:black " .. black)
+        else
+            -- one frame
+            functions.runFFmpeg("-f lavfi -i color=c=black:s=" .. options.width .. "x" .. options.height .. ":d=1 -update 1 -preset veryfast -y \"" .. black .. "\"")
+        end
     end
     return true
 end
 
 function PostCommand(commandindex, outputresult, errorresult, options, pluginSettings, functions)
-    if commandindex == 1 then
+    if commandindex == 1 and indexoffset == 1 then
+        -- Set variables
+        distortmusic = functions.getRandomLibraryFile("audio", "distort")
+        -- Apply effect
+        if functions.magickInstalled() then
+            functions.runMagick("convert -size " .. options.width .. "x" .. options.height .. " canvas:black " .. black)
+        else
+            -- one frame
+            functions.runFFmpeg("-f lavfi -i color=c=black:s=" .. options.width .. "x" .. options.height .. ":d=1 -update 1 -preset veryfast -y \"" .. black .. "\"")
+        end
+    elseif commandindex == 1+indexoffset then
         functions.runFFmpeg("-i \"" .. options.inputVideo .. "\" -ss 0 -frames:v 1 -update 1 -q:v 1 -preset veryfast -y \"" .. distort0 .. "\"")
-    elseif commandindex <= 6 then
+    elseif commandindex <= 6+indexoffset then
         local action = ""
         local rng = functions.randomInt(1, 8)
         if functions.magickInstalled() then
@@ -96,7 +130,7 @@ function PostCommand(commandindex, outputresult, errorresult, options, pluginSet
             end
             functions.runFFmpeg("-i \"" .. distort0 .. "\" " .. action .. " -frames:v 1 -update 1 -preset veryfast -y \"" .. distorts[commandindex - 1] .. "\"")
         end
-    elseif commandindex == 7 then
+    elseif commandindex == 7+indexoffset then
         local concatstring = [[file ']] .. distort0 .. [['
 duration 0.467
 file ']] .. distort1 .. [['
@@ -113,7 +147,10 @@ file ']] .. distort5 .. [['
 duration 0.467
 ]]
         functions.fileWrite(concatdistort, concatstring)
-        functions.runFFmpeg("-f concat -i \"" .. concatdistort .. "\" -i \"" .. distortmusic .. "\" -c:v libx264 -c:a aac -pix_fmt yuv420p -preset veryfast -shortest -y \"" .. options.outputVideo .. "\"")
+        -- convert mp3 to wav
+        functions.runFFmpeg("-i \"" .. distortmusic .. "\" -acodec pcm_s16le -ac 2 -ar 44100 \"" .. music .. "\"")
+    elseif commandindex == 8+indexoffset then
+        functions.runFFmpeg("-f concat -i \"" .. concatdistort .. "\" -i \"" .. music .. "\" -c:v libx264 -c:a aac -pix_fmt yuv420p -preset veryfast -shortest -y \"" .. options.outputVideo .. "\"")
     end
 end
 

@@ -1,3 +1,4 @@
+#if MONOGAME
 using System.Diagnostics;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Content;
@@ -53,7 +54,7 @@ namespace NonsensicalVideoGenerator
                     SaveData.Save();
                     // Restart software through steam
                     ProcessStartInfo startInfo = new ProcessStartInfo();
-                    startInfo.FileName = "steam://rungameid/" + Global.appId.ToString();
+                    startInfo.FileName = "steam://run/" + Global.appId.ToString();
                     startInfo.UseShellExecute = true;
                     startInfo.Verb = "open";
                     Process.Start(startInfo);
@@ -104,3 +105,4 @@ namespace NonsensicalVideoGenerator
         }
     }
 }
+#endif

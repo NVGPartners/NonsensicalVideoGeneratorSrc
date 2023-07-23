@@ -1,7 +1,11 @@
 using System;
 using System.Collections.Generic;
 using System.IO;
+#if MONOGAME
 using Microsoft.Xna.Framework;
+#else
+using System.Drawing;
+#endif
 using Newtonsoft.Json;
 using System.Runtime.InteropServices;
 using System.ComponentModel;
@@ -296,9 +300,8 @@ namespace NonsensicalVideoGenerator
             {
                 File.Copy(file.Path, newfile);
             }
-            catch
+            catch(Exception e)
             {
-                // shh...
             }
             file.Path = newfile;
             libraryFiles.Add(file);
@@ -556,20 +559,26 @@ namespace NonsensicalVideoGenerator
                     else
                     {
                         ConsoleOutput.WriteLine("Failed to download clip: yt-dlp is not installed.", Color.Red);
+#if MONOGAME
                         LibraryPage.Done(false);
+#endif
                         continue;
                     }
                 }
                 catch (Exception ex)
                 {
                     ConsoleOutput.WriteLine("Failed to download clip: " + ex.Message, Color.Red);
+#if MONOGAME
                     LibraryPage.Done(false);
+#endif
                     continue;
                 }
                 // Add it to the library.
                 LibraryFile file = new(Path.GetFileNameWithoutExtension(path), path, downloadType);
                 // Run callback
+#if MONOGAME
                 LibraryPage.Done(true);
+#endif
                 libraryFiles.Add(file);
                 Global.justCompletedRender = true; // Refresh the library.
                 ConsoleOutput.WriteLine("Downloaded clip to library: " + path, Color.Green);

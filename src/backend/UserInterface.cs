@@ -1,4 +1,5 @@
-﻿using System;
+﻿#if MONOGAME
+using System;
 using System.Linq;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
@@ -21,7 +22,6 @@ namespace NonsensicalVideoGenerator
     {
         Playing,
         Paused,
-        Stopped,
     }
     public class UserInterface : Game
     {
@@ -29,8 +29,9 @@ namespace NonsensicalVideoGenerator
         private GraphicsDeviceManager _graphics;
         private SpriteBatch? _spriteBatch;
         private WindowState _windowState = WindowState.Unfocused;
-        private MusicState _musicState = MusicState.Stopped;
+        private MusicState _musicState = MusicState.Paused;
         private int _musicActive = 0;
+        private int music;
         public UserInterface()
         {
             ConsoleOutput.WriteLine("Creating new UserInterface instance...", Color.Transparent);
@@ -74,7 +75,7 @@ namespace NonsensicalVideoGenerator
             gameForm.DragDrop += new DragEventHandler(DragDrop);
             gameForm.DragLeave += new EventHandler(DragLeave);
             ConsoleOutput.WriteLine("Form supports drag and drop.", Color.Transparent);
-#else
+#elif DESKTOPGL
             ConsoleOutput.WriteLine("Form does not support drag and drop.", Color.Transparent);
 #endif
             // Set window title.
@@ -99,8 +100,6 @@ namespace NonsensicalVideoGenerator
             _spriteBatch = new SpriteBatch(GraphicsDevice);
             // Load default content.
             GlobalContent.LoadDefaultContent(Content, GraphicsDevice);
-            // Find music.
-            FindMusic();
             // Load all screen content.
             ScreenManager.LoadContent(Content, GraphicsDevice);
             base.LoadContent();
@@ -115,11 +114,14 @@ namespace NonsensicalVideoGenerator
         }
         private void FindMusic()
         {
-            _musicActive = Global.generatorFactory.globalRandom.Next(0, GlobalContent.GetSongCount());
-            MediaPlayer.Play(GlobalContent.GetSongByIndex(_musicActive));
-            if(!Global.ready)
-                MediaPlayer.Volume = 0f;
+            music = Global.generatorFactory.globalRandom.Next(0, GlobalContent.GetSongCount());
+            // Make sure music is in range.
+            if(music < 0 || music >= GlobalContent.GetSongCount())
+            {
+                music = 0;
+            }
             _musicState = MusicState.Playing;
+            MediaPlayer.Play(GlobalContent.GetSongByIndex(music));
         }
         protected override void Update(GameTime gameTime)
         {
@@ -133,6 +135,13 @@ namespace NonsensicalVideoGenerator
             // Play music after 500ms.
             if(gameTime.TotalGameTime.TotalMilliseconds > Global.readyTime + 2500 && Global.ready)
             {
+                // Exchange music if it's not the same as the active music.
+                if(_musicActive != music)
+                {
+                    _musicActive = music;
+                    MediaPlayer.Play(GlobalContent.GetSongByIndex(_musicActive));
+                    MediaPlayer.Volume = 0f;
+                }
                 if(Global.exiting)
                 {
                     if(MediaPlayer.Volume > 0.01f)
@@ -155,24 +164,17 @@ namespace NonsensicalVideoGenerator
                         if(MediaPlayer.Volume > vol)
                             MediaPlayer.Volume = vol;
                     }
-                    else if((_windowState == WindowState.Focused && _musicState == MusicState.Stopped) && FramePlayer.canPlayBgMusic)
+                    // Loop music
+                    if(MediaPlayer.State == MediaState.Stopped)
                     {
                         FindMusic();
                     }
-                    else if((_windowState == WindowState.Focused && _musicState == MusicState.Paused) && FramePlayer.canPlayBgMusic)
+                    if((_windowState == WindowState.Focused && _musicState == MusicState.Paused) && FramePlayer.canPlayBgMusic)
                     {
                         MediaPlayer.Resume();
                         _musicState = MusicState.Playing;
                     }
-                    // Loop music.
-                    if((_windowState == WindowState.Focused && MediaPlayer.State == MediaState.Stopped) && FramePlayer.canPlayBgMusic)
-                    {
-                        int newSong = Global.generatorFactory.globalRandom.Next(0, GlobalContent.GetSongCount());
-                        while(newSong == _musicActive)
-                            newSong = Global.generatorFactory.globalRandom.Next(0, GlobalContent.GetSongCount());
-                        _musicActive = newSong;
-                    }
-                    if((_windowState == WindowState.Unfocused &&_musicState == MusicState.Playing) || !FramePlayer.canPlayBgMusic)
+                    if((_windowState == WindowState.Unfocused && _musicState == MusicState.Playing) || !FramePlayer.canPlayBgMusic)
                     {
                         // Fade out music.
                         if(MediaPlayer.Volume > 0.1f)
@@ -216,3 +218,4 @@ namespace NonsensicalVideoGenerator
         }
     }
 }
+#endif

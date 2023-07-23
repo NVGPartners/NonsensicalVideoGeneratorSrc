@@ -2,7 +2,11 @@ using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
+#if MONOGAME
 using Microsoft.Xna.Framework;
+#else
+using System.Drawing;
+#endif
 using Newtonsoft.Json;
 
 namespace NonsensicalVideoGenerator
@@ -28,7 +32,7 @@ namespace NonsensicalVideoGenerator
             {"OutrosEnabled", "true"},
             {"PlayAutomatically", "true"},
             {"GameHighScore", "0"},
-            {"MusicVolume", "25"},
+            {"MusicVolume", "50"},
             {"SoundEffectVolume", "100"},
             {"VideoVolume", "100"},
             {"TransitionChance", "20"},

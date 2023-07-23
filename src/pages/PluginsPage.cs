@@ -1,3 +1,4 @@
+#if MONOGAME
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
@@ -11,22 +12,6 @@ using MonoGame.Extended.Tweening;
 
 namespace NonsensicalVideoGenerator
 {
-    [Flags]
-    public enum WorkshopTag
-    {
-        None = 0,
-        Effect_AudioOnly = 1,
-        Effect_VideoOnly = 2,
-        Library_SFX = 4,
-        Library_Music = 8,
-        Library_Material = 16,
-        Library_Transition = 32,
-        Library_Intro = 64,
-        Library_Outro = 128,
-        Library_Overlay = 256,
-        Library_Render = 512,
-        Library_Custom = 1024,
-    }
     /// <summary>
     /// Generate page.
     /// </summary>
@@ -739,31 +724,31 @@ namespace NonsensicalVideoGenerator
                                                 case SettingType.TextInput:
                                                 default:
                                                     te = new TextEntry(s.Key, PluginHandler.plugins[i].settingTooltips[s.Key], PluginHandler.plugins[i].settings[s.Key].ToString(), new Vector2(139, 60+19*sindex), 50, 25, ty, (int i) => {
-                                                        if(i == 1)
+                                                        if(i == 0)
                                                         {
                                                             // Set "setting" to the setting index where mouse cursor y is
                                                             int y = MouseInput.MouseState.Y / GlobalGraphics.scale;
-                                                            Rectangle source = new(139, 70, 53, 15);
+                                                            Rectangle source = new(139, 60, 53, 15);
                                                             int separator = 4;
                                                             setting = (y - source.Y - separator) / (source.Height + separator);
+                                                            ConsoleOutput.WriteLine("Setting " + setting, Color.RoyalBlue);
                                                             if(setting < 0)
                                                                 setting = 0;
                                                             while(PluginHandler.plugins[settingsIndex].settingTypes.ElementAt(setting).Value == SettingType.Label)
                                                                 setting++;
                                                             if(setting >= PluginHandler.plugins[settingsIndex].settings.Count)
                                                                 setting = PluginHandler.plugins[settingsIndex].settings.Count - 1;
-                                                            return false;
-                                                        }
-                                                        else if(i == 0)
-                                                        {
                                                             // Use "setting" to get the key of the setting
                                                             string keyFromIndex = PluginHandler.plugins[settingsIndex].settings.Keys.ElementAt(setting);
                                                             string oldValue = PluginHandler.plugins[settingsIndex].settings[keyFromIndex].ToString();
+                                                            if(!controller.interactables.ContainsKey(keyFromIndex))
+                                                            {
+                                                                Global.editing = "";
+                                                                return true;
+                                                            }
                                                             PluginHandler.plugins[settingsIndex].settings[keyFromIndex] = controller.interactables[keyFromIndex].Tooltip;
                                                             if(oldValue != PluginHandler.plugins[settingsIndex].settings[keyFromIndex].ToString())
                                                                 PluginHandler.SavePluginSettings();
-                                                            else
-                                                                GlobalContent.GetSound("Error").Play(int.Parse(SaveData.saveValues["SoundEffectVolume"]) / 100f, 0f, 0f);
                                                         }
                                                         return false;
                                                     }).Register();
@@ -893,3 +878,4 @@ namespace NonsensicalVideoGenerator
         }
     }
 }
+#endif

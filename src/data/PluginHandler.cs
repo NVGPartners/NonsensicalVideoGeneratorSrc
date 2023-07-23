@@ -5,7 +5,11 @@ using System.Collections.Generic;
 using System;
 using Newtonsoft.Json;
 using System.Linq;
+#if MONOGAME
 using Microsoft.Xna.Framework;
+#else
+using System.Drawing;
+#endif
 using System.Text.RegularExpressions;
 using Newtonsoft.Json.Linq;
 using MoonSharp.Interpreter;
@@ -13,9 +17,26 @@ using MoonSharp.Interpreter.Loaders;
 using Steamworks;
 using System.ComponentModel;
 using System.Threading;
+using System.Net;
 
 namespace NonsensicalVideoGenerator
 {
+    [Flags]
+    public enum WorkshopTag
+    {
+        None = 0,
+        Effect_AudioOnly = 1,
+        Effect_VideoOnly = 2,
+        Library_SFX = 4,
+        Library_Music = 8,
+        Library_Material = 16,
+        Library_Transition = 32,
+        Library_Intro = 64,
+        Library_Outro = 128,
+        Library_Overlay = 256,
+        Library_Render = 512,
+        Library_Custom = 1024,
+    }
     public enum PluginType
     {
         None,
@@ -40,6 +61,7 @@ namespace NonsensicalVideoGenerator
         FFprobe,
         Magick,
         YtDlp,
+        Download,
     }
     public class Command
     {
@@ -102,42 +124,121 @@ namespace NonsensicalVideoGenerator
         }
         public string[] Call()
         {
-            string args = this.args ?? "";
-            ProcessStartInfo startInfo = new()
+            if(type != CommandType.Download)
             {
-                FileName = command,
-                Arguments = args,
-                WorkingDirectory = workingDirectory ?? Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location),
-                UseShellExecute = false,
-                RedirectStandardOutput = true,
-                RedirectStandardError = true,
-                CreateNoWindow = true,
-            };
-            Process process = new()
+                string args = this.args ?? "";
+                ProcessStartInfo startInfo = new()
+                {
+                    FileName = command,
+                    Arguments = args,
+                    WorkingDirectory = workingDirectory ?? Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location),
+                    UseShellExecute = false,
+                    RedirectStandardOutput = true,
+                    RedirectStandardError = true,
+                    CreateNoWindow = true,
+                };
+                Process process = new()
+                {
+                    StartInfo = startInfo
+                };
+                process.Start();
+                string output = "";
+                string error = "";
+                process.OutputDataReceived += (sender, e) => {
+                    if(e.Data != null)
+                    {
+                        output += e.Data;
+                        ConsoleOutput.WriteLine(e.Data, Color.Transparent);
+                    }
+                };
+                process.ErrorDataReceived += (sender, e) => {
+                    if(e.Data != null)
+                    {
+                        error += e.Data;
+                        ConsoleOutput.WriteLine(e.Data, Color.Transparent);
+                    }
+                };
+                process.BeginOutputReadLine();
+                process.BeginErrorReadLine();
+                process.WaitForExit();
+                return new string[] { output, error };
+            }
+            else
             {
-                StartInfo = startInfo
-            };
-            process.Start();
-            string output = "";
-            string error = "";
-            process.OutputDataReceived += (sender, e) => {
-                if(e.Data != null)
+                // Split args into url, rootType, and subType
+                string[] args = this.args?.Split(' ') ?? new string[] { };
+                if(args.Length < 1)
                 {
-                    output += e.Data;
-                    ConsoleOutput.WriteLine(e.Data, Color.Transparent);
+                    ConsoleOutput.WriteLine("Download command missing arguments.", Color.Red);
+                    return new string[] { "", "" };
                 }
-            };
-            process.ErrorDataReceived += (sender, e) => {
-                if(e.Data != null)
+                string url = args[0];
+                string rootType = args.Length > 1 ? args[1] : "";
+                string subType = args.Length > 2 ? args[2] : "";
+                // Validate url
+                if(!Uri.IsWellFormedUriString(url, UriKind.Absolute))
                 {
-                    error += e.Data;
-                    ConsoleOutput.WriteLine(e.Data, Color.Transparent);
+                    ConsoleOutput.WriteLine("Download command has invalid URL.", Color.Red);
+                    return new string[] { "", "" };
                 }
-            };
-            process.BeginOutputReadLine();
-            process.BeginErrorReadLine();
-            process.WaitForExit();
-            return new string[] { output, error };
+                // Validate rootType and subType
+                LibraryType? dummyType = null;
+                if(rootType == "video" || rootType == "audio")
+                {
+                    // Validate subType
+                    foreach (KeyValuePair<LibraryType, string> pair in LibraryData.libraryPaths)
+                    {
+                        if (pair.Value == rootType + "\\" + subType)
+                        {
+                            dummyType = pair.Key;
+                            break;
+                        }
+                        if (pair.Key == LibraryData.libraryPaths.Last().Key)
+                        {
+                            throw new Exception("Invalid subType");
+                        }
+                    }
+                    if (dummyType == null)
+                    {
+                        throw new Exception("Invalid subType");
+                    }
+                }
+                else
+                {
+                    subType = "";
+                }
+                // If libraryRoot is not empty, download to library instead of job folder
+                string downloadPath = subType != "" ? Path.Join(Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location), "library", rootType, subType) : rootType;
+                string combinedPath = Path.Combine(downloadPath, Path.GetFileName(url));
+                // get complete path
+                combinedPath = Path.GetFullPath(combinedPath);
+                // create directory if it doesn't exist
+                Directory.CreateDirectory(Path.GetDirectoryName(combinedPath));
+                if (File.Exists(combinedPath))
+                {
+                    ConsoleOutput.WriteLine($"File {combinedPath} already exists.", Color.LightBlue);
+                    return new string[] { "", "" };
+                }
+                // Download file
+                ConsoleOutput.WriteLine($"Downloading {url}" + (subType != "" ? " to library " + rootType + "\\" + subType : ""), Color.LightBlue);
+                using (WebClient client = new WebClient())
+                {
+                    client.DownloadFile(url, combinedPath);
+                }
+                // Load to library
+                if(dummyType != null)
+                {
+                    ConsoleOutput.WriteLine($"Loading {combinedPath} to library", Color.LightBlue);
+                    LibraryFile libfile = new(Path.GetFileNameWithoutExtension(combinedPath), Path.Join(rootType, subType, Path.GetFileName(combinedPath)), dummyType);
+                    if(LibraryData.Load(libfile) == null)
+                    {
+                        ConsoleOutput.WriteLine($"Failed to load {combinedPath} to library", Color.Red);
+                        return new string[] { "", "" };
+                    }
+                    Global.justCompletedRender = true;
+                }
+                return new string[] { "", "" };
+            }
         }
     }
     public enum SettingType
@@ -164,6 +265,7 @@ namespace NonsensicalVideoGenerator
         public Dictionary<string, string> settingTooltips = new();
         public Dictionary<string, SettingType> settingTypes = new();
         public static Dictionary<string, string> placeholders = new();
+        public ConsentForm? consentForm;
         public Plugin(string path, PluginType type, string rootPath, bool enabled = true)
         {
             this.path = path;
@@ -254,12 +356,6 @@ namespace NonsensicalVideoGenerator
         {
             if(!ValidateInput(args)) return;
             PluginHandler.commands.Add(new Command(CommandType.Magick, ReplacePlaceholders(args), jobDirectory));
-        }
-        // RunYtDlp for lua
-        public static void RunYtDlp(string args)
-        {
-            if(!ValidateInput(args)) return;
-            PluginHandler.commands.Add(new Command(CommandType.YtDlp, ReplacePlaceholders(args), jobDirectory));
         }
         // FolderCreate for lua
         public static void FolderCreate(string path)
@@ -360,11 +456,6 @@ namespace NonsensicalVideoGenerator
         {
             return UpdateManager.DoesCommandExist("magick");
         }
-        // YtDlp installed for lua
-        public static bool YtDlpInstalled()
-        {
-            return Global.useSystemYtDlp || File.Exists(Path.Combine(Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location), "yt-dlp.exe"));
-        }
         // GetRandomLibraryFile for lua
         public static string GetRandomLibraryFile(string rootType = "video", string subType = "materials")
         {
@@ -404,6 +495,156 @@ namespace NonsensicalVideoGenerator
                 return "{LibraryFile_" + subType + "}";
             }
             return "";
+        }
+        // AddToLibrary for lua
+        public void AddToLibrary(string rootType, string subType, string path)
+        {
+            if(consentForm != null && !consentForm.CheckConsentParam(Consents.AddToLibrary, ReplacePlaceholders(path)))
+            {
+                ConsoleOutput.WriteLine("Plugin attempted to add a file to the library without permission.", Color.Red);
+                return;
+            }
+            if(!ValidateInput(path))
+            {
+                ConsoleOutput.WriteLine("Plugin attempted to add a file to the library with an invalid path.", Color.Red);
+                return;
+            }
+            // Validate rootType and subType
+            if (rootType != "video" && rootType != "audio")
+            {
+                throw new Exception("Invalid rootType");
+            }
+            LibraryType? dummyType = null;
+            // Validate subType
+            foreach (KeyValuePair<LibraryType, string> pair in LibraryData.libraryPaths)
+            {
+                if (pair.Value == rootType + "\\" + subType)
+                {
+                    dummyType = pair.Key;
+                    break;
+                }
+                if (pair.Key == LibraryData.libraryPaths.Last().Key)
+                {
+                    throw new Exception("Invalid subType");
+                }
+            }
+            if (dummyType == null)
+            {
+                throw new Exception("Invalid subType");
+            }
+            // Add to library
+            ConsoleOutput.WriteLine($"Loading {ReplacePlaceholders(path)} to library", Color.LightBlue);
+            LibraryFile libfile = new(Path.GetFileNameWithoutExtension(ReplacePlaceholders(path)), Path.Combine("temp", Path.GetDirectoryName(jobDirectory), ReplacePlaceholders(path)), dummyType);
+            if(LibraryData.Load(libfile) == null)
+            {
+                ConsoleOutput.WriteLine($"Failed to load {ReplacePlaceholders(path)} to library", Color.Red);
+                return;
+            }
+            Global.justCompletedRender = true;
+        }
+        // LibraryHasFile for lua
+        public static bool LibraryHasFile(string rootType, string subType, string path)
+        {
+            // Validate rootType and subType
+            if (rootType != "video" && rootType != "audio")
+            {
+                throw new Exception("Invalid rootType");
+            }
+            // Check library directory
+            string combinedPath = Path.Combine(Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location), "library", rootType, subType, ReplacePlaceholders(path));
+            // Make sure folder exists
+            if (!Directory.Exists(Path.GetDirectoryName(combinedPath)))
+            {
+                return false;
+            }
+            // Check if file exists
+            if (File.Exists(combinedPath))
+            {
+                return true;
+            }
+            return false;
+        }
+        // DownloadFile for lua
+        public void DownloadFile(string url, string rootType = "", string subType = "")
+        {
+            if(consentForm != null && !consentForm.CheckConsentParam(Consents.DownloadFiles, ReplacePlaceholders(url)))
+            {
+                ConsoleOutput.WriteLine("Plugin attempted to download a file without permission.", Color.Red);
+                return;
+            }
+            if(!ValidateInput(ReplacePlaceholders(url)))
+            {
+                ConsoleOutput.WriteLine("Plugin attempted to download a file with an invalid URL.", Color.Red);
+                return;
+            }
+            if(subType == "")
+                rootType = jobDirectory;
+            else if(consentForm != null && !consentForm.CheckConsentParam(Consents.AddToLibrary, Path.GetFileName(ReplacePlaceholders(url))))
+            {
+                ConsoleOutput.WriteLine("Plugin attempted to add a file to the library without permission.", Color.Red);
+                return;
+            }
+            PluginHandler.commands.Add(new Command(CommandType.Download, ReplacePlaceholders(url) + " " + rootType + " " + subType, jobDirectory));
+        }
+        // ExecuteProgram for lua
+        public void ExecuteProgram(string program, string args)
+        {
+            if(consentForm != null && !consentForm.CheckConsentParam(Consents.ExecutePrograms, ReplacePlaceholders(program)))
+            {
+                ConsoleOutput.WriteLine("Plugin attempted to execute a program without permission.", Color.Red);
+                return;
+            }
+            if(!ValidateInput(ReplacePlaceholders(program)))
+            {
+                ConsoleOutput.WriteLine("Plugin attempted to execute a program with an invalid program name.", Color.Red);
+                return;
+            }
+            if(!ValidateInput(ReplacePlaceholders(args)))
+            {
+                ConsoleOutput.WriteLine("Plugin attempted to execute a program with invalid arguments.", Color.Red);
+                return;
+            }
+            // If program is yt-dlp, allow it to be executed from cwd
+            if(program == "yt-dlp")
+            {
+                program = Path.Combine(Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location), "yt-dlp.exe");
+            }
+            // Execute program
+            ConsoleOutput.WriteLine($"Executing {ReplacePlaceholders(program)} {ReplacePlaceholders(args)}", Color.LightBlue);
+            ProcessStartInfo startInfo = new()
+            {
+                FileName = ReplacePlaceholders(program),
+                Arguments = ReplacePlaceholders(args),
+                WorkingDirectory = jobDirectory,
+                UseShellExecute = false,
+                RedirectStandardOutput = true,
+                RedirectStandardError = true,
+                CreateNoWindow = true,
+            };
+            Process process = new()
+            {
+                StartInfo = startInfo
+            };
+            process.Start();
+            string output = "";
+            string error = "";
+            process.OutputDataReceived += (sender, e) => {
+                if(e.Data != null)
+                {
+                    output += e.Data;
+                    ConsoleOutput.WriteLine(e.Data, Color.Transparent);
+                }
+            };
+            process.ErrorDataReceived += (sender, e) => {
+                if(e.Data != null)
+                {
+                    error += e.Data;
+                    ConsoleOutput.WriteLine(e.Data, Color.Transparent);
+                }
+            };
+            process.BeginOutputReadLine();
+            process.BeginErrorReadLine();
+            process.WaitForExit();
         }
         public PluginReturnValue Call(string video)
         {
@@ -454,7 +695,6 @@ namespace NonsensicalVideoGenerator
                             functions["runFFmpeg"] = (Action<string>)RunFFmpeg;
                             functions["runFFprobe"] = (Action<string>)RunFFprobe;
                             functions["runMagick"] = (Action<string>)RunMagick;
-                            functions["runYtDlp"] = (Action<string>)RunYtDlp;
                             functions["randomDouble"] = (Func<double, double, double>)RandomDouble;
                             functions["randomInt"] = (Func<int, int, int>)RandomInt;
                             functions["randomBool"] = (Func<bool>)RandomBool;
@@ -470,7 +710,11 @@ namespace NonsensicalVideoGenerator
                             functions["ffmpegInstalled"] = (Func<bool>)FFmpegInstalled;
                             functions["ffprobeInstalled"] = (Func<bool>)FFprobeInstalled;
                             functions["magickInstalled"] = (Func<bool>)MagickInstalled;
-                            functions["ytdlpInstalled"] = (Func<bool>)YtDlpInstalled;
+                            functions["libraryHasFile"] = (Func<string, string, string, bool>)LibraryHasFile;
+                            // Requires permission
+                            functions["addToLibrary"] = (Action<string, string, string>)AddToLibrary;
+                            functions["downloadFile"] = (Action<string, string, string>)DownloadFile;
+                            functions["executeProgram"] = (Action<string, string>)ExecuteProgram;
                             PluginHandler.commands.Clear();
                             // Call generation
                             DynValue result = luaScript.Call(luaScript.Globals["StartGeneration"], videoOptions, pluginSettings, functions);
@@ -644,9 +888,68 @@ namespace NonsensicalVideoGenerator
                             //if (settingCount > 0)
                                 //ConsoleOutput.WriteLine($"Plugin {Path.GetFileName(path)} added {settingCount} settings.", Color.LightBlue);
                         }
+                        DynValue luaConsentForms = luaQuery.Table.Get("userconsent");
+                        if (luaConsentForms.Type == DataType.Table)
+                        {
+                            // Parse flags table as flags
+                            Consents consentFlags = Consents.None;
+                            Dictionary<Consents, List<string>> consentSettings = new();
+                            DynValue luaConsentFlags = luaConsentForms.Table.Get("consents");
+                            if (luaConsentFlags.Type == DataType.Table)
+                            {
+                                foreach (DynValue flag in luaConsentFlags.Table.Values)
+                                {
+                                    if (flag.Type != DataType.Table)
+                                    {
+                                        continue;
+                                    }
+                                    DynValue flagString = flag.Table.Get("flag");
+                                    if (flagString.Type == DataType.String)
+                                    {
+                                        string flagStringParsed = flagString.String;
+                                        switch (flagStringParsed)
+                                        {
+                                            case "DownloadFiles":
+                                                consentFlags |= Consents.DownloadFiles;
+                                                break;
+                                            case "ExecutePrograms":
+                                                consentFlags |= Consents.ExecutePrograms;
+                                                break;
+                                            case "AddToLibrary":
+                                                consentFlags |= Consents.AddToLibrary;
+                                                break;
+                                        }
+                                        // Get parameters
+                                        DynValue luaConsentSettings = flag.Table.Get("params");
+                                        List<string> param = new();
+                                        if (luaConsentSettings.Type == DataType.Table)
+                                        {
+                                            foreach (DynValue setting in luaConsentSettings.Table.Values)
+                                            {
+                                                if (setting.Type != DataType.String)
+                                                {
+                                                    continue;
+                                                }
+                                                // param is either a url or a program name
+                                                param.Add(setting.String);
+                                            }
+                                        }
+                                        Consents singleFlag = flagStringParsed == "DownloadFiles" ? Consents.DownloadFiles : (flagStringParsed == "ExecutePrograms" ? Consents.ExecutePrograms : Consents.AddToLibrary);
+                                        consentSettings.Add(singleFlag, param);
+                                    }
+                                }
+                            }
+                            consentForm = new ConsentForm(Path.GetFileName(path), GetDisplayName(), consentFlags, workshopId, rootPath, consentSettings);
+                        }
                     }
                     return true;
             }
+        }
+        public bool CheckConsent()
+        {
+            if (consentForm == null)
+                return false;
+            return UserConsent.CheckConsentForm(consentForm);
         }
     }
     public class LibraryCombinedType
@@ -1047,6 +1350,27 @@ namespace NonsensicalVideoGenerator
                 Global.generatorFactory.progressText = $"{plugins.Count} effects loaded.";
                 Global.canRender = true;
                 LibraryData.SequentialName();
+                // Check to see if there are any plugins that need consent forms filled out.
+                foreach(Plugin plugin in plugins)
+                {
+                    if(plugin.CheckConsent())
+                    {
+                        UserConsent.needsConsent = true;
+                        UserConsent.consentForm = plugin.consentForm;
+                        Global.generatorFactory.progressText = $"Plugin {plugin.GetDisplayName()} requires consent.";
+                        FramePlayer.canPlayBgMusic = false;
+                        ScreenManager.PushNavigation("Initial Setup");
+                        ScreenManager.GetScreen<TutorialScreen>("Initial Setup")?.Show();
+                        ScreenManager.GetScreen<ContentScreen>("Content")?.Hide();
+                        ScreenManager.GetScreen<MenuScreen>("Main Menu")?.Hide();
+                        if(FramePlayer.audio != null)
+                            ScreenManager.GetScreen<VideoScreen>("Video")?.Hide();
+                        ScreenManager.GetScreen<BackgroundScreen>("Background")?.Hide();
+                        ScreenManager.GetScreen<SocialScreen>("Socials")?.Hide();
+                        GlobalContent.GetSound("Prompt").Play(int.Parse(SaveData.saveValues["SoundEffectVolume"]) / 100f, 0f, 0f);
+                        break;
+                    }
+                }
             }
             catch (Exception e)
             {

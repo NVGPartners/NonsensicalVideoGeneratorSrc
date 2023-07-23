@@ -7,7 +7,11 @@ using System.IO;
 using System.Linq;
 using System.Reflection;
 using System.Threading;
+#if MONOGAME
 using Microsoft.Xna.Framework;
+#else
+using System.Drawing;
+#endif
 
 namespace NonsensicalVideoGenerator
 {

@@ -86,10 +86,13 @@ function PostCommand(commandindex, outputresult, errorresult, options, pluginSet
             -- Invoke-Command -ScriptBlock {&$ffmpeg -i "$temp2" -filter_complex "[0:v]setpts=0.75*PTS[f];[0:v]setpts=0.5*PTS,reverse[fr];[f][fr]concat=n=2:v=1:a=0,format=yuv420p[v];[0:a]atempo=2.0[a1];[0:a]atempo=0.75,areverse[a2];[a1][a2]concat=n=2:v=0:a=1[a]" -map "[v]" -map "[a]" -shortest -preset veryfast -y "$output"}
             functions.runFFmpeg("-i \"" .. temp2 .. "\" -filter_complex \"[0:v]setpts=0.75*PTS[f];[0:v]setpts=0.5*PTS,reverse[fr];[f][fr]concat=n=2:v=1:a=0,format=yuv420p[v];[0:a]atempo=2.0[a1];[0:a]atempo=0.75,areverse[a2];[a1][a2]concat=n=2:v=0:a=1[a]\" -map \"[v]\" -map \"[a]\" -shortest -preset veryfast -y \"" .. options.outputVideo .. "\"")
         else
-            -- Invoke-Command -ScriptBlock {&$ffmpeg -i "$temp2" -i "$randomSound" -filter_complex "[0:v]setpts=0.75*PTS[f];[0:v]setpts=0.5*PTS,reverse[fr];[f][fr]concat=n=2:v=1:a=0,format=yuv420p[v]" -map "[v]" -map "1:a" -shortest -preset veryfast -y "$output"}
-            functions.runFFmpeg("-i \"" .. temp2 .. "\" -i \"" .. randomSound .. "\" -filter_complex \"[0:v]setpts=0.75*PTS[f];[0:v]setpts=0.5*PTS,reverse[fr];[f][fr]concat=n=2:v=1:a=0,format=yuv420p[v]\" -map \"[v]\" -map \"1:a\" -shortest -preset veryfast -y \"" .. options.outputVideo .. "\"")
+            -- convert mp3 to wav
+            functions.runFFmpeg("-i \"" .. randomSound .. "\" -acodec pcm_s16le -ac 2 -ar 44100 \"" .. music .. "\"")
         end
         success = true
+    elseif commandindex == 4 and randomSound != "" then
+        -- Invoke-Command -ScriptBlock {&$ffmpeg -i "$temp2" -i "$randomSound" -filter_complex "[0:v]setpts=0.75*PTS[f];[0:v]setpts=0.5*PTS,reverse[fr];[f][fr]concat=n=2:v=1:a=0,format=yuv420p[v]" -map "[v]" -map "1:a" -shortest -preset veryfast -y "$output"}
+        functions.runFFmpeg("-i \"" .. temp2 .. "\" -i \"" .. music .. "\" -filter_complex \"[0:v]setpts=0.75*PTS[f];[0:v]setpts=0.5*PTS,reverse[fr];[f][fr]concat=n=2:v=1:a=0,format=yuv420p[v]\" -map \"[v]\" -map \"1:a\" -shortest -preset veryfast -y \"" .. options.outputVideo .. "\"")
     end
 end
 

@@ -1,3 +1,4 @@
+#if MONOGAME
 using System.Collections.Generic;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Content;
@@ -310,7 +311,7 @@ namespace NonsensicalVideoGenerator
                 if(downloading)
                     totalIndicator =    "Downloading...";
                 Vector2 totalIndicatorSize = munroSmall.MeasureString(totalIndicator);
-                Vector2 totalPosition = new Vector2((rects["HeaderButton"].X + rects["HeaderButton"].Width / 2 - totalIndicatorSize.X / 2), GlobalGraphics.Scale(56));
+                Vector2 totalPosition = new Vector2((rects["HeaderButton"].X + rects["HeaderButton"].Width / 2 - totalIndicatorSize.X / 2) + GlobalGraphics.Scale(1), GlobalGraphics.Scale(56));
                 spriteBatch.DrawString(munroSmall, totalIndicator, totalPosition + new Vector2(GlobalGraphics.Scale(1), GlobalGraphics.Scale(1)), Color.Black);
                 spriteBatch.DrawString(munroSmall, totalIndicator, totalPosition, Color.White);
             }
@@ -432,7 +433,8 @@ namespace NonsensicalVideoGenerator
             // Done!
             try
             {
-                loadVideosThread.Dispose();
+                if(loadVideosThread != null)
+                    loadVideosThread.Dispose();
             }
             catch {}
             loadVideosThread = null;
@@ -623,7 +625,7 @@ namespace NonsensicalVideoGenerator
                 {   
 #if WINDOWSDX
                     if(currentLibraryType == DefaultLibraryTypes.Render && rects.Keys.ElementAt(i) == "HeaderButton")
-#else
+#elif DESKTOPGL
                     if(rects.Keys.ElementAt(i) == "HeaderButton")   
 #endif
                         continue;
@@ -1181,7 +1183,7 @@ namespace NonsensicalVideoGenerator
                                 {
 #if WINDOWSDX
                                     tooltip = "Add Media: Click or Drag and Drop";
-#else
+#elif DESKTOPGL
                                     tooltip = "Add Media";
 #endif
                                 }
@@ -1197,3 +1199,4 @@ namespace NonsensicalVideoGenerator
         }
     }
 }
+#endif

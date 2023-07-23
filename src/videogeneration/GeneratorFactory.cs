@@ -6,12 +6,16 @@ using System.Globalization;
 using System.IO;
 using Newtonsoft.Json;
 using System.Diagnostics;
-using Microsoft.Xna.Framework;
 using System.Threading;
 using System.Linq;
 using System.Text.RegularExpressions;
 using System.Reflection;
 using Steamworks;
+#if MONOGAME
+using Microsoft.Xna.Framework;
+#else
+using System.Drawing;
+#endif
 
 namespace NonsensicalVideoGenerator
 {
@@ -114,8 +118,10 @@ namespace NonsensicalVideoGenerator
                         }
                         else
                         {
+#if MONOGAME
                             if (bool.Parse(SaveData.saveValues["PlayAutomatically"]))
                                 FramePlayer.PlayMedia(libraryFile);
+#endif
                         }
                     }
                     else
@@ -401,7 +407,7 @@ namespace NonsensicalVideoGenerator
                                     PluginReturnValue effect = PluginHandler.PickRandom(globalRandom, Path.Combine(Utilities.temporaryDirectory, "video" + i + ".mp4"));
                                     if(effect.success)
                                     {
-                                        if(!rolledForTransition && int.Parse(SaveData.saveValues["EffectChance"]) >= 100)
+                                        if(int.Parse(SaveData.saveValues["EffectChance"]) >= 100)
                                         {
                                             Global.usedAllEffectChance = true;
                                         }
@@ -503,8 +509,10 @@ namespace NonsensicalVideoGenerator
                         }
                         else
                         {
+#if MONOGAME
                             if (bool.Parse(SaveData.saveValues["PlayAutomatically"]))
                                 FramePlayer.PlayMedia(libraryFile);
+#endif
                         }
                     }
                     else
@@ -568,7 +576,9 @@ namespace NonsensicalVideoGenerator
             Global.usedWorkshopPlugin = false;
             Global.rolledForOverlay = false;
             Global.usedAllEffectChance = false;
+#if MONOGAME
             FramePlayer.Stop();
+#endif
             try
             {
                 if(vidThreadWorker == null)

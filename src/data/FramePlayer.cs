@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.ComponentModel;
 using System.Diagnostics;
 using System.IO;
+#if MONOGAME
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Audio;
 using Microsoft.Xna.Framework.Content;
@@ -10,18 +11,31 @@ using Microsoft.Xna.Framework.Graphics;
 using Microsoft.Xna.Framework.Input;
 using Microsoft.Xna.Framework.Media;
 using MonoGame.Extended.Tweening;
+#else
+using System.Drawing;
+using System.Windows.Forms;
+using System.Media;
+#endif
 
 namespace NonsensicalVideoGenerator
 {
     public static class FramePlayer
     {
         public static int currentFrame = 0;
+#if MONOGAME
         public static List<Texture2D> frames = new();
+#else
+        public static List<Image> frames = new();
+#endif
         public static double timeStarted = 0;
         public static int fps = 30;
         public static bool playing = false;
         public static bool audioPlaying = false;
+#if MONOGAME
         public static SoundEffectInstance audio;
+#else
+        public static SoundPlayer audio;
+#endif
         public static bool processing = false;
         public static double startedProcessing = 0;
         public static string currentPath = "";
@@ -59,8 +73,13 @@ namespace NonsensicalVideoGenerator
                 }
                 if(worker.CancellationPending || !processing)
                     return;
+#if MONOGAME
                 int w = GlobalGraphics.Scale(104);
                 int h = GlobalGraphics.Scale(82);
+#else
+                int w = 360;
+                int h = 240;
+#endif
                 ProcessStartInfo startInfo = new()
                 {
                     FileName = "ffmpeg",
@@ -100,15 +119,23 @@ namespace NonsensicalVideoGenerator
                         return;
                     Global.generatorFactory.progressText = "Loading frame " + i + "/" + curcount + "...";
                     FileStream frameFile = File.OpenRead($".\\temp\\extracted\\frames\\{i}.bmp");
+#if MONOGAME
                     frames.Add(Texture2D.FromStream(UserInterface.instance.GraphicsDevice, frameFile));
+#else
+                    frames.Add(Image.FromStream(frameFile));
+#endif
                     frameFile.Close();
                 }
                 // Load audio
                 FileStream audioFile = File.OpenRead(".\\temp\\extracted\\audio.wav");
+#if MONOGAME
                 SoundEffect snd = SoundEffect.FromStream(audioFile);
                 audio = snd.CreateInstance();
                 ScreenManager.PushNavigation("Video");
                 ScreenManager.GetScreen<VideoScreen>("Video")?.Show();
+#else
+                audio = new SoundPlayer(audioFile);
+#endif
                 audioFile.Close();
                 if(worker.CancellationPending || !processing)
                     return;
@@ -213,10 +240,17 @@ namespace NonsensicalVideoGenerator
                 startedProcessing = 0;
                 canPlayBgMusic = true;
                 // Unload frames
+#if MONOGAME
                 foreach(Texture2D frame in frames)
                 {
                     frame.Dispose();
                 }
+#else
+                foreach(Image frame in frames)
+                {
+                    frame.Dispose();
+                }
+#endif
                 frames.Clear();
                 // Unload audio
                 if(audio != null)
@@ -224,7 +258,9 @@ namespace NonsensicalVideoGenerator
                     audio.Stop();
                     audio.Dispose();
                     audio = null;
+#if MONOGAME
                     ScreenManager.GetScreen<VideoScreen>("Video")?.Hide();
+#endif
                     Global.generatorFactory.progressText = "Stopped playback.";
                 }
             }
@@ -273,14 +309,52 @@ namespace NonsensicalVideoGenerator
                     audio.Stop();
                     audio.Dispose();
                     audio = null;
+#if MONOGAME
                     ScreenManager.GetScreen<VideoScreen>("Video")?.Hide();
+#endif
                 }
                 FileStream audioFile = File.OpenRead(".\\temp\\extracted\\audio.wav");
+#if MONOGAME
                 SoundEffect snd = SoundEffect.FromStream(audioFile);
                 audio = snd.CreateInstance();
+#else
+                audio = new SoundPlayer(audioFile);
+#endif
                 audioFile.Close();
                 currentAudioTime = 0;
+#if MONOGAME
                 audioLength = snd.Duration.TotalMilliseconds;
+#else
+                // Get length of audio with ffprobe
+                startInfo = new()
+                {
+                    FileName = "ffprobe",
+                    Arguments = "-v error -show_entries format=duration -of default=noprint_wrappers=1:nokey=1 \"" + currentPath + "\"",
+                    UseShellExecute = false,
+                    RedirectStandardOutput = true,
+                    CreateNoWindow = true
+                };
+                process = new()
+                {
+                    StartInfo = startInfo
+                };
+                process.OutputDataReceived += (sender, args) => {
+                    if(args.Data != null)
+                    {
+                        audioLength = double.Parse(args.Data) * 1000;
+                        ConsoleOutput.WriteLine(args.Data, Color.Transparent);
+                    }
+                };
+                if(audioConvertWorker.CancellationPending || !processing)
+                    return;
+                process.Start();
+                if(audioConvertWorker.CancellationPending || !processing)
+                    return;
+                process.BeginOutputReadLine();
+                if(audioConvertWorker.CancellationPending || !processing)
+                    return;
+                process.WaitForExit();
+#endif
                 canPlayBgMusic = false;
                 audio.Play();
                 audioPlaying = true;
@@ -387,11 +461,19 @@ namespace NonsensicalVideoGenerator
                 Global.generatorFactory.progressText = "Failed to stop playback.";
             }
         }
+#if MONOGAME
         public static void Update(GameTime gameTime)
+#else
+        public static void Update()
+#endif
         {
             if(audioLength > 0 && currentAudioTime < audioLength && audioPlaying)
             {
+#if MONOGAME
                 currentAudioTime += gameTime.ElapsedGameTime.TotalMilliseconds;
+#else
+                currentAudioTime += 1000f / 60f;
+#endif
                 if(currentAudioTime > audioLength)
                 {
                     Stop();
@@ -401,23 +483,37 @@ namespace NonsensicalVideoGenerator
             if(frames.Count > 0 && !playing && audio != null && !processing)
             {
                 Global.generatorFactory.progressText = "Playing media...";
+#if MONOGAME
                 timeStarted = gameTime.TotalGameTime.TotalSeconds;
+#else
+                timeStarted = 0;
+#endif
                 canPlayBgMusic = false;
                 audio.Play();
+#if MONOGAME
                 audio.Volume = int.Parse(SaveData.saveValues["VideoVolume"]) / 100f;
+#endif
                 currentFrame = 0;
                 playing = true;
             }
             else if(processing && startedProcessing == 0)
             {
+#if MONOGAME
                 startedProcessing = gameTime.TotalGameTime.TotalSeconds;
+#else
+                startedProcessing = 0;
+#endif
             }
             if(playing)
             {
                 if(currentFrame >= 0 && currentFrame < frames.Count)
                 {
                     // Update frame
+#if MONOGAME
                     currentFrame = (int)((gameTime.TotalGameTime.TotalSeconds - timeStarted) * fps);
+#else
+                    currentFrame = (int)((currentAudioTime / 1000f) * fps);
+#endif
                     if(currentFrame >= frames.Count)
                     {
                         if(audio != null)
@@ -425,11 +521,13 @@ namespace NonsensicalVideoGenerator
                         playing = false;
                     }
                 }
+#if MONOGAME
                 // Update volume on the fly
                 if(audio != null)
                 {
                     audio.Volume = int.Parse(SaveData.saveValues["VideoVolume"]) / 100f;
                 }
+#endif
             }
         }
     }

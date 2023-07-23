@@ -1,3 +1,4 @@
+#if MONOGAME
 using System;
 using System.Collections.Generic;
 using Microsoft.Xna.Framework;
@@ -58,3 +59,4 @@ namespace NonsensicalVideoGenerator
         }
     }
 }
+#endif

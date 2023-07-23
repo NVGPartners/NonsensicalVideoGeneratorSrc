@@ -20,7 +20,8 @@
     <ApplicationHighDpiMode>true</ApplicationHighDpiMode>
     <Nullable>enable</Nullable>
     <UseWPF>true</UseWPF>
-    <DefineConstants>WINDOWSDX</DefineConstants>
+    <DefineConstants>WINDOWSDX MONOGAME</DefineConstants>
+    <Platforms>x64</Platforms>
   </PropertyGroup>
   <PropertyGroup>
     <ApplicationManifest>app.manifest</ApplicationManifest>
@@ -34,7 +35,7 @@
     <PackageReference Include="MonoGame.Content.Builder.Task" Version="3.8.0.1641" />
     <PackageReference Include="MonoGame.Framework.WindowsDX" Version="3.8.1.303" />
     <PackageReference Include="MoonSharp" Version="2.0.0" />
-    <PackageReference Include="Newtonsoft.Json" Version="13.0.1" />
+    <PackageReference Include="Newtonsoft.Json" Version="13.0.3" />
     <PackageReference Include="System.Speech" Version="7.0.0" />
     <PackageReference Include="WindowsAPICodePack-Core" Version="1.1.2" />
     <PackageReference Include="WindowsAPICodePack-Shell" Version="1.1.1" />
@@ -50,23 +51,27 @@
 
 	<ItemGroup>
     <BasePlugins Include="$(ProjectDir)baseplugins\user\stock\*.*" />
+    <WorkshopPlugins Include="$(ProjectDir)baseplugins\user\**\*.*" />
     <BaseTemplates Include="$(ProjectDir)basetemplates\*.*" />
+    <BaseHTML Include="$(ProjectDir)basehtml\**\*.*" />
  	</ItemGroup>
 	<Target Name="CopyPlugins" AfterTargets="Build">
 		<MakeDir Directories="$(ProjectDir)bin\x64\Release\net6.0-windows\plugins" />
     <MakeDir Directories="$(ProjectDir)bin\x64\Release\net6.0-windows\library" />
     <MakeDir Directories="$(ProjectDir)bin\x64\Release\net6.0-windows\library\audio" />
     <MakeDir Directories="$(ProjectDir)bin\x64\Release\net6.0-windows\library\video" />
-		<MakeDir Directories="$(ProjectDir)bin\x64\debug\net6.0-windows\plugins" />
-    <MakeDir Directories="$(ProjectDir)bin\x64\debug\net6.0-windows\library" />
-    <MakeDir Directories="$(ProjectDir)bin\x64\debug\net6.0-windows\library\audio" />
-    <MakeDir Directories="$(ProjectDir)bin\x64\debug\net6.0-windows\library\video" />
+		<MakeDir Directories="$(ProjectDir)bin\x64\Debug\net6.0-windows\plugins" />
+    <MakeDir Directories="$(ProjectDir)bin\x64\Debug\net6.0-windows\library" />
+    <MakeDir Directories="$(ProjectDir)bin\x64\Debug\net6.0-windows\library\audio" />
+    <MakeDir Directories="$(ProjectDir)bin\x64\Debug\net6.0-windows\library\video" />
+    <MakeDir Directories="$(ProjectDir)bin\x64\Release\net6.0-windows\templates" />
+    <MakeDir Directories="$(ProjectDir)bin\x64\Debug\net6.0-windows\templates" />
 		<Copy SourceFiles="@(BasePlugins)" DestinationFiles="$(ProjectDir)bin\x64\Release\net6.0-windows\plugins\user\stock\%(Filename)%(Extension)" />
-		<Copy SourceFiles="@(BasePlugins)" DestinationFiles="$(ProjectDir)bin\x64\debug\net6.0-windows\plugins\user\stock\%(Filename)%(Extension)" />
+		<Copy SourceFiles="@(WorkshopPlugins)" DestinationFiles="$(ProjectDir)bin\x64\Debug\net6.0-windows\plugins\user\%(RecursiveDir)%(Filename)%(Extension)" />
     <Copy SourceFiles="@(BaseTemplates)" DestinationFiles="$(ProjectDir)bin\x64\Release\net6.0-windows\templates\%(Filename)%(Extension)" />
-    <Copy SourceFiles="@(BaseTemplates)" DestinationFiles="$(ProjectDir)bin\x64\debug\net6.0-windows\templates\%(Filename)%(Extension)" />
+    <Copy SourceFiles="@(BaseTemplates)" DestinationFiles="$(ProjectDir)bin\x64\Debug\net6.0-windows\templates\%(Filename)%(Extension)" />
     <!-- .\packages\Steamworks.NET\steam_api64.dll -->
     <Copy SourceFiles=".\packages\Steamworks.NET\steam_api64.dll" DestinationFiles="$(ProjectDir)bin\x64\Release\net6.0-windows\steam_api64.dll" />
-    <Copy SourceFiles=".\packages\Steamworks.NET\steam_api64.dll" DestinationFiles="$(ProjectDir)bin\x64\debug\net6.0-windows\steam_api64.dll" />
+    <Copy SourceFiles=".\packages\Steamworks.NET\steam_api64.dll" DestinationFiles="$(ProjectDir)bin\x64\Debug\net6.0-windows\steam_api64.dll" />
 	</Target>
 </Project>

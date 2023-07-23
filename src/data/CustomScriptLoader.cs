@@ -5,7 +5,6 @@ using System.Collections.Generic;
 using System;
 using Newtonsoft.Json;
 using System.Linq;
-using Microsoft.Xna.Framework;
 using System.Text.RegularExpressions;
 using Newtonsoft.Json.Linq;
 using MoonSharp.Interpreter;

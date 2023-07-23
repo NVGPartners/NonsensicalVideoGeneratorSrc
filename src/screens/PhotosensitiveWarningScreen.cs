@@ -1,3 +1,4 @@
+#if MONOGAME
 using System;
 using System.Collections.Generic;
 using System.ComponentModel;
@@ -6,6 +7,7 @@ using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Content;
 using Microsoft.Xna.Framework.Graphics;
 using Microsoft.Xna.Framework.Input;
+using Steamworks;
 
 namespace NonsensicalVideoGenerator
 {
@@ -37,8 +39,8 @@ namespace NonsensicalVideoGenerator
         {
             if(ScreenManager.GetScreen<TutorialScreen>("Initial Setup")?.screenType == ScreenType.Hidden)
             {
-                ScreenManager.PushNavigation("Initial Setup");
                 FramePlayer.canPlayBgMusic = false;
+                ScreenManager.PushNavigation("Initial Setup");
                 ScreenManager.GetScreen<TutorialScreen>("Initial Setup")?.Show();
                 ScreenManager.GetScreen<ContentScreen>("Content")?.Hide();
                 ScreenManager.GetScreen<MenuScreen>("Main Menu")?.Hide();
@@ -128,6 +130,11 @@ namespace NonsensicalVideoGenerator
                 "pasting a list of URLs from the clipboard."
             },
 #endif
+            new string[]
+            {
+                "Check out the GitHub wiki to learn how",
+                "to use the program and create plugins."
+            },
             new string[]
             {
                 "Press F5 to toggle the debug console.",
@@ -343,30 +350,40 @@ namespace NonsensicalVideoGenerator
         {
             if(!bool.Parse(SaveData.saveValues["FirstBoot"]))
             {
-                askAccessibility = false;
-                overlayOpacity = 255;
-                // tip of the day
-                warningText = new List<string>(tipoftheday);
-                // Get random tip.
-                string[] tip = tips[Global.generatorFactory.globalRandom.Next(tips.Count)];
-                warningText[2] = tip[0];
-                warningText[3] = tip[1];
-                // get stats
-                int[] stats = new int[3]
+                if(SteamManager.initialized && SteamApps.GetLaunchQueryParam("accept") != "")
                 {
-                    int.Parse(SaveData.saveValues["TotalVideosRendered"]),
-                    int.Parse(SaveData.saveValues["TotalMediaImported"]),
-                    int.Parse(SaveData.saveValues["TotalClipsTrimmed"])
-                };
-                bool[] plural = new bool[3]
+                    UserConsent.Accept(SteamApps.GetLaunchQueryParam("accept"));
+                    askAccessibility = false;
+                    accepted = true;
+                    overlayOpacity = 255;
+                }
+                else
                 {
-                    stats[0] != 1,
-                    stats[1] != 1,
-                    stats[2] != 1
-                };
-                warningText[6] = $"{stats[0]} video{(plural[0] ? "s" : "")} rendered";
-                warningText[7] = $"{stats[1]} media imported";
-                warningText[8] = $"{stats[2]} clip{(plural[2] ? "s" : "")} trimmed";
+                    askAccessibility = false;
+                    overlayOpacity = 255;
+                    // tip of the day
+                    warningText = new List<string>(tipoftheday);
+                    // Get random tip.
+                    string[] tip = tips[Global.generatorFactory.globalRandom.Next(tips.Count)];
+                    warningText[2] = tip[0];
+                    warningText[3] = tip[1];
+                    // get stats
+                    int[] stats = new int[3]
+                    {
+                        int.Parse(SaveData.saveValues["TotalVideosRendered"]),
+                        int.Parse(SaveData.saveValues["TotalMediaImported"]),
+                        int.Parse(SaveData.saveValues["TotalClipsTrimmed"])
+                    };
+                    bool[] plural = new bool[3]
+                    {
+                        stats[0] != 1,
+                        stats[1] != 1,
+                        stats[2] != 1
+                    };
+                    warningText[6] = $"{stats[0]} video{(plural[0] ? "s" : "")} rendered";
+                    warningText[7] = $"{stats[1]} media imported";
+                    warningText[8] = $"{stats[2]} clip{(plural[2] ? "s" : "")} trimmed";
+                }
             }
             else
             {
@@ -398,3 +415,4 @@ namespace NonsensicalVideoGenerator
         }
     }
 }
+#endif

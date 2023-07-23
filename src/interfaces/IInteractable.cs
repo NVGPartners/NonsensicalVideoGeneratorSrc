@@ -1,3 +1,4 @@
+#if MONOGAME
 using System;
 using System.Collections.Generic;
 using Microsoft.Xna.Framework;
@@ -18,3 +19,4 @@ namespace NonsensicalVideoGenerator
         public Func<int, bool> Callback { get; set; }
     }
 }
+#endif

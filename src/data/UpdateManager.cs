@@ -4,7 +4,11 @@ using System.IO;
 using Newtonsoft.Json;
 using System.Net.Http;
 using System.Diagnostics;
+#if MONOGAME
+using Microsoft.Xna.Framework;
+#else
 using System.Drawing;
+#endif
 
 namespace NonsensicalVideoGenerator
 {    
@@ -49,7 +53,7 @@ namespace NonsensicalVideoGenerator
         public static void GetDependencyStatus()
         {
             // Test for dependencies.
-            ConsoleOutput.WriteLine("Checking for dependencies...", Microsoft.Xna.Framework.Color.Magenta);
+            ConsoleOutput.WriteLine("Checking for dependencies...", Color.Magenta);
             bool[] status = new bool[3];
             imagemagickInstalled = DoesCommandExist("magick");
             // Check if .\ffmpeg.exe and .\ffprobe.exe exist.
@@ -134,7 +138,7 @@ namespace NonsensicalVideoGenerator
                                   latestVersionInt[2] > currentVersionInt[2];
                     if (!update)
                     {
-                        ConsoleOutput.WriteLine("No updates available.", Microsoft.Xna.Framework.Color.Magenta);
+                        ConsoleOutput.WriteLine("No updates available.", Color.Magenta);
                         return false;
                     }
                     // Get download URL.
@@ -147,19 +151,19 @@ namespace NonsensicalVideoGenerator
                     {
                         updateTag = latestVersion;
                     }
-                    ConsoleOutput.WriteLine("Update available: " + latestVersion, Microsoft.Xna.Framework.Color.Magenta);
+                    ConsoleOutput.WriteLine("Update available: " + latestVersion, Color.Magenta);
                     updateAvailable = true;
                     return true;
                 }
                 else
                 {
-                    ConsoleOutput.WriteLine("No updates available.", Microsoft.Xna.Framework.Color.Magenta);
+                    ConsoleOutput.WriteLine("No updates available.", Color.Magenta);
                     return false;
                 }
             }
             catch(Exception e)
             {
-                ConsoleOutput.WriteLine("Failed to check for updates: " + e.Message, Microsoft.Xna.Framework.Color.Red);
+                ConsoleOutput.WriteLine("Failed to check for updates: " + e.Message, Color.Red);
                 updateFailed = true;
                 return false;
             }
@@ -168,12 +172,12 @@ namespace NonsensicalVideoGenerator
         {
             if (updateUrl == "")
             {
-                ConsoleOutput.WriteLine("No update URL.", Microsoft.Xna.Framework.Color.Magenta);
+                ConsoleOutput.WriteLine("No update URL.", Color.Magenta);
                 return;
             }
             try
             {
-                ConsoleOutput.WriteLine("Downloading update...", Microsoft.Xna.Framework.Color.Magenta);
+                ConsoleOutput.WriteLine("Downloading update...", Color.Magenta);
                 // Download update.
                 HttpClient client = new();
                 byte[] data = client.GetByteArrayAsync(updateUrl).Result;
@@ -187,14 +191,14 @@ namespace NonsensicalVideoGenerator
                     string? path = Path.GetDirectoryName(System.Reflection.Assembly.GetExecutingAssembly().Location);
                     if (path != null)
                     {
-                        ConsoleOutput.WriteLine("Unzipping update...", Microsoft.Xna.Framework.Color.Magenta);
+                        ConsoleOutput.WriteLine("Unzipping update...", Color.Magenta);
                         string updatePath = Path.Combine(path, "update");
                         if (!Directory.Exists(updatePath))
                         {
                             Directory.CreateDirectory(updatePath);
                         }
                         System.IO.Compression.ZipFile.ExtractToDirectory(fileName, updatePath);
-                        ConsoleOutput.WriteLine("Update extracted. Applying update...", Microsoft.Xna.Framework.Color.Magenta);
+                        ConsoleOutput.WriteLine("Update extracted. Applying update...", Color.Magenta);
                         // Create a batch script to move the update to the main folder.
                         // We can't do this directly because the program is still running.
                         List<string> batchScript = new()
@@ -227,19 +231,19 @@ namespace NonsensicalVideoGenerator
                     }
                     else
                     {
-                        ConsoleOutput.WriteLine("Failed to obtain path.", Microsoft.Xna.Framework.Color.Red);
+                        ConsoleOutput.WriteLine("Failed to obtain path.", Color.Red);
                         return;
                     }
                 }
                 else
                 {
-                    ConsoleOutput.WriteLine("Failed to obtain version.", Microsoft.Xna.Framework.Color.Red);
+                    ConsoleOutput.WriteLine("Failed to obtain version.", Color.Red);
                     return;
                 }
             }
             catch
             {
-                ConsoleOutput.WriteLine("Failed to download update.", Microsoft.Xna.Framework.Color.Red);
+                ConsoleOutput.WriteLine("Failed to download update.", Color.Red);
             }
         }
     }

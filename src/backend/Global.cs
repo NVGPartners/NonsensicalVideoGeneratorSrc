@@ -15,7 +15,9 @@ namespace NonsensicalVideoGenerator
         public static FileVersionInfo fileVersionInfo = FileVersionInfo.GetVersionInfo(assembly.Location);
         public static string? productName = fileVersionInfo.ProductName;
         public static string? productVersion = fileVersionInfo.ProductVersion;
+#if MONOGAME
         public static Mask mask = new();
+#endif
         public static bool justCompletedRender = true;
         public static bool exiting = false;
         public static bool shuffled = false;

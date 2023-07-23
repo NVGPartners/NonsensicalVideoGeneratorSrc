@@ -2,7 +2,11 @@ using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Text;
+#if MONOGAME
 using Microsoft.Xna.Framework;
+#else
+using System.Drawing;
+#endif
 
 namespace NonsensicalVideoGenerator
 {
@@ -46,6 +50,25 @@ namespace NonsensicalVideoGenerator
         {
             return scrollAmount > -1 ? scrolledOutput : output;
         }
+#if !MONOGAME
+        public static ConsoleColor GetColor(Color col)
+        {
+            // Get closest match in terms of rgb values.
+            ConsoleColor closest = ConsoleColor.White;
+            double closestDistance = double.MaxValue;
+            foreach (ConsoleColor c in Enum.GetValues(typeof(ConsoleColor)))
+            {
+                Color consoleColor = Color.FromName(c.ToString());
+                double distance = Math.Sqrt(Math.Pow(consoleColor.R - col.R, 2) + Math.Pow(consoleColor.G - col.G, 2) + Math.Pow(consoleColor.B - col.B, 2));
+                if (distance < closestDistance)
+                {
+                    closest = c;
+                    closestDistance = distance;
+                }
+            }
+            return closest;
+        }
+#endif
         private static void WriteLineInternal(string line, bool newLine = true, Color? color = null)
         {
             Color c = Color.White;
@@ -83,6 +106,18 @@ namespace NonsensicalVideoGenerator
                     }
                 }
             }
+#if !MONOGAME
+            // Write to console.
+            if(c != Color.Transparent)
+            {
+                ConsoleColor cc = GetColor(c);
+                Console.ForegroundColor = cc;
+                if (!newLine)
+                    Console.Write(line);
+                else
+                    Console.WriteLine(line);
+            }
+#endif
             // Remove old lines.
             while (output.Count > maxLines)
                 output.RemoveAt(0);
@@ -124,7 +159,11 @@ namespace NonsensicalVideoGenerator
                     {
                         if (int.TryParse(colorValues[0], out int r) && int.TryParse(colorValues[1], out int g) && int.TryParse(colorValues[2], out int b))
                         {
+#if MONOGAME
                             c = new Color(r, g, b);
+#else
+                            c = Color.FromArgb(r, g, b);
+#endif
                             line = line.Substring(end + 2);
                         }
                     }

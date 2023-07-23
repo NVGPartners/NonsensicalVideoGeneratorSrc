@@ -55,6 +55,7 @@ local musicSeekEnd = 5
 -- Temp files
 local temp2 = "temp2.mp4"
 local temp3 = "temp3.mp4"
+local music = "music.wav"
 
 -- Variables
 local segmentLength = 0.2
@@ -111,8 +112,11 @@ function PostCommand(commandindex, outputresult, errorresult, options, pluginSet
             -- Invoke-Command -ScriptBlock {&$ffmpeg -i "$temp2" -vf reverse -preset veryfast -y "$temp3"}
             functions.runFFmpeg("-i \"" .. temp2 .. "\" -vf reverse -preset veryfast -y \"" .. temp3 .. "\"")
         elseif commandindex == 2 then
+            -- convert mp3 to wav
+            functions.runFFmpeg("-i \"" .. randomSound .. "\" -acodec pcm_s16le -ac 2 -ar 44100 \"" .. music .. "\"")
+        elseif commandindex == 3 then
             -- Invoke-Command -ScriptBlock {&$ffmpeg -i "$temp3" -i "$temp2" -ss $seek -i "$randomSound" -filter_complex "[0:v][1:v][0:v][1:v][0:v][1:v][0:v][1:v]concat=n=8:v=1[out]" -map "[out]" -map 2:a -preset veryfast -shortest -preset veryfast -y "$output"}
-            functions.runFFmpeg("-i \"" .. temp3 .. "\" -i \"" .. temp2 .. "\" -ss " .. tostring(seek) .. " -i \"" .. randomSound .. "\" -filter_complex \"[0:v][1:v][0:v][1:v][0:v][1:v][0:v][1:v]concat=n=8:v=1[out]\" -map \"[out]\" -map 2:a -preset veryfast -shortest -preset veryfast -y \"" .. options.outputVideo .. "\"")
+            functions.runFFmpeg("-i \"" .. temp3 .. "\" -i \"" .. temp2 .. "\" -ss " .. tostring(seek) .. " -i \"" .. music .. "\" -filter_complex \"[0:v][1:v][0:v][1:v][0:v][1:v][0:v][1:v]concat=n=8:v=1[out]\" -map \"[out]\" -map 2:a -preset veryfast -shortest -preset veryfast -y \"" .. options.outputVideo .. "\"")
         end
     end
 end

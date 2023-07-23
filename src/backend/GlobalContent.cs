@@ -1,25 +1,72 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+#if MONOGAME
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Audio;
 using Microsoft.Xna.Framework.Content;
 using Microsoft.Xna.Framework.Graphics;
 using Microsoft.Xna.Framework.Media;
+#else
+using System.Drawing;
+using System.Windows.Forms;
+#endif
 
 namespace NonsensicalVideoGenerator
 {
+#if !MONOGAME
+    public class SoundEffect
+    {
+        // Just a wrapper for System.Media.SoundPlayer.
+        private System.Media.SoundPlayer soundPlayer;
+        public SoundEffect(string path)
+        {
+            soundPlayer = new System.Media.SoundPlayer(path);
+        }
+        public void Play(float volume = 1.0f, float pitch = 0.0f, float pan = 0.0f)
+        {
+            soundPlayer.Play();
+        }
+        public void Dispose()
+        {
+            soundPlayer.Dispose();
+        }
+    }
+    // Wrapper to load content.
+    public class ContentManager
+    {
+        public ContentManager()
+        {
+        }
+        public T Load<T>(string path)
+        {
+            if(typeof(T) == typeof(SoundEffect))
+            {
+                return (T)(object)new SoundEffect(path);
+            }
+            else
+            {
+                throw new Exception("Unsupported type.");
+            }
+        }
+    }
+#endif
     /// <summary>
     /// Store content for access by other classes.
     /// </summary>
     public static class GlobalContent
     {
+        private static Dictionary<string, SoundEffect> sounds = new Dictionary<string, SoundEffect>();
+#if MONOGAME
         private static Dictionary<string, Texture2D> textures = new Dictionary<string, Texture2D>();
         private static Dictionary<string, SpriteFont> fonts = new Dictionary<string, SpriteFont>();
-        private static Dictionary<string, SoundEffect> sounds = new Dictionary<string, SoundEffect>();
         private static Dictionary<string, Song> songs = new Dictionary<string, Song>();
         private static Dictionary<string, string[]> songTitlesAndArtists = new Dictionary<string, string[]>();
         public static void LoadDefaultContent(ContentManager contentManager, GraphicsDevice graphicsDevice)
+#else
+        private static ContentManager contentManager;
+        public static void LoadDefaultContent()
+#endif
         {
             // Load default sounds.
             AddSound("AddSource", contentManager.Load<SoundEffect>("sound/addsource"));
@@ -34,6 +81,7 @@ namespace NonsensicalVideoGenerator
             AddSound("Start", contentManager.Load<SoundEffect>("sound/start"));
             AddSound("CompatSelect", contentManager.Load<SoundEffect>("sound/compatselect"));
             AddSound("Disambiguation", contentManager.Load<SoundEffect>("sound/disambiguation"));
+#if MONOGAME
             // Load default fonts.
             int scale = int.Parse(SaveData.saveValues["ScreenScale"]);
             AddFont("Munro", contentManager.Load<SpriteFont>("fonts/munro-x"+scale));
@@ -104,22 +152,26 @@ namespace NonsensicalVideoGenerator
             }
             filledCircle.SetData(data2);
             AddTexture("FilledCircle", filledCircle);
+#endif
         }
         public static void UnloadContent()
         {
-            foreach(string key in textures.Keys)
-            {
-                textures[key].Dispose();
-            }
             foreach(string key in sounds.Keys)
             {
                 sounds[key].Dispose();
+            }
+#if MONOGAME
+            foreach(string key in textures.Keys)
+            {
+                textures[key].Dispose();
             }
             foreach(string key in songs.Keys)
             {
                 songs[key].Dispose();
             }
+#endif
         }
+#if MONOGAME
         public static bool AddTexture(string name, Texture2D texture)
         {
             if (textures.ContainsKey(name))
@@ -134,6 +186,7 @@ namespace NonsensicalVideoGenerator
             fonts.Add(name, font);
             return true;
         }
+#endif
         public static bool AddSound(string name, SoundEffect sound)
         {
             if (sounds.ContainsKey(name))
@@ -141,6 +194,11 @@ namespace NonsensicalVideoGenerator
             sounds.Add(name, sound);
             return true;
         }
+        public static SoundEffect GetSound(string name)
+        {
+            return sounds[name];
+        }
+#if MONOGAME
         public static bool AddSong(string name, Song song, string title = null, string artist = null)
         {
             if (songs.ContainsKey(name))
@@ -161,10 +219,6 @@ namespace NonsensicalVideoGenerator
         {
             return fonts[name];
         }
-        public static SoundEffect GetSound(string name)
-        {
-            return sounds[name];
-        }
         public static Song GetSong(string name)
         {
             return songs[name];
@@ -181,6 +235,6 @@ namespace NonsensicalVideoGenerator
         {
             return songTitlesAndArtists.Values.ElementAt(index)[1];
         }
+#endif
     }
 }
-
