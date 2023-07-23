@@ -56,7 +56,7 @@ namespace NonsensicalVideoGenerator
             {
                 if(!showDisambiguation)
                 {
-                    GlobalContent.GetSound("Disambiguation").Play(int.Parse(SaveData.saveValues["SoundEffectVolume"]) / 100f, 0f, 0f);
+                    GlobalContent.GetSound("Disambiguation").Play(int.Parse(SaveData.saveValues["SoundEffectVolume"], System.Globalization.CultureInfo.InvariantCulture) / 100f, 0f, 0f);
                     showDisambiguation = true;
                     selectedDisambiguationOption = -1;
                     offset = 0;
@@ -73,7 +73,7 @@ namespace NonsensicalVideoGenerator
                 else
                 {
                     synth.SpeakAsyncCancelAll();
-                    GlobalContent.GetSound("Back").Play(int.Parse(SaveData.saveValues["SoundEffectVolume"]) / 100f, 0f, 0f);
+                    GlobalContent.GetSound("Back").Play(int.Parse(SaveData.saveValues["SoundEffectVolume"], System.Globalization.CultureInfo.InvariantCulture) / 100f, 0f, 0f);
                     showDisambiguation = false;
                     result = true;
                 }
@@ -100,7 +100,7 @@ namespace NonsensicalVideoGenerator
             // Check if user pressed escape key and disambiguation is already showing.
             if(newKeyboardState2.IsKeyDown(Keys.Escape) && !oldKeyboardState2.IsKeyDown(Keys.Escape) && showDisambiguation)
             {
-                GlobalContent.GetSound("Back").Play(int.Parse(SaveData.saveValues["SoundEffectVolume"]) / 100f, 0f, 0f);
+                GlobalContent.GetSound("Back").Play(int.Parse(SaveData.saveValues["SoundEffectVolume"], System.Globalization.CultureInfo.InvariantCulture) / 100f, 0f, 0f);
                 showDisambiguation = false;
                 result = true;
             }
@@ -208,17 +208,17 @@ namespace NonsensicalVideoGenerator
                         // Only 46 possible keys, so shift until the last option is able to be selected.
                         if(offset < -(disambiguationOptions.Count - 1))
                         {
-                            //GlobalContent.GetSound("Error").Play(int.Parse(SaveData.saveValues["SoundEffectVolume"]) / 100f, 0f, 0f);
+                            //GlobalContent.GetSound("Error").Play(int.Parse(SaveData.saveValues["SoundEffectVolume"], System.Globalization.CultureInfo.InvariantCulture) / 100f, 0f, 0f);
                             //offset = -(disambiguationOptions.Count - 1);
                             offset = 0;
                         }
                         else if(offset > 0)
                         {
-                            //GlobalContent.GetSound("Error").Play(int.Parse(SaveData.saveValues["SoundEffectVolume"]) / 100f, 0f, 0f);
+                            //GlobalContent.GetSound("Error").Play(int.Parse(SaveData.saveValues["SoundEffectVolume"], System.Globalization.CultureInfo.InvariantCulture) / 100f, 0f, 0f);
                             //offset = 0;
                             offset = -(disambiguationOptions.Count - 1);
                         }
-                        GlobalContent.GetSound("Option").Play(int.Parse(SaveData.saveValues["SoundEffectVolume"]) / 100f, 0f, 0f);
+                        GlobalContent.GetSound("Option").Play(int.Parse(SaveData.saveValues["SoundEffectVolume"], System.Globalization.CultureInfo.InvariantCulture) / 100f, 0f, 0f);
                         TTS();
                     }
                 }
@@ -240,22 +240,22 @@ namespace NonsensicalVideoGenerator
                         // Only 46 possible keys, so shift until the last option is able to be selected.
                         if(offset < -(disambiguationOptions.Count - 1))
                         {
-                            //GlobalContent.GetSound("Error").Play(int.Parse(SaveData.saveValues["SoundEffectVolume"]) / 100f, 0f, 0f);
+                            //GlobalContent.GetSound("Error").Play(int.Parse(SaveData.saveValues["SoundEffectVolume"], System.Globalization.CultureInfo.InvariantCulture) / 100f, 0f, 0f);
                             //offset = -(disambiguationOptions.Count - 1);
                             offset = 0;
                         }
                         else if(offset > 0)
                         {
-                            //GlobalContent.GetSound("Error").Play(int.Parse(SaveData.saveValues["SoundEffectVolume"]) / 100f, 0f, 0f);
+                            //GlobalContent.GetSound("Error").Play(int.Parse(SaveData.saveValues["SoundEffectVolume"], System.Globalization.CultureInfo.InvariantCulture) / 100f, 0f, 0f);
                             //offset = 0;
                             offset = -(disambiguationOptions.Count - 1);
                         }
-                        GlobalContent.GetSound("Option").Play(int.Parse(SaveData.saveValues["SoundEffectVolume"]) / 100f, 0f, 0f);
+                        GlobalContent.GetSound("Option").Play(int.Parse(SaveData.saveValues["SoundEffectVolume"], System.Globalization.CultureInfo.InvariantCulture) / 100f, 0f, 0f);
                         TTS();
                     }
                     else
                     {
-                        GlobalContent.GetSound("Error").Play(int.Parse(SaveData.saveValues["SoundEffectVolume"]) / 100f, 0f, 0f);
+                        GlobalContent.GetSound("Error").Play(int.Parse(SaveData.saveValues["SoundEffectVolume"], System.Globalization.CultureInfo.InvariantCulture) / 100f, 0f, 0f);
                     }
                 }
                 if(offset < -(disambiguationOptions.Count - 1))
@@ -337,7 +337,7 @@ namespace NonsensicalVideoGenerator
                             selectedDisambiguationOption = i;
                             showDisambiguation = false;
                             holdItForMe = true;
-                            GlobalContent.GetSound("CompatSelect").Play(int.Parse(SaveData.saveValues["SoundEffectVolume"]) / 100f, 0f, 0f);
+                            GlobalContent.GetSound("CompatSelect").Play(int.Parse(SaveData.saveValues["SoundEffectVolume"], System.Globalization.CultureInfo.InvariantCulture) / 100f, 0f, 0f);
                             TTS("Selected " + disambiguationOptions[i].tts);
                             return;
                         }

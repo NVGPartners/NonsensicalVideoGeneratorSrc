@@ -83,7 +83,7 @@ namespace NonsensicalVideoGenerator
             AddSound("Disambiguation", contentManager.Load<SoundEffect>("sound/disambiguation"));
 #if MONOGAME
             // Load default fonts.
-            int scale = int.Parse(SaveData.saveValues["ScreenScale"]);
+            int scale = int.Parse(SaveData.saveValues["ScreenScale"], System.Globalization.CultureInfo.InvariantCulture);
             AddFont("Munro", contentManager.Load<SpriteFont>("fonts/munro-x"+scale));
             AddFont("MunroNarrow", contentManager.Load<SpriteFont>("fonts/munro-narrow-x"+scale));
             AddFont("MunroSmall", contentManager.Load<SpriteFont>("fonts/munro-small-x"+scale));

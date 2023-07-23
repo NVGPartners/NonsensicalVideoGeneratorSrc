@@ -113,13 +113,13 @@ namespace NonsensicalVideoGenerator
                 if(Toggle())
                 {
                     ConsoleOutput.ResetScroll();
-                    GlobalContent.GetSound("Select").Play(int.Parse(SaveData.saveValues["SoundEffectVolume"]) / 100f, 0f, 0f);
+                    GlobalContent.GetSound("Select").Play(int.Parse(SaveData.saveValues["SoundEffectVolume"], System.Globalization.CultureInfo.InvariantCulture) / 100f, 0f, 0f);
                     if(Accessibility.showDisambiguation)
                         Accessibility.TTS("Console shown.");
                 }
                 else
                 {
-                    GlobalContent.GetSound("Back").Play(int.Parse(SaveData.saveValues["SoundEffectVolume"]) / 100f, 0f, 0f);
+                    GlobalContent.GetSound("Back").Play(int.Parse(SaveData.saveValues["SoundEffectVolume"], System.Globalization.CultureInfo.InvariantCulture) / 100f, 0f, 0f);
                     if(Accessibility.showDisambiguation)
                         Accessibility.TTS("Console hidden.");
                 }
@@ -157,7 +157,7 @@ namespace NonsensicalVideoGenerator
                 ConsoleOutput.Scroll(-ConsoleOutput.maxLines * 120);
             }
             // (DEBUG) Fill the console with nonsense.
-            //ConsoleOutput.WriteLine(Math.Sin(gameTime.TotalGameTime.TotalSeconds).ToString());
+            //ConsoleOutput.WriteLine(Math.Sin(gameTime.TotalGameTime.TotalSeconds).ToString(System.Globalization.CultureInfo.InvariantCulture));
             return handleInput && !overrideReturn;
         }
         public void Draw(GameTime gameTime, SpriteBatch spriteBatch)
@@ -188,7 +188,7 @@ namespace NonsensicalVideoGenerator
             }
             catch {}
             // Draw assembly version.
-            string version = "- v" + Global.productVersion + " - View full output in console.txt -" + (ConsoleOutput.proxyOutput.Count > ConsoleOutput.maxLines ? (" Line " + (ConsoleOutput.scrollAmount > -1 ? (ConsoleOutput.scrollAmount + 1).ToString() : (ConsoleOutput.proxyOutput.Count - ConsoleOutput.maxLines + 1).ToString()) + "/" + ConsoleOutput.proxyOutput.Count.ToString() + " -") : "");
+            string version = "- v" + Global.productVersion + " - View full output in console.txt -" + (ConsoleOutput.proxyOutput.Count > ConsoleOutput.maxLines ? (" Line " + (ConsoleOutput.scrollAmount > -1 ? (ConsoleOutput.scrollAmount + 1).ToString(System.Globalization.CultureInfo.InvariantCulture) : (ConsoleOutput.proxyOutput.Count - ConsoleOutput.maxLines + 1).ToString(System.Globalization.CultureInfo.InvariantCulture)) + "/" + ConsoleOutput.proxyOutput.Count.ToString(System.Globalization.CultureInfo.InvariantCulture) + " -") : "");
             spriteBatch.DrawString(GlobalGraphics.fontMunroSmall, version, new Vector2(GlobalGraphics.Scale(8), lineY), Color.White);
             // End offset spritebatch
             spriteBatch.End();

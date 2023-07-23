@@ -48,7 +48,7 @@ namespace NonsensicalVideoGenerator
                     ScreenManager.GetScreen<VideoScreen>("Video")?.Hide();
                 ScreenManager.GetScreen<BackgroundScreen>("Background")?.Hide();
                 ScreenManager.GetScreen<SocialScreen>("Socials")?.Hide();
-                GlobalContent.GetSound("Prompt").Play(int.Parse(SaveData.saveValues["SoundEffectVolume"]) / 100f, 0f, 0f);
+                GlobalContent.GetSound("Prompt").Play(int.Parse(SaveData.saveValues["SoundEffectVolume"], System.Globalization.CultureInfo.InvariantCulture) / 100f, 0f, 0f);
             }
         }
         private void UpdateCheckThread(object? sender, DoWorkEventArgs e)
@@ -291,7 +291,7 @@ namespace NonsensicalVideoGenerator
                             ConsoleOutput.WriteLine("User acknowledged photosensitive warning.", Color.LightGreen);
                         }
                         accepted = true;
-                        GlobalContent.GetSound("Select").Play(int.Parse(SaveData.saveValues["SoundEffectVolume"]) / 100f, 0f, 0f);
+                        GlobalContent.GetSound("Select").Play(int.Parse(SaveData.saveValues["SoundEffectVolume"], System.Globalization.CultureInfo.InvariantCulture) / 100f, 0f, 0f);
                     }
                 }
                 else if(!askAccessibility)
@@ -340,7 +340,7 @@ namespace NonsensicalVideoGenerator
                             Global.ready = true;
                             Global.readyTime = gameTime.TotalGameTime.TotalMilliseconds;
                             // Play startup sound.
-                            GlobalContent.GetSound("Start").Play(int.Parse(SaveData.saveValues["SoundEffectVolume"]) / 100f, 0f, 0f);
+                            GlobalContent.GetSound("Start").Play(int.Parse(SaveData.saveValues["SoundEffectVolume"], System.Globalization.CultureInfo.InvariantCulture) / 100f, 0f, 0f);
                             fadingIn = true;
                         }
                         accepted = false;
@@ -373,9 +373,9 @@ namespace NonsensicalVideoGenerator
                     // get stats
                     int[] stats = new int[3]
                     {
-                        int.Parse(SaveData.saveValues["TotalVideosRendered"]),
-                        int.Parse(SaveData.saveValues["TotalMediaImported"]),
-                        int.Parse(SaveData.saveValues["TotalClipsTrimmed"])
+                        int.Parse(SaveData.saveValues["TotalVideosRendered"], System.Globalization.CultureInfo.InvariantCulture),
+                        int.Parse(SaveData.saveValues["TotalMediaImported"], System.Globalization.CultureInfo.InvariantCulture),
+                        int.Parse(SaveData.saveValues["TotalClipsTrimmed"], System.Globalization.CultureInfo.InvariantCulture)
                     };
                     bool[] plural = new bool[3]
                     {

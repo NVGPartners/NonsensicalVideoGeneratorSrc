@@ -90,7 +90,7 @@ namespace NonsensicalVideoGenerator
                     Match match = regex.Match(file);
                     if (match.Success)
                     {
-                        int clipNumber = int.Parse(match.Groups[1].Value);
+                        int clipNumber = int.Parse(match.Groups[1].Value, System.Globalization.CultureInfo.InvariantCulture);
                         if (clipNumber > maxClips)
                             maxClips = clipNumber;
                     }
@@ -170,9 +170,9 @@ namespace NonsensicalVideoGenerator
                                 SteamUserStats.SetAchievement(achievement);
                             }
                         }
-                        SaveData.saveValues["TotalVideosRendered"] = (int.Parse(SaveData.saveValues["TotalVideosRendered"]) + 1).ToString();
+                        SaveData.saveValues["TotalVideosRendered"] = (int.Parse(SaveData.saveValues["TotalVideosRendered"], System.Globalization.CultureInfo.InvariantCulture) + 1).ToString(System.Globalization.CultureInfo.InvariantCulture);
                         SaveData.Save();
-                        GlobalContent.GetSound("RenderComplete").Play(int.Parse(SaveData.saveValues["SoundEffectVolume"]) / 100f, 0f, 0f);
+                        GlobalContent.GetSound("RenderComplete").Play(int.Parse(SaveData.saveValues["SoundEffectVolume"], System.Globalization.CultureInfo.InvariantCulture) / 100f, 0f, 0f);
                         /*
                         // Open the video in the default video player if the user has that option enabled.
                         if (bool.Parse(SaveData.saveValues["PlayAutomatically"]))
@@ -258,10 +258,12 @@ namespace NonsensicalVideoGenerator
                 seed += (int)c;
             }
             */
-            ConsoleOutput.WriteLine("Seed: " + seed, Color.Gray);
+            ConsoleOutput.WriteLine("Seed: " + seed.ToString(System.Globalization.CultureInfo.InvariantCulture), Color.Gray);
             globalRandom = new Random(seed);
-            int maxClips = int.Parse(SaveData.saveValues["MaxClipCount"]);
+            int maxClips = int.Parse(SaveData.saveValues["MaxClipCount"], System.Globalization.CultureInfo.InvariantCulture);
             
+            ConsoleOutput.WriteLine("Max clips: " + maxClips.ToString(System.Globalization.CultureInfo.InvariantCulture), Color.Gray);
+
             // Clean up previous temporary files.
             progressText = "Cleaning up...";
             CleanUp();
@@ -300,15 +302,15 @@ namespace NonsensicalVideoGenerator
                             progressText = "Introducing ourselves... (" + (i + 1) + "/" + maxClips + ")";
                             Utilities.CopyVideo(introPath, Path.Combine(Utilities.temporaryDirectory, "video" + i + ".mp4"));
                             // get length of intro and add it to currentTime
-                            float introLength = float.Parse(Utilities.GetLength(introPath));
+                            float introLength = float.Parse(Utilities.GetLength(introPath), System.Globalization.CultureInfo.InvariantCulture);
                         }
                     }
                     if (vidThreadWorker?.CancellationPending == true)
                         return;
                     if(!intro)
                     {
-                        bool rolledForOverlay = RandomInt(0, 100) < int.Parse(SaveData.saveValues["OverlayChance"]);
-                        bool rolledForTransition = RandomInt(0, 100) < int.Parse(SaveData.saveValues["TransitionChance"]);
+                        bool rolledForOverlay = RandomInt(0, 100) < int.Parse(SaveData.saveValues["OverlayChance"], System.Globalization.CultureInfo.InvariantCulture);
+                        bool rolledForTransition = RandomInt(0, 100) < int.Parse(SaveData.saveValues["TransitionChance"], System.Globalization.CultureInfo.InvariantCulture);
                         string overlayPath = "";
                         progress = Convert.ToInt32(((float)i / (float)maxClips));
                         progressText = "Clipping... (" + (i + 1) + "/" + maxClips + ")";
@@ -323,13 +325,13 @@ namespace NonsensicalVideoGenerator
                         }
                         else
                         {
-                            source = float.Parse(Utilities.GetLength(sourceToPick));
+                            source = float.Parse(Utilities.GetLength(sourceToPick), System.Globalization.CultureInfo.InvariantCulture);
                         }
-                        string output = source.ToString("0.#########################", new CultureInfo("en-US"));
-                        //ConsoleOutput.WriteLine(Utilities.GetLength(sourceToPick) + " -> " + output + " -> " + float.Parse(output));
-                        float outputDuration = float.Parse(output);
-                        float startOfClip = RandomFloat(0f, outputDuration - float.Parse(SaveData.saveValues["MinStreamDuration"]));
-                        float endOfClip = startOfClip + RandomFloat(float.Parse(SaveData.saveValues["MinStreamDuration"]), float.Parse(SaveData.saveValues["MaxStreamDuration"]));
+                        string output = source.ToString(System.Globalization.CultureInfo.InvariantCulture);
+                        //ConsoleOutput.WriteLine(Utilities.GetLength(sourceToPick) + " -> " + output + " -> " + float.Parse(output, System.Globalization.CultureInfo.InvariantCulture));
+                        float outputDuration = float.Parse(output, System.Globalization.CultureInfo.InvariantCulture);
+                        float startOfClip = RandomFloat(0f, outputDuration - float.Parse(SaveData.saveValues["MinStreamDuration"], System.Globalization.CultureInfo.InvariantCulture));
+                        float endOfClip = startOfClip + RandomFloat(float.Parse(SaveData.saveValues["MinStreamDuration"], System.Globalization.CultureInfo.InvariantCulture), float.Parse(SaveData.saveValues["MaxStreamDuration"], System.Globalization.CultureInfo.InvariantCulture));
                         // Ensure that the start is not less than 0 and the end is not greater than the source length.
                         if (startOfClip < 0)
                             startOfClip = 0;
@@ -364,7 +366,7 @@ namespace NonsensicalVideoGenerator
                         {
                             // No transition, just snip the video.
                             Utilities.SnipVideo(sourceToPick, startOfClip, endOfClip, Path.Combine(Utilities.temporaryDirectory, "video" + i + ".mp4"));
-                            SaveData.saveValues["TotalClipsTrimmed"] = (int.Parse(SaveData.saveValues["TotalClipsTrimmed"]) + 1).ToString();
+                            SaveData.saveValues["TotalClipsTrimmed"] = (int.Parse(SaveData.saveValues["TotalClipsTrimmed"], System.Globalization.CultureInfo.InvariantCulture) + 1).ToString(System.Globalization.CultureInfo.InvariantCulture);
                             SaveData.Save();
                         }
                         if (vidThreadWorker?.CancellationPending == true)
@@ -380,9 +382,9 @@ namespace NonsensicalVideoGenerator
                                 //if(!alreadySnipped)
                                     //Utilities.SnipVideo(sourceToPick, startOfClip, endOfClip, Path.Combine(Utilities.temporaryDirectory, "video" + i + ".mp4"));
                                 // Now we'll snip the overlay with another random duration.
-                                float overlayDuration = float.Parse(Utilities.GetLength(overlayPath));
-                                float startOfOverlay = RandomFloat(0f, overlayDuration - float.Parse(SaveData.saveValues["MinStreamDuration"]));
-                                float endOfOverlay = startOfOverlay + RandomFloat(float.Parse(SaveData.saveValues["MinStreamDuration"]), float.Parse(SaveData.saveValues["MaxStreamDuration"]));
+                                float overlayDuration = float.Parse(Utilities.GetLength(overlayPath), System.Globalization.CultureInfo.InvariantCulture);
+                                float startOfOverlay = RandomFloat(0f, overlayDuration - float.Parse(SaveData.saveValues["MinStreamDuration"], System.Globalization.CultureInfo.InvariantCulture));
+                                float endOfOverlay = startOfOverlay + RandomFloat(float.Parse(SaveData.saveValues["MinStreamDuration"], System.Globalization.CultureInfo.InvariantCulture), float.Parse(SaveData.saveValues["MaxStreamDuration"], System.Globalization.CultureInfo.InvariantCulture));
                                 // Make sure the start is not less than 0 and the end is not greater than the overlay length.
                                 if (startOfOverlay < 0)
                                     startOfOverlay = 0;
@@ -400,14 +402,14 @@ namespace NonsensicalVideoGenerator
                             if(numberOfPlugins > 0)
                             {
                                 // Roll for effect
-                                if(RandomInt(0, 100) < (rolledForTransition ? int.Parse(SaveData.saveValues["TransitionEffectChance"]) : int.Parse(SaveData.saveValues["EffectChance"])))
+                                if(RandomInt(0, 100) < (rolledForTransition ? int.Parse(SaveData.saveValues["TransitionEffectChance"], System.Globalization.CultureInfo.InvariantCulture) : int.Parse(SaveData.saveValues["EffectChance"], System.Globalization.CultureInfo.InvariantCulture)))
                                 {
                                     progressText = (rolledForTransition ? "Boiling" : "Baking") + " effects... (" + (i + 1) + "/" + maxClips + ")";
                                     // We rolled for an effect, let's pick one.
                                     PluginReturnValue effect = PluginHandler.PickRandom(globalRandom, Path.Combine(Utilities.temporaryDirectory, "video" + i + ".mp4"));
                                     if(effect.success)
                                     {
-                                        if(int.Parse(SaveData.saveValues["EffectChance"]) >= 100)
+                                        if(int.Parse(SaveData.saveValues["EffectChance"], System.Globalization.CultureInfo.InvariantCulture) >= 100)
                                         {
                                             Global.usedAllEffectChance = true;
                                         }
@@ -478,8 +480,9 @@ namespace NonsensicalVideoGenerator
                 // Finished, throw to get into catch block.
                 throw new Exception("Finished");
             }
-            catch
+            catch(Exception ex2)
             {
+                ConsoleOutput.WriteLine(ex2.Message, Color.Red);
                 try
                 {
                     if (vidThreadWorker?.CancellationPending == true)

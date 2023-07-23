@@ -194,7 +194,7 @@ namespace NonsensicalVideoGenerator
                         if (MouseInput.LastMouseState.LeftButton == ButtonState.Released && MouseInput.MouseState.LeftButton == ButtonState.Pressed)
                         {
                             // Play sound
-                            GlobalContent.GetSound("Select").Play(int.Parse(SaveData.saveValues["SoundEffectVolume"]) / 100f, 0f, 0f);    
+                            GlobalContent.GetSound("Select").Play(int.Parse(SaveData.saveValues["SoundEffectVolume"], System.Globalization.CultureInfo.InvariantCulture) / 100f, 0f, 0f);    
                             if(Pagination.DrawnPage != segment)
                             {
                                 if(segment == Pagination.GetPageCount() - 2)

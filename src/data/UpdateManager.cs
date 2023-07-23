@@ -129,8 +129,8 @@ namespace NonsensicalVideoGenerator
                     int[] latestVersionInt = new int[3];
                     for (int i = 0; i < 3; i++)
                     {
-                        currentVersionInt[i] = int.Parse(currentVersion?[i] ?? "0");
-                        latestVersionInt[i] = int.Parse(latestVersionSplit?[i] ?? "0");
+                        currentVersionInt[i] = int.Parse(currentVersion?[i] ?? "0", System.Globalization.CultureInfo.InvariantCulture);
+                        latestVersionInt[i] = int.Parse(latestVersionSplit?[i] ?? "0", System.Globalization.CultureInfo.InvariantCulture);
                     }
                     // Compare versions.
                     bool update = latestVersionInt[0] > currentVersionInt[0] ||

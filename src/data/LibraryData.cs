@@ -310,7 +310,7 @@ namespace NonsensicalVideoGenerator
                 string achievement = "ACHIEVEMENT_LIBRARY_IMPORT";
                 ConsoleOutput.WriteLine("Awarding achievement: "+achievement, Color.LightBlue);
                 SteamUserStats.SetAchievement(achievement);
-                SaveData.saveValues["TotalMediaImported"] = (int.Parse(SaveData.saveValues["TotalMediaImported"]) + 1).ToString();
+                SaveData.saveValues["TotalMediaImported"] = (int.Parse(SaveData.saveValues["TotalMediaImported"], System.Globalization.CultureInfo.InvariantCulture) + 1).ToString(System.Globalization.CultureInfo.InvariantCulture);
                 SaveData.Save();
             }
             SequentialName();
@@ -434,7 +434,7 @@ namespace NonsensicalVideoGenerator
         public static List<LibraryFile> GetFiles(LibraryType type)
         {
             // Get all files of a certain type.
-            return libraryFiles.FindAll(x => x.Type == type);
+            return libraryFiles.FindAll(x => x.Type == type && x.Path != null && File.Exists(x.Path) && x.Enabled);
         }
         public static int GetFileCount(LibraryType type)
         {
@@ -643,7 +643,7 @@ namespace NonsensicalVideoGenerator
                     string achievement = "ACHIEVEMENT_LIBRARY_IMPORT";
                     ConsoleOutput.WriteLine("Awarding achievement: "+achievement, Color.LightBlue);
                     SteamUserStats.SetAchievement(achievement);
-                    SaveData.saveValues["TotalMediaImported"] = (int.Parse(SaveData.saveValues["TotalMediaImported"]) + 1).ToString();
+                    SaveData.saveValues["TotalMediaImported"] = (int.Parse(SaveData.saveValues["TotalMediaImported"], System.Globalization.CultureInfo.InvariantCulture) + 1).ToString();
                     SaveData.Save();
                 }
                 return true;

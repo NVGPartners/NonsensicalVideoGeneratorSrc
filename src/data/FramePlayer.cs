@@ -145,7 +145,7 @@ namespace NonsensicalVideoGenerator
                 ConsoleOutput.WriteLine($"Failed to extract frames and audio.");
                 ConsoleOutput.WriteLine(e.Message);
                 Stop();
-                GlobalContent.GetSound("Error").Play(int.Parse(SaveData.saveValues["SoundEffectVolume"]) / 100f, 0f, 0f);
+                GlobalContent.GetSound("Error").Play(int.Parse(SaveData.saveValues["SoundEffectVolume"], System.Globalization.CultureInfo.InvariantCulture) / 100f, 0f, 0f);
                 Global.generatorFactory.progressText = "Failed to play media.";
             }
             processing = false;
@@ -191,7 +191,7 @@ namespace NonsensicalVideoGenerator
                 process.OutputDataReceived += (sender, args) => {
                     if(args.Data != null)
                     {
-                        count = int.Parse(args.Data);
+                        count = int.Parse(args.Data, System.Globalization.CultureInfo.InvariantCulture);
                         ConsoleOutput.WriteLine(args.Data, Color.Transparent);
                     }
                 };
@@ -341,7 +341,7 @@ namespace NonsensicalVideoGenerator
                 process.OutputDataReceived += (sender, args) => {
                     if(args.Data != null)
                     {
-                        audioLength = double.Parse(args.Data) * 1000;
+                        audioLength = double.Parse(args.Data, System.Globalization.CultureInfo.InvariantCulture) * 1000;
                         ConsoleOutput.WriteLine(args.Data, Color.Transparent);
                     }
                 };
@@ -449,7 +449,7 @@ namespace NonsensicalVideoGenerator
                         {
                             ConsoleOutput.WriteLine($"Failed to play media.");
                             ConsoleOutput.WriteLine(e.Message);
-                            GlobalContent.GetSound("Error").Play(int.Parse(SaveData.saveValues["SoundEffectVolume"]) / 100f, 0f, 0f);
+                            GlobalContent.GetSound("Error").Play(int.Parse(SaveData.saveValues["SoundEffectVolume"], System.Globalization.CultureInfo.InvariantCulture) / 100f, 0f, 0f);
                             Global.generatorFactory.progressText = "Failed to play media.";
                         }
                     }
@@ -457,7 +457,7 @@ namespace NonsensicalVideoGenerator
             }
             else
             {
-                GlobalContent.GetSound("Error").Play(int.Parse(SaveData.saveValues["SoundEffectVolume"]) / 100f, 0f, 0f);
+                GlobalContent.GetSound("Error").Play(int.Parse(SaveData.saveValues["SoundEffectVolume"], System.Globalization.CultureInfo.InvariantCulture) / 100f, 0f, 0f);
                 Global.generatorFactory.progressText = "Failed to stop playback.";
             }
         }
@@ -491,7 +491,7 @@ namespace NonsensicalVideoGenerator
                 canPlayBgMusic = false;
                 audio.Play();
 #if MONOGAME
-                audio.Volume = int.Parse(SaveData.saveValues["VideoVolume"]) / 100f;
+                audio.Volume = int.Parse(SaveData.saveValues["VideoVolume"], System.Globalization.CultureInfo.InvariantCulture) / 100f;
 #endif
                 currentFrame = 0;
                 playing = true;
@@ -525,7 +525,7 @@ namespace NonsensicalVideoGenerator
                 // Update volume on the fly
                 if(audio != null)
                 {
-                    audio.Volume = int.Parse(SaveData.saveValues["VideoVolume"]) / 100f;
+                    audio.Volume = int.Parse(SaveData.saveValues["VideoVolume"], System.Globalization.CultureInfo.InvariantCulture) / 100f;
                 }
 #endif
             }

@@ -62,7 +62,7 @@ namespace NonsensicalVideoGenerator
                 if ((mouseButtonFlags & 2) == 2)
                 {
                     SwitchState = !SwitchState;
-                    GlobalContent.GetSound("Option").Play(int.Parse(SaveData.saveValues["SoundEffectVolume"]) / 100f, 0f, 0f);
+                    GlobalContent.GetSound("Option").Play(int.Parse(SaveData.saveValues["SoundEffectVolume"], System.Globalization.CultureInfo.InvariantCulture) / 100f, 0f, 0f);
                 }
                 // Turn flags into state (most significant bit)
                 State = (int)Math.Log(mouseButtonFlags, 2) + 1;

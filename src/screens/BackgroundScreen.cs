@@ -108,8 +108,8 @@ namespace NonsensicalVideoGenerator
             if (hueColor >= 360)
                 hueColor = 0;
             // Update background color and tile color hue.
-            HSVToRGB((int)hueColor, int.Parse(SaveData.saveValues["BackgroundSaturation"]), 25, out backgroundColor);
-            HSVToRGB((int)hueColor, int.Parse(SaveData.saveValues["BackgroundSaturation"]), 40, out tileColor);
+            HSVToRGB((int)hueColor, int.Parse(SaveData.saveValues["BackgroundSaturation"], System.Globalization.CultureInfo.InvariantCulture), 25, out backgroundColor);
+            HSVToRGB((int)hueColor, int.Parse(SaveData.saveValues["BackgroundSaturation"], System.Globalization.CultureInfo.InvariantCulture), 40, out tileColor);
             // Input.
             if(handleInput)
             {
@@ -118,7 +118,7 @@ namespace NonsensicalVideoGenerator
                     // Add a circle.
                     circles.Add(new MisclickCircle(new Vector2(MouseInput.MouseState.X, MouseInput.MouseState.Y)));
                     // Play a sound.
-                    GlobalContent.GetSound("Hover").Play(int.Parse(SaveData.saveValues["SoundEffectVolume"]) / 100f, 0f, 0f);
+                    GlobalContent.GetSound("Hover").Play(int.Parse(SaveData.saveValues["SoundEffectVolume"], System.Globalization.CultureInfo.InvariantCulture) / 100f, 0f, 0f);
                     return true;
                 }
             }

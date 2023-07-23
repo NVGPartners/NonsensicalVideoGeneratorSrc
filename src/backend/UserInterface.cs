@@ -86,9 +86,9 @@ namespace NonsensicalVideoGenerator
             GraphicsDevice.SamplerStates[0] = SamplerState.PointClamp;
             // Set screen resolution.
             ConsoleOutput.WriteLine("Setting screen resolution...", Color.Transparent);
-            int scale = int.Parse(SaveData.saveValues["ScreenScale"]);
-            _graphics.PreferredBackBufferWidth = (int)(int.Parse(SaveData.saveValues["ScreenWidth"]) * scale);
-            _graphics.PreferredBackBufferHeight = (int)(int.Parse(SaveData.saveValues["ScreenHeight"]) * scale);
+            int scale = int.Parse(SaveData.saveValues["ScreenScale"], System.Globalization.CultureInfo.InvariantCulture);
+            _graphics.PreferredBackBufferWidth = (int)(int.Parse(SaveData.saveValues["ScreenWidth"], System.Globalization.CultureInfo.InvariantCulture) * scale);
+            _graphics.PreferredBackBufferHeight = (int)(int.Parse(SaveData.saveValues["ScreenHeight"], System.Globalization.CultureInfo.InvariantCulture) * scale);
             _graphics.ApplyChanges();
             ConsoleOutput.WriteLine("Screen resolution set.", Color.Transparent);
             ScreenManager.LoadScreens();
@@ -165,7 +165,7 @@ namespace NonsensicalVideoGenerator
                     if((_windowState == WindowState.Focused && _musicState == MusicState.Playing) && FramePlayer.canPlayBgMusic)
                     {
                         // Fade in music.
-                        float vol = int.Parse(SaveData.saveValues["MusicVolume"]) / 100f;
+                        float vol = int.Parse(SaveData.saveValues["MusicVolume"], System.Globalization.CultureInfo.InvariantCulture) / 100f;
                         if(MediaPlayer.Volume < vol)
                             MediaPlayer.Volume += 0.1f;
                         // Clamp music if it's over the volume level.

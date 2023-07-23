@@ -91,7 +91,7 @@ namespace NonsensicalVideoGenerator
                 {
                     waiting = false;
                     velocity = -jump;
-                    GlobalContent.GetSound("Option").Play(int.Parse(SaveData.saveValues["SoundEffectVolume"]) / 100f, 0f, 0f);
+                    GlobalContent.GetSound("Option").Play(int.Parse(SaveData.saveValues["SoundEffectVolume"], System.Globalization.CultureInfo.InvariantCulture) / 100f, 0f, 0f);
                     return true;
                 }
             }
@@ -110,7 +110,7 @@ namespace NonsensicalVideoGenerator
                     if (MouseInput.LastMouseState.LeftButton == ButtonState.Released && MouseInput.MouseState.LeftButton == ButtonState.Pressed)
                     {
                         velocity = -jump;
-                        GlobalContent.GetSound("Hover").Play(int.Parse(SaveData.saveValues["SoundEffectVolume"]) / 100f, 0f, 0f);
+                        GlobalContent.GetSound("Hover").Play(int.Parse(SaveData.saveValues["SoundEffectVolume"], System.Globalization.CultureInfo.InvariantCulture) / 100f, 0f, 0f);
                         return true;
                     }
                 }
@@ -299,7 +299,7 @@ namespace NonsensicalVideoGenerator
             /*
             if (handleInput && MouseInput.MouseState.RightButton == ButtonState.Pressed && MouseInput.LastMouseState.RightButton == ButtonState.Released)
             {
-                GlobalContent.GetSound("Back").Play(int.Parse(SaveData.saveValues["SoundEffectVolume"]) / 100f, 0f, 0f);
+                GlobalContent.GetSound("Back").Play(int.Parse(SaveData.saveValues["SoundEffectVolume"], System.Globalization.CultureInfo.InvariantCulture) / 100f, 0f, 0f);
                 Hide();
                 ScreenManager.PushNavigation("Video");
                 ScreenManager.GetScreen<VideoScreen>("Video")?.Show();
@@ -324,7 +324,7 @@ namespace NonsensicalVideoGenerator
                     // If player is in an obstacle, die
                     if(obstacle.CheckCollision(new Rectangle(GlobalGraphics.Scale(player.spacing), GlobalGraphics.Scale((int)player.spacingPlacementY), GlobalGraphics.Scale(player.width), GlobalGraphics.Scale(player.height))))
                     {
-                        GlobalContent.GetSound("Error").Play(int.Parse(SaveData.saveValues["SoundEffectVolume"]) / 100f, 0f, 0f);
+                        GlobalContent.GetSound("Error").Play(int.Parse(SaveData.saveValues["SoundEffectVolume"], System.Globalization.CultureInfo.InvariantCulture) / 100f, 0f, 0f);
                         player.dead = true;
                         // timer in 0.05 seconds
                         timer = (float)gameTime.TotalGameTime.TotalMilliseconds + 50f;
@@ -342,7 +342,7 @@ namespace NonsensicalVideoGenerator
                         if(!obstacle.isDead && !obstacle.point)
                         {
                             obstacle.point = true;
-                            GlobalContent.GetSound("AddSource").Play(int.Parse(SaveData.saveValues["SoundEffectVolume"]) / 100f, 0f, 0f);
+                            GlobalContent.GetSound("AddSource").Play(int.Parse(SaveData.saveValues["SoundEffectVolume"], System.Globalization.CultureInfo.InvariantCulture) / 100f, 0f, 0f);
                             player.points++;
                             currentCredit++;
                             if(currentCredit > creditRoll.Count-1)
@@ -351,7 +351,7 @@ namespace NonsensicalVideoGenerator
                             }
                             if(player.points >= highScore)
                             {
-                                GlobalContent.GetSound("Prompt").Play(int.Parse(SaveData.saveValues["SoundEffectVolume"]) / 100f, 0f, 0f);
+                                GlobalContent.GetSound("Prompt").Play(int.Parse(SaveData.saveValues["SoundEffectVolume"], System.Globalization.CultureInfo.InvariantCulture) / 100f, 0f, 0f);
                                 highScore = player.points;
                                 SaveData.saveValues["GameHighScore"] = highScore.ToString();
                                 SaveData.Save();
@@ -370,7 +370,7 @@ namespace NonsensicalVideoGenerator
                     }
                     if(phase == 0 && player.spacingPlacementY > 240-player.height)
                     {
-                        GlobalContent.GetSound("Error").Play(int.Parse(SaveData.saveValues["SoundEffectVolume"]) / 100f, 0f, 0f);
+                        GlobalContent.GetSound("Error").Play(int.Parse(SaveData.saveValues["SoundEffectVolume"], System.Globalization.CultureInfo.InvariantCulture) / 100f, 0f, 0f);
                         player.dead = true;
                         // timer in 0.05 seconds
                         timer = (float)gameTime.TotalGameTime.TotalMilliseconds + 50f;
@@ -552,7 +552,7 @@ namespace NonsensicalVideoGenerator
                 obstacle.LoadContent(contentManager, graphicsDevice);
             }
             // Set high score
-            highScore = int.Parse(SaveData.saveValues["GameHighScore"]);
+            highScore = int.Parse(SaveData.saveValues["GameHighScore"], System.Globalization.CultureInfo.InvariantCulture);
         }
     }
 }

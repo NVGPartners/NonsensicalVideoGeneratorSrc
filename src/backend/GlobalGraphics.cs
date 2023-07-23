@@ -14,9 +14,9 @@ namespace NonsensicalVideoGenerator
         public static SpriteFont fontMunro = GlobalContent.GetFont("Munro");
         public static SpriteFont fontMunroNarrow = GlobalContent.GetFont("MunroNarrow");
         public static SpriteFont fontMunroSmall = GlobalContent.GetFont("MunroSmall");
-        public static int width = int.Parse(SaveData.saveValues["ScreenWidth"]);
-        public static int height = int.Parse(SaveData.saveValues["ScreenHeight"]);
-        public static int scale = int.Parse(SaveData.saveValues["ScreenScale"]);
+        public static int width = int.Parse(SaveData.saveValues["ScreenWidth"], System.Globalization.CultureInfo.InvariantCulture);
+        public static int height = int.Parse(SaveData.saveValues["ScreenHeight"], System.Globalization.CultureInfo.InvariantCulture);
+        public static int scale = int.Parse(SaveData.saveValues["ScreenScale"], System.Globalization.CultureInfo.InvariantCulture);
         public static int scaledWidth = (int)(width * scale);
         public static int scaledHeight = (int)(height * scale);
         public static int shadowScale = 1;

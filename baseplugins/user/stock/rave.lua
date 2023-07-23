@@ -38,6 +38,7 @@ local frames = ".\\frames"
 -- Variables
 local randomSound = ""
 local success = false
+local music = "music.wav"
 
 function StartGeneration(options, pluginSettings, functions)
     -- Set settings

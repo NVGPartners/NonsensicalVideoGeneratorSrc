@@ -21,7 +21,7 @@ namespace NonsensicalVideoGenerator
             {
                 // Exit page is always the last
                 Global.exiting = true;
-                GlobalContent.GetSound("Quit").Play(int.Parse(SaveData.saveValues["SoundEffectVolume"]) / 100f, 0f, 0f);
+                GlobalContent.GetSound("Quit").Play(int.Parse(SaveData.saveValues["SoundEffectVolume"], System.Globalization.CultureInfo.InvariantCulture) / 100f, 0f, 0f);
                 ScreenManager.GetScreen<MenuScreen>("Main Menu")?.Hide();
                 VideoScreen video = ScreenManager.GetScreen<VideoScreen>("Video");
                 if(FramePlayer.audio != null)

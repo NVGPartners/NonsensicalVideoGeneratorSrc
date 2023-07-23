@@ -71,7 +71,7 @@ namespace NonsensicalVideoGenerator
                             originalValue = value;
                             originalDegrees = degrees;
                             State = 2;
-                            GlobalContent.GetSound("Option").Play(int.Parse(SaveData.saveValues["SoundEffectVolume"]) / 100f, 0f, 0f);
+                            GlobalContent.GetSound("Option").Play(int.Parse(SaveData.saveValues["SoundEffectVolume"], System.Globalization.CultureInfo.InvariantCulture) / 100f, 0f, 0f);
                             return true;
                         }
                         break;
@@ -80,7 +80,7 @@ namespace NonsensicalVideoGenerator
                         if (MouseInput.LastMouseState.LeftButton == ButtonState.Pressed && MouseInput.MouseState.LeftButton == ButtonState.Released)
                         {
                             State = 0;
-                            GlobalContent.GetSound("Option").Play(int.Parse(SaveData.saveValues["SoundEffectVolume"]) / 100f, 0f, 0f);
+                            GlobalContent.GetSound("Option").Play(int.Parse(SaveData.saveValues["SoundEffectVolume"], System.Globalization.CultureInfo.InvariantCulture) / 100f, 0f, 0f);
                             break;
                         }
                         // Rotating around the origin point (bounds.X+7, bounds.Y+7, 5.5, 5.5)
@@ -179,8 +179,8 @@ namespace NonsensicalVideoGenerator
                 spriteBatch.Draw(dialValues[0], new Rectangle(GlobalGraphics.Scale(bounds.X + 2), GlobalGraphics.Scale(bounds.Y + 2), GlobalGraphics.Scale(dialValues[0].Width), GlobalGraphics.Scale(dialValues[0].Height)), Color.White);
             }
             // Draw text + shadow
-            spriteBatch.DrawString(GlobalGraphics.fontMunro, value.ToString(), new Vector2(GlobalGraphics.Scale(bounds.X + 17 + 1), GlobalGraphics.Scale(bounds.Y + 1 + 1)), Color.Black);
-            spriteBatch.DrawString(GlobalGraphics.fontMunro, value.ToString(), new Vector2(GlobalGraphics.Scale(bounds.X + 17), GlobalGraphics.Scale(bounds.Y + 1)), Color.White);
+            spriteBatch.DrawString(GlobalGraphics.fontMunro, value.ToString(System.Globalization.CultureInfo.InvariantCulture), new Vector2(GlobalGraphics.Scale(bounds.X + 17 + 1), GlobalGraphics.Scale(bounds.Y + 1 + 1)), Color.Black);
+            spriteBatch.DrawString(GlobalGraphics.fontMunro, value.ToString(System.Globalization.CultureInfo.InvariantCulture), new Vector2(GlobalGraphics.Scale(bounds.X + 17), GlobalGraphics.Scale(bounds.Y + 1)), Color.White);
             // Label
             spriteBatch.DrawString(GlobalGraphics.fontMunro, Name, new Vector2(GlobalGraphics.Scale(bounds.X + bounds.Width + 4 + 1), GlobalGraphics.Scale(bounds.Y + 2 + 1)), Color.Black);
             spriteBatch.DrawString(GlobalGraphics.fontMunro, Name, new Vector2(GlobalGraphics.Scale(bounds.X + bounds.Width + 4), GlobalGraphics.Scale(bounds.Y + 2)), Color.White);

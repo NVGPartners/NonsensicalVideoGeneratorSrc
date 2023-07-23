@@ -28,7 +28,7 @@ namespace NonsensicalVideoGenerator
             if (Global.editing != "" && !names.Contains(Global.editing))
             {
                 Global.editing = "";
-                GlobalContent.GetSound("Back").Play(int.Parse(SaveData.saveValues["SoundEffectVolume"]) / 100f, 0f, 0f);
+                GlobalContent.GetSound("Back").Play(int.Parse(SaveData.saveValues["SoundEffectVolume"], System.Globalization.CultureInfo.InvariantCulture) / 100f, 0f, 0f);
             }
             try
             {

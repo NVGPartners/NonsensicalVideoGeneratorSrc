@@ -235,7 +235,7 @@ namespace NonsensicalVideoGenerator
                                 {
                                     dragging = true;
                                     dragOffset = MouseInput.MouseState.Y - GlobalGraphics.Scale(69 + scrollOffset * (214 - 69) / maxScrollOffset);
-                                    GlobalContent.GetSound("Option").Play(int.Parse(SaveData.saveValues["SoundEffectVolume"]) / 100f, 0f, 0f);
+                                    GlobalContent.GetSound("Option").Play(int.Parse(SaveData.saveValues["SoundEffectVolume"], System.Globalization.CultureInfo.InvariantCulture) / 100f, 0f, 0f);
                                     return true;
                                 }
                                 // 293, 57, 11x11 Scroll Up
@@ -244,7 +244,7 @@ namespace NonsensicalVideoGenerator
                                 {
                                     if(scrollOffset - 1 >= 0)
                                     {
-                                        GlobalContent.GetSound("Option").Play(int.Parse(SaveData.saveValues["SoundEffectVolume"]) / 100f, 0f, 0f);
+                                        GlobalContent.GetSound("Option").Play(int.Parse(SaveData.saveValues["SoundEffectVolume"], System.Globalization.CultureInfo.InvariantCulture) / 100f, 0f, 0f);
                                         int oldScrollOffset = scrollOffset;
                                         // Round down scroll offset to the nearest 16 multiple.
                                         scrollOffset = (int)(Math.Floor((double)scrollOffset / 16) * 16);
@@ -261,7 +261,7 @@ namespace NonsensicalVideoGenerator
                                     }
                                     else
                                     {
-                                        GlobalContent.GetSound("Error").Play(int.Parse(SaveData.saveValues["SoundEffectVolume"]) / 100f, 0f, 0f);
+                                        GlobalContent.GetSound("Error").Play(int.Parse(SaveData.saveValues["SoundEffectVolume"], System.Globalization.CultureInfo.InvariantCulture) / 100f, 0f, 0f);
                                     }
                                     return true;
                                 }
@@ -271,7 +271,7 @@ namespace NonsensicalVideoGenerator
                                 {
                                     if (scrollOffset + 1 <= maxScrollOffset)
                                     {
-                                        GlobalContent.GetSound("Option").Play(int.Parse(SaveData.saveValues["SoundEffectVolume"]) / 100f, 0f, 0f);
+                                        GlobalContent.GetSound("Option").Play(int.Parse(SaveData.saveValues["SoundEffectVolume"], System.Globalization.CultureInfo.InvariantCulture) / 100f, 0f, 0f);
                                         int oldScrollOffset = scrollOffset;
                                         // Round up scroll offset to the nearest 16 multiple.
                                         scrollOffset = (int)(Math.Ceiling((double)scrollOffset / 16) * 16);
@@ -288,7 +288,7 @@ namespace NonsensicalVideoGenerator
                                     }
                                     else
                                     {
-                                        GlobalContent.GetSound("Error").Play(int.Parse(SaveData.saveValues["SoundEffectVolume"]) / 100f, 0f, 0f);
+                                        GlobalContent.GetSound("Error").Play(int.Parse(SaveData.saveValues["SoundEffectVolume"], System.Globalization.CultureInfo.InvariantCulture) / 100f, 0f, 0f);
                                     }
                                     return true;
                                 }
@@ -298,7 +298,7 @@ namespace NonsensicalVideoGenerator
                         {
                             if (MouseInput.MouseState.LeftButton == ButtonState.Released)
                             {
-                                GlobalContent.GetSound("Option").Play(int.Parse(SaveData.saveValues["SoundEffectVolume"]) / 100f, 0f, 0f);
+                                GlobalContent.GetSound("Option").Play(int.Parse(SaveData.saveValues["SoundEffectVolume"], System.Globalization.CultureInfo.InvariantCulture) / 100f, 0f, 0f);
                                 dragging = false;
                             }
                             else
@@ -320,14 +320,14 @@ namespace NonsensicalVideoGenerator
                             if(MouseInput.MouseState.X >= GlobalGraphics.Scale(294) && MouseInput.MouseState.X < GlobalGraphics.Scale(304)
                                 && MouseInput.MouseState.Y >= GlobalGraphics.Scale(57) && MouseInput.MouseState.Y < GlobalGraphics.Scale(68))
                             {
-                                GlobalContent.GetSound("Error").Play(int.Parse(SaveData.saveValues["SoundEffectVolume"]) / 100f, 0f, 0f);
+                                GlobalContent.GetSound("Error").Play(int.Parse(SaveData.saveValues["SoundEffectVolume"], System.Globalization.CultureInfo.InvariantCulture) / 100f, 0f, 0f);
                                 return true;
                             }
                             // 293, 224, 11x11 Scroll Down
                             if (MouseInput.MouseState.X >= GlobalGraphics.Scale(294) && MouseInput.MouseState.X < GlobalGraphics.Scale(304)
                                 && MouseInput.MouseState.Y >= GlobalGraphics.Scale(224) && MouseInput.MouseState.Y < GlobalGraphics.Scale(235))
                             {
-                                GlobalContent.GetSound("Error").Play(int.Parse(SaveData.saveValues["SoundEffectVolume"]) / 100f, 0f, 0f);
+                                GlobalContent.GetSound("Error").Play(int.Parse(SaveData.saveValues["SoundEffectVolume"], System.Globalization.CultureInfo.InvariantCulture) / 100f, 0f, 0f);
                                 return true;
                             }
                         }
@@ -376,11 +376,11 @@ namespace NonsensicalVideoGenerator
                                     {
                                         PluginHandler.plugins[i].enabled = !PluginHandler.plugins[i].enabled;
                                         PluginHandler.SavePluginSettings();
-                                        GlobalContent.GetSound("Option").Play(int.Parse(SaveData.saveValues["SoundEffectVolume"]) / 100f, 0f, 0f);
+                                        GlobalContent.GetSound("Option").Play(int.Parse(SaveData.saveValues["SoundEffectVolume"], System.Globalization.CultureInfo.InvariantCulture) / 100f, 0f, 0f);
                                     }
                                     else
                                     {
-                                        GlobalContent.GetSound("Error").Play(int.Parse(SaveData.saveValues["SoundEffectVolume"]) / 100f, 0f, 0f);
+                                        GlobalContent.GetSound("Error").Play(int.Parse(SaveData.saveValues["SoundEffectVolume"], System.Globalization.CultureInfo.InvariantCulture) / 100f, 0f, 0f);
                                     }
                                     return true;
                                 }
@@ -393,7 +393,7 @@ namespace NonsensicalVideoGenerator
                                 if (MouseInput.MouseState.X >= GlobalGraphics.Scale(138) && MouseInput.MouseState.X < GlobalGraphics.Scale(inRange)
                                     && MouseInput.MouseState.Y >= GlobalGraphics.Scale(59 + (i * 16) - scrollOffset) && MouseInput.MouseState.Y < GlobalGraphics.Scale(70 + (i * 16) - scrollOffset))
                                 {
-                                    GlobalContent.GetSound("Option").Play(int.Parse(SaveData.saveValues["SoundEffectVolume"]) / 100f, 0f, 0f);
+                                    GlobalContent.GetSound("Option").Play(int.Parse(SaveData.saveValues["SoundEffectVolume"], System.Globalization.CultureInfo.InvariantCulture) / 100f, 0f, 0f);
                                     // Open directory and select file
                                     ProcessStartInfo startInfo = new();
                                     // Workshop plugin should open workshop page
@@ -436,7 +436,7 @@ namespace NonsensicalVideoGenerator
                                     if (MouseInput.MouseState.X >= GlobalGraphics.Scale(230) && MouseInput.MouseState.X < GlobalGraphics.Scale(267)
                                         && MouseInput.MouseState.Y >= GlobalGraphics.Scale(59 + (i * 16) - scrollOffset) && MouseInput.MouseState.Y < GlobalGraphics.Scale(70 + (i * 16) - scrollOffset))
                                     {
-                                        GlobalContent.GetSound("Select").Play(int.Parse(SaveData.saveValues["SoundEffectVolume"]) / 100f, 0f, 0f);
+                                        GlobalContent.GetSound("Select").Play(int.Parse(SaveData.saveValues["SoundEffectVolume"], System.Globalization.CultureInfo.InvariantCulture) / 100f, 0f, 0f);
                                         // Open settings
                                         controller.Clear();
                                         settingsIndex = i;
@@ -450,7 +450,7 @@ namespace NonsensicalVideoGenerator
                                                     switch(i)
                                                     {
                                                         case 2:
-                                                            GlobalContent.GetSound("Select").Play(int.Parse(SaveData.saveValues["SoundEffectVolume"]) / 100f, 0f, 0f);
+                                                            GlobalContent.GetSound("Select").Play(int.Parse(SaveData.saveValues["SoundEffectVolume"], System.Globalization.CultureInfo.InvariantCulture) / 100f, 0f, 0f);
                                                             ProcessStartInfo startInfo = new();
                                                             startInfo.FileName = "https://steamcommunity.com/sharedfiles/filedetails/?id=" + PluginHandler.plugins[settingsIndex].submittedId;
                                                             startInfo.UseShellExecute = true;
@@ -470,7 +470,7 @@ namespace NonsensicalVideoGenerator
                                                             try
                                                             {
                                                                 Directory.Delete(Path.GetDirectoryName(PluginHandler.plugins[settingsIndex].path), true);
-                                                                GlobalContent.GetSound("Select").Play(int.Parse(SaveData.saveValues["SoundEffectVolume"]) / 100f, 0f, 0f);
+                                                                GlobalContent.GetSound("Select").Play(int.Parse(SaveData.saveValues["SoundEffectVolume"], System.Globalization.CultureInfo.InvariantCulture) / 100f, 0f, 0f);
                                                                 if(SteamManager.initialized)
                                                                     PluginHandler.LoadWorkshop();
                                                                 else
@@ -479,7 +479,7 @@ namespace NonsensicalVideoGenerator
                                                             }
                                                             catch
                                                             {
-                                                                GlobalContent.GetSound("Error").Play(int.Parse(SaveData.saveValues["SoundEffectVolume"]) / 100f, 0f, 0f);
+                                                                GlobalContent.GetSound("Error").Play(int.Parse(SaveData.saveValues["SoundEffectVolume"], System.Globalization.CultureInfo.InvariantCulture) / 100f, 0f, 0f);
                                                             }
                                                             return true;
                                                     }
@@ -489,7 +489,7 @@ namespace NonsensicalVideoGenerator
                                                     switch(i)
                                                     {
                                                         case 2: // left click
-                                                            GlobalContent.GetSound("Select").Play(int.Parse(SaveData.saveValues["SoundEffectVolume"]) / 100f, 0f, 0f);
+                                                            GlobalContent.GetSound("Select").Play(int.Parse(SaveData.saveValues["SoundEffectVolume"], System.Globalization.CultureInfo.InvariantCulture) / 100f, 0f, 0f);
                                                             Name = "Workshop Tags: " + PluginHandler.plugins[settingsIndex].GetDisplayName();
                                                             controller.Clear();
                                                             controller.Add("LibraryCustom", new Switch("Custom Library", "Uses a custom library type.", new Vector2(139, 60+19*8), (int i) => {
@@ -607,7 +607,7 @@ namespace NonsensicalVideoGenerator
                                                                 switch(i)
                                                                 {
                                                                     case 2: // left click
-                                                                        GlobalContent.GetSound("Option").Play(int.Parse(SaveData.saveValues["SoundEffectVolume"]) / 100f, 0f, 0f);
+                                                                        GlobalContent.GetSound("Option").Play(int.Parse(SaveData.saveValues["SoundEffectVolume"], System.Globalization.CultureInfo.InvariantCulture) / 100f, 0f, 0f);
                                                                         // Select png, jpg, or gif icon with file dialog
                                                                         System.Windows.Forms.OpenFileDialog fileDialog = new System.Windows.Forms.OpenFileDialog();
                                                                         fileDialog.Filter = "Image Files (*.png;*.jpg;*.gif)|*.png;*.jpg;*.gif";
@@ -631,7 +631,7 @@ namespace NonsensicalVideoGenerator
                                                                 switch(i)
                                                                 {
                                                                     case 2: // left click
-                                                                        GlobalContent.GetSound("Back").Play(int.Parse(SaveData.saveValues["SoundEffectVolume"]) / 100f, 0f, 0f);
+                                                                        GlobalContent.GetSound("Back").Play(int.Parse(SaveData.saveValues["SoundEffectVolume"], System.Globalization.CultureInfo.InvariantCulture) / 100f, 0f, 0f);
                                                                         controller.Clear();
                                                                         Name = "Effects";
                                                                         editingSettings = false;
@@ -649,7 +649,7 @@ namespace NonsensicalVideoGenerator
                                             switch(i)
                                             {
                                                 case 2: // left click
-                                                    GlobalContent.GetSound("Back").Play(int.Parse(SaveData.saveValues["SoundEffectVolume"]) / 100f, 0f, 0f);
+                                                    GlobalContent.GetSound("Back").Play(int.Parse(SaveData.saveValues["SoundEffectVolume"], System.Globalization.CultureInfo.InvariantCulture) / 100f, 0f, 0f);
                                                     controller.Clear();
                                                     Name = "Effects";
                                                     editingSettings = false;
@@ -716,7 +716,7 @@ namespace NonsensicalVideoGenerator
                                                             if(oldValue != PluginHandler.plugins[settingsIndex].settings[keyFromIndex].ToString())
                                                                 PluginHandler.SavePluginSettings();
                                                             else
-                                                                GlobalContent.GetSound("Error").Play(int.Parse(SaveData.saveValues["SoundEffectVolume"]) / 100f, 0f, 0f);
+                                                                GlobalContent.GetSound("Error").Play(int.Parse(SaveData.saveValues["SoundEffectVolume"], System.Globalization.CultureInfo.InvariantCulture) / 100f, 0f, 0f);
                                                         }
                                                         return switchState;
                                                     }, PluginHandler.plugins[i].settings[s.Key].ToString() == "1");
@@ -777,7 +777,7 @@ namespace NonsensicalVideoGenerator
                                     {
                                         pluginCreation = true;
                                         editingSettings = true;
-                                        GlobalContent.GetSound("Select").Play(int.Parse(SaveData.saveValues["SoundEffectVolume"]) / 100f, 0f, 0f);
+                                        GlobalContent.GetSound("Select").Play(int.Parse(SaveData.saveValues["SoundEffectVolume"], System.Globalization.CultureInfo.InvariantCulture) / 100f, 0f, 0f);
                                         return true;
                                     }
                                 }
@@ -828,7 +828,7 @@ namespace NonsensicalVideoGenerator
                 switch(i)
                 {
                     case 2: // left click
-                        GlobalContent.GetSound("Back").Play(int.Parse(SaveData.saveValues["SoundEffectVolume"]) / 100f, 0f, 0f);
+                        GlobalContent.GetSound("Back").Play(int.Parse(SaveData.saveValues["SoundEffectVolume"], System.Globalization.CultureInfo.InvariantCulture) / 100f, 0f, 0f);
                         editingSettings = false;
                         pluginCreation = false;
                         return true;
@@ -839,7 +839,7 @@ namespace NonsensicalVideoGenerator
                 switch(i)
                 {
                     case 2:
-                        GlobalContent.GetSound("Option").Play(int.Parse(SaveData.saveValues["SoundEffectVolume"]) / 100f, 0f, 0f);
+                        GlobalContent.GetSound("Option").Play(int.Parse(SaveData.saveValues["SoundEffectVolume"], System.Globalization.CultureInfo.InvariantCulture) / 100f, 0f, 0f);
                         if(SteamManager.initialized)
                             PluginHandler.LoadWorkshop();
                         else
@@ -855,7 +855,7 @@ namespace NonsensicalVideoGenerator
                         pluginCreation = false;
                         if(PluginHandler.CreatePlugin(customPluginFileName, customPluginName, customPluginMinimal, out string file))
                         {
-                            GlobalContent.GetSound("Select").Play(int.Parse(SaveData.saveValues["SoundEffectVolume"]) / 100f, 0f, 0f);
+                            GlobalContent.GetSound("Select").Play(int.Parse(SaveData.saveValues["SoundEffectVolume"], System.Globalization.CultureInfo.InvariantCulture) / 100f, 0f, 0f);
                             // load plugins
                             if(SteamManager.initialized)
                                 PluginHandler.LoadWorkshop();
@@ -865,7 +865,7 @@ namespace NonsensicalVideoGenerator
                         }
                         else
                         {
-                            GlobalContent.GetSound("Error").Play(int.Parse(SaveData.saveValues["SoundEffectVolume"]) / 100f, 0f, 0f);
+                            GlobalContent.GetSound("Error").Play(int.Parse(SaveData.saveValues["SoundEffectVolume"], System.Globalization.CultureInfo.InvariantCulture) / 100f, 0f, 0f);
                             editingSettings = false;
                         }
                         return true;
