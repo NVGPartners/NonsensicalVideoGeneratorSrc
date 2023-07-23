@@ -283,6 +283,7 @@ namespace NonsensicalVideoGenerator
                     timeout = defaultTimeout;
                     if (vidThreadWorker?.CancellationPending == true)
                         return;
+                    ConsoleOutput.WriteLine("Starting clip " + (i + 1) + "/" + maxClips + "...", Color.Gray);
                     progressText = "Starting clip " + (i + 1) + "/" + maxClips + "...";
                     bool intro = false;
                     if (i == 0 && bool.Parse(SaveData.saveValues["IntrosEnabled"]))
@@ -298,11 +299,9 @@ namespace NonsensicalVideoGenerator
                         {
                             maxClips++;
                             ConsoleOutput.WriteLine("Intro clip enabled, adding 1 to max clips. New max clips is " + maxClips + ".", Color.Gray);
-                            progress = Convert.ToInt32(((float)i / (float)maxClips), System.Globalization.CultureInfo.InvariantCulture);
+                            progress = Convert.ToInt32(i / maxClips, System.Globalization.CultureInfo.InvariantCulture);
                             progressText = "Introducing ourselves... (" + (i + 1) + "/" + maxClips + ")";
                             Utilities.CopyVideo(introPath, Path.Combine(Utilities.temporaryDirectory, "video" + i + ".mp4"));
-                            // get length of intro and add it to currentTime
-                            float introLength = float.Parse(Utilities.GetLength(introPath), System.Globalization.CultureInfo.InvariantCulture);
                         }
                     }
                     if (vidThreadWorker?.CancellationPending == true)
@@ -312,7 +311,8 @@ namespace NonsensicalVideoGenerator
                         bool rolledForOverlay = RandomInt(0, 100) < int.Parse(SaveData.saveValues["OverlayChance"], System.Globalization.CultureInfo.InvariantCulture);
                         bool rolledForTransition = RandomInt(0, 100) < int.Parse(SaveData.saveValues["TransitionChance"], System.Globalization.CultureInfo.InvariantCulture);
                         string overlayPath = "";
-                        progress = Convert.ToInt32(((float)i / (float)maxClips), System.Globalization.CultureInfo.InvariantCulture);
+                        progress = Convert.ToInt32(i / maxClips, System.Globalization.CultureInfo.InvariantCulture);
+                        ConsoleOutput.WriteLine("Clipping... (" + (i + 1) + "/" + maxClips + ")", Color.Gray);
                         progressText = "Clipping... (" + (i + 1) + "/" + maxClips + ")";
                         string sourceToPick = LibraryData.PickRandom(DefaultLibraryTypes.Material, globalRandom);
                         float source = -1;
@@ -327,6 +327,7 @@ namespace NonsensicalVideoGenerator
                         {
                             source = float.Parse(Utilities.GetLength(sourceToPick), System.Globalization.CultureInfo.InvariantCulture);
                         }
+                        ConsoleOutput.WriteLine("Length: " + source, Color.Gray);
                         string output = source.ToString(System.Globalization.CultureInfo.InvariantCulture);
                         //ConsoleOutput.WriteLine(Utilities.GetLength(sourceToPick) + " -> " + output + " -> " + float.Parse(output, System.Globalization.CultureInfo.InvariantCulture));
                         float outputDuration = float.Parse(output, System.Globalization.CultureInfo.InvariantCulture);
@@ -359,6 +360,7 @@ namespace NonsensicalVideoGenerator
                             if(transitionPath != "")
                             {
                                 progressText = "Transitioning... (" + (i + 1) + "/" + maxClips + ")";
+                                ConsoleOutput.WriteLine("Transitioning...", Color.Gray);
                                 Utilities.CopyVideo(transitionPath, Path.Combine(Utilities.temporaryDirectory, "video" + i + ".mp4"));
                             }
                         }
@@ -368,6 +370,7 @@ namespace NonsensicalVideoGenerator
                             Utilities.SnipVideo(sourceToPick, startOfClip, endOfClip, Path.Combine(Utilities.temporaryDirectory, "video" + i + ".mp4"));
                             SaveData.saveValues["TotalClipsTrimmed"] = (int.Parse(SaveData.saveValues["TotalClipsTrimmed"], System.Globalization.CultureInfo.InvariantCulture) + 1).ToString(System.Globalization.CultureInfo.InvariantCulture);
                             SaveData.Save();
+                            ConsoleOutput.WriteLine("Snipped video.", Color.Gray);
                         }
                         if (vidThreadWorker?.CancellationPending == true)
                             return;
@@ -488,7 +491,9 @@ namespace NonsensicalVideoGenerator
                     ConsoleOutput.WriteLine(ex2.Message, Color.Red);
                     // print line number
                     if(ex2.StackTrace != null)
+                    {
                         ConsoleOutput.WriteLine(ex2.StackTrace, Color.Red);
+                    }
                 }
                 try
                 {
