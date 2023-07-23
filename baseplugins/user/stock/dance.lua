@@ -86,7 +86,7 @@ function StartGeneration(options, pluginSettings, functions)
     segmentLength = functions.randomDouble(randomTimeMin, randomTimeMax)
     seek = functions.randomInt(musicSeekStart, musicSeekEnd)
     randomSound = functions.getRandomLibraryFile("audio", "music")
-    useOriginalAudio = (randomSound != "" and functions.randomInt(1, 100) <= tonumber(pluginSettings["No Music Chance"]))
+    useOriginalAudio = (randomSound == "" or functions.randomInt(1, 100) <= tonumber(pluginSettings["No Music Chance"]))
     -- Apply effect
     if useOriginalAudio then
         -- Invoke-Command -ScriptBlock {&$ffmpeg -i "$video" -t $randomTime -filter_complex "[0:v]setpts=.5*PTS[v];[0:a]atempo=2.0[a]" -map "[v]" -map "[a]" -preset veryfast -y "$temp2"}

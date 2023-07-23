@@ -72,43 +72,50 @@ namespace NonsensicalVideoGenerator
                 File.WriteAllText(consentFileName, JsonConvert.SerializeObject(new List<ConsentForm>(), Formatting.Indented));
             }
             // Check if the user has already accepted the consent form
-            List<ConsentForm> consentForms = JsonConvert.DeserializeObject<List<ConsentForm>>(File.ReadAllText(consentFileName));
-            foreach(ConsentForm consentForm in consentForms)
+            try
             {
-                // Check if pluginName is loaded
-                bool pluginLoaded = false;
-                foreach(Plugin plugin in PluginHandler.plugins)
+                List<ConsentForm> consentForms = JsonConvert.DeserializeObject<List<ConsentForm>>(File.ReadAllText(consentFileName));
+                foreach(ConsentForm consentForm in consentForms)
                 {
-                    if(Path.GetFileName(plugin.path) == consentForm.pluginName)
+                    // Check if pluginName is loaded
+                    bool pluginLoaded = false;
+                    foreach(Plugin plugin in PluginHandler.plugins)
                     {
-                        // Plugin is loaded
-                        pluginLoaded = true;
+                        if(Path.GetFileName(plugin.path) == consentForm.pluginName)
+                        {
+                            // Plugin is loaded
+                            pluginLoaded = true;
+                        }
                     }
-                }
-                if(!pluginLoaded)
-                {
-                    ConsoleOutput.WriteLine("Plugin " + consentForm.pluginName + " is not loaded. Removing consent form.", Color.Red);
-                    // Remove consent form from json file
-                    consentForms.Remove(consentForm);
-                    File.WriteAllText(consentFileName, JsonConvert.SerializeObject(consentForms, Formatting.Indented));
-                    continue;
-                }
-                if(consentForm.pluginName == checkConsentForm.pluginName)
-                {
-                    // Check if the consent form has been updated
-                    if(consentForm.name != checkConsentForm.name || consentForm.consents != checkConsentForm.consents || consentForm.workshopId != checkConsentForm.workshopId || consentForm.rootPath != checkConsentForm.rootPath)
+                    if(!pluginLoaded)
                     {
-                        // Consent form has been updated
-                        needsConsent = true;
-                        UserConsent.consentForm = checkConsentForm;
-                        // Remove existing consent form
+                        ConsoleOutput.WriteLine("Plugin " + consentForm.pluginName + " is not loaded. Removing consent form.", Color.Red);
+                        // Remove consent form from json file
                         consentForms.Remove(consentForm);
                         File.WriteAllText(consentFileName, JsonConvert.SerializeObject(consentForms, Formatting.Indented));
-                        return true;
+                        continue;
                     }
-                    // Consent form has already been accepted
-                    return false;
+                    if(consentForm.pluginName == checkConsentForm.pluginName)
+                    {
+                        // Check if the consent form has been updated
+                        if(consentForm.name != checkConsentForm.name || consentForm.consents != checkConsentForm.consents || consentForm.workshopId != checkConsentForm.workshopId || consentForm.rootPath != checkConsentForm.rootPath)
+                        {
+                            // Consent form has been updated
+                            needsConsent = true;
+                            UserConsent.consentForm = checkConsentForm;
+                            // Remove existing consent form
+                            consentForms.Remove(consentForm);
+                            File.WriteAllText(consentFileName, JsonConvert.SerializeObject(consentForms, Formatting.Indented));
+                            return true;
+                        }
+                        // Consent form has already been accepted
+                        return false;
+                    }
                 }
+            }
+            catch
+            {
+                return CheckConsentForm(checkConsentForm);
             }
             // Consent form has not been accepted
             needsConsent = true;

@@ -117,7 +117,7 @@ function PostCommand(commandindex, outputresult, errorresult, options, pluginSet
             elseif rng == 7 then
                 action = "-channel RGB -negate"
             end
-            functions.runMagick("convert \"" .. distort0 .. "\" " .. action .. " \"" .. distorts[commandindex - 1] .. "\"")
+            functions.runMagick("convert \"" .. distort0 .. "\" " .. action .. " \"" .. distorts[commandindex - 1 - indexoffset] .. "\"")
         else
             if rng <= 2 then
                 action = "-vf hflip"

@@ -270,7 +270,7 @@ namespace NonsensicalVideoGenerator
                 return false;
             }));
             // Add text entries
-            controller.Add("MaxStreamDuration", new TextEntry("Random Length", "End of random length range.", SaveData.saveValues["MaxStreamDuration"], new Vector2(172, 60+19*3), 26, 5, 2, (int i) => {
+            controller.Add("MaxStreamDuration", new TextEntry("Random Clip Length", "End of random length range.", SaveData.saveValues["MaxStreamDuration"], new Vector2(172, 60+19*3), 26, 5, 2, (int i) => {
                 string oldValue = SaveData.saveValues["MaxStreamDuration"];
                 if(float.Parse(controller.interactables["MaxStreamDuration"].Tooltip) < 0.2)
                     controller.interactables["MaxStreamDuration"].Tooltip = "0.2";
