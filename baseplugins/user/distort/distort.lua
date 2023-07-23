@@ -128,7 +128,7 @@ function PostCommand(commandindex, outputresult, errorresult, options, pluginSet
             elseif rng == 7 then
                 action = "-vf negate"
             end
-            functions.runFFmpeg("-i \"" .. distort0 .. "\" " .. action .. " -frames:v 1 -update 1 -preset veryfast -y \"" .. distorts[commandindex - 1] .. "\"")
+            functions.runFFmpeg("-i \"" .. distort0 .. "\" " .. action .. " -frames:v 1 -update 1 -preset veryfast -y \"" .. distorts[commandindex - 1 - indexoffset] .. "\"")
         end
     elseif commandindex == 7+indexoffset then
         local concatstring = [[file ']] .. distort0 .. [['

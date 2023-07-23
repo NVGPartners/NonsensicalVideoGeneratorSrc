@@ -53,22 +53,25 @@ namespace NonsensicalVideoGenerator
         }
         private void UpdateCheckThread(object? sender, DoWorkEventArgs e)
         {
-            try
-            {
-                if(SteamManager.initialized)
-                    PluginHandler.LoadWorkshop();
-                else
-                    PluginHandler.LoadPluginsThreaded();
-            }
-            catch
-            {
-                ConsoleOutput.WriteLine("Failed to load Workshop plugins.");
-                PluginHandler.LoadPluginsThreaded();
-            }
             UpdateManager.GetDependencyStatus();
             if(!UpdateManager.ffmpegInstalled || !UpdateManager.ffprobeInstalled)
             {
                 ErrorOut();
+            }
+            else
+            {
+                try
+                {
+                    if(SteamManager.initialized)
+                        PluginHandler.LoadWorkshop();
+                    else
+                        PluginHandler.LoadPluginsThreaded();
+                }
+                catch
+                {
+                    ConsoleOutput.WriteLine("Failed to load Workshop plugins.");
+                    PluginHandler.LoadPluginsThreaded();
+                }
             }
         }
         private List<string> warningText = new List<string>()
@@ -110,7 +113,7 @@ namespace NonsensicalVideoGenerator
             " ",
             "Total Stats:",
             "0 videos rendered",
-            "0 media imported",
+            "0 media imports",
             "0 clips trimmed",
             " ",
             "Click anywhere to continue.",
@@ -152,7 +155,7 @@ namespace NonsensicalVideoGenerator
             },
             new string[]
             {
-                "You can right click the media player to",
+                "You can right click the video player to",
                 "start playing in an external player."
             },
             new string[]
@@ -168,7 +171,7 @@ namespace NonsensicalVideoGenerator
             new string[]
             {
                 "You can press space to pause or re-play",
-                "the video in the media player."
+                "the video in the video player."
             },
             new string[]
             {
@@ -381,7 +384,7 @@ namespace NonsensicalVideoGenerator
                         stats[2] != 1
                     };
                     warningText[6] = $"{stats[0]} video{(plural[0] ? "s" : "")} rendered";
-                    warningText[7] = $"{stats[1]} media imported";
+                    warningText[7] = $"{stats[1]} media import{(plural[1] ? "s" : "")}";
                     warningText[8] = $"{stats[2]} clip{(plural[2] ? "s" : "")} trimmed";
                 }
             }

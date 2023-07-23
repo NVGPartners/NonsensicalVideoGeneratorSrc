@@ -731,6 +731,10 @@ namespace NonsensicalVideoGenerator
                                 ScreenManager.GetScreen<ContentScreen>("Content")?.Show();
                                 ScreenManager.PushNavigation("Socials");
                                 ScreenManager.GetScreen<SocialScreen>("Socials")?.Show();
+                                if(SteamManager.initialized)
+                                    PluginHandler.LoadWorkshop();
+                                else
+                                    PluginHandler.LoadPluginsThreaded();
                             }
                         }
                     }

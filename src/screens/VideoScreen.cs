@@ -272,7 +272,7 @@ namespace NonsensicalVideoGenerator
             spriteBatch.Draw(vidwindow, new Rectangle(GlobalGraphics.Scale(0), GlobalGraphics.Scale(36), GlobalGraphics.Scale(vidwindow.Width), GlobalGraphics.Scale(vidwindow.Height)), Color.White);
             SpriteFont munro = GlobalContent.GetFont("MunroSmall");
             // Draw window title on left side (90 degrees)
-            string altTitle = "Media Player";
+            string altTitle = "Video Player";
             Vector2 titleSize = munro.MeasureString(altTitle);
             spriteBatch.DrawString(munro, altTitle, new Vector2(GlobalGraphics.Scale(111), GlobalGraphics.Scale(110)), Color.White, MathHelper.ToRadians(90), new Vector2(titleSize.X, titleSize.Y), 1, SpriteEffects.None, 0);
             // End offset spritebatch
