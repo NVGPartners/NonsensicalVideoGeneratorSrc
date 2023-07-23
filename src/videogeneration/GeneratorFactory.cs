@@ -298,7 +298,7 @@ namespace NonsensicalVideoGenerator
                         {
                             maxClips++;
                             ConsoleOutput.WriteLine("Intro clip enabled, adding 1 to max clips. New max clips is " + maxClips + ".", Color.Gray);
-                            progress = Convert.ToInt32(((float)i / (float)maxClips));
+                            progress = Convert.ToInt32(((float)i / (float)maxClips), System.Globalization.CultureInfo.InvariantCulture);
                             progressText = "Introducing ourselves... (" + (i + 1) + "/" + maxClips + ")";
                             Utilities.CopyVideo(introPath, Path.Combine(Utilities.temporaryDirectory, "video" + i + ".mp4"));
                             // get length of intro and add it to currentTime
@@ -312,7 +312,7 @@ namespace NonsensicalVideoGenerator
                         bool rolledForOverlay = RandomInt(0, 100) < int.Parse(SaveData.saveValues["OverlayChance"], System.Globalization.CultureInfo.InvariantCulture);
                         bool rolledForTransition = RandomInt(0, 100) < int.Parse(SaveData.saveValues["TransitionChance"], System.Globalization.CultureInfo.InvariantCulture);
                         string overlayPath = "";
-                        progress = Convert.ToInt32(((float)i / (float)maxClips));
+                        progress = Convert.ToInt32(((float)i / (float)maxClips), System.Globalization.CultureInfo.InvariantCulture);
                         progressText = "Clipping... (" + (i + 1) + "/" + maxClips + ")";
                         string sourceToPick = LibraryData.PickRandom(DefaultLibraryTypes.Material, globalRandom);
                         float source = -1;
@@ -482,7 +482,14 @@ namespace NonsensicalVideoGenerator
             }
             catch(Exception ex2)
             {
-                ConsoleOutput.WriteLine(ex2.Message, Color.Red);
+                // not finished
+                if (ex2.Message != "Finished")
+                {
+                    ConsoleOutput.WriteLine(ex2.Message, Color.Red);
+                    // print line number
+                    if(ex2.StackTrace != null)
+                        ConsoleOutput.WriteLine(ex2.StackTrace, Color.Red);
+                }
                 try
                 {
                     if (vidThreadWorker?.CancellationPending == true)
