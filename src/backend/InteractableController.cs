@@ -30,6 +30,7 @@ namespace NonsensicalVideoGenerator
                 Global.editing = "";
                 GlobalContent.GetSound("Back").Play(int.Parse(SaveData.saveValues["SoundEffectVolume"]) / 100f, 0f, 0f);
             }
+            try
             {
                 // Update all interactables.
                 foreach (KeyValuePair<string, IInteractable> interactable in interactables)
@@ -38,6 +39,7 @@ namespace NonsensicalVideoGenerator
                         returnValue = true;
                 }
             }
+            catch {}
             return returnValue;
         }
         public void Draw(GameTime gameTime, SpriteBatch spriteBatch)
