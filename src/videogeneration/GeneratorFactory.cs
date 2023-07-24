@@ -41,7 +41,7 @@ namespace NonsensicalVideoGenerator
         public BackgroundWorker? timeoutWorker { get; set; }
         
         public BackgroundWorker? killWorker { get; set; }
-        public static readonly int defaultTimeout = 30;
+        public static readonly int defaultTimeout = 60;
         public int timeout = defaultTimeout; // in seconds
         public string tempOutput = Path.Combine(Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location), "library", "video", "renders", "temp.mp4");
         public void KillChildProcesses()

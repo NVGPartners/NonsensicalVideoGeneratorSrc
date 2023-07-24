@@ -63,7 +63,7 @@ namespace NonsensicalVideoGenerator
                 LibraryType libraryType = DefaultLibraryTypes.AllTypes[i];
                 if(!libraryType.Special)
                 {
-                    libraryFileCache[libraryType] = LibraryData.GetFiles(libraryType);
+                    libraryFileCache[libraryType] = LibraryData.GetFiles(libraryType, false);
                 }
             }
         }
@@ -1176,7 +1176,7 @@ namespace NonsensicalVideoGenerator
                                     LibraryFile file = libraryFileCache[currentLibraryType][position];
                                     if (file.Path != null)
                                     {
-                                        tooltip = Path.GetFileName(file.Path).Replace("\\", "/").Replace(".disabled", "");
+                                        tooltip = Path.GetFileName(file.Path).Replace("\\", "/");
                                     }
                                 }
                                 else if(currentLibraryType != DefaultLibraryTypes.Render)

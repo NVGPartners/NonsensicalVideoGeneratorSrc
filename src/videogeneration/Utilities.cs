@@ -247,14 +247,48 @@ namespace NonsensicalVideoGenerator
 
                 string command1 = "";
 
-                // Rename all files in temporary directory that start with video to video0, video1, etc.
+                // Re-encode all files in temporary directory that start with video to video0, video1, etc.
                 string[] files = Directory.GetFiles(temporaryDirectory);
                 int i2 = 0;
                 for (int i = 0; i < count; i++)
                 {
                     if (File.Exists(Path.Combine(temporaryDirectory, "video" + i + ".mp4")))
                     {
-                        File.Move(Path.Combine(temporaryDirectory, "video" + i + ".mp4"), Path.Combine(temporaryDirectory, "concat" + i2 + ".mp4"));
+                        ConsoleOutput.WriteLine("Re-encoding... (" + (i + 1) + "/" + count + ")", Color.Gray);
+                        Global.generatorFactory.progressText = "Re-encoding... (" + (i + 1) + "/" + count + ")";
+                        //File.Move(Path.Combine(temporaryDirectory, "video" + i + ".mp4"), Path.Combine(temporaryDirectory, "concat" + i2 + ".mp4"));
+                        // Run ffmpeg to re-encode the video and add audio if it doesn't have any
+                        string appendNoAudio = "";
+                        if (!HasAudio(Path.Combine(temporaryDirectory, "video" + i + ".mp4")))
+                        {
+                            // Get video length
+                            string length = GetLength(Path.Combine(temporaryDirectory, "video" + i + ".mp4"));
+                            appendNoAudio = "-f lavfi -i anullsrc=channel_layout=mono:sample_rate=44100 -t " + length + " ";
+                        }
+                        System.Diagnostics.Process process2 = new System.Diagnostics.Process();
+                        System.Diagnostics.ProcessStartInfo startInfo2 = new System.Diagnostics.ProcessStartInfo();
+                        startInfo2.WindowStyle = System.Diagnostics.ProcessWindowStyle.Hidden;
+                        startInfo2.FileName = Global.useSystemFFmpeg ? "ffmpeg" : @".\ffmpeg.exe";
+                        startInfo2.Arguments = "-i \"" + Path.Combine(temporaryDirectory, "video" + i + ".mp4") + "\" " + appendNoAudio
+                                + " -c:v libx264"
+                                + " -crf 18"
+                                + " -preset veryfast"
+                                + " -vf scale=" + SaveData.saveValues["VideoWidth"] + "x" + SaveData.saveValues["VideoHeight"] + ",setsar=1:1,fps=fps=30"
+                                + " -y"
+                                + " \"" + Path.Combine(temporaryDirectory, "concat" + i2 + ".mp4") + "\"";
+                        startInfo2.UseShellExecute = false;
+                        startInfo2.RedirectStandardError = true;
+                        startInfo2.WorkingDirectory = Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location);
+                        startInfo2.CreateNoWindow = true;
+                        process2.StartInfo = startInfo2;
+                        process2.ErrorDataReceived += (sender, e) =>
+                        {
+                            if (e.Data != null)
+                                ConsoleOutput.WriteLine(e.Data, Color.Transparent);
+                        };
+                        process2.Start();
+                        process2.BeginErrorReadLine();
+                        process2.WaitForExit();
                         i2++;
                     }
                 }
@@ -263,6 +297,8 @@ namespace NonsensicalVideoGenerator
 
                 for (int i = 0; i < i2; i++)
                 {
+                    ConsoleOutput.WriteLine("Checking for validity... (" + (i + 1) + "/" + i2 + ")", Color.Gray);
+                    Global.generatorFactory.progressText = "Checking for validity... (" + (i + 1) + "/" + i2 + ")";
                     // Make sure this is a valid file with ffprobe.
                     ProcessStartInfo ffprobe = new ProcessStartInfo()
                     {
@@ -308,6 +344,9 @@ namespace NonsensicalVideoGenerator
 
                 //realcount +=1;
                 command1 += "concat=n=" + realCount + ":v=1:a=1[outv][outa];[outv]scale=" + SaveData.saveValues["VideoWidth"] + "x" + SaveData.saveValues["VideoHeight"] + ",setsar=1:1,fps=fps=30[outv]\" -map [outv] -map [outa] -shortest -c:v libx264 -crf 18 -preset veryfast -y \"" + ou + "\"";
+
+                ConsoleOutput.WriteLine("Concatenating clips...", Color.Gray);
+                Global.generatorFactory.progressText = "Concatenating clips...";
 
                 System.Diagnostics.Process process = new System.Diagnostics.Process();
                 System.Diagnostics.ProcessStartInfo startInfo = new System.Diagnostics.ProcessStartInfo();

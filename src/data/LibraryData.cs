@@ -431,15 +431,15 @@ namespace NonsensicalVideoGenerator
                 return path;
             return "";
         }
-        public static List<LibraryFile> GetFiles(LibraryType type)
+        public static List<LibraryFile> GetFiles(LibraryType type, bool hideDisabled = true)
         {
             // Get all files of a certain type.
-            return libraryFiles.FindAll(x => x.Type == type && x.Path != null && File.Exists(x.Path) && x.Enabled);
+            return libraryFiles.FindAll(x => x.Type == type && x.Path != null && File.Exists(x.Path) && (!hideDisabled || x.Enabled));
         }
-        public static int GetFileCount(LibraryType type)
+        public static int GetFileCount(LibraryType type, bool hideDisabled = true)
         {
             // Get the number of files of a certain type.
-            return GetFiles(type).Count;
+            return GetFiles(type, hideDisabled).Count;
         }
         public static List<string> GetLibraryNames(LibraryRootType type)
         {

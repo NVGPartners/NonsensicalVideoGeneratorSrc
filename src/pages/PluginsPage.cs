@@ -28,8 +28,8 @@ namespace NonsensicalVideoGenerator
         private int settingsIndex = 0;
         private int setting = 0;
         private string internalTooltip = "";
-        public string customPluginName = "My Effect";
-        public string customPluginFileName = "myeffect";
+        public string customPluginName = "Untitled";
+        public string customPluginFileName = "untitled";
         public bool customPluginMinimal = false;
         public WorkshopTag selectedFlagsWorkshop = WorkshopTag.None;
         private readonly InteractableController controller = new();
