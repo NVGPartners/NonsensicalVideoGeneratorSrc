@@ -3,9 +3,9 @@
     <AssemblyName>NonsensicalVideoGenerator</AssemblyName>
     <AssemblyProduct>NonsensicalVideoGenerator</AssemblyProduct>
     <AssemblyTitle>Nonsensical Video Generator</AssemblyTitle>
-    <FileVersion>1.0.0.4</FileVersion>
-    <AssemblyVersion>1.0.0.4</AssemblyVersion>
-    <Version>1.0.0.4</Version>
+    <FileVersion>1.0.0.5</FileVersion>
+    <AssemblyVersion>1.0.0.5</AssemblyVersion>
+    <Version>1.0.0.5</Version>
     <AssemblyCopyright>Copyright © KiwifruitDev 2023</AssemblyCopyright>
     <AssemblyTrademark>Newtonsoft.Json licensed under MIT; MonoGame licensed under Ms-PL; MoonSharp licensed under MIT; Steamworks.NET licensed under MIT; Munro licensed under SIL OFL</AssemblyTrademark>
     <Authors>KiwifruitDev</Authors>
@@ -31,6 +31,7 @@
     <TrimmerRootAssembly Include="Microsoft.Xna.Framework.Content.ContentTypeReader" Visible="false" />
   </ItemGroup>
   <ItemGroup>
+    <PackageReference Include="DiscordRichPresence" Version="1.1.4.20" />
     <PackageReference Include="MonoGame.Extended.Tweening" Version="3.8.0" />
     <PackageReference Include="MonoGame.Content.Builder.Task" Version="3.8.0.1641" />
     <PackageReference Include="MonoGame.Framework.WindowsDX" Version="3.8.1.303" />

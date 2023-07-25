@@ -58,6 +58,7 @@ namespace NonsensicalVideoGenerator
         }
         protected override void Initialize()
         {
+            DiscordRPC.Initialize();
             ConsoleOutput.WriteLine("Starting initialization for v" + Global.productVersion + "...", Color.Transparent);
             try
             {
@@ -125,6 +126,7 @@ namespace NonsensicalVideoGenerator
         }
         protected override void Update(GameTime gameTime)
         {
+            DiscordRPC.Update();
             // fix text entries
             bool handleInput = Accessibility.showDisambiguation || (IsActive && MouseInput.MouseState.X >= 0 && MouseInput.MouseState.X <= GlobalGraphics.scaledWidth &&
                 MouseInput.MouseState.Y >= 0 && MouseInput.MouseState.Y <= GlobalGraphics.scaledHeight && !Global.dragDrop);
@@ -223,6 +225,7 @@ namespace NonsensicalVideoGenerator
             base.OnExiting(sender, args);
             if(SteamManager.initialized)
                 SteamManager.Shutdown();
+            DiscordRPC.Shutdown();
         }
     }
 }

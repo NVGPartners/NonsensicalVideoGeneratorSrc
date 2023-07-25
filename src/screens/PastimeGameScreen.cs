@@ -200,6 +200,7 @@ namespace NonsensicalVideoGenerator
             "Newtonsoft.Json (MIT License)",
             "Steamworks.NET (MIT License)",
             "MoonSharp (MIT License)",
+            "DiscordRichPresence (MIT License)",
             "yt-dlp (Unlicense)",
             "Font Licenses:",
             "Munro (SIL Open Font License)",

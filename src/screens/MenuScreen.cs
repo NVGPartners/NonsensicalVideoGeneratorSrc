@@ -197,6 +197,10 @@ namespace NonsensicalVideoGenerator
                             GlobalContent.GetSound("Select").Play(int.Parse(SaveData.saveValues["SoundEffectVolume"], System.Globalization.CultureInfo.InvariantCulture) / 100f, 0f, 0f);    
                             if(Pagination.DrawnPage != segment)
                             {
+                                string name = Pagination.GetPage(segment).Name;
+                                if(segment == 2)
+                                    name = "Effects";
+                                DiscordRPC.curtab = DiscordRPC.ToTab(name);
                                 if(segment == Pagination.GetPageCount() - 2)
                                 {
                                     ScreenManager.PushNavigation("Pastime Game");
