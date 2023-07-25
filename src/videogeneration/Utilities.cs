@@ -250,11 +250,11 @@ namespace NonsensicalVideoGenerator
                 // Re-encode all files in temporary directory that start with video to video0, video1, etc.
                 string[] files = Directory.GetFiles(temporaryDirectory);
                 int i2 = 0;
+                ConsoleOutput.WriteLine("Re-encoding...", Color.Gray);
                 for (int i = 0; i < count; i++)
                 {
                     if (File.Exists(Path.Combine(temporaryDirectory, "video" + i + ".mp4")))
                     {
-                        ConsoleOutput.WriteLine("Re-encoding... (" + (i + 1) + "/" + count + ")", Color.Gray);
                         Global.generatorFactory.progressText = "Re-encoding... (" + (i + 1) + "/" + count + ")";
                         //File.Move(Path.Combine(temporaryDirectory, "video" + i + ".mp4"), Path.Combine(temporaryDirectory, "concat" + i2 + ".mp4"));
                         // Run ffmpeg to re-encode the video and add audio if it doesn't have any
@@ -295,9 +295,9 @@ namespace NonsensicalVideoGenerator
 
                 List<bool> validFiles = new List<bool>();
 
+                ConsoleOutput.WriteLine("Checking for validity...", Color.Gray);
                 for (int i = 0; i < i2; i++)
                 {
-                    ConsoleOutput.WriteLine("Checking for validity... (" + (i + 1) + "/" + i2 + ")", Color.Gray);
                     Global.generatorFactory.progressText = "Checking for validity... (" + (i + 1) + "/" + i2 + ")";
                     // Make sure this is a valid file with ffprobe.
                     ProcessStartInfo ffprobe = new ProcessStartInfo()

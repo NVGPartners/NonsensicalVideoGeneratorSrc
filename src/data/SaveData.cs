@@ -33,7 +33,7 @@ namespace NonsensicalVideoGenerator
             {"PlayAutomatically", "true"},
             {"GameHighScore", "0"},
             {"MusicVolume", "50"},
-            {"SoundEffectVolume", "100"},
+            {"SoundEffectVolume", "65"},
             {"VideoVolume", "100"},
             {"TransitionChance", "20"},
             {"OverlayChance", "20"},
@@ -48,6 +48,7 @@ namespace NonsensicalVideoGenerator
             {"TotalVideosRendered", "0"},
             {"TotalMediaImported", "0"},
             {"TotalClipsTrimmed", "0"},
+            {"PlayOverlayInFull", "false"}
         };
         public static string saveFileName = "Options.json";
         public static bool Save()

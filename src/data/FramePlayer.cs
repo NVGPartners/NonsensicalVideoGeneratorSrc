@@ -85,7 +85,7 @@ namespace NonsensicalVideoGenerator
                     FileName = "ffmpeg",
                     // 100x78 letterboxed
                     // fastest method
-                    Arguments = "-i \""+currentPath+"\" -vf scale=" + w + ":" + h + ":force_original_aspect_ratio=decrease,pad=" + w + ":" + h + ":(ow-iw)/2:(oh-ih)/2 -r " + fps + " -y .\\temp\\extracted\\frames\\%d.bmp .\\temp\\extracted\\audio.wav",
+                    Arguments = "-i \""+currentPath+"\" -vf scale=" + w + ":" + h + ":force_original_aspect_ratio=decrease,pad=" + w + ":" + h + ":(ow-iw)/2:(oh-ih)/2 -r " + fps + " -y .\\temp\\extracted\\frames\\%d.bmp -vn -acodec pcm_s16le -ar 44100 -ac 2 -f wav -y .\\temp\\extracted\\audio.wav",
                     UseShellExecute = false,
                     RedirectStandardError = true,
                     CreateNoWindow = true

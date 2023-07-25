@@ -103,7 +103,18 @@ namespace NonsensicalVideoGenerator
                         return true;
                 }
                 return false;
-            }));                                      
+            }));
+            controllerAdvanced.Add("PlayOverlayInFull", new Switch("Overlays Play in Full", "Play overlays at their full length.", new Vector2(139, 60+19*6), (int i) => {
+                bool switchState = (i & 256) != 0;
+                if((i & 2) != 0)
+                {
+                    string oldValue = SaveData.saveValues["PlayOverlayInFull"];
+                    SaveData.saveValues["PlayOverlayInFull"] = switchState.ToString().ToLower();
+                    if(oldValue != SaveData.saveValues["PlayOverlayInFull"])
+                        SaveData.Save();
+                }
+                return switchState;
+            }, SaveData.saveValues["PlayOverlayInFull"] == "true"));                       
             controllerAdvanced.Add("TransitionEffectChance", new TextEntry("Transition Effect Chance", "How often transitions get effects, from 0-100.", SaveData.saveValues["TransitionEffectChance"], new Vector2(139, 60+19*5), 24, 3, 1, (int i) => {
                 int oldValue = int.Parse(SaveData.saveValues["TransitionEffectChance"], System.Globalization.CultureInfo.InvariantCulture);
                 // Range: 0-100

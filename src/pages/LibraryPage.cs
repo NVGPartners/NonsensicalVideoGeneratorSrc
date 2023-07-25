@@ -307,7 +307,7 @@ namespace NonsensicalVideoGenerator
             {
                 string totalIndicator = "Click to download media";
                 if((selectedFlags & 4) == 4)
-                    totalIndicator =    "Paste URL to download";
+                    totalIndicator =    "Paste URLs to download";
                 if(downloading)
                     totalIndicator =    "Downloading...";
                 Vector2 totalIndicatorSize = munroSmall.MeasureString(totalIndicator);
@@ -639,7 +639,7 @@ namespace NonsensicalVideoGenerator
                         case "HeaderButton":
                             string totalIndicator = "Click to download media";
                             if((selectedFlags & 4) == 4)
-                                totalIndicator = "Paste URL to download";
+                                totalIndicator = "Paste URLs to download";
                             if(downloading)
                                 totalIndicator = "Downloading...";
                             tts = totalIndicator;

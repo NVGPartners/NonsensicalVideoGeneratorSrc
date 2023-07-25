@@ -367,7 +367,18 @@ namespace NonsensicalVideoGenerator
                         else
                         {
                             // No transition, just snip the video.
-                            Utilities.SnipVideo(sourceToPick, startOfClip, endOfClip, Path.Combine(Utilities.temporaryDirectory, "video" + i + ".mp4"));
+                                
+                            if(rolledForOverlay && bool.Parse(SaveData.saveValues["PlayOverlayInFull"]))
+                            {
+                                // Snip video to overlay length at startOfClip (override endOfClip)
+                                float overlayDuration = float.Parse(Utilities.GetLength(overlayPath), System.Globalization.CultureInfo.InvariantCulture);
+                                endOfClip = startOfClip + overlayDuration;
+                                Utilities.SnipVideo(sourceToPick, startOfClip, endOfClip, Path.Combine(Utilities.temporaryDirectory, "video" + i + ".mp4"));
+                            }
+                            else
+                            {
+                                Utilities.SnipVideo(sourceToPick, startOfClip, endOfClip, Path.Combine(Utilities.temporaryDirectory, "video" + i + ".mp4"));
+                            }
                             SaveData.saveValues["TotalClipsTrimmed"] = (int.Parse(SaveData.saveValues["TotalClipsTrimmed"], System.Globalization.CultureInfo.InvariantCulture) + 1).ToString(System.Globalization.CultureInfo.InvariantCulture);
                             SaveData.Save();
                             ConsoleOutput.WriteLine("Snipped video.", Color.Gray);
@@ -384,17 +395,25 @@ namespace NonsensicalVideoGenerator
                                 // We snip the clip here in case it was a transition
                                 //if(!alreadySnipped)
                                     //Utilities.SnipVideo(sourceToPick, startOfClip, endOfClip, Path.Combine(Utilities.temporaryDirectory, "video" + i + ".mp4"));
-                                // Now we'll snip the overlay with another random duration.
-                                float overlayDuration = float.Parse(Utilities.GetLength(overlayPath), System.Globalization.CultureInfo.InvariantCulture);
-                                float startOfOverlay = RandomFloat(0f, overlayDuration - float.Parse(SaveData.saveValues["MinStreamDuration"], System.Globalization.CultureInfo.InvariantCulture));
-                                float endOfOverlay = startOfOverlay + RandomFloat(float.Parse(SaveData.saveValues["MinStreamDuration"], System.Globalization.CultureInfo.InvariantCulture), float.Parse(SaveData.saveValues["MaxStreamDuration"], System.Globalization.CultureInfo.InvariantCulture));
-                                // Make sure the start is not less than 0 and the end is not greater than the overlay length.
-                                if (startOfOverlay < 0)
-                                    startOfOverlay = 0;
-                                if (endOfOverlay > overlayDuration)
-                                    endOfOverlay = overlayDuration;
-                                Utilities.SnipVideo(overlayPath, startOfOverlay, endOfOverlay, Path.Combine(Utilities.temporaryDirectory, "video" + i + "_tempoverlay.mp4"));
-                                Utilities.OverlayVideo(Path.Combine(Utilities.temporaryDirectory, "video" + i + ".mp4"), Path.Combine(Utilities.temporaryDirectory, "video" + i + "_tempoverlay.mp4"));
+                                if(!bool.Parse(SaveData.saveValues["PlayOverlayInFull"]))
+                                {
+                                    // Now we'll snip the overlay with another random duration.
+                                    float overlayDuration = float.Parse(Utilities.GetLength(overlayPath), System.Globalization.CultureInfo.InvariantCulture);
+                                    float startOfOverlay = RandomFloat(0f, overlayDuration - float.Parse(SaveData.saveValues["MinStreamDuration"], System.Globalization.CultureInfo.InvariantCulture));
+                                    float endOfOverlay = startOfOverlay + RandomFloat(float.Parse(SaveData.saveValues["MinStreamDuration"], System.Globalization.CultureInfo.InvariantCulture), float.Parse(SaveData.saveValues["MaxStreamDuration"], System.Globalization.CultureInfo.InvariantCulture));
+                                    // Make sure the start is not less than 0 and the end is not greater than the overlay length.
+                                    if (startOfOverlay < 0)
+                                        startOfOverlay = 0;
+                                    if (endOfOverlay > overlayDuration)
+                                        endOfOverlay = overlayDuration;
+                                    Utilities.SnipVideo(overlayPath, startOfOverlay, endOfOverlay, Path.Combine(Utilities.temporaryDirectory, "video" + i + "_tempoverlay.mp4"));
+                                    Utilities.OverlayVideo(Path.Combine(Utilities.temporaryDirectory, "video" + i + ".mp4"), Path.Combine(Utilities.temporaryDirectory, "video" + i + "_tempoverlay.mp4"));
+                                }
+                                else
+                                {
+                                    // Overlay video on top of clip.
+                                    Utilities.OverlayVideo(Path.Combine(Utilities.temporaryDirectory, "video" + i + ".mp4"), overlayPath);
+                                }
                             }
                         }
                         if (vidThreadWorker?.CancellationPending == true)
