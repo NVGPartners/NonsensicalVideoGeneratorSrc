@@ -32,7 +32,6 @@ namespace NonsensicalVideoGenerator
         private MusicState _musicState = MusicState.Paused;
         private int _musicActive = 0;
         private int music;
-        private bool tabbedOut = false;
         public UserInterface()
         {
             ConsoleOutput.WriteLine("Creating new UserInterface instance...", Color.Transparent);
@@ -127,8 +126,9 @@ namespace NonsensicalVideoGenerator
         protected override void Update(GameTime gameTime)
         {
             // fix text entries
-            tabbedOut = !IsActive;
-            if (tabbedOut && Global.editing != "")
+            bool handleInput = Accessibility.showDisambiguation || (IsActive && MouseInput.MouseState.X >= 0 && MouseInput.MouseState.X <= GlobalGraphics.scaledWidth &&
+                MouseInput.MouseState.Y >= 0 && MouseInput.MouseState.Y <= GlobalGraphics.scaledHeight && !Global.dragDrop);
+            if (!handleInput && Global.editing != "")
             {
                 Global.editing = "";
                 Accessibility.allowAccessibility = true;

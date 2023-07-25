@@ -89,11 +89,17 @@ namespace NonsensicalVideoGenerator
             if(!Global.useSystemFFmpeg)
             {
                 ffmpegInstalled = status[0];
-                ffprobeInstalled = status[1];
             }
             else
             {
                 ffmpegInstalled = DoesCommandExist("ffmpeg");
+            }
+            if(!Global.useSystemFFprobe)
+            {
+                ffprobeInstalled = status[1];
+            }
+            else
+            {
                 ffprobeInstalled = DoesCommandExist("ffprobe");
             }
             if(!Global.useSystemYtDlp)

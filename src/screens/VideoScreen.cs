@@ -285,8 +285,6 @@ namespace NonsensicalVideoGenerator
         }
         public void LoadContent(ContentManager contentManager, GraphicsDevice graphicsDevice)
         {
-            // Logo
-            GlobalContent.AddTexture("Logo", contentManager.Load<Texture2D>("graphics/logo"));
             // Video Window
             GlobalContent.AddTexture("VidWindow", contentManager.Load<Texture2D>("graphics/vidwindow"));
             GlobalContent.AddTexture("VidButton", contentManager.Load<Texture2D>("graphics/vidbutton"));

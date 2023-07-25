@@ -119,7 +119,7 @@ namespace NonsensicalVideoGenerator
                     }
                 }
             }
-            float hollowInside = GlobalGraphics.scale;
+            float hollowInside = GlobalGraphics.scale * 3;
             for(int x = 0; x < circleSize-hollowInside; x++)
             {
                 for(int y = 0; y < circleSize-hollowInside; y++)

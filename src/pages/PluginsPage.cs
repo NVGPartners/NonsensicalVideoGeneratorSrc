@@ -610,7 +610,7 @@ namespace NonsensicalVideoGenerator
                                                                         GlobalContent.GetSound("Option").Play(int.Parse(SaveData.saveValues["SoundEffectVolume"], System.Globalization.CultureInfo.InvariantCulture) / 100f, 0f, 0f);
                                                                         // Select png, jpg, or gif icon with file dialog
                                                                         System.Windows.Forms.OpenFileDialog fileDialog = new System.Windows.Forms.OpenFileDialog();
-                                                                        fileDialog.Filter = "Image Files (*.png;*.jpg;*.gif)|*.png;*.jpg;*.gif";
+                                                                        fileDialog.Filter = "Joint Photographic Experts Group (*.jpg, *.jpeg)|*.jpg;*.jpeg";
                                                                         fileDialog.Title = "Select Workshop Icon";
                                                                         fileDialog.InitialDirectory = Path.GetFullPath(@"templates");
                                                                         fileDialog.FileName = "workshop.jpg";

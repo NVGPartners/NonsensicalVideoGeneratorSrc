@@ -14,7 +14,8 @@ namespace NonsensicalVideoGenerator
     {
         public Vector2 circleClick = new Vector2(0, 0);
         public int circleSize = 1;
-        public int circleRGB = 100;
+        public int circleSaturation = 100;
+        public int circleValue = 100;
         public MisclickCircle(Vector2 circleClick)
         {
             this.circleClick = circleClick;
@@ -23,17 +24,19 @@ namespace NonsensicalVideoGenerator
         {
             if(circleClick.X != 0 && circleClick.Y != 0)
             {
-                if(circleRGB <= 25)
+                if(circleSaturation <= 25 && circleValue <= 25)
                 {
                     // By setting the circle size to 0, the circle will be removed from the screen.
                     circleClick = new Vector2(0, 0);
                     circleSize = 0;
-                    circleRGB = 0;
                 }
                 else
                 {
-                    circleRGB -= 1;
-                    circleSize += GlobalGraphics.Scale(2);
+                    if(circleSaturation > 25)
+                        circleSaturation -= 1;
+                    if(circleValue > 25)
+                        circleValue -= 1;
+                    circleSize += GlobalGraphics.Scale(1);
                 }
             }
         }
@@ -164,7 +167,7 @@ namespace NonsensicalVideoGenerator
                 foreach(MisclickCircle circle in circles)
                 {
                     Color circleColor = Color.Black;
-                    HSVToRGB((int)hueColor, 50, circle.circleRGB, out circleColor);
+                    HSVToRGB((int)hueColor, circle.circleSaturation, circle.circleValue, out circleColor);
                     GlobalGraphics.DrawCircle(spriteBatch, circle.circleClick, circle.circleSize, circleColor);
                 }
                 // Draw the tiled background.
