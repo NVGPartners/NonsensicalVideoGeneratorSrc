@@ -555,8 +555,8 @@ namespace NonsensicalVideoGenerator
                 case 2: // left click
                     if(!UserConsent.needsConsent)
                     {
-                        if(!Global.generatorFactory.progressText.ToLower().Contains("extract")
-                            && !Global.generatorFactory.progressText.ToLower().Contains("downloading"))
+                        if(!Global.generator.progressText.ToLower().Contains("extract")
+                            && !Global.generator.progressText.ToLower().Contains("downloading"))
                         {
                             GlobalContent.GetSound("Option").Play(int.Parse(SaveData.saveValues["SoundEffectVolume"], System.Globalization.CultureInfo.InvariantCulture) / 100f, 0f, 0f);
                             if(!bool.Parse(SaveData.saveValues["DisableMotion"]))
@@ -590,8 +590,8 @@ namespace NonsensicalVideoGenerator
                     if(!UserConsent.needsConsent)
                     {
                         // Get dependencies.
-                        if(!Global.generatorFactory.progressText.ToLower().Contains("extract")
-                            && !Global.generatorFactory.progressText.ToLower().Contains("downloading"))
+                        if(!Global.generator.progressText.ToLower().Contains("extract")
+                            && !Global.generator.progressText.ToLower().Contains("downloading"))
                         {
                             GlobalContent.GetSound("Option").Play(int.Parse(SaveData.saveValues["SoundEffectVolume"], System.Globalization.CultureInfo.InvariantCulture) / 100f, 0f, 0f);
                             if(!bool.Parse(SaveData.saveValues["DisableMotion"]))
@@ -620,7 +620,7 @@ namespace NonsensicalVideoGenerator
                 case 2: // left click
                     if(!UserConsent.needsConsent)
                     {
-                        Global.generatorFactory.progressText = "Starting download...";
+                        Global.generator.progressText = "Starting download...";
 
                         GlobalContent.GetSound("Option").Play(int.Parse(SaveData.saveValues["SoundEffectVolume"], System.Globalization.CultureInfo.InvariantCulture) / 100f, 0f, 0f);
                         tutorialText[1][3] = " - ffmpeg: Downloading...";
@@ -646,12 +646,12 @@ namespace NonsensicalVideoGenerator
                             using (WebClient client = new WebClient())
                             {
                                 client.DownloadProgressChanged += (sender, e) => {
-                                    Global.generatorFactory.progressText = "Downloading... (" + e.ProgressPercentage + "%)";
+                                    Global.generator.progressText = "Downloading... (" + e.ProgressPercentage + "%)";
                                     tutorialText[1][3] = " - ffmpeg: Downloading... (" + e.ProgressPercentage + "%)";
                                     tutorialText[1][4] = " - ffprobe: Downloading... (" + e.ProgressPercentage + "%)";
                                 };
                                 client.DownloadFileCompleted += (sender, e) => {
-                                    Global.generatorFactory.progressText = "Extracting...";
+                                    Global.generator.progressText = "Extracting...";
                                     tutorialText[1][3] = " - ffmpeg: Extracting...";
                                     tutorialText[1][4] = " - ffprobe: Extracting...";
                                     ffmpegDownloadWorker = new BackgroundWorker();
@@ -679,7 +679,7 @@ namespace NonsensicalVideoGenerator
                             dependencyWorker = new BackgroundWorker();
                             dependencyWorker.DoWork += DependencyCheckThread;
                             dependencyWorker.RunWorkerAsync();
-                            Global.generatorFactory.progressText = "Failed to download.";
+                            Global.generator.progressText = "Failed to download.";
                             // Play sound effect
                             GlobalContent.GetSound("Error").Play(int.Parse(SaveData.saveValues["SoundEffectVolume"], System.Globalization.CultureInfo.InvariantCulture) / 100f, 0f, 0f);
                         }
@@ -699,8 +699,8 @@ namespace NonsensicalVideoGenerator
                 case 2: // left click
                     if(!UserConsent.needsConsent)
                     {
-                        if(!Global.generatorFactory.progressText.ToLower().Contains("extract")
-                            && !Global.generatorFactory.progressText.ToLower().Contains("downloading"))
+                        if(!Global.generator.progressText.ToLower().Contains("extract")
+                            && !Global.generator.progressText.ToLower().Contains("downloading"))
                         {
                             GlobalContent.GetSound("Option").Play(int.Parse(SaveData.saveValues["SoundEffectVolume"], System.Globalization.CultureInfo.InvariantCulture) / 100f, 0f, 0f);
                             if(!check3)
@@ -753,14 +753,14 @@ namespace NonsensicalVideoGenerator
                 case 2: // left click
                     if(UserConsent.needsConsent)
                     {
-                        if(!Global.generatorFactory.progressText.ToLower().Contains("extract")
-                            && !Global.generatorFactory.progressText.ToLower().Contains("downloading"))
+                        if(!Global.generator.progressText.ToLower().Contains("extract")
+                            && !Global.generator.progressText.ToLower().Contains("downloading"))
                         {
                             GlobalContent.GetSound("Option").Play(int.Parse(SaveData.saveValues["SoundEffectVolume"], System.Globalization.CultureInfo.InvariantCulture) / 100f, 0f, 0f);
                             UserConsent.Accept(UserConsent.consentForm?.pluginName);
                             GlobalContent.GetSound("Back").Play(int.Parse(SaveData.saveValues["SoundEffectVolume"], System.Globalization.CultureInfo.InvariantCulture) / 100f, 0f, 0f);
                             toggle = false;
-                            Global.generatorFactory.progressText = $"Plugin {UserConsent.consentForm?.pluginName} accepted.";
+                            Global.generator.progressText = $"Plugin {UserConsent.consentForm?.pluginName} accepted.";
                             if(!bool.Parse(SaveData.saveValues["DisableMotion"]))
                             {
                                 tween.TweenTo(this, t => t.offset, new Vector2(GlobalGraphics.Scale(-640), GlobalGraphics.Scale(240)), 0.5f)
@@ -805,8 +805,8 @@ namespace NonsensicalVideoGenerator
                 case 2: // left click
                     if(UserConsent.needsConsent)
                     {
-                        if(!Global.generatorFactory.progressText.ToLower().Contains("extract")
-                            && !Global.generatorFactory.progressText.ToLower().Contains("downloading"))
+                        if(!Global.generator.progressText.ToLower().Contains("extract")
+                            && !Global.generator.progressText.ToLower().Contains("downloading"))
                         {
                             if(UserConsent.needsConsent)
                             {
@@ -845,8 +845,8 @@ namespace NonsensicalVideoGenerator
                     if(!UserConsent.needsConsent)
                     {
                         // Get dependencies.
-                        if(!Global.generatorFactory.progressText.ToLower().Contains("extract")
-                            && !Global.generatorFactory.progressText.ToLower().Contains("downloading"))
+                        if(!Global.generator.progressText.ToLower().Contains("extract")
+                            && !Global.generator.progressText.ToLower().Contains("downloading"))
                         {
                             GlobalContent.GetSound("Option").Play(int.Parse(SaveData.saveValues["SoundEffectVolume"], System.Globalization.CultureInfo.InvariantCulture) / 100f, 0f, 0f);
                             if(!check)
@@ -894,8 +894,8 @@ namespace NonsensicalVideoGenerator
                 case 2: // left click
                     if(!UserConsent.needsConsent)
                     {
-                        if(!Global.generatorFactory.progressText.ToLower().Contains("extract")
-                            && !Global.generatorFactory.progressText.ToLower().Contains("downloading"))
+                        if(!Global.generator.progressText.ToLower().Contains("extract")
+                            && !Global.generator.progressText.ToLower().Contains("downloading"))
                         {
                             if(UpdateManager.ffmpegInstalled && UpdateManager.ffprobeInstalled)
                             {
@@ -1077,12 +1077,12 @@ namespace NonsensicalVideoGenerator
             // Play sound effect
             if(ffmpegExePath != "" && ffprobeExePath != "")
             {
-                Global.generatorFactory.progressText = "Download complete.";
+                Global.generator.progressText = "Download complete.";
                 GlobalContent.GetSound("RenderComplete").Play(int.Parse(SaveData.saveValues["SoundEffectVolume"], System.Globalization.CultureInfo.InvariantCulture) / 100f, 0f, 0f);
             }
             else
             {
-                Global.generatorFactory.progressText = "Failed to download.";
+                Global.generator.progressText = "Failed to download.";
                 GlobalContent.GetSound("Error").Play(int.Parse(SaveData.saveValues["SoundEffectVolume"], System.Globalization.CultureInfo.InvariantCulture) / 100f, 0f, 0f);
             }
         }

@@ -48,7 +48,8 @@ namespace NonsensicalVideoGenerator
             {"TotalVideosRendered", "0"},
             {"TotalMediaImported", "0"},
             {"TotalClipsTrimmed", "0"},
-            {"PlayOverlayInFull", "false"}
+            {"PlayOverlayInFull", "false"},
+            {"MaxUniqueClips", "0"}
         };
         public static string saveFileName = "Options.json";
         public static bool Save()

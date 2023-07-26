@@ -619,7 +619,7 @@ namespace NonsensicalVideoGenerator
                                                                             Name = "Effects";
                                                                             editingSettings = false;
                                                                             controller.Clear();
-                                                                            Global.generatorFactory.progressText = "Uploading...";
+                                                                            Global.generator.progressText = "Uploading...";
                                                                             ConsoleOutput.WriteLine("Publishing " + Path.GetFileName(PluginHandler.plugins[settingsIndex].path) + " with icon " + Path.GetFileName(fileDialog.FileName), Color.RoyalBlue);
                                                                             PluginHandler.PublishPlugin(PluginHandler.plugins[settingsIndex], selectedFlagsWorkshop, fileDialog.FileName);
                                                                         }

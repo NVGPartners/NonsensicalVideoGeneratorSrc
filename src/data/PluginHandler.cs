@@ -429,17 +429,17 @@ namespace NonsensicalVideoGenerator
         // RandomDouble for lua (uses global random)
         public static double RandomDouble(double min, double max)
         {
-            return Global.generatorFactory.globalRandom.NextDouble() * (max - min) + min;
+            return Global.generator.globalRandom.NextDouble() * (max - min) + min;
         }
         // RandomInt for lua (uses global random)
         public static int RandomInt(int min, int max)
         {
-            return Global.generatorFactory.globalRandom.Next(min, max);
+            return Global.generator.globalRandom.Next(min, max);
         }
         // RandomBool for lua (uses global random)
         public static bool RandomBool()
         {
-            return Global.generatorFactory.globalRandom.Next(2) == 0;
+            return Global.generator.globalRandom.Next(2) == 0;
         }
         // FFmpeg installed for lua
         public static bool FFmpegInstalled()
@@ -482,7 +482,7 @@ namespace NonsensicalVideoGenerator
             {
                 throw new Exception("Invalid subType");
             }
-            string file = LibraryData.PickRandom(dummyType, Global.generatorFactory.globalRandom);
+            string file = LibraryData.PickRandom(dummyType, Global.generator.globalRandom);
             // remove placeholder if it already exists
             if (placeholders.ContainsKey("{LibraryFile_" + subType + "}"))
             {
@@ -744,6 +744,14 @@ namespace NonsensicalVideoGenerator
                         catch (Exception e)
                         {
                             ConsoleOutput.WriteLine(e.Message, Color.Red);
+                            if (e.StackTrace != null)
+                                ConsoleOutput.WriteLine(e.StackTrace, Color.Red);
+                            if (e.InnerException != null)
+                            {
+                                ConsoleOutput.WriteLine(e.InnerException.Message, Color.Red);
+                                if (e.InnerException.StackTrace != null)
+                                    ConsoleOutput.WriteLine(e.InnerException.StackTrace, Color.Red);
+                            }
                             return new PluginReturnValue(false, Path.GetFileName(path));
                         }
                     }
@@ -1065,7 +1073,7 @@ namespace NonsensicalVideoGenerator
         public static void LoadPlugin(string path, PluginType type, string rootPath, string workshopid = "")
         {
             Plugin plugin = new(path, type, rootPath);
-            Global.generatorFactory.progressText = $"Loading plugin {Path.GetFileName(path)}...";
+            Global.generator.progressText = $"Loading plugin {Path.GetFileName(path)}...";
             if(!plugin.Query())
                 throw new Exception($"Failed to query plugin {Path.GetFileName(path)}.");
             plugins.Add(plugin);
@@ -1347,7 +1355,7 @@ namespace NonsensicalVideoGenerator
                 }
                 Global.justCompletedRender = true; // demand a refresh
                 LoadPluginSettings();
-                Global.generatorFactory.progressText = $"{plugins.Count} effects loaded.";
+                Global.generator.progressText = $"{plugins.Count} effects loaded.";
                 Global.canRender = true;
                 LibraryData.SequentialName();
                 // Check to see if there are any plugins that need consent forms filled out.
@@ -1357,7 +1365,7 @@ namespace NonsensicalVideoGenerator
                     {
                         UserConsent.needsConsent = true;
                         UserConsent.consentForm = plugin.consentForm;
-                        Global.generatorFactory.progressText = $"Plugin {plugin.GetDisplayName()} requires consent.";
+                        Global.generator.progressText = $"Plugin {plugin.GetDisplayName()} requires consent.";
                         FramePlayer.canPlayBgMusic = false;
                         ScreenManager.PushNavigation("Initial Setup");
                         ScreenManager.GetScreen<TutorialScreen>("Initial Setup")?.Show();
@@ -1375,7 +1383,7 @@ namespace NonsensicalVideoGenerator
             catch (Exception e)
             {
                 ConsoleOutput.WriteLine($"Error loading plugins: {e.Message}", Color.Red);
-                Global.generatorFactory.progressText = $"Error loading plugins!";
+                Global.generator.progressText = $"Error loading plugins!";
                 GlobalContent.GetSound("Error").Play(int.Parse(SaveData.saveValues["SoundEffectVolume"], System.Globalization.CultureInfo.InvariantCulture) / 100f, 0f, 0f);
                 return false;
             }
@@ -1453,7 +1461,7 @@ namespace NonsensicalVideoGenerator
             // Is Steam API available?
             if(SteamAPI.IsSteamRunning() == false || !SteamManager.initialized)
             {
-                Global.generatorFactory.progressText = "Steam is not running.";
+                Global.generator.progressText = "Steam is not running.";
                 GlobalContent.GetSound("Error").Play(int.Parse(SaveData.saveValues["SoundEffectVolume"], System.Globalization.CultureInfo.InvariantCulture) / 100f, 0f, 0f);
                 ConsoleOutput.WriteLine("Steam is not running, cannot publish plugin.", Color.Red);
                 publishPlugin = null;
@@ -1507,13 +1515,13 @@ namespace NonsensicalVideoGenerator
             if (param.m_eResult != EResult.k_EResultOK || bIOFailure)
             {
                 ConsoleOutput.WriteLine($"Error creating workshop item: {param.m_eResult}", Color.Red);
-                Global.generatorFactory.progressText = "Error creating workshop item.";
+                Global.generator.progressText = "Error creating workshop item.";
                 GlobalContent.GetSound("Error").Play(int.Parse(SaveData.saveValues["SoundEffectVolume"], System.Globalization.CultureInfo.InvariantCulture) / 100f, 0f, 0f);
                 publishPlugin = null;
                 publishing = false;
                 return;
             }
-            Global.generatorFactory.progressText = "Creating Workshop item...";
+            Global.generator.progressText = "Creating Workshop item...";
         
             string achievement = "ACHIEVEMENT_WORKSHOP_SUBMIT";
             ConsoleOutput.WriteLine("Awarding achievement: "+achievement, Color.LightBlue);
@@ -1530,7 +1538,7 @@ namespace NonsensicalVideoGenerator
             if(handle.m_UGCUpdateHandle == 0)
             {
                 ConsoleOutput.WriteLine($"Error updating workshop item: Invalid handle.", Color.Red);
-                Global.generatorFactory.progressText = "Error updating workshop item.";
+                Global.generator.progressText = "Error updating workshop item.";
                 GlobalContent.GetSound("Error").Play(int.Parse(SaveData.saveValues["SoundEffectVolume"], System.Globalization.CultureInfo.InvariantCulture) / 100f, 0f, 0f);
                 publishPlugin = null;
                 publishing = false;
@@ -1553,7 +1561,7 @@ namespace NonsensicalVideoGenerator
             if(!cont)
             {
                 ConsoleOutput.WriteLine($"Error updating workshop item: Invalid title.", Color.Red);
-                Global.generatorFactory.progressText = "Error updating workshop item.";
+                Global.generator.progressText = "Error updating workshop item.";
                 GlobalContent.GetSound("Error").Play(int.Parse(SaveData.saveValues["SoundEffectVolume"], System.Globalization.CultureInfo.InvariantCulture) / 100f, 0f, 0f);
                 publishPlugin = null;
                 publishing = false;
@@ -1597,7 +1605,7 @@ namespace NonsensicalVideoGenerator
             if(!cont)
             {
                 ConsoleOutput.WriteLine($"Error updating workshop item: Invalid visibility.", Color.Red);
-                Global.generatorFactory.progressText = "Error updating workshop item.";
+                Global.generator.progressText = "Error updating workshop item.";
                 GlobalContent.GetSound("Error").Play(int.Parse(SaveData.saveValues["SoundEffectVolume"], System.Globalization.CultureInfo.InvariantCulture) / 100f, 0f, 0f);
                 publishPlugin = null;
                 publishing = false;
@@ -1626,7 +1634,7 @@ namespace NonsensicalVideoGenerator
             if(!cont)
             {
                 ConsoleOutput.WriteLine($"Error updating workshop item: Invalid content path.", Color.Red);
-                Global.generatorFactory.progressText = "Error updating workshop item.";
+                Global.generator.progressText = "Error updating workshop item.";
                 GlobalContent.GetSound("Error").Play(int.Parse(SaveData.saveValues["SoundEffectVolume"], System.Globalization.CultureInfo.InvariantCulture) / 100f, 0f, 0f);
                 publishPlugin = null;
                 publishing = false;
@@ -1637,7 +1645,7 @@ namespace NonsensicalVideoGenerator
             if(!cont)
             {
                 ConsoleOutput.WriteLine($"Error updating workshop item: Invalid preview path.", Color.Red);
-                Global.generatorFactory.progressText = "Error updating workshop item.";
+                Global.generator.progressText = "Error updating workshop item.";
                 GlobalContent.GetSound("Error").Play(int.Parse(SaveData.saveValues["SoundEffectVolume"], System.Globalization.CultureInfo.InvariantCulture) / 100f, 0f, 0f);
                 publishPlugin = null;
                 publishing = false;
@@ -1690,7 +1698,7 @@ namespace NonsensicalVideoGenerator
             if(!cont)
             {
                 ConsoleOutput.WriteLine($"Error updating workshop item: Invalid tags.", Color.Red);
-                Global.generatorFactory.progressText = "Error updating workshop item.";
+                Global.generator.progressText = "Error updating workshop item.";
                 GlobalContent.GetSound("Error").Play(int.Parse(SaveData.saveValues["SoundEffectVolume"], System.Globalization.CultureInfo.InvariantCulture) / 100f, 0f, 0f);
                 publishPlugin = null;
                 publishing = false;
@@ -1699,7 +1707,7 @@ namespace NonsensicalVideoGenerator
             // Submit the update.
             SteamAPICall_t call = SteamUGC.SubmitItemUpdate(handle, "Updated plugin.");
             updateItemResult.Set(call);
-            Global.generatorFactory.progressText = "Publishing...";
+            Global.generator.progressText = "Publishing...";
         }
         public static void OnWorkshopItemUpdated(SubmitItemUpdateResult_t param, bool bIOFailure)
         {
@@ -1707,14 +1715,14 @@ namespace NonsensicalVideoGenerator
                 return;
             if (param.m_eResult != EResult.k_EResultOK || bIOFailure)
             {
-                Global.generatorFactory.progressText = "Error publishing.";
+                Global.generator.progressText = "Error publishing.";
                 GlobalContent.GetSound("Error").Play(int.Parse(SaveData.saveValues["SoundEffectVolume"], System.Globalization.CultureInfo.InvariantCulture) / 100f, 0f, 0f);
                 ConsoleOutput.WriteLine($"Error updating workshop item: {param.m_eResult}", Color.Red);
                 publishPlugin = null;
                 publishing = false;
                 return;
             }
-            Global.generatorFactory.progressText = "Successfully published.";
+            Global.generator.progressText = "Successfully published.";
             GlobalContent.GetSound("RenderComplete").Play(int.Parse(SaveData.saveValues["SoundEffectVolume"], System.Globalization.CultureInfo.InvariantCulture) / 100f, 0f, 0f);
             ConsoleOutput.WriteLine($"Successfully published plugin {publishPlugin.GetDisplayName()} to the workshop.", Color.Green);
             publishPlugin.submittedId = param.m_nPublishedFileId.ToString();
@@ -1728,7 +1736,8 @@ namespace NonsensicalVideoGenerator
         {
             if(!Global.pluginsLoaded)
                 return 0;
-            return plugins.Count;
+            // Get enabled plugin count.
+            return plugins.FindAll(plugin => plugin.enabled).Count;
         }
     }
 }

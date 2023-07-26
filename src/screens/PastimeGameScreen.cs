@@ -25,7 +25,7 @@ namespace NonsensicalVideoGenerator
         public PastimeGameObstacle(int offset)
         {
             distance = 320 + offset;
-            spacingPlacementY = Global.generatorFactory.globalRandom.Next(spacing*2, height-(spacing*2));
+            spacingPlacementY = Global.generator.globalRandom.Next(spacing*2, height-(spacing*2));
         }
         public bool Update(GameTime gameTime, bool handleInput)
         {
@@ -35,7 +35,7 @@ namespace NonsensicalVideoGenerator
             {
                 point = false;
                 distance = 320;
-                spacingPlacementY = Global.generatorFactory.globalRandom.Next(spacing*2, height-(spacing*2));
+                spacingPlacementY = Global.generator.globalRandom.Next(spacing*2, height-(spacing*2));
             }
             return false;
         }
@@ -357,7 +357,7 @@ namespace NonsensicalVideoGenerator
                                 SaveData.saveValues["GameHighScore"] = highScore.ToString();
                                 SaveData.Save();
                                 // get random high score tease
-                                int rand = Global.generatorFactory.globalRandom.Next(0, highScoreTeases.Count);
+                                int rand = Global.generator.globalRandom.Next(0, highScoreTeases.Count);
                                 ConsoleOutput.WriteLine(highScoreTeases[rand] + " New high score: " + highScore, Color.Cyan);
                             }
                             if(player.points == 50 && !Global.highScore50)
@@ -526,14 +526,14 @@ namespace NonsensicalVideoGenerator
             spriteBatch.DrawString(font, creditRoll[currentCredit], new Vector2(GlobalGraphics.Scale(320) - textSize.X - GlobalGraphics.Scale(9), GlobalGraphics.Scale(8)), Color.White);
             // Draw render progress on right side (pastime)
             /*
-            if(Global.generatorFactory.progressText != "")
+            if(Global.generator.progressText != "")
             {
                 textSize = font.MeasureString(Global.videoTitle);
                 spriteBatch.DrawString(font, Global.videoTitle, new Vector2(GlobalGraphics.Scale(320) - textSize.X - GlobalGraphics.Scale(8), GlobalGraphics.Scale(9)), Color.Black);
                 spriteBatch.DrawString(font, Global.videoTitle, new Vector2(GlobalGraphics.Scale(320) - textSize.X - GlobalGraphics.Scale(9), GlobalGraphics.Scale(8)), Color.White);
-                Vector2 textSize2 = font.MeasureString(Global.generatorFactory.progressText);
-                spriteBatch.DrawString(font, Global.generatorFactory.progressText, new Vector2(GlobalGraphics.Scale(320) - textSize2.X - GlobalGraphics.Scale(8), GlobalGraphics.Scale(9) + textSize.Y), Color.Black);
-                spriteBatch.DrawString(font, Global.generatorFactory.progressText, new Vector2(GlobalGraphics.Scale(320) - textSize2.X - GlobalGraphics.Scale(9), GlobalGraphics.Scale(8) + textSize.Y), Color.White);
+                Vector2 textSize2 = font.MeasureString(Global.generator.progressText);
+                spriteBatch.DrawString(font, Global.generator.progressText, new Vector2(GlobalGraphics.Scale(320) - textSize2.X - GlobalGraphics.Scale(8), GlobalGraphics.Scale(9) + textSize.Y), Color.Black);
+                spriteBatch.DrawString(font, Global.generator.progressText, new Vector2(GlobalGraphics.Scale(320) - textSize2.X - GlobalGraphics.Scale(9), GlobalGraphics.Scale(8) + textSize.Y), Color.White);
             }
             */
             // End offset spritebatch

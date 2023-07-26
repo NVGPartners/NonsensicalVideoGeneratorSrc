@@ -142,22 +142,22 @@ namespace NonsensicalVideoGenerator
                 spriteBatch.Draw(logomask, new Rectangle(GlobalGraphics.Scale(clickOffset.X), GlobalGraphics.Scale(clickOffset.Y + (int)jump), GlobalGraphics.Scale(clickOffset.Width), GlobalGraphics.Scale(clickOffset.Height)), clickColor);
                 spriteBatch.Draw(iconmask, new Rectangle(GlobalGraphics.Scale(clickOffset2.X), GlobalGraphics.Scale(clickOffset2.Y + (int)jump), GlobalGraphics.Scale(clickOffset2.Width), GlobalGraphics.Scale(clickOffset2.Height)), clickColor);
             }
-            spriteBatch.Draw(logo, new Rectangle(GlobalGraphics.Scale(11 + 21 + 1), GlobalGraphics.Scale(10 + 1 + (int)jump), GlobalGraphics.Scale(logo.Width), GlobalGraphics.Scale(logo.Height)), Color.Black);
-            spriteBatch.Draw(logo, new Rectangle(GlobalGraphics.Scale(11 + 21), GlobalGraphics.Scale(10 + (int)jump), GlobalGraphics.Scale(logo.Width), GlobalGraphics.Scale(logo.Height)), Color.White);
-            spriteBatch.Draw(icon, new Rectangle(GlobalGraphics.Scale(11 + 1), GlobalGraphics.Scale(10 + 1 + (int)jump), GlobalGraphics.Scale(icon.Width), GlobalGraphics.Scale(icon.Height)), Color.Black);
-            spriteBatch.Draw(icon, new Rectangle(GlobalGraphics.Scale(11), GlobalGraphics.Scale(10 + (int)jump), GlobalGraphics.Scale(icon.Width), GlobalGraphics.Scale(icon.Height)), Color.White);
+            spriteBatch.Draw(logo, new Rectangle(GlobalGraphics.Scale(10 + 21 + 1), GlobalGraphics.Scale(10 + 1 + (int)jump), GlobalGraphics.Scale(logo.Width), GlobalGraphics.Scale(logo.Height)), Color.Black);
+            spriteBatch.Draw(logo, new Rectangle(GlobalGraphics.Scale(10 + 21), GlobalGraphics.Scale(10 + (int)jump), GlobalGraphics.Scale(logo.Width), GlobalGraphics.Scale(logo.Height)), Color.White);
+            spriteBatch.Draw(icon, new Rectangle(GlobalGraphics.Scale(10 + 1), GlobalGraphics.Scale(11 + 1 + (int)jump), GlobalGraphics.Scale(icon.Width), GlobalGraphics.Scale(icon.Height)), Color.Black);
+            spriteBatch.Draw(icon, new Rectangle(GlobalGraphics.Scale(10), GlobalGraphics.Scale(11 + (int)jump), GlobalGraphics.Scale(icon.Width), GlobalGraphics.Scale(icon.Height)), Color.White);
 
             // Draw rendering progress
-            if(Global.generatorFactory.progressText != "")
+            if(Global.generator.progressText != "")
             {
                 string rendering = Global.videoTitle;
                 // measure to center horizontally (one on top of the other)
                 Vector2 renderingSize = font.MeasureString(rendering);
-                Vector2 progressSize = font.MeasureString(Global.generatorFactory.progressText != "" ? Global.generatorFactory.progressText : (Global.generatorFactory.failureReason != "" ? Global.generatorFactory.failureReason : Global.generatorFactory.progress + "%"));
+                Vector2 progressSize = font.MeasureString(Global.generator.progressText != "" ? Global.generator.progressText : (Global.generator.failureReason != "" ? Global.generator.failureReason : Global.generator.progress + "%"));
                 spriteBatch.DrawString(font, rendering, new Vector2(GlobalGraphics.Scale(320/2) - renderingSize.X/2 + GlobalGraphics.Scale(1), GlobalGraphics.Scale(8 + 1)), Color.Black);
-                spriteBatch.DrawString(font, Global.generatorFactory.progressText, new Vector2(GlobalGraphics.Scale(320/2) - progressSize.X/2 + GlobalGraphics.Scale(1), GlobalGraphics.Scale(8 + 1) + renderingSize.Y), Color.Black);
+                spriteBatch.DrawString(font, Global.generator.progressText, new Vector2(GlobalGraphics.Scale(320/2) - progressSize.X/2 + GlobalGraphics.Scale(1), GlobalGraphics.Scale(8 + 1) + renderingSize.Y), Color.Black);
                 spriteBatch.DrawString(font, rendering, new Vector2(GlobalGraphics.Scale(320/2) - renderingSize.X/2, GlobalGraphics.Scale(8)), Color.White);
-                spriteBatch.DrawString(font, Global.generatorFactory.progressText, new Vector2(GlobalGraphics.Scale(320/2) - progressSize.X/2, GlobalGraphics.Scale(8) + renderingSize.Y), Color.White);
+                spriteBatch.DrawString(font, Global.generator.progressText, new Vector2(GlobalGraphics.Scale(320/2) - progressSize.X/2, GlobalGraphics.Scale(8) + renderingSize.Y), Color.White);
             }
             // End offset spritebatch
             spriteBatch.End();
@@ -198,14 +198,14 @@ namespace NonsensicalVideoGenerator
                     int width = (int)(logo.Width * (1 + growth * (gameTime.TotalGameTime.TotalSeconds - timeClicked) / 0.5));
                     int height = (int)(logo.Height * (1 + growth * (gameTime.TotalGameTime.TotalSeconds - timeClicked) / 0.5));
                     // Offset
-                    clickOffset = new Rectangle((int)(11 + 21 - (width - logo.Width) / 2), (int)(10 - (height - logo.Height) / 2), width, height);
+                    clickOffset = new Rectangle((int)(10 + 21 - (width - logo.Width) / 2), (int)(10 - (height - logo.Height) / 2), width, height);
                     // Increase width/height over time
                     Texture2D icon = GlobalContent.GetTexture("Icon");
                     Vector2 pivot2 = new Vector2(icon.Width / 2, icon.Height / 2);
                     int width2 = (int)(icon.Width * (1 + growth * (gameTime.TotalGameTime.TotalSeconds - timeClicked) / 0.5));
                     int height2 = (int)(icon.Height * (1 + growth * (gameTime.TotalGameTime.TotalSeconds - timeClicked) / 0.5));
                     // Offset
-                    clickOffset2 = new Rectangle((int)(11 - (width2 - icon.Width) / 2), (int)(10 - (height2 - icon.Height) / 2), width2, height2);
+                    clickOffset2 = new Rectangle((int)(10 - (width2 - icon.Width) / 2), (int)(11 - (height2 - icon.Height) / 2), width2, height2);
                     // Apply
                     clickHeaderList[i].clickOffset = clickOffset;
                     clickHeaderList[i].clickOffset2 = clickOffset2;
@@ -245,21 +245,21 @@ namespace NonsensicalVideoGenerator
                 if(MouseInput.MouseState.LeftButton == ButtonState.Pressed && MouseInput.LastMouseState.LeftButton == ButtonState.Released)
                 {
                     Texture2D logo = GlobalContent.GetTexture("Logo");
-                    if(MouseInput.MouseState.X >= GlobalGraphics.Scale(11) && MouseInput.MouseState.X <= GlobalGraphics.Scale(11) + GlobalGraphics.Scale(logo.Width) + GlobalGraphics.Scale(21) && MouseInput.MouseState.Y >= GlobalGraphics.Scale(10) && MouseInput.MouseState.Y <= GlobalGraphics.Scale(10) + GlobalGraphics.Scale(logo.Height))
+                    if(MouseInput.MouseState.X >= GlobalGraphics.Scale(10) && MouseInput.MouseState.X <= GlobalGraphics.Scale(10) + GlobalGraphics.Scale(logo.Width) + GlobalGraphics.Scale(21) && MouseInput.MouseState.Y >= GlobalGraphics.Scale(10) && MouseInput.MouseState.Y <= GlobalGraphics.Scale(10) + GlobalGraphics.Scale(logo.Height))
                     {
                         if(!bool.Parse(SaveData.saveValues["DisableMotion"]))
                         {
                             Texture2D icon = GlobalContent.GetTexture("Icon");
                             Color clickColor = new Color(255, 255, 255, 255);
-                            Rectangle clickOffset = new Rectangle(11 + 21, 10, logo.Width, logo.Height);
-                            Rectangle clickOffset2 = new Rectangle(11, 10, icon.Width, icon.Height);
-                            float growth = Global.generatorFactory.globalRandom.Next(20, 30) / 100f;
+                            Rectangle clickOffset = new Rectangle(10 + 21, 10, logo.Width, logo.Height);
+                            Rectangle clickOffset2 = new Rectangle(10, 11, icon.Width, icon.Height);
+                            float growth = Global.generator.globalRandom.Next(20, 30) / 100f;
                             clickHeaderList.Add(new ClickHeader(clickOffset, clickOffset2, gameTime.TotalGameTime.TotalSeconds, growth, clickColor));
                         }
                         // Roll for jump
                         if(!jumping)
                         {
-                            if(Global.generatorFactory.globalRandom.Next(0, 100) < 10)
+                            if(Global.generator.globalRandom.Next(0, 100) < 10)
                             {
                                 if(!bool.Parse(SaveData.saveValues["DisableMotion"]))
                                 {

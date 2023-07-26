@@ -37,12 +37,10 @@ function StartGeneration(options, pluginSettings, functions)
     -- Apply effect
     if vibratoOrChorus then
         -- Vibrato effect
-        -- Invoke-Command -ScriptBlock {&$ffmpeg -i "$video" -af chorus="0.5:0.9:50|60|40:0.4|0.32|0.3:0.25|0.4|0.3:2|2.3|1.3" -preset veryfast -y "$output"}
-        functions.runFFmpeg("-i \"" .. options.inputVideo .. "\" -af chorus=\"0.5:0.9:50|60|40:0.4|0.32|0.3:0.25|0.4|0.3:2|2.3|1.3\" -preset veryfast -y \"" .. options.outputVideo .. "\"")
+        functions.runFFmpeg("-i \"" .. options.inputVideo .. "\" -af chorus=\"0.7:0.9:55:0.4:0.25:2\" -preset veryfast -y \"" .. options.outputVideo .. "\"")
     else
         -- Chorus effect
-        -- Invoke-Command -ScriptBlock {&$ffmpeg -i "$video" -af vibrato=f=7.0:d=0.5 -preset veryfast -y "$output"}
-        functions.runFFmpeg("-i \"" .. options.inputVideo .. "\" -af vibrato=f=7.0:d=0.5 -preset veryfast -y \"" .. options.outputVideo .. "\"")
+        functions.runFFmpeg("-i \"" .. options.inputVideo .. "\" -af vibrato=f=6.5:d=0.5 -preset veryfast -y \"" .. options.outputVideo .. "\"")
     end
     return true
 end

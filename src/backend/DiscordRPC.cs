@@ -44,9 +44,9 @@ namespace NonsensicalVideoGenerator
         }
         public static void Update()
         {
-            if(Global.generatorFactory.progressText != curstate)
+            if(Global.generator.progressText != curstate)
             {
-                curstate = Global.generatorFactory.progressText;
+                curstate = Global.generator.progressText;
                 UpdatePresence();
             }
             if(curtab != prevtab)

@@ -115,7 +115,7 @@ namespace NonsensicalVideoGenerator
         }
         private void FindMusic()
         {
-            music = Global.generatorFactory.globalRandom.Next(0, GlobalContent.GetSongCount());
+            music = Global.generator.globalRandom.Next(0, GlobalContent.GetSongCount());
             // Make sure music is in range.
             if(music < 0 || music >= GlobalContent.GetSongCount())
             {

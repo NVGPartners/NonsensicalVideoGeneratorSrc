@@ -131,7 +131,7 @@ namespace NonsensicalVideoGenerator
                         FramePlayer.currentAudioTime = 0;
                         FramePlayer.audioPlaying = false;
                         FramePlayer.canPlayBgMusic = true;
-                        Global.generatorFactory.progressText = "Stopped playback.";
+                        Global.generator.progressText = "Stopped playback.";
                         GlobalContent.GetSound("Option").Play(int.Parse(SaveData.saveValues["SoundEffectVolume"], System.Globalization.CultureInfo.InvariantCulture) / 100f, 0f, 0f);
                     }
                     else
@@ -163,7 +163,7 @@ namespace NonsensicalVideoGenerator
                                 FramePlayer.currentAudioTime = 0;
                                 FramePlayer.audioPlaying = false;
                                 FramePlayer.canPlayBgMusic = true;
-                                Global.generatorFactory.progressText = "Stopped playback.";
+                                Global.generator.progressText = "Stopped playback.";
                                 GlobalContent.GetSound("Option").Play(int.Parse(SaveData.saveValues["SoundEffectVolume"], System.Globalization.CultureInfo.InvariantCulture) / 100f, 0f, 0f);
                             }
                             else
@@ -183,7 +183,7 @@ namespace NonsensicalVideoGenerator
                             FramePlayer.currentAudioTime = 0;
                             FramePlayer.audioPlaying = false;
                             FramePlayer.canPlayBgMusic = true;
-                            Global.generatorFactory.progressText = "Stopped playback.";
+                            Global.generator.progressText = "Stopped playback.";
                             FramePlayer.canPlayBgMusic = true;
                         }
                         ProcessStartInfo startInfo = new()

@@ -117,7 +117,7 @@ namespace NonsensicalVideoGenerator
                 {
                     if(worker.CancellationPending || !processing)
                         return;
-                    Global.generatorFactory.progressText = "Loading frame " + i + "/" + curcount + "...";
+                    Global.generator.progressText = "Loading frame " + i + "/" + curcount + "...";
                     FileStream frameFile = File.OpenRead($".\\temp\\extracted\\frames\\{i}.bmp");
 #if MONOGAME
                     frames.Add(Texture2D.FromStream(UserInterface.instance.GraphicsDevice, frameFile));
@@ -146,7 +146,7 @@ namespace NonsensicalVideoGenerator
                 ConsoleOutput.WriteLine(e.Message);
                 Stop();
                 GlobalContent.GetSound("Error").Play(int.Parse(SaveData.saveValues["SoundEffectVolume"], System.Globalization.CultureInfo.InvariantCulture) / 100f, 0f, 0f);
-                Global.generatorFactory.progressText = "Failed to play media.";
+                Global.generator.progressText = "Failed to play media.";
             }
             processing = false;
         }
@@ -160,11 +160,11 @@ namespace NonsensicalVideoGenerator
                 dircount = Directory.GetFiles(".\\temp\\extracted\\frames").Length;
                 if(dircount > 0)
                 {
-                    Global.generatorFactory.progressText = "Extracting frames... (" + dircount + "/" + count + ")";
+                    Global.generator.progressText = "Extracting frames... (" + dircount + "/" + count + ")";
                 }
                 else
                 {
-                    Global.generatorFactory.progressText = "Extracting frames... (0/" + count + ")";
+                    Global.generator.progressText = "Extracting frames... (0/" + count + ")";
                 }
                 System.Threading.Thread.Sleep(100);
             }
@@ -261,7 +261,7 @@ namespace NonsensicalVideoGenerator
 #if MONOGAME
                     ScreenManager.GetScreen<VideoScreen>("Video")?.Hide();
 #endif
-                    Global.generatorFactory.progressText = "Stopped playback.";
+                    Global.generator.progressText = "Stopped playback.";
                 }
             }
             catch(Exception e)
@@ -358,7 +358,7 @@ namespace NonsensicalVideoGenerator
                 canPlayBgMusic = false;
                 audio.Play();
                 audioPlaying = true;
-                Global.generatorFactory.progressText = "Playing media...";
+                Global.generator.progressText = "Playing media...";
             }
             catch(Exception e)
             {
@@ -377,7 +377,7 @@ namespace NonsensicalVideoGenerator
                     if(!audioPlaying && frames.Count == 0)
                     {
                         audio.Play();
-                        Global.generatorFactory.progressText = "Playing media...";
+                        Global.generator.progressText = "Playing media...";
                         FramePlayer.canPlayBgMusic = false;
                         audioPlaying = true;
                     }
@@ -387,7 +387,7 @@ namespace NonsensicalVideoGenerator
                         currentAudioTime = 0;
                         audioPlaying = false;
                         FramePlayer.canPlayBgMusic = true;
-                        Global.generatorFactory.progressText = "Stopped playback.";
+                        Global.generator.progressText = "Stopped playback.";
                     }
                 }
                 playing = false;
@@ -395,7 +395,7 @@ namespace NonsensicalVideoGenerator
             }
             if(Stop())
             {
-                Global.generatorFactory.progressText = "Loading media...";
+                Global.generator.progressText = "Loading media...";
                 currentPath = file.Path;
                 // Extract frames and audio
                 if(!processing)
@@ -450,7 +450,7 @@ namespace NonsensicalVideoGenerator
                             ConsoleOutput.WriteLine($"Failed to play media.");
                             ConsoleOutput.WriteLine(e.Message);
                             GlobalContent.GetSound("Error").Play(int.Parse(SaveData.saveValues["SoundEffectVolume"], System.Globalization.CultureInfo.InvariantCulture) / 100f, 0f, 0f);
-                            Global.generatorFactory.progressText = "Failed to play media.";
+                            Global.generator.progressText = "Failed to play media.";
                         }
                     }
                 }
@@ -458,7 +458,7 @@ namespace NonsensicalVideoGenerator
             else
             {
                 GlobalContent.GetSound("Error").Play(int.Parse(SaveData.saveValues["SoundEffectVolume"], System.Globalization.CultureInfo.InvariantCulture) / 100f, 0f, 0f);
-                Global.generatorFactory.progressText = "Failed to stop playback.";
+                Global.generator.progressText = "Failed to stop playback.";
             }
         }
 #if MONOGAME
@@ -482,7 +482,7 @@ namespace NonsensicalVideoGenerator
             }
             if(frames.Count > 0 && !playing && audio != null && !processing)
             {
-                Global.generatorFactory.progressText = "Playing media...";
+                Global.generator.progressText = "Playing media...";
 #if MONOGAME
                 timeStarted = gameTime.TotalGameTime.TotalSeconds;
 #else

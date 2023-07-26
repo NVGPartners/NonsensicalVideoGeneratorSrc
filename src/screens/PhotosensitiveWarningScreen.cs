@@ -367,7 +367,7 @@ namespace NonsensicalVideoGenerator
                     // tip of the day
                     warningText = new List<string>(tipoftheday);
                     // Get random tip.
-                    string[] tip = tips[Global.generatorFactory.globalRandom.Next(tips.Count)];
+                    string[] tip = tips[Global.generator.globalRandom.Next(tips.Count)];
                     warningText[2] = tip[0];
                     warningText[3] = tip[1];
                     // get stats

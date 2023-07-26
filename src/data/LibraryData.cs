@@ -225,14 +225,14 @@ namespace NonsensicalVideoGenerator
             }
             foreach (string dir in Directory.GetDirectories(path))
                 LoadRecursive(dir, type);
-            if(!Global.generatorFactory.generatorActive)
+            if(!Global.generator.generatorActive)
                 SequentialName();
         }
         public static void Load()
         {
             try
             {
-                if(!Global.generatorFactory.generatorActive)
+                if(!Global.generator.generatorActive)
                     Global.videoTitle = "Render1";
                 libraryFiles.Clear();
                 foreach (LibraryType type in libraryPaths.Keys)
@@ -419,16 +419,27 @@ namespace NonsensicalVideoGenerator
                 }
             }
         }
+        public static List<string> calledMedia = new();
         public static string PickRandom(LibraryType type, Random rnd)
         {
             // Pick a random file from the library.
-            List<LibraryFile> files = libraryFiles.FindAll(x => x.Type == type && x.Path != null && File.Exists(x.Path) && x.Enabled);
+            List<LibraryFile> files = libraryFiles.FindAll(x =>
+                (x.Type == type && x.Path != null && File.Exists(x.Path) && x.Enabled)
+                && (!calledMedia.Contains(x.Path) || int.Parse(SaveData.saveValues["MaxUniqueClips"], System.Globalization.CultureInfo.InvariantCulture) == 0)
+            );
             if (files.Count == 0)
                 return "";
             int index = rnd.Next(files.Count);
             string? path = files[index].Path;
             if(path != null)
+            {
+                // Add to called media
+                if(int.Parse(SaveData.saveValues["MaxUniqueClips"], System.Globalization.CultureInfo.InvariantCulture) > 0)
+                {
+                    calledMedia.Add(path);
+                }
                 return path;
+            }
             return "";
         }
         public static List<LibraryFile> GetFiles(LibraryType type, bool hideDisabled = true)

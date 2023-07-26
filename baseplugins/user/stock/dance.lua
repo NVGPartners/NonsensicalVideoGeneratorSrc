@@ -104,8 +104,8 @@ function PostCommand(commandindex, outputresult, errorresult, options, pluginSet
             -- Invoke-Command -ScriptBlock {&$ffmpeg -i "$temp2" -vf reverse -af areverse -preset veryfast -y "$temp3"}
             functions.runFFmpeg("-i \"" .. temp2 .. "\" -vf reverse -af areverse -preset veryfast -y \"" .. temp3 .. "\"")
         elseif commandindex == 2 then
-            -- Invoke-Command -ScriptBlock {&$ffmpeg -i "$temp3" -i "$temp2" -filter_complex "[0:v][1:v][0:v][1:v][0:v][1:v][0:v][1:v]concat=n=8:v=1[out];[0:a][1:a][0:a][1:a][0:a][1:a][0:a][1:a]concat=n=8:v=0:a=1[out2]" -map "[out]" -map "[out2]" -preset veryfast -shortest -y "$output"}
-            functions.runFFmpeg("-i \"" .. temp3 .. "\" -i \"" .. temp2 .. "\" -filter_complex \"[0:v][1:v][0:v][1:v][0:v][1:v][0:v][1:v]concat=n=8:v=1[out];[0:a][1:a][0:a][1:a][0:a][1:a][0:a][1:a]concat=n=8:v=0:a=1[out2]\" -map \"[out]\" -map \"[out2]\" -preset veryfast -shortest -y \"" .. options.outputVideo .. "\"")
+            -- Invoke-Command -ScriptBlock {&$ffmpeg -i "$temp3" -i "$temp2" -filter_complex "[0:v][1:v][0:v][1:v][0:v]concat=n=5:v=1[out];[0:a][1:a][0:a][1:a][0:a][1:a][0:a][1:a]concat=n=8:v=0:a=1[out2]" -map "[out]" -map "[out2]" -preset veryfast -shortest -y "$output"}
+            functions.runFFmpeg("-i \"" .. temp3 .. "\" -i \"" .. temp2 .. "\" -filter_complex \"[0:v][1:v][0:v][1:v][0:v]concat=n=5:v=1[out];[0:a][1:a][0:a][1:a][0:a][1:a][0:a][1:a]concat=n=8:v=0:a=1[out2]\" -map \"[out]\" -map \"[out2]\" -preset veryfast -shortest -y \"" .. options.outputVideo .. "\"")
         end
     else
         if commandindex == 1 then
@@ -115,8 +115,8 @@ function PostCommand(commandindex, outputresult, errorresult, options, pluginSet
             -- convert mp3 to wav
             functions.runFFmpeg("-i \"" .. randomSound .. "\" -acodec pcm_s16le -ac 2 -ar 44100 \"" .. music .. "\"")
         elseif commandindex == 3 then
-            -- Invoke-Command -ScriptBlock {&$ffmpeg -i "$temp3" -i "$temp2" -ss $seek -i "$randomSound" -filter_complex "[0:v][1:v][0:v][1:v][0:v][1:v][0:v][1:v]concat=n=8:v=1[out]" -map "[out]" -map 2:a -preset veryfast -shortest -preset veryfast -y "$output"}
-            functions.runFFmpeg("-i \"" .. temp3 .. "\" -i \"" .. temp2 .. "\" -ss " .. tostring(seek) .. " -i \"" .. music .. "\" -filter_complex \"[0:v][1:v][0:v][1:v][0:v][1:v][0:v][1:v]concat=n=8:v=1[out]\" -map \"[out]\" -map 2:a -preset veryfast -shortest -preset veryfast -y \"" .. options.outputVideo .. "\"")
+            -- Invoke-Command -ScriptBlock {&$ffmpeg -i "$temp3" -i "$temp2" -ss $seek -i "$randomSound" -filter_complex "[0:v][1:v][0:v][1:v][0:v]concat=n=5:v=1[out]" -map "[out]" -map 2:a -preset veryfast -shortest -preset veryfast -y "$output"}
+            functions.runFFmpeg("-i \"" .. temp3 .. "\" -i \"" .. temp2 .. "\" -ss " .. tostring(seek) .. " -i \"" .. music .. "\" -filter_complex \"[0:v][1:v][0:v][1:v][0:v]concat=n=5:v=1[out]\" -map \"[out]\" -map 2:a -preset veryfast -shortest -preset veryfast -y \"" .. options.outputVideo .. "\"")
         end
     end
 end

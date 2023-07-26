@@ -25,7 +25,7 @@ namespace NonsensicalVideoGenerator
                 if(controllerAdvanced.Update(gameTime, handleInput))
                     return true;
             }
-            else if(Global.generatorFactory.generatorActive)
+            else if(Global.generator.generatorActive)
             {
                 if(controllerRendering.Update(gameTime, handleInput))
                     return true;
@@ -49,7 +49,7 @@ namespace NonsensicalVideoGenerator
                 spriteBatch.Draw(GlobalContent.GetTexture("Pixel"), new Rectangle(GlobalGraphics.Scale(305-1), GlobalGraphics.Scale(58), GlobalGraphics.Scale(1), GlobalGraphics.Scale(178)), new Color(0, 0, 0, 96));
                 controllerAdvanced.Draw(gameTime, spriteBatch);
             }
-            else if(Global.generatorFactory.generatorActive)
+            else if(Global.generator.generatorActive)
             {
                 spriteBatch.Draw(GlobalContent.GetTexture("Pixel"), new Rectangle(GlobalGraphics.Scale(137), GlobalGraphics.Scale(56), GlobalGraphics.Scale(167-1), GlobalGraphics.Scale(180)), new Color(0, 0, 0, 96));
                 spriteBatch.Draw(GlobalContent.GetTexture("Pixel"), new Rectangle(GlobalGraphics.Scale(136), GlobalGraphics.Scale(57), GlobalGraphics.Scale(1), GlobalGraphics.Scale(179)), new Color(0, 0, 0, 96));
@@ -77,7 +77,7 @@ namespace NonsensicalVideoGenerator
                 {
                     case 2: // left click
                         GlobalContent.GetSound("Select").Play(int.Parse(SaveData.saveValues["SoundEffectVolume"], System.Globalization.CultureInfo.InvariantCulture) / 100f, 0f, 0f);
-                        Global.generatorFactory.CancelGeneration(true);
+                        Global.generator.CancelGeneration(true);
                         return true;
                 }
                 return false;
@@ -87,7 +87,7 @@ namespace NonsensicalVideoGenerator
                 {
                     case 2: // left click
                         GlobalContent.GetSound("Select").Play(int.Parse(SaveData.saveValues["SoundEffectVolume"], System.Globalization.CultureInfo.InvariantCulture) / 100f, 0f, 0f);
-                        Global.generatorFactory.CancelGeneration(true, true);
+                        Global.generator.CancelGeneration(true, true);
                         return true;
                 }
                 return false;
@@ -102,6 +102,16 @@ namespace NonsensicalVideoGenerator
                         GlobalContent.GetSound("Back").Play(int.Parse(SaveData.saveValues["SoundEffectVolume"], System.Globalization.CultureInfo.InvariantCulture) / 100f, 0f, 0f);
                         return true;
                 }
+                return false;
+            }));                  
+            controllerAdvanced.Add("MaxUniqueClips", new TextEntry("Max Unique Media", "The max times a unique media file can be used.", SaveData.saveValues["MaxUniqueClips"], new Vector2(139, 60+19*7), 24, 3, 1, (int i) => {
+                int oldValue = int.Parse(SaveData.saveValues["MaxUniqueClips"], System.Globalization.CultureInfo.InvariantCulture);
+                // Range: 0-100
+                if(int.Parse(controllerAdvanced.interactables["MaxUniqueClips"].Tooltip, System.Globalization.CultureInfo.InvariantCulture) < 0)
+                    controllerAdvanced.interactables["MaxUniqueClips"].Tooltip = "0";
+                SaveData.saveValues["MaxUniqueClips"] = controllerAdvanced.interactables["MaxUniqueClips"].Tooltip;
+                if(oldValue != int.Parse(SaveData.saveValues["MaxUniqueClips"], System.Globalization.CultureInfo.InvariantCulture))
+                    SaveData.Save();
                 return false;
             }));
             controllerAdvanced.Add("PlayOverlayInFull", new Switch("Overlays Play in Full", "Play overlays at their full length.", new Vector2(139, 60+19*6), (int i) => {
@@ -225,7 +235,7 @@ namespace NonsensicalVideoGenerator
                             return true;
                         }
                         GlobalContent.GetSound("Select").Play(int.Parse(SaveData.saveValues["SoundEffectVolume"], System.Globalization.CultureInfo.InvariantCulture) / 100f, 0f, 0f);
-                        Global.generatorFactory.StartGeneration((sender, e) => {
+                        Global.generator.StartGeneration((sender, e) => {
                             if(e.ProgressPercentage == 100)
                             {
                                 try
@@ -303,8 +313,10 @@ namespace NonsensicalVideoGenerator
                 string oldValue = SaveData.saveValues["MaxClipCount"];
                 if(int.Parse(controller.interactables["ClipCount"].Tooltip, System.Globalization.CultureInfo.InvariantCulture) < 0)
                     controller.interactables["ClipCount"].Tooltip = "0";
+                /*
                 if(int.Parse(controller.interactables["ClipCount"].Tooltip, System.Globalization.CultureInfo.InvariantCulture) > 100)
                     controller.interactables["ClipCount"].Tooltip = "100";
+                */
                 SaveData.saveValues["MaxClipCount"] = controller.interactables["ClipCount"].Tooltip;
                 if(oldValue != SaveData.saveValues["MaxClipCount"])
                     SaveData.Save();

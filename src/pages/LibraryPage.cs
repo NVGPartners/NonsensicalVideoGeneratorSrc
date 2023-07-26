@@ -128,12 +128,12 @@ namespace NonsensicalVideoGenerator
             if(success)
             {
                 GlobalContent.GetSound("RenderComplete").Play(int.Parse(SaveData.saveValues["SoundEffectVolume"], System.Globalization.CultureInfo.InvariantCulture) / 100f, 0f, 0f);
-                Global.generatorFactory.progressText = "Downloaded clip.";
+                Global.generator.progressText = "Downloaded clip.";
             }
             else
             {
                 GlobalContent.GetSound("Error").Play(int.Parse(SaveData.saveValues["SoundEffectVolume"], System.Globalization.CultureInfo.InvariantCulture) / 100f, 0f, 0f);
-                Global.generatorFactory.progressText = "Failed to download clip.";
+                Global.generator.progressText = "Failed to download clip.";
             }
         }
         public void Draw(GameTime gameTime, SpriteBatch spriteBatch)
@@ -469,7 +469,7 @@ namespace NonsensicalVideoGenerator
                     selectedFlags &= ~4;
                     if(libraryFileCache.Keys.Contains(currentLibraryType))
                     {
-                        Global.generatorFactory.progressText = "Downloading...";
+                        Global.generator.progressText = "Downloading...";
                         downloading = true;
                         string clipboard = Clipboard.GetText();
                         // Remove invalid characters
@@ -479,7 +479,7 @@ namespace NonsensicalVideoGenerator
                         if (!LibraryData.DownloadClip(clipboard.Split('\n'), currentLibraryType))
                         {
                             downloading = false;
-                            Global.generatorFactory.progressText = "Failed to download media.";
+                            Global.generator.progressText = "Failed to download media.";
                             GlobalContent.GetSound("Error").Play(int.Parse(SaveData.saveValues["SoundEffectVolume"], System.Globalization.CultureInfo.InvariantCulture) / 100f, 0f, 0f);
                         }
                     }
