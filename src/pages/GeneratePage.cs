@@ -17,39 +17,39 @@ namespace NonsensicalVideoGenerator
         private readonly InteractableController controller = new();
         private readonly InteractableController controllerAdvanced = new();
         private readonly InteractableController controllerRendering = new();
-        private bool advanced = false;
+        private readonly InteractableController controllerPage3 = new();
+        private int page = 0;
         public bool Update(GameTime gameTime, bool handleInput)
         {
-            if(advanced)
-            {
-                if(controllerAdvanced.Update(gameTime, handleInput))
-                    return true;
-            }
-            else if(Global.generator.generatorActive)
+            if(Global.generator.generatorActive)
             {
                 if(controllerRendering.Update(gameTime, handleInput))
                     return true;
             }
             else
             {
-                if(controller.Update(gameTime, handleInput))
-                    return true;
+                switch(page)
+                {
+                    case 0:
+                        if(controller.Update(gameTime, handleInput))
+                            return true;
+                        break;
+                    case 1:
+                        if(controllerAdvanced.Update(gameTime, handleInput))
+                            return true;
+                        break;
+                    case 2:
+                        if(controllerPage3.Update(gameTime, handleInput))
+                            return true;
+                        break;
+                }
             }
             return false;
         }
         public void Draw(GameTime gameTime, SpriteBatch spriteBatch)
         {
             // Interactable
-            if(advanced)
-            {
-                spriteBatch.Draw(GlobalContent.GetTexture("Pixel"), new Rectangle(GlobalGraphics.Scale(137), GlobalGraphics.Scale(56), GlobalGraphics.Scale(167-1), GlobalGraphics.Scale(180)), new Color(0, 0, 0, 96));
-                spriteBatch.Draw(GlobalContent.GetTexture("Pixel"), new Rectangle(GlobalGraphics.Scale(136), GlobalGraphics.Scale(57), GlobalGraphics.Scale(1), GlobalGraphics.Scale(179)), new Color(0, 0, 0, 96));
-                spriteBatch.Draw(GlobalContent.GetTexture("Pixel"), new Rectangle(GlobalGraphics.Scale(304-1), GlobalGraphics.Scale(57), GlobalGraphics.Scale(1), GlobalGraphics.Scale(179)), new Color(0, 0, 0, 96));
-                spriteBatch.Draw(GlobalContent.GetTexture("Pixel"), new Rectangle(GlobalGraphics.Scale(135), GlobalGraphics.Scale(58), GlobalGraphics.Scale(1), GlobalGraphics.Scale(178)), new Color(0, 0, 0, 96));
-                spriteBatch.Draw(GlobalContent.GetTexture("Pixel"), new Rectangle(GlobalGraphics.Scale(305-1), GlobalGraphics.Scale(58), GlobalGraphics.Scale(1), GlobalGraphics.Scale(178)), new Color(0, 0, 0, 96));
-                controllerAdvanced.Draw(gameTime, spriteBatch);
-            }
-            else if(Global.generator.generatorActive)
+            if(Global.generator.generatorActive)
             {
                 spriteBatch.Draw(GlobalContent.GetTexture("Pixel"), new Rectangle(GlobalGraphics.Scale(137), GlobalGraphics.Scale(56), GlobalGraphics.Scale(167-1), GlobalGraphics.Scale(180)), new Color(0, 0, 0, 96));
                 spriteBatch.Draw(GlobalContent.GetTexture("Pixel"), new Rectangle(GlobalGraphics.Scale(136), GlobalGraphics.Scale(57), GlobalGraphics.Scale(1), GlobalGraphics.Scale(179)), new Color(0, 0, 0, 96));
@@ -66,11 +66,82 @@ namespace NonsensicalVideoGenerator
             }
             else
             {
-                controller.Draw(gameTime, spriteBatch);
+                if(page > 0)
+                {
+                    spriteBatch.Draw(GlobalContent.GetTexture("Pixel"), new Rectangle(GlobalGraphics.Scale(137), GlobalGraphics.Scale(56), GlobalGraphics.Scale(167-1), GlobalGraphics.Scale(180)), new Color(0, 0, 0, 96));
+                    spriteBatch.Draw(GlobalContent.GetTexture("Pixel"), new Rectangle(GlobalGraphics.Scale(136), GlobalGraphics.Scale(57), GlobalGraphics.Scale(1), GlobalGraphics.Scale(179)), new Color(0, 0, 0, 96));
+                    spriteBatch.Draw(GlobalContent.GetTexture("Pixel"), new Rectangle(GlobalGraphics.Scale(304-1), GlobalGraphics.Scale(57), GlobalGraphics.Scale(1), GlobalGraphics.Scale(179)), new Color(0, 0, 0, 96));
+                    spriteBatch.Draw(GlobalContent.GetTexture("Pixel"), new Rectangle(GlobalGraphics.Scale(135), GlobalGraphics.Scale(58), GlobalGraphics.Scale(1), GlobalGraphics.Scale(178)), new Color(0, 0, 0, 96));
+                    spriteBatch.Draw(GlobalContent.GetTexture("Pixel"), new Rectangle(GlobalGraphics.Scale(305-1), GlobalGraphics.Scale(58), GlobalGraphics.Scale(1), GlobalGraphics.Scale(178)), new Color(0, 0, 0, 96));
+                }
+                switch(page)
+                {
+                    case 0:
+                        controller.Draw(gameTime, spriteBatch);
+                        break;
+                    case 1:
+                        controllerAdvanced.Draw(gameTime, spriteBatch);
+                        break;
+                    case 2:
+                        controllerPage3.Draw(gameTime, spriteBatch);
+                        break;
+                }
             }
         }
         public void LoadContent(ContentManager contentManager, GraphicsDevice graphicsDevice)
         {
+            // PAGE 3
+            controllerPage3.Add("DisableClipsAfterMaxUniqueClips", new Switch("Disable Clips After Max Reached", "Disable clips after they reach the max unique clip count.", new Vector2(139, 60+19*2), (int i) => {
+                bool switchState = (i & 256) != 0;
+                if((i & 2) != 0)
+                {
+                    string oldValue = SaveData.saveValues["DisableClipsAfterMaxUniqueClips"];
+                    SaveData.saveValues["DisableClipsAfterMaxUniqueClips"] = switchState.ToString().ToLower();
+                    if(oldValue != SaveData.saveValues["DisableClipsAfterMaxUniqueClips"])
+                    {
+                        SaveData.saveValues["DeleteClipsAfterMaxUniqueClips"] = "false";
+                        (controllerPage3.interactables["DeleteClipsAfterMaxUniqueClips"] as Switch).SwitchState = false;
+                        SaveData.Save();
+                    }
+                }
+                return switchState;
+            }, SaveData.saveValues["DisableClipsAfterMaxUniqueClips"] == "true"));
+            controllerPage3.Add("DeleteClipsAfterMaxUniqueClips", new Switch("Delete Clips After Max Reached", "Delete clips after they reach the max unique clip count.", new Vector2(139, 60+19), (int i) => {
+                bool switchState = (i & 256) != 0;
+                if((i & 2) != 0)
+                {
+                    string oldValue = SaveData.saveValues["DeleteClipsAfterMaxUniqueClips"];
+                    SaveData.saveValues["DeleteClipsAfterMaxUniqueClips"] = switchState.ToString().ToLower();
+                    if(oldValue != SaveData.saveValues["DeleteClipsAfterMaxUniqueClips"])
+                    {
+                        SaveData.saveValues["DisableClipsAfterMaxUniqueClips"] = "false";
+                        (controllerPage3.interactables["DisableClipsAfterMaxUniqueClips"] as Switch).SwitchState = false;
+                        SaveData.Save();
+                    }
+                }
+                return switchState;
+            }, SaveData.saveValues["DeleteClipsAfterMaxUniqueClips"] == "true"));
+            controllerPage3.Add("MaxUniqueClips", new TextEntry("Max Unique Media", "The max times a unique media file can be used.", SaveData.saveValues["MaxUniqueClips"], new Vector2(139, 60), 24, 3, 1, (int i) => {
+                int oldValue = int.Parse(SaveData.saveValues["MaxUniqueClips"], System.Globalization.CultureInfo.InvariantCulture);
+                // Range: 0-100
+                if(int.Parse(controllerPage3.interactables["MaxUniqueClips"].Tooltip, System.Globalization.CultureInfo.InvariantCulture) < 0)
+                    controllerPage3.interactables["MaxUniqueClips"].Tooltip = "0";
+                SaveData.saveValues["MaxUniqueClips"] = controllerPage3.interactables["MaxUniqueClips"].Tooltip;
+                if(oldValue != int.Parse(SaveData.saveValues["MaxUniqueClips"], System.Globalization.CultureInfo.InvariantCulture))
+                    SaveData.Save();
+                return false;
+            }));
+            controllerPage3.Add("Page3Label", new Label("Page 3", new Vector2(144, 64+19*8)));
+            controllerPage3.Add("PrevPage", new Button("Next Page", "Next page of options.", new Vector2(239+36, 60+10+19*8), (int i) => {
+                switch(i)
+                {
+                    case 2: // left click
+                        page = 0;
+                        GlobalContent.GetSound("Back").Play(int.Parse(SaveData.saveValues["SoundEffectVolume"], System.Globalization.CultureInfo.InvariantCulture) / 100f, 0f, 0f);
+                        return true;
+                }
+                return false;
+            }));                  
             // RENDERING MODE
             controllerRendering.Add("Cancel", new Button("Cancel", "Stop rendering.", new Vector2(119+36, 60+10+19*8), (int i) => {
                 switch(i)
@@ -93,25 +164,15 @@ namespace NonsensicalVideoGenerator
                 return false;
             }));
             // ADVANCED MODE
-            controllerAdvanced.Add("AdvancedLabel", new Label("Advanced Options", new Vector2(144, 64+19*8)));
+            controllerAdvanced.Add("AdvancedLabel", new Label("Page 2", new Vector2(144, 64+19*8)));
             controllerAdvanced.Add("BackToRegularOptions", new Button("Next Page", "Next page of options.", new Vector2(239+36, 60+10+19*8), (int i) => {
                 switch(i)
                 {
                     case 2: // left click
-                        advanced = false;
-                        GlobalContent.GetSound("Back").Play(int.Parse(SaveData.saveValues["SoundEffectVolume"], System.Globalization.CultureInfo.InvariantCulture) / 100f, 0f, 0f);
+                        page++;
+                        GlobalContent.GetSound("Select").Play(int.Parse(SaveData.saveValues["SoundEffectVolume"], System.Globalization.CultureInfo.InvariantCulture) / 100f, 0f, 0f);
                         return true;
                 }
-                return false;
-            }));                  
-            controllerAdvanced.Add("MaxUniqueClips", new TextEntry("Max Unique Media", "The max times a unique media file can be used.", SaveData.saveValues["MaxUniqueClips"], new Vector2(139, 60+19*7), 24, 3, 1, (int i) => {
-                int oldValue = int.Parse(SaveData.saveValues["MaxUniqueClips"], System.Globalization.CultureInfo.InvariantCulture);
-                // Range: 0-100
-                if(int.Parse(controllerAdvanced.interactables["MaxUniqueClips"].Tooltip, System.Globalization.CultureInfo.InvariantCulture) < 0)
-                    controllerAdvanced.interactables["MaxUniqueClips"].Tooltip = "0";
-                SaveData.saveValues["MaxUniqueClips"] = controllerAdvanced.interactables["MaxUniqueClips"].Tooltip;
-                if(oldValue != int.Parse(SaveData.saveValues["MaxUniqueClips"], System.Globalization.CultureInfo.InvariantCulture))
-                    SaveData.Save();
                 return false;
             }));
             controllerAdvanced.Add("PlayOverlayInFull", new Switch("Overlays Play in Full", "Play overlays at their full length.", new Vector2(139, 60+19*6), (int i) => {
@@ -219,7 +280,7 @@ namespace NonsensicalVideoGenerator
                 switch(i)
                 {
                     case 2: // left click
-                        advanced = true;
+                        page++;
                         GlobalContent.GetSound("Select").Play(int.Parse(SaveData.saveValues["SoundEffectVolume"], System.Globalization.CultureInfo.InvariantCulture) / 100f, 0f, 0f);
                         return true;
                 }
@@ -360,6 +421,7 @@ namespace NonsensicalVideoGenerator
             controller.LoadContent(contentManager, graphicsDevice);
             controllerAdvanced.LoadContent(contentManager, graphicsDevice);
             controllerRendering.LoadContent(contentManager, graphicsDevice);
+            controllerPage3.LoadContent(contentManager, graphicsDevice);
         }
     }
 }

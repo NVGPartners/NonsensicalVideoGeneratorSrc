@@ -464,7 +464,7 @@ namespace NonsensicalVideoGenerator
                             Clip thisClip = clips[i];
                             if(!thisClip.rolledForTransition || bool.Parse(SaveData.saveValues["TransitionEffects"]))
                             {
-                                int numberOfPlugins = PluginHandler.GetPluginCount();
+                                int numberOfPlugins = PluginHandler.GetPluginCount(true);
                                 if(numberOfPlugins > 0)
                                 {
                                     // Roll for effect
@@ -638,6 +638,18 @@ namespace NonsensicalVideoGenerator
         }
         public void StartGeneration(ProgressChangedEventHandler progressReporter, RunWorkerCompletedEventHandler completedReporter)
         {
+            // Delete all paths in calledMedia with LibraryData.Unload()
+            if(bool.Parse(SaveData.saveValues["DeleteClipsAfterMaxUniqueClips"])
+                || bool.Parse(SaveData.saveValues["DisableClipsAfterMaxUniqueClips"]))
+            {
+                for (int i = 0; i < LibraryData.calledMedia.Count; i++)
+                {
+                    if(bool.Parse(SaveData.saveValues["DeleteClipsAfterMaxUniqueClips"]))
+                        LibraryData.Unload(LibraryData.calledMedia[i]);
+                    else
+                        LibraryData.SetEnabled(LibraryData.calledMedia[i], false);
+                }
+            }
             LibraryData.calledMedia.Clear();
             Global.usedWorkshopPlugin = false;
             Global.rolledForOverlay = false;
@@ -1099,20 +1111,28 @@ namespace NonsensicalVideoGenerator
             string concat = "";
             for (int i = 0; i < clips2.Count; i++)
             {
-                concat += "file '" + clips2[i].name + "'\n";
+                concat += "-i \"" + Path.Combine(temporaryDirectory, clips2[i].name) + "\" ";
             }
-            File.WriteAllText(Path.Combine(temporaryDirectory, "concat.txt"), concat);
+            // filter_complex
+            concat += "-filter_complex \"";
+            for (int i = 0; i < clips2.Count; i++)
+            {
+                concat += "[" + i + ":v:0][" + i + ":a:0]";
+            }
+            concat += "concat=n=" + clips2.Count + ":v=1:a=1[outv][outa];[outv]scale=" + SaveData.saveValues["VideoWidth"] + "x" + SaveData.saveValues["VideoHeight"] + ",setsar=1:1,fps=fps=30[outv]\""
+                    + " -map \"[outv]\""
+                    + " -map \"[outa]\""
+                    + " -c:v libx264"
+                    + " -crf 18"
+                    + " -preset veryfast"
+                    + " -ar 32000 -shortest -avoid_negative_ts make_zero -fflags +genpts"
+                    + " -y";
             // Run ffmpeg to concatenate them
             System.Diagnostics.Process process = new System.Diagnostics.Process();
             System.Diagnostics.ProcessStartInfo startInfo = new System.Diagnostics.ProcessStartInfo();
             startInfo.WindowStyle = System.Diagnostics.ProcessWindowStyle.Hidden;
             startInfo.FileName = Global.useSystemFFmpeg ? "ffmpeg" : @".\ffmpeg.exe";
-            startInfo.Arguments = "-f concat"
-                    + " -safe 0"
-                    + " -i \"" + Path.Combine(temporaryDirectory, "concat.txt") + "\""
-                    + " -c copy"
-                    + " -y"
-                    + " \"" + Path.Combine(temporaryDirectory, "iteration" + iteration + ".mp4") + "\"";
+            startInfo.Arguments = concat + " \"" + Path.Combine(temporaryDirectory, "iteration" + iteration + ".mp4") + "\"";
             startInfo.UseShellExecute = false;
             startInfo.RedirectStandardError = true;
             startInfo.WorkingDirectory = Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location);
@@ -1144,7 +1164,7 @@ namespace NonsensicalVideoGenerator
                 Global.generator.progressText = "Concatenating iterations...";
                 // Create a list of clips to concatenate
                 List<Clip> clips3 = new List<Clip>();
-                for (int i = 0; i < iteration + 1; i++)
+                for (int i = 0; i <= iteration; i++)
                 {
                     clips3.Add(new Clip("iteration" + i + ".mp4"));
                 }
@@ -1152,20 +1172,28 @@ namespace NonsensicalVideoGenerator
                 string concat2 = "";
                 for (int i = 0; i < clips3.Count; i++)
                 {
-                    concat2 += "file '" + clips3[i].name + "'\n";
+                    concat2 += "-i \"" + Path.Combine(temporaryDirectory, clips3[i].name) + "\" ";
                 }
-                File.WriteAllText(Path.Combine(temporaryDirectory, "concat.txt"), concat2);
+                // filter_complex
+                concat2 += "-filter_complex \"";
+                for (int i = 0; i < clips3.Count; i++)
+                {
+                    concat2 += "[" + i + ":v:0][" + i + ":a:0]";
+                }
+                concat2 += "concat=n=" + clips3.Count + ":v=1:a=1[outv][outa];[outv]scale=" + SaveData.saveValues["VideoWidth"] + "x" + SaveData.saveValues["VideoHeight"] + ",setsar=1:1,fps=fps=30[outv]\""
+                        + " -map \"[outv]\""
+                        + " -map \"[outa]\""
+                        + " -c:v libx264"
+                        + " -crf 18"
+                        + " -preset veryfast"
+                        + " -ar 32000 -shortest -avoid_negative_ts make_zero -fflags +genpts"
+                        + " -y";
                 // Run ffmpeg to concatenate them
                 System.Diagnostics.Process process2 = new System.Diagnostics.Process();
                 System.Diagnostics.ProcessStartInfo startInfo2 = new System.Diagnostics.ProcessStartInfo();
                 startInfo2.WindowStyle = System.Diagnostics.ProcessWindowStyle.Hidden;
                 startInfo2.FileName = Global.useSystemFFmpeg ? "ffmpeg" : @".\ffmpeg.exe";
-                startInfo2.Arguments = "-f concat"
-                        + " -safe 0"
-                        + " -i \"" + Path.Combine(temporaryDirectory, "concat.txt") + "\""
-                        + " -c copy"
-                        + " -y"
-                        + " \"" + output + "\"";
+                startInfo2.Arguments = concat2 + " \"" + output + "\"";
                 startInfo2.UseShellExecute = false;
                 startInfo2.RedirectStandardError = true;
                 startInfo2.WorkingDirectory = Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location);
@@ -1179,6 +1207,19 @@ namespace NonsensicalVideoGenerator
                 process2.Start();
                 process2.BeginErrorReadLine();
                 process2.WaitForExit();
+                // Delete all paths in calledMedia with LibraryData.Unload()
+                if(bool.Parse(SaveData.saveValues["DeleteClipsAfterMaxUniqueClips"])
+                    || bool.Parse(SaveData.saveValues["DisableClipsAfterMaxUniqueClips"]))
+                {
+                    for (int i = 0; i < LibraryData.calledMedia.Count; i++)
+                    {
+                        if(bool.Parse(SaveData.saveValues["DeleteClipsAfterMaxUniqueClips"]))
+                            LibraryData.Unload(LibraryData.calledMedia[i]);
+                        else
+                            LibraryData.SetEnabled(LibraryData.calledMedia[i], false);
+                    }
+                }
+                LibraryData.calledMedia.Clear();
             }
         }
         public static void OverlayVideo(string video, string overlay)

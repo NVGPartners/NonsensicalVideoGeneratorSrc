@@ -1732,12 +1732,19 @@ namespace NonsensicalVideoGenerator
             publishPlugin = null;
             publishing = false;
         }
-        public static int GetPluginCount()
+        public static int GetPluginCount(bool enabledOnly = false)
         {
             if(!Global.pluginsLoaded)
                 return 0;
             // Get enabled plugin count.
-            return plugins.FindAll(plugin => plugin.enabled).Count;
+            if(enabledOnly)
+            {
+                return plugins.FindAll(plugin => plugin.enabled).Count;
+            }
+            else
+            {
+                return plugins.Count;
+            }
         }
     }
 }

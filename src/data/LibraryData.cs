@@ -339,6 +339,11 @@ namespace NonsensicalVideoGenerator
         }
         public static void Unload(LibraryFile file)
         {
+            if(file.Path.Contains("defaultoutro.mp4"))
+            {
+                ConsoleOutput.WriteLine("Cannot unload default outro.", Color.Red);
+                return;
+            }
             // Delete the library file.
             if(file.Path == null)
             {
@@ -419,14 +424,32 @@ namespace NonsensicalVideoGenerator
                 }
             }
         }
-        public static List<string> calledMedia = new();
+        public static List<LibraryFile> calledMedia = new();
         public static string PickRandom(LibraryType type, Random rnd)
         {
             // Pick a random file from the library.
             List<LibraryFile> files = libraryFiles.FindAll(x =>
-                (x.Type == type && x.Path != null && File.Exists(x.Path) && x.Enabled)
-                && (!calledMedia.Contains(x.Path) || int.Parse(SaveData.saveValues["MaxUniqueClips"], System.Globalization.CultureInfo.InvariantCulture) == 0)
-            );
+            {
+                if (x.Type == type && x.Path != null && File.Exists(x.Path) && x.Enabled)
+                {
+                    int max = int.Parse(SaveData.saveValues["MaxUniqueClips"], System.Globalization.CultureInfo.InvariantCulture);
+                    // Check if it's already been called.
+                    if (max > 0 && calledMedia.Contains(x))
+                    {
+                        // How many instances of this clip are there?
+                        int count = 0;
+                        foreach (LibraryFile path in calledMedia)
+                        {
+                            if (path == x)
+                                count++;
+                        }
+                        if (count >= max)
+                            return false;
+                    }
+                    return true;
+                }
+                return false;
+            });
             if (files.Count == 0)
                 return "";
             int index = rnd.Next(files.Count);
@@ -436,7 +459,7 @@ namespace NonsensicalVideoGenerator
                 // Add to called media
                 if(int.Parse(SaveData.saveValues["MaxUniqueClips"], System.Globalization.CultureInfo.InvariantCulture) > 0)
                 {
-                    calledMedia.Add(path);
+                    calledMedia.Add(files[index]);
                 }
                 return path;
             }
@@ -601,7 +624,7 @@ namespace NonsensicalVideoGenerator
             foreach(string clipUrl in clipUrls)
             {
                 // Download a clip from a URL and add it to the library.
-                string filename = Path.GetFileName(clipUrl);
+                string filename = Path.GetFileName(clipUrl).Replace(" ", "");
                 string path = Path.Combine(libraryRootPath, libraryPaths[key], filename);
                 // Does it end in a file extension?
                 if (!filename.Contains("."))
