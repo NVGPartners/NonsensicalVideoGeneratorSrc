@@ -32,7 +32,7 @@
             "type": "process",
             "args": [
                 "build",
-                "${workspaceFolder}\\DesktopGL.csproj",
+                "${workspaceFolder}\\NonsensicalVideoGenerator.csproj",
                 "/property:GenerateFullPaths=true",
                 "/consoleloggerparameters:NoSummary",
                 "/p:Platform=x64",
@@ -61,7 +61,7 @@
             "type": "process",
             "args": [
                 "build",
-                "${workspaceFolder}\\DesktopGL.csproj",
+                "${workspaceFolder}\\NonsensicalVideoGenerator.csproj",
                 "/property:GenerateFullPaths=true",
                 "/consoleloggerparameters:NoSummary",
                 "/p:Configuration=Release",
@@ -107,7 +107,7 @@
             "type": "process",
             "args": [
                 "restore",
-                "${workspaceFolder}\\DesktopGL.csproj",
+                "${workspaceFolder}\\NonsensicalVideoGenerator.csproj",
                 "/property:GenerateFullPaths=true",
                 "/consoleloggerparameters:NoSummary",
                 "/p:Platform=x64",
@@ -133,7 +133,7 @@
             "type": "process",
             "args": [
                 "clean",
-                "${workspaceFolder}\\DesktopGL.csproj",
+                "${workspaceFolder}\\NonsensicalVideoGenerator.csproj",
                 "/property:GenerateFullPaths=true",
                 "/consoleloggerparameters:NoSummary",
                 "/p:Platform=x64",

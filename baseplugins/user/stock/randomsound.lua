@@ -45,12 +45,16 @@ end
 
 function PostCommand(commandindex, outputresult, errorresult, options, pluginSettings, functions)
     if commandindex == 1 then
+        -- ffprobe get length of soundEffect
+        functions.runFFprobe("-v error -show_entries format=duration -of default=noprint_wrappers=1:nokey=1 " .. soundEffect)
+    elseif commandindex == 2 then
+        local length = tonumber(outputresult)
         if muteOriginalAudio then
-            -- Override original audio with sfx (shortest)
-            functions.runFFmpeg("-i " .. options.inputVideo .. " -i " .. soundEffect .. " -filter_complex \"[0:a]aformat=sample_fmts=fltp:sample_rates=44100:channel_layouts=stereo,volume=0.0[a0];[1:a]aformat=sample_fmts=fltp:sample_rates=44100:channel_layouts=stereo,volume=1.0[a1];[a0][a1]amerge=inputs=2[a]\" -map 0:v -map \"[a]\" -c:v copy -shortest -preset ultrafast -y " .. options.outputVideo)
+            -- Override original audio with sfx with video cut to length
+            functions.runFFmpeg("-i " .. soundEffect .. " -i " .. options.inputVideo .. " -filter_complex \"[0:a]apad[0a];[1:a]volume=0.0[a1];[0a][a1]amix=inputs=2:duration=first:dropout_transition=0\" -c:v copy -map 1:v -map 0:a -shortest -y " .. options.outputVideo)
         else
-            -- Add sfx to original audio
-            functions.runFFmpeg("-i " .. options.inputVideo .. " -i " .. soundEffect .. " -filter_complex \"[0:a]aformat=sample_fmts=fltp:sample_rates=44100:channel_layouts=stereo,volume=1.0[a0];[1:a]aformat=sample_fmts=fltp:sample_rates=44100:channel_layouts=stereo,volume=1.0[a1];[a0][a1]amerge=inputs=2[a]\" -map 0:v -map \"[a]\" -c:v copy -preset ultrafast -y " .. options.outputVideo)
+            -- Add sfx to original audio to length
+            functions.runFFmpeg("-i " .. soundEffect .. " -i " .. options.inputVideo .. " -filter_complex \"[0:a]apad[0a];[1:a]volume=1.0[a1];[0a][a1]amix=inputs=2:duration=first:dropout_transition=0\" -c:v copy -map 1:v -map 0:a -shortest -y " .. options.outputVideo)
         end
     end
 end

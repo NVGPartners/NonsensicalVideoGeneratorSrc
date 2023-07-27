@@ -245,8 +245,8 @@ namespace NonsensicalVideoGenerator
             controllerAdvanced.Add("Height", new TextEntry("Output Resolution", "Height: how tall the result is.", SaveData.saveValues["VideoHeight"], new Vector2(170, 60), 24, 4, 1, (int i) => {
                 string oldValue = SaveData.saveValues["VideoHeight"];
                 // minimum must be 240
-                if(int.Parse(controllerAdvanced.interactables["Height"].Tooltip, System.Globalization.CultureInfo.InvariantCulture) < 240)
-                    controllerAdvanced.interactables["Height"].Tooltip = "240";
+                if(int.Parse(controllerAdvanced.interactables["Height"].Tooltip, System.Globalization.CultureInfo.InvariantCulture) < 128)
+                    controllerAdvanced.interactables["Height"].Tooltip = "128";
                 // maximum must be 2160
                 if(int.Parse(controllerAdvanced.interactables["Height"].Tooltip, System.Globalization.CultureInfo.InvariantCulture) > 2160)
                     controllerAdvanced.interactables["Height"].Tooltip = "2160";
@@ -261,8 +261,8 @@ namespace NonsensicalVideoGenerator
             controllerAdvanced.Add("Width", new TextEntry("     ", "Width: how wide the result is.", SaveData.saveValues["VideoWidth"], new Vector2(139, 60), 24, 4, 1, (int i) => {
                 string oldValue = SaveData.saveValues["VideoWidth"];
                 // minimum must be 320
-                if(int.Parse(controllerAdvanced.interactables["Width"].Tooltip, System.Globalization.CultureInfo.InvariantCulture) < 320)
-                    controllerAdvanced.interactables["Width"].Tooltip = "320";
+                if(int.Parse(controllerAdvanced.interactables["Width"].Tooltip, System.Globalization.CultureInfo.InvariantCulture) < 128)
+                    controllerAdvanced.interactables["Width"].Tooltip = "128";
                 // maximum must be 3840
                 if(int.Parse(controllerAdvanced.interactables["Width"].Tooltip, System.Globalization.CultureInfo.InvariantCulture) > 3840)
                     controllerAdvanced.interactables["Width"].Tooltip = "3840";

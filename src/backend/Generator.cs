@@ -110,6 +110,10 @@ namespace NonsensicalVideoGenerator
                 }
                 if(clips.Count > 0)
                 {
+                    for(int i = 0; i < clips.Count; i++)
+                    {
+                        ApplyEffects(clips[i], i, clips.Count);
+                    }
                     ConsoleOutput.WriteLine("Concatenating clips...", Color.LightGreen);
                     progressText = "Concatenating clips...";
                     progressState = ProgressState.Concatenating;
@@ -234,6 +238,97 @@ namespace NonsensicalVideoGenerator
                 if(timeout > -1)
                     timeout--;
                 Thread.Sleep(1000);
+            }
+        }
+        public void ApplyEffects(Clip thisClip, int i, int maxClips)
+        {
+            try
+            {
+                if(thisClip.intro)
+                    return;
+                if(!thisClip.rolledForTransition || bool.Parse(SaveData.saveValues["TransitionEffects"]))
+                {
+                    int numberOfPlugins = PluginHandler.GetPluginCount(true);
+                    if(numberOfPlugins > 0)
+                    {
+                        // Roll for effect
+                        if(RandomInt(0, 100) < (thisClip.rolledForTransition ? int.Parse(SaveData.saveValues["TransitionEffectChance"], System.Globalization.CultureInfo.InvariantCulture) : int.Parse(SaveData.saveValues["EffectChance"], System.Globalization.CultureInfo.InvariantCulture)))
+                        {
+                            progressText = (thisClip.rolledForTransition ? "Boiling" : "Baking") + " effects... (" + (i + 1) + "/" + maxClips + ")";
+                            // We rolled for an effect, let's pick one.
+                            PluginReturnValue effect = PluginHandler.PickRandom(globalRandom, Path.Combine(temporaryDirectory, thisClip.name));
+                            if(effect.success)
+                            {
+                                if(int.Parse(SaveData.saveValues["EffectChance"], System.Globalization.CultureInfo.InvariantCulture) >= 100)
+                                {
+                                    Global.usedAllEffectChance = true;
+                                }
+                                // Check if effect job path contains output.mp4, if so, plugin was indeed successful.
+                                // so move to videoi.mp4
+                                // Search for output.mp4 in job folder.
+                                string[] files = Directory.GetFiles(effect.jobFolder);
+                                bool foundOutput = false;
+                                foreach(string file in files)
+                                {
+                                    if(Path.GetFileName(file) == "output.mp4")
+                                    {
+                                        // Make sure this is a valid file with ffprobe.
+                                        ProcessStartInfo ffprobe = new ProcessStartInfo()
+                                        {
+                                            FileName = Global.useSystemFFprobe ? "ffprobe" : @".\ffprobe.exe",
+                                            Arguments = "-v error -select_streams v:0 -show_entries stream=codec_name -of default=noprint_wrappers=1:nokey=1 \"" + file + "\"",
+                                            UseShellExecute = false,
+                                            RedirectStandardOutput = true,
+                                            CreateNoWindow = true
+                                        };
+                                        Process? ffprobeProcess = new Process();
+                                        ffprobeProcess.StartInfo = ffprobe;
+                                        string isVideo = null;
+                                        ffprobeProcess.OutputDataReceived += (sender, e) =>
+                                        {
+                                            isVideo += e.Data;
+                                        };
+                                        ffprobeProcess.Start();
+                                        ffprobeProcess.BeginOutputReadLine();
+                                        ffprobeProcess.WaitForExit();
+                                        if (isVideo != null && isVideo != "" && isVideo != "N/A")
+                                        {
+                                            foundOutput = true;
+                                        }
+                                        break;
+                                    }
+                                }
+                                if(foundOutput)
+                                {
+                                    // Delete existing videoi.mp4
+                                    if(File.Exists(Path.Combine(temporaryDirectory, thisClip.name)))
+                                        File.Delete(Path.Combine(temporaryDirectory, thisClip.name));
+                                    try
+                                    {
+                                        File.Move(effect.jobFolder + "output.mp4", Path.Combine(temporaryDirectory, thisClip.name));
+                                    }
+                                    catch(Exception ex)
+                                    {
+                                        ConsoleOutput.WriteLine("Failed to move output.mp4 to " + thisClip.name +": " + ex.Message, Color.Red);
+                                        effect.success = false;
+                                    }
+                                }
+                                else
+                                {
+                                    effect.success = false;
+                                }
+                                // Delete job folder.
+                                if(!bool.Parse(SaveData.saveValues["HiddenKeepTemporaryJobFolders"]))
+                                    Directory.Delete(effect.jobFolder, true);
+                            }
+                            ConsoleOutput.WriteLine(effect.success ? "Applied "+effect.pluginName+" to " + (thisClip.rolledForTransition ? "transition" : "clip") + " " + i + "." : "Failed to apply "+effect.pluginName+" to " + (thisClip.rolledForTransition ? "transition" : "clip") + " " + i + ".", effect.success ? Color.LightGreen : Color.Red);
+                        }
+                    }
+                }
+            }
+            catch
+            {
+                ConsoleOutput.WriteLine("Failed to apply effect to clip " + (i + 1) +".", Color.Red);
             }
         }
         public void VidThread(object? sender, DoWorkEventArgs e)
@@ -378,6 +473,10 @@ namespace NonsensicalVideoGenerator
                                     ConsoleOutput.WriteLine("Transitioning...", Color.Gray);
                                     FFprobe_EncodeVideo(transitionPath, Path.Combine(temporaryDirectory, thisClip.name));
                                 }
+                                else
+                                {
+                                    thisClip.rolledForTransition = false;
+                                }
                             }
                             else
                             {
@@ -457,95 +556,13 @@ namespace NonsensicalVideoGenerator
                 }
                 try
                 {
+                    if (vidThreadWorker?.CancellationPending == true)
+                        return;
                     for(int i = 0; i < clips.Count; i++)
                     {
-                        try
-                        {
-                            Clip thisClip = clips[i];
-                            if(!thisClip.rolledForTransition || bool.Parse(SaveData.saveValues["TransitionEffects"]))
-                            {
-                                int numberOfPlugins = PluginHandler.GetPluginCount(true);
-                                if(numberOfPlugins > 0)
-                                {
-                                    // Roll for effect
-                                    if(RandomInt(0, 100) < (thisClip.rolledForTransition ? int.Parse(SaveData.saveValues["TransitionEffectChance"], System.Globalization.CultureInfo.InvariantCulture) : int.Parse(SaveData.saveValues["EffectChance"], System.Globalization.CultureInfo.InvariantCulture)))
-                                    {
-                                        progressText = (thisClip.rolledForTransition ? "Boiling" : "Baking") + " effects... (" + (i + 1) + "/" + maxClips + ")";
-                                        // We rolled for an effect, let's pick one.
-                                        PluginReturnValue effect = PluginHandler.PickRandom(globalRandom, Path.Combine(temporaryDirectory, thisClip.name));
-                                        if(effect.success)
-                                        {
-                                            if(int.Parse(SaveData.saveValues["EffectChance"], System.Globalization.CultureInfo.InvariantCulture) >= 100)
-                                            {
-                                                Global.usedAllEffectChance = true;
-                                            }
-                                            // Check if effect job path contains output.mp4, if so, plugin was indeed successful.
-                                            // so move to videoi.mp4
-                                            // Search for output.mp4 in job folder.
-                                            string[] files = Directory.GetFiles(effect.jobFolder);
-                                            bool foundOutput = false;
-                                            foreach(string file in files)
-                                            {
-                                                if(Path.GetFileName(file) == "output.mp4")
-                                                {
-                                                    // Make sure this is a valid file with ffprobe.
-                                                    ProcessStartInfo ffprobe = new ProcessStartInfo()
-                                                    {
-                                                        FileName = Global.useSystemFFprobe ? "ffprobe" : @".\ffprobe.exe",
-                                                        Arguments = "-v error -select_streams v:0 -show_entries stream=codec_name -of default=noprint_wrappers=1:nokey=1 \"" + file + "\"",
-                                                        UseShellExecute = false,
-                                                        RedirectStandardOutput = true,
-                                                        CreateNoWindow = true
-                                                    };
-                                                    Process? ffprobeProcess = new Process();
-                                                    ffprobeProcess.StartInfo = ffprobe;
-                                                    string isVideo = null;
-                                                    ffprobeProcess.OutputDataReceived += (sender, e) =>
-                                                    {
-                                                        isVideo += e.Data;
-                                                    };
-                                                    ffprobeProcess.Start();
-                                                    ffprobeProcess.BeginOutputReadLine();
-                                                    ffprobeProcess.WaitForExit();
-                                                    if (isVideo != null && isVideo != "" && isVideo != "N/A")
-                                                    {
-                                                        foundOutput = true;
-                                                    }
-                                                    break;
-                                                }
-                                            }
-                                            if(foundOutput)
-                                            {
-                                                // Delete existing videoi.mp4
-                                                if(File.Exists(Path.Combine(temporaryDirectory, thisClip.name)))
-                                                    File.Delete(Path.Combine(temporaryDirectory, thisClip.name));
-                                                try
-                                                {
-                                                    File.Move(effect.jobFolder + "output.mp4", Path.Combine(temporaryDirectory, thisClip.name));
-                                                }
-                                                catch(Exception ex)
-                                                {
-                                                    ConsoleOutput.WriteLine("Failed to move output.mp4 to " + thisClip.name +": " + ex.Message, Color.Red);
-                                                    effect.success = false;
-                                                }
-                                            }
-                                            else
-                                            {
-                                                effect.success = false;
-                                            }
-                                            // Delete job folder.
-                                            if(!bool.Parse(SaveData.saveValues["HiddenKeepTemporaryJobFolders"]))
-                                                Directory.Delete(effect.jobFolder, true);
-                                        }
-                                        ConsoleOutput.WriteLine(effect.success ? "Applied "+effect.pluginName+" to " + (thisClip.rolledForTransition ? "transition" : "clip") + " " + i + "." : "Failed to apply "+effect.pluginName+" to " + (thisClip.rolledForTransition ? "transition" : "clip") + " " + i + ".", effect.success ? Color.LightGreen : Color.Red);
-                                    }
-                                }
-                            }
-                        }
-                        catch
-                        {
-                            ConsoleOutput.WriteLine("Failed to apply effect to clip " + (i + 1) +".", Color.Red);
-                        }
+                        if (vidThreadWorker?.CancellationPending == true)
+                            return;
+                        ApplyEffects(clips[i], i, clips.Count);
                     }
                     if (vidThreadWorker?.CancellationPending == true)
                         return;

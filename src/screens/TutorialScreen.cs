@@ -956,7 +956,7 @@ namespace NonsensicalVideoGenerator
             controller.Add("Button4", new Button("Previous Page", "", new Vector2(28+32+640-4, 217+12-6), PreviousPage2));
             controller.Add("Button5", new Button("Continue", "", new Vector2(238+32+640+5, 217+12-6), ContinueButton));
             // PAGE 2 but it's dynamic
-            controller.Add("ButtonFFmpeg", new Button("Use gyan.dev build", "", new Vector2(28+32+320-4+135, 91+12-6), ButtonFFmpeg));
+            controller.Add("ButtonFFmpeg", new Button("Download from gyan.dev", "", new Vector2(28+32+320-4+135, 91+12-6), ButtonFFmpeg));
             for(int i = 0; i < baseTutorialText.Length; i++)
             {
                 tutorialText[i] = new List<string>();
