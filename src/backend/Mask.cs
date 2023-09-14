@@ -64,7 +64,7 @@ namespace NonsensicalVideoGenerator
     {
         public Dictionary<string, SimpleObject> unmaskedObjects = new();
         public bool enabled = false;
-        public Color color = new(0, 0, 0, 192);
+        public Color color = new(0, 0, 0, 128);
         public bool Update(GameTime gameTime, bool handleInput)
         {
             if (enabled)

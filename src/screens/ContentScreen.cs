@@ -118,12 +118,16 @@ namespace NonsensicalVideoGenerator
             spriteBatch.Begin(SpriteSortMode.Deferred, BlendState.AlphaBlend, SamplerState.PointClamp, null, null, null, Matrix.CreateTranslation(offset.X, offset.Y, 0));
             // Main Window
             Texture2D mainwindow = GlobalContent.GetTexture("MainWindow");
-            spriteBatch.Draw(mainwindow, new Rectangle(GlobalGraphics.Scale(128), GlobalGraphics.Scale(36), GlobalGraphics.Scale(mainwindow.Width), GlobalGraphics.Scale(mainwindow.Height)), Color.White);
+            spriteBatch.Draw(mainwindow, new Rectangle(GlobalGraphics.Scale(128-33), GlobalGraphics.Scale(36), GlobalGraphics.Scale(mainwindow.Width), GlobalGraphics.Scale(mainwindow.Height)), Color.White);
             // Draw the center title bar text.
             string pageTitle = Pagination.GetSubPageName();
             // Center within bounds of x 128 and x 312
             Vector2 titleSize = GlobalGraphics.fontMunroSmall.MeasureString(pageTitle);
             spriteBatch.DrawString(GlobalGraphics.fontMunroSmall, pageTitle, new Vector2(GlobalGraphics.Scale(220) - titleSize.X / 2, GlobalGraphics.Scale(37)), Color.White);
+            // Draw action window text
+            string altTitle = "Actions";
+            Vector2 titleSize2 = GlobalGraphics.fontMunroSmall.MeasureString(altTitle);
+            spriteBatch.DrawString(GlobalGraphics.fontMunroSmall, altTitle, new Vector2(GlobalGraphics.Scale(108), GlobalGraphics.Scale(151)), Color.White, MathHelper.ToRadians(-90), new Vector2(titleSize2.X, titleSize2.Y), 1, SpriteEffects.None, 0);
             // Pagination
             Pagination.Draw(gameTime, spriteBatch);
             // End offset spritebatch

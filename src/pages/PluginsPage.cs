@@ -731,7 +731,6 @@ namespace NonsensicalVideoGenerator
                                                             Rectangle source = new(139, 60, 53, 15);
                                                             int separator = 4;
                                                             setting = (y - source.Y - separator) / (source.Height + separator);
-                                                            ConsoleOutput.WriteLine("Setting " + setting, Color.RoyalBlue);
                                                             if(setting < 0)
                                                                 setting = 0;
                                                             while(PluginHandler.plugins[settingsIndex].settingTypes.ElementAt(setting).Value == SettingType.Label)

@@ -20,7 +20,7 @@ namespace NonsensicalVideoGenerator
         public int State { get; set; } // 0: none, 1: entering text
         public Vector2 Position { get; set; }
         public Func<int, bool> Callback { get; set; }
-        private Rectangle bounds;
+        public Rectangle bounds;
         private Rectangle scaledBounds;
         private int maxChars = 0;
         private int mode = 0;
@@ -56,24 +56,42 @@ namespace NonsensicalVideoGenerator
                     {
                         if(Global.editing == Name + "Input")
                         {
-                            Global.editing = "";
                             Callback(State);
-                            Accessibility.allowAccessibility = true;
+                            Global.editing = "";
+                            //Accessibility.allowAccessibility = true;
                             GlobalContent.GetSound("Option").Play(int.Parse(SaveData.saveValues["SoundEffectVolume"], System.Globalization.CultureInfo.InvariantCulture) / 100f, 0f, 0f);
+                            Global.mask.Disable();
                         }
                         else if(Global.editing == "")
                         {
-                            Global.editing = Name + "Input";
                             Callback(State);
-                            Accessibility.allowAccessibility = false;
+                            Global.editing = Name + "Input";
+                            //Accessibility.allowAccessibility = false;
                             GlobalContent.GetSound("Option").Play(int.Parse(SaveData.saveValues["SoundEffectVolume"], System.Globalization.CultureInfo.InvariantCulture) / 100f, 0f, 0f);
+                            Global.mask.AddUnmaskedObject("TextEntry", new SimpleObject(scaledBounds, Color.Transparent, GlobalGraphics.pixel, () => {
+                                Callback(State);
+                                Global.editing = "";
+                                //Accessibility.allowAccessibility = true;
+                                GlobalContent.GetSound("Option").Play(int.Parse(SaveData.saveValues["SoundEffectVolume"], System.Globalization.CultureInfo.InvariantCulture) / 100f, 0f, 0f);
+                                Global.mask.Disable();
+                                return true;
+                            }, true));
+                            Global.mask.Enable();
                         }
                         else
                         {
                             // If editing is not in the name list, set it to ""
                             if (Global.editing != "")
-                                Global.editing = "";
-                            GlobalContent.GetSound("Back").Play(int.Parse(SaveData.saveValues["SoundEffectVolume"], System.Globalization.CultureInfo.InvariantCulture) / 100f, 0f, 0f);
+                            {
+                                //Global.editing = "";
+                                GlobalContent.GetSound("Error").Play(int.Parse(SaveData.saveValues["SoundEffectVolume"], System.Globalization.CultureInfo.InvariantCulture) / 100f, 0f, 0f);
+                            }
+                            else
+                            {
+                                Callback(State);
+                                GlobalContent.GetSound("Back").Play(int.Parse(SaveData.saveValues["SoundEffectVolume"], System.Globalization.CultureInfo.InvariantCulture) / 100f, 0f, 0f);
+                                Global.mask.Disable();
+                            }
                         }
                         return true;
                     }
@@ -237,7 +255,7 @@ namespace NonsensicalVideoGenerator
         // implementation of textinputeventargs
         private void TextInput(object? sender, TextInputEventArgs e)
         {
-            if ((Global.editing == Name + "Input"))
+            if (Global.editing == Name + "Input")
             {
                 if(e.Key == Keys.Tab || e.Key == Keys.Enter || e.Key == Keys.Escape)
                     return;

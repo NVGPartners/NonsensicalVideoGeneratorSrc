@@ -58,7 +58,8 @@ namespace NonsensicalVideoGenerator
         }
         protected override void Initialize()
         {
-            DiscordRPC.Initialize();
+            if(bool.Parse(SaveData.saveValues["EnableDiscordRPC"]))
+                DiscordRPC.Initialize();
             ConsoleOutput.WriteLine("Starting initialization for v" + Global.productVersion + "...", Color.Transparent);
             try
             {
@@ -126,15 +127,11 @@ namespace NonsensicalVideoGenerator
         }
         protected override void Update(GameTime gameTime)
         {
-            DiscordRPC.Update();
+            if(bool.Parse(SaveData.saveValues["EnableDiscordRPC"]))
+                DiscordRPC.Update();
             // fix text entries
             bool handleInput = Accessibility.showDisambiguation || (IsActive && MouseInput.MouseState.X >= 0 && MouseInput.MouseState.X <= GlobalGraphics.scaledWidth &&
                 MouseInput.MouseState.Y >= 0 && MouseInput.MouseState.Y <= GlobalGraphics.scaledHeight && !Global.dragDrop);
-            if (!handleInput && Global.editing != "")
-            {
-                Global.editing = "";
-                Accessibility.allowAccessibility = true;
-            }
             try
             {
                 if(SteamManager.initialized)

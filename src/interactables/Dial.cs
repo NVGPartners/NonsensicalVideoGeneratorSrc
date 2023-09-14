@@ -18,7 +18,7 @@ namespace NonsensicalVideoGenerator
         public int State { get; set; } // 0: none, 1: hovering, 2: dragging, 3: stopped dragging
         public Vector2 Position { get; set; }
         public Func<int, bool> Callback { get; set; }
-        private Rectangle bounds;
+        public Rectangle bounds;
         private Rectangle scaledBounds;
         private int minValue = 0;
         private int maxValue = 100;

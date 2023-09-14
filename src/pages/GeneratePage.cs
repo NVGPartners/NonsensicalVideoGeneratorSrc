@@ -14,6 +14,7 @@ namespace NonsensicalVideoGenerator
     {
         public string Name { get; set; } = "Generate";
         public string Tooltip { get; } = "Render a nonsensical video.";
+        private readonly InteractableController actionController = new();
         private readonly InteractableController controller = new();
         private readonly InteractableController controllerAdvanced = new();
         private readonly InteractableController controllerRendering = new();
@@ -21,6 +22,8 @@ namespace NonsensicalVideoGenerator
         private int page = 0;
         public bool Update(GameTime gameTime, bool handleInput)
         {
+            if(actionController.Update(gameTime, handleInput))
+                return true;
             if(Global.generator.generatorActive)
             {
                 if(controllerRendering.Update(gameTime, handleInput))
@@ -87,9 +90,76 @@ namespace NonsensicalVideoGenerator
                         break;
                 }
             }
+            actionController.Draw(gameTime, spriteBatch);
         }
         public void LoadContent(ContentManager contentManager, GraphicsDevice graphicsDevice)
         {
+            // Actions
+            actionController.Add("ActionRender", new ActionButton("Start generating a new video.", new Vector2(113, 137), (int i) => {
+                switch(i)
+                {
+                    case 2: // left click
+                        if(!Global.canRender || Global.generator.generatorActive)
+                        {
+                            GlobalContent.GetSound("Error").Play(int.Parse(SaveData.saveValues["SoundEffectVolume"], System.Globalization.CultureInfo.InvariantCulture) / 100f, 0f, 0f);
+                            return true;
+                        }
+                        GlobalContent.GetSound("Select").Play(int.Parse(SaveData.saveValues["SoundEffectVolume"], System.Globalization.CultureInfo.InvariantCulture) / 100f, 0f, 0f);
+                        Global.generator.StartGeneration((sender, e) => {
+                            if(e.ProgressPercentage == 100)
+                            {
+                                try
+                                {
+                                    // award achievements
+                                    if (SteamManager.initialized && Global.canAchieve)
+                                    {
+                                        List<string> achievements = new()
+                                        {
+                                            "ACHIEVEMENT_FIRST_RENDER",
+                                        };
+                                        if(Global.usedWorkshopPlugin)
+                                        {
+                                            Global.usedWorkshopPlugin = false;
+                                            achievements.Add("ACHIEVEMENT_WORKSHOP_USAGE");
+                                        }
+                                        if(Global.rolledForOverlay)
+                                        {
+                                            Global.rolledForOverlay = false;
+                                            achievements.Add("ACHIEVEMENT_CHROMA_KEY");
+                                        }
+                                        if(Global.usedAllEffectChance)
+                                        {
+                                            Global.usedAllEffectChance = false;
+                                            achievements.Add("ACHIEVEMENT_ALL_EFFECTS");
+                                        }
+                                        if(Global.usedDifferentOutro)
+                                        {
+                                            Global.usedDifferentOutro = false;
+                                            achievements.Add("ACHIEVEMENT_OUTRO_OVERRIDE");
+                                        }
+                                        foreach(string achievement in achievements)
+                                        {
+                                            ConsoleOutput.WriteLine("Awarding achievement: "+achievement, Color.LightBlue);
+                                            SteamUserStats.SetAchievement(achievement);
+                                        }
+                                    }
+                                }
+                                catch {}
+                                SaveData.saveValues["TotalVideosRendered"] = (int.Parse(SaveData.saveValues["TotalVideosRendered"], System.Globalization.CultureInfo.InvariantCulture) + 1).ToString(System.Globalization.CultureInfo.InvariantCulture);
+                                SaveData.Save();
+                                GlobalContent.GetSound("RenderComplete").Play(int.Parse(SaveData.saveValues["SoundEffectVolume"], System.Globalization.CultureInfo.InvariantCulture) / 100f, 0f, 0f);
+                            }
+                            else
+                            {
+                                GlobalContent.GetSound("Error").Play(int.Parse(SaveData.saveValues["SoundEffectVolume"], System.Globalization.CultureInfo.InvariantCulture) / 100f, 0f, 0f);
+                            }
+                            Global.justCompletedRender = true;
+                            //SteamUserStats.SetAchievement("RENDER_VIDEO");
+                        }, (sender, e) => {});
+                        return true;
+                }
+                return false;
+            }, contentManager.Load<Texture2D>("graphics/actions/render")));
             // PAGE 3
             controllerPage3.Add("DisableClipsAfterMaxUniqueClips", new Switch("Disable Clips After Max Reached", "Disable clips after they reach the max unique clip count.", new Vector2(139, 60+19*2), (int i) => {
                 bool switchState = (i & 256) != 0;
@@ -290,7 +360,7 @@ namespace NonsensicalVideoGenerator
                 switch(i)
                 {
                     case 2: // left click
-                        if(!Global.canRender)
+                        if(!Global.canRender || Global.generator.generatorActive)
                         {
                             GlobalContent.GetSound("Error").Play(int.Parse(SaveData.saveValues["SoundEffectVolume"], System.Globalization.CultureInfo.InvariantCulture) / 100f, 0f, 0f);
                             return true;
@@ -363,8 +433,8 @@ namespace NonsensicalVideoGenerator
             }));
             controller.Add("MinStreamDuration", new TextEntry("  ", "Start of random length range.", SaveData.saveValues["MinStreamDuration"], new Vector2(139, 60+19*3), 26, 5, 2, (int i) => {
                 string oldValue = SaveData.saveValues["MinStreamDuration"];
-                if(float.Parse(controller.interactables["MinStreamDuration"].Tooltip, System.Globalization.CultureInfo.InvariantCulture) < 0.2)
-                    controller.interactables["MinStreamDuration"].Tooltip = "0.2";
+                //if(float.Parse(controller.interactables["MinStreamDuration"].Tooltip, System.Globalization.CultureInfo.InvariantCulture) < 0.2)
+                    //controller.interactables["MinStreamDuration"].Tooltip = "0.2";
                 SaveData.saveValues["MinStreamDuration"] = controller.interactables["MinStreamDuration"].Tooltip;
                 if(oldValue != SaveData.saveValues["MinStreamDuration"])
                     SaveData.Save();
@@ -422,6 +492,7 @@ namespace NonsensicalVideoGenerator
             controllerAdvanced.LoadContent(contentManager, graphicsDevice);
             controllerRendering.LoadContent(contentManager, graphicsDevice);
             controllerPage3.LoadContent(contentManager, graphicsDevice);
+            actionController.LoadContent(contentManager, graphicsDevice);
         }
     }
 }

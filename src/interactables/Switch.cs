@@ -19,7 +19,7 @@ namespace NonsensicalVideoGenerator
         public bool SwitchState { get; set; } // false: off, true: on
         public Vector2 Position { get; set; }
         public Func<int, bool> Callback { get; set; }
-        private Rectangle bounds;
+        public Rectangle bounds;
         public Switch(string defaultName, string defaultTooltip, Vector2 defaultPosition, Func<int, bool> defaultCallback, bool defaultSwitchState)
         {
             Name = defaultName;

@@ -30,6 +30,21 @@ namespace NonsensicalVideoGenerator
         public void LoadContent(ContentManager contentManager, GraphicsDevice graphicsDevice)
         {
             // Add dials
+            controller.Add("EnableDiscordRPC", new Switch("Enable Discord RPC", "Tell others that you're using NVG.", new Vector2(139, 60+19*5), (int i) => {
+                bool switchState = (i & 256) != 0;
+                if((i & 2) != 0)
+                {
+                    string oldValue = SaveData.saveValues["EnableDiscordRPC"];
+                    SaveData.saveValues["EnableDiscordRPC"] = switchState.ToString().ToLower();
+                    if(oldValue != SaveData.saveValues["EnableDiscordRPC"])
+                        SaveData.Save();
+                    if(switchState)
+                        DiscordRPC.Initialize();
+                    else
+                        DiscordRPC.Shutdown();
+                }
+                return switchState;
+            }, SaveData.saveValues["EnableDiscordRPC"] == "true"));
             controller.Add("MotionDisable", new Switch("Disable Motion", "Turns off screen tweening and other elements.", new Vector2(139, 60+19*4), (int i) => {
                 bool switchState = (i & 256) != 0;
                 if((i & 2) != 0)

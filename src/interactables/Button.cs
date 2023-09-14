@@ -18,9 +18,9 @@ namespace NonsensicalVideoGenerator
         public int State { get; set; } // 0: none, 1: hovering, 2: left click, 3: right click, 4: middle click, 5: forward, 6: back, 7: scroll up, 8: scroll down
         public Vector2 Position { get; set; }
         public Func<int, bool> Callback { get; set; }
-        private Vector2 textSize;
-        private Vector2 textPosition;
-        private Rectangle bounds;
+        public Vector2 textSize;
+        public Vector2 textPosition;
+        public Rectangle bounds;
         public Button(string defaultName, string defaultTooltip, Vector2 defaultPosition, Func<int, bool> defaultCallback)
         {
             Name = defaultName;
@@ -28,7 +28,7 @@ namespace NonsensicalVideoGenerator
             Position = defaultPosition;
             Callback = defaultCallback;
         }
-        public bool Update(GameTime gameTime, bool handleInput)
+        public virtual bool Update(GameTime gameTime, bool handleInput)
         {
             // Calculate bounds
             textSize = (GlobalGraphics.fontMunro.MeasureString(Name) / GlobalGraphics.scale) - new Vector2(GlobalGraphics.Scale(1), 0);
@@ -71,7 +71,7 @@ namespace NonsensicalVideoGenerator
             }
             return false;
         }
-        public void Draw(GameTime gameTime, SpriteBatch spriteBatch)
+        public virtual void Draw(GameTime gameTime, SpriteBatch spriteBatch)
         {
             // Draw the sides
             Texture2D side = GlobalContent.GetTexture("InteractiveButtonSide");
@@ -105,7 +105,7 @@ namespace NonsensicalVideoGenerator
                 spriteBatch.DrawString(GlobalGraphics.fontMunroSmall, Tooltip, new Vector2(position.X + GlobalGraphics.Scale(2), position.Y - GlobalGraphics.Scale(2)), Color.White);
             }
         }
-        public void LoadContent(ContentManager contentManager, GraphicsDevice graphicsDevice)
+        public virtual void LoadContent(ContentManager contentManager, GraphicsDevice graphicsDevice)
         {
             GlobalContent.AddTexture("InteractiveButtonSide", contentManager.Load<Texture2D>("graphics/interactivebuttonside"));
             GlobalContent.AddTexture("InteractiveButtonInner", contentManager.Load<Texture2D>("graphics/interactivebuttoninner"));

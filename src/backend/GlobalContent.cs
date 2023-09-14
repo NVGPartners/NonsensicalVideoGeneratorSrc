@@ -90,6 +90,7 @@ namespace NonsensicalVideoGenerator
             // Load default songs.
             AddSong("Theme", contentManager.Load<Song>("music/theme"), "This Is Nonsense!", "KiwifruitDev");
             AddSong("Theme2", contentManager.Load<Song>("music/theme2"), "A Nonsensical Song", "Bobby I Guess");
+            AddSong("Theme3", contentManager.Load<Song>("music/theme3"), "Yet Another Nonsensical Song", "Bobby I Guess");
             //AddSong("Theme3", contentManager.Load<Song>("music/theme3"), "Creation", "Bobby I Guess");
             // Dynamic implementation is required for these two songs.
             // They're context-sensitive, so we'll add them at a later time.

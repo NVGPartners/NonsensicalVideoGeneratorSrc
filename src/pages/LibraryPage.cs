@@ -822,6 +822,8 @@ namespace NonsensicalVideoGenerator
                                                 selectedFlags &= ~4;
                                                 demandChange = true;
                                                 GlobalContent.GetSound("Option").Play(int.Parse(SaveData.saveValues["SoundEffectVolume"], System.Globalization.CultureInfo.InvariantCulture) / 100f, 0f, 0f);
+                                                // Reset page
+                                                page = 0;
                                                 // Get subtype
                                                 foreach (KeyValuePair<LibraryType, string> type in LibraryData.libraryNames)
                                                 {
