@@ -67,12 +67,13 @@ namespace NonsensicalVideoGenerator
                 int plcount = PluginHandler.GetPluginCount() + 1;
                 for(int i = 0; i < plcount; i++)
                 {
-                    spriteBatch.Draw(pluginEntry, new Rectangle(GlobalGraphics.Scale(136), GlobalGraphics.Scale(57 + i * pluginEntry.Height + i), pluginEntry.Width * GlobalGraphics.scale, pluginEntry.Height * GlobalGraphics.scale), Color.White);
+                    // Alternate colors so it's easier to see
+                    spriteBatch.Draw(pluginEntry, new Rectangle(GlobalGraphics.Scale(136), GlobalGraphics.Scale(57 + i * pluginEntry.Height + i), pluginEntry.Width * GlobalGraphics.scale, pluginEntry.Height * GlobalGraphics.scale), new Color(i % 2 == 0 ? 255 : 192, i % 2 == 0 ? 255 : 192, i % 2 == 0 ? 255 : 192));
                     if(i < plcount-1)
                     {
                         if(Global.canRender)
                         {
-                            spriteBatch.Draw(pluginSettings, new Rectangle(GlobalGraphics.Scale(226), GlobalGraphics.Scale(59 + i * pluginEntry.Height + i), pluginSettings.Width * GlobalGraphics.scale, pluginSettings.Height * GlobalGraphics.scale), Color.White);
+                            spriteBatch.Draw(pluginSettings, new Rectangle(GlobalGraphics.Scale(226), GlobalGraphics.Scale(59 + i * pluginEntry.Height + i), pluginSettings.Width * GlobalGraphics.scale, pluginSettings.Height * GlobalGraphics.scale), new Color(i % 2 == 0 ? 255 : 192, i % 2 == 0 ? 255 : 192, i % 2 == 0 ? 255 : 192));
                             spriteBatch.DrawString(munroSmall, "Settings", new Vector2(GlobalGraphics.Scale(233+1), GlobalGraphics.Scale(58+1 + i * pluginEntry.Height + i)), Color.Black);
                             spriteBatch.DrawString(munroSmall, "Settings", new Vector2(GlobalGraphics.Scale(233), GlobalGraphics.Scale(58 + i * pluginEntry.Height + i)), Color.White);
                         }
@@ -91,7 +92,7 @@ namespace NonsensicalVideoGenerator
                     else
                     {
                         // create plugin
-                        spriteBatch.Draw(createPlugin, new Rectangle(GlobalGraphics.Scale(265), GlobalGraphics.Scale(59 + i * pluginEntry.Height + i), createPlugin.Width * GlobalGraphics.scale, createPlugin.Height * GlobalGraphics.scale), Color.White);
+                        spriteBatch.Draw(createPlugin, new Rectangle(GlobalGraphics.Scale(265), GlobalGraphics.Scale(59 + i * pluginEntry.Height + i), createPlugin.Width * GlobalGraphics.scale, createPlugin.Height * GlobalGraphics.scale), new Color(i % 2 == 0 ? 255 : 192, i % 2 == 0 ? 255 : 192, i % 2 == 0 ? 255 : 192));
                         spriteBatch.DrawString(munroSmall, "Workshop Effect Management", new Vector2(GlobalGraphics.Scale(141+1), GlobalGraphics.Scale(58+1 + i * pluginEntry.Height + i)), Color.Black);
                         spriteBatch.DrawString(munroSmall, "Workshop Effect Management", new Vector2(GlobalGraphics.Scale(141), GlobalGraphics.Scale(58 + i * pluginEntry.Height + i)), Color.White);
                     }

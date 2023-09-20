@@ -30,6 +30,7 @@ namespace NonsensicalVideoGenerator
         private bool textFadedIn = false;
         private double timeText = 0;
         private bool askAccessibility = false;
+        private bool dontAskAgain = false;
         private static KeyboardState oldKeyboardState;
         private static KeyboardState newKeyboardState;
         // shamelessly copied from tutorial screen
@@ -280,18 +281,22 @@ namespace NonsensicalVideoGenerator
                     if (MouseInput.MouseState.LeftButton == ButtonState.Pressed && MouseInput.LastMouseState.LeftButton == ButtonState.Released
                         || newKeyboardState.GetPressedKeys().Length > 0 && oldKeyboardState.GetPressedKeys().Length == 0)
                     {
-                        if(askAccessibility)
+                        if(!dontAskAgain)
                         {
-                            SaveData.saveValues["FirstBoot"] = "false";
-                            SaveData.Save();
-                            askAccessibility = false;
+                            if(askAccessibility)
+                            {
+                                SaveData.saveValues["FirstBoot"] = "false";
+                                SaveData.Save();
+                                askAccessibility = false;
+                            }
+                            else
+                            {
+                                ConsoleOutput.WriteLine("User acknowledged photosensitive warning.", Color.LightGreen);
+                            }
+                            dontAskAgain = true;
+                            accepted = true;
+                            GlobalContent.GetSound("Select").Play(int.Parse(SaveData.saveValues["SoundEffectVolume"], System.Globalization.CultureInfo.InvariantCulture) / 100f, 0f, 0f);
                         }
-                        else
-                        {
-                            ConsoleOutput.WriteLine("User acknowledged photosensitive warning.", Color.LightGreen);
-                        }
-                        accepted = true;
-                        GlobalContent.GetSound("Select").Play(int.Parse(SaveData.saveValues["SoundEffectVolume"], System.Globalization.CultureInfo.InvariantCulture) / 100f, 0f, 0f);
                     }
                 }
                 else if(!askAccessibility)

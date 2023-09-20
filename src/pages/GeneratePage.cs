@@ -1,5 +1,8 @@
 #if MONOGAME
+using System;
 using System.Collections.Generic;
+using System.IO;
+using System.Reflection;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Content;
 using Microsoft.Xna.Framework.Graphics;
@@ -95,6 +98,124 @@ namespace NonsensicalVideoGenerator
         public void LoadContent(ContentManager contentManager, GraphicsDevice graphicsDevice)
         {
             // Actions
+            actionController.Add("ActionConsole", new ActionButton("View console output.", new Vector2(113, 182), (int i) => {
+                switch(i)
+                {
+                    case 2: // left click
+                        if(Global.ready)
+                        {
+                            Global.editing = "";
+                            Accessibility.allowAccessibility = true;
+                            if(ScreenManager.GetScreen<ConsoleScreen>("Console").Toggle())
+                            {
+                                ConsoleOutput.ResetScroll();
+                                GlobalContent.GetSound("Select").Play(int.Parse(SaveData.saveValues["SoundEffectVolume"], System.Globalization.CultureInfo.InvariantCulture) / 100f, 0f, 0f);
+                                if(Accessibility.showDisambiguation)
+                                    Accessibility.TTS("Console shown.");
+                            }
+                            else
+                            {
+                                GlobalContent.GetSound("Back").Play(int.Parse(SaveData.saveValues["SoundEffectVolume"], System.Globalization.CultureInfo.InvariantCulture) / 100f, 0f, 0f);
+                                if(Accessibility.showDisambiguation)
+                                    Accessibility.TTS("Console hidden.");
+                            }
+                        }
+                        return true;
+                }
+                return false;
+            }, contentManager.Load<Texture2D>("graphics/actions/console")));
+            actionController.Add("ActionReset", new ActionButton("Reset to default parameters.", new Vector2(113, 167), (int i) => {
+                switch(i)
+                {
+                    case 2: // left click
+                        GlobalContent.GetSound("Select").Play(int.Parse(SaveData.saveValues["SoundEffectVolume"], System.Globalization.CultureInfo.InvariantCulture) / 100f, 0f, 0f);
+                        //SaveData.saveValues["ScreenWidth"] = "320";
+                        //SaveData.saveValues["ScreenHeight"] = "240";
+                        //SaveData.saveValues["ScreenScale"] = "2";
+                        //SaveData.saveValues["BackgroundSaturation"] = "0";
+                        SaveData.saveValues["MinStreamDuration"] = "0.2";
+                        SaveData.saveValues["MaxStreamDuration"] = "0.4";
+                        SaveData.saveValues["MaxClipCount"] = "20";
+                        SaveData.saveValues["VideoWidth"] = "640";
+                        SaveData.saveValues["VideoHeight"] = "480";
+                        SaveData.saveValues["IntrosEnabled"] = "false";
+                        SaveData.saveValues["OutrosEnabled"] = "true";
+                        SaveData.saveValues["PlayAutomatically"] = "true";
+                        //SaveData.saveValues["GameHighScore"] = "0";
+                        //SaveData.saveValues["MusicVolume"] = "50";
+                        //SaveData.saveValues["SoundEffectVolume"] = "65";
+                        //SaveData.saveValues["VideoVolume"] = "100";
+                        SaveData.saveValues["TransitionChance"] = "20";
+                        SaveData.saveValues["OverlayChance"] = "20";
+                        SaveData.saveValues["EffectChance"] = "60";
+                        SaveData.saveValues["TransitionEffects"] = "true";
+                        SaveData.saveValues["TransitionEffectChance"] = "30";
+                        //SaveData.saveValues["HiddenKeepTemporaryJobFolders"] = "false";
+                        //SaveData.saveValues["HiddenVerbose"] = "false";
+                        //SaveData.saveValues["DisableMotion"] = "false";
+                        //SaveData.saveValues["FirstBoot"] = "true";
+                        //SaveData.saveValues["DisabledMedia"] = "[]";
+                        //SaveData.saveValues["TotalVideosRendered"] = "0";
+                        //SaveData.saveValues["TotalMediaImported"] = "0";
+                        //SaveData.saveValues["TotalClipsTrimmed"] = "0";
+                        SaveData.saveValues["PlayOverlayInFull"] = "false";
+                        SaveData.saveValues["MaxUniqueClips"] = "0";
+                        SaveData.saveValues["DeleteClipsAfterMaxUniqueClips"] = "false";
+                        SaveData.saveValues["DisableClipsAfterMaxUniqueClips"] = "false";
+                        SaveData.Save();
+                        controller.interactables["MinStreamDuration"].Tooltip = SaveData.saveValues["MinStreamDuration"];
+                        controller.interactables["MaxStreamDuration"].Tooltip = SaveData.saveValues["MaxStreamDuration"];
+                        controller.interactables["ClipCount"].Tooltip = SaveData.saveValues["MaxClipCount"];
+                        controllerAdvanced.interactables["Width"].Tooltip = SaveData.saveValues["VideoWidth"];
+                        controllerAdvanced.interactables["Height"].Tooltip = SaveData.saveValues["VideoHeight"];
+                        ((Switch)controller.interactables["SaveToLibrary"]).SwitchState = SaveData.saveValues["PlayAutomatically"] == "true";
+                        ((Switch)controller.interactables["InsertIntro"]).SwitchState = SaveData.saveValues["IntrosEnabled"] == "true";
+                        ((Switch)controller.interactables["InsertOutro"]).SwitchState = SaveData.saveValues["OutrosEnabled"] == "true";
+                        controllerAdvanced.interactables["TransitionChance"].Tooltip = SaveData.saveValues["TransitionChance"];
+                        controllerAdvanced.interactables["OverlayChance"].Tooltip = SaveData.saveValues["OverlayChance"];
+                        controllerAdvanced.interactables["EffectChance"].Tooltip = SaveData.saveValues["EffectChance"];
+                        ((Switch)controllerAdvanced.interactables["TransitionEffects"]).SwitchState = SaveData.saveValues["TransitionEffects"] == "true";
+                        controllerAdvanced.interactables["TransitionEffectChance"].Tooltip = SaveData.saveValues["TransitionEffectChance"];
+                        ((Switch)controllerAdvanced.interactables["PlayOverlayInFull"]).SwitchState = SaveData.saveValues["PlayOverlayInFull"] == "true";
+                        controllerPage3.interactables["MaxUniqueClips"].Tooltip = SaveData.saveValues["MaxUniqueClips"];
+                        ((Switch)controllerPage3.interactables["DeleteClipsAfterMaxUniqueClips"]).SwitchState = SaveData.saveValues["DeleteClipsAfterMaxUniqueClips"] == "true";
+                        ((Switch)controllerPage3.interactables["DisableClipsAfterMaxUniqueClips"]).SwitchState = SaveData.saveValues["DisableClipsAfterMaxUniqueClips"] == "true";
+                        return true;
+                }
+                return false;
+            }, contentManager.Load<Texture2D>("graphics/actions/reset")));
+            actionController.Add("ActionPlayLast", new ActionButton("Play last rendered video.", new Vector2(113, 152), (int i) => {
+                switch(i)
+                {
+                    case 2: // left click
+                        string renderFolder = Path.Combine(Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location), "library", "video", "renders");
+                        // Get last modified file
+                        string lastModifiedFile = "";
+                        DateTime lastModified = new(0);
+                        foreach(string fileName in Directory.GetFiles(renderFolder))
+                        {
+                            DateTime lastWriteTime = File.GetLastWriteTime(fileName);
+                            if(lastWriteTime > lastModified)
+                            {
+                                lastModified = lastWriteTime;
+                                lastModifiedFile = fileName;
+                            }
+                        }
+                        if (lastModifiedFile != "")
+                        {
+                            LibraryFile file = new LibraryFile(Path.GetFileName(lastModifiedFile), lastModifiedFile, DefaultLibraryTypes.Render, true);
+                            if(file.Path != null)
+                            {
+                                GlobalContent.GetSound("Select").Play(int.Parse(SaveData.saveValues["SoundEffectVolume"], System.Globalization.CultureInfo.InvariantCulture) / 100f, 0f, 0f);
+                                FramePlayer.PlayMedia(file);
+                                return true;
+                            }
+                        }
+                        GlobalContent.GetSound("Error").Play(int.Parse(SaveData.saveValues["SoundEffectVolume"], System.Globalization.CultureInfo.InvariantCulture) / 100f, 0f, 0f);
+                        return true;
+                }
+                return false;
+            }, contentManager.Load<Texture2D>("graphics/actions/playlast")));
             actionController.Add("ActionRender", new ActionButton("Start generating a new video.", new Vector2(113, 137), (int i) => {
                 switch(i)
                 {

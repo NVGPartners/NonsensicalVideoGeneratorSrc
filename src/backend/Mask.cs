@@ -17,6 +17,8 @@ namespace NonsensicalVideoGenerator
         public Texture2D texture;
         public Func<bool> updateAction;
         public bool isButton = true;
+        private static KeyboardState oldKeyboardState;
+        private static KeyboardState newKeyboardState;
         public SimpleObject(Rectangle rectangle, Color color, Texture2D texture, Func<bool> updateAction)
         {
             this.rectangle = rectangle;
@@ -45,6 +47,17 @@ namespace NonsensicalVideoGenerator
                         if(updateAction())
                             return true;
                     }
+                }
+                // Set up keyboard states.
+                oldKeyboardState = newKeyboardState;
+                newKeyboardState = Keyboard.GetState();
+                // Keyboard: Enter
+                if (oldKeyboardState.IsKeyUp(Keys.Enter)
+                    && newKeyboardState.IsKeyDown(Keys.Enter)
+                    && !Accessibility.showDisambiguation)
+                {
+                    if (updateAction())
+                        return true;
                 }
             }
             return false;

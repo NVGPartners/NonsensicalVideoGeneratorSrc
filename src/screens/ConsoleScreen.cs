@@ -104,21 +104,27 @@ namespace NonsensicalVideoGenerator
             int scrollWeight = newKeyboardState.IsKeyDown(Keys.LeftShift) || newKeyboardState.IsKeyDown(Keys.RightShift) ? 5 : 1;
             // Show/hide console when you press f5
             if ((newKeyboardState.IsKeyDown(Keys.F5) && !oldKeyboardState.IsKeyDown(Keys.F5))
-                || (newKeyboardState.IsKeyDown(Keys.OemTilde) && !oldKeyboardState.IsKeyDown(Keys.OemTilde))
+                || newKeyboardState.IsKeyDown(Keys.OemTilde) && !oldKeyboardState.IsKeyDown(Keys.OemTilde)
+                || MouseInput.MouseState.LeftButton == ButtonState.Pressed && MouseInput.LastMouseState.LeftButton == ButtonState.Released
                 && Global.ready)
             {
-                Global.editing = "";
-                Accessibility.allowAccessibility = true;
-                overrideReturn = true;
-                if(Toggle())
+                if(screenType == ScreenType.Drawn)
+                {
+                    Global.editing = "";
+                    Accessibility.allowAccessibility = true;
+                    overrideReturn = true;
+                }
+                if(!MouseInput.MouseState.LeftButton.Equals(ButtonState.Pressed) && Toggle())
                 {
                     ConsoleOutput.ResetScroll();
                     GlobalContent.GetSound("Select").Play(int.Parse(SaveData.saveValues["SoundEffectVolume"], System.Globalization.CultureInfo.InvariantCulture) / 100f, 0f, 0f);
                     if(Accessibility.showDisambiguation)
                         Accessibility.TTS("Console shown.");
                 }
-                else
+                else if(screenType == ScreenType.Drawn && !hiding && !showing)
                 {
+                    if(MouseInput.MouseState.LeftButton.Equals(ButtonState.Pressed))
+                        Toggle();
                     GlobalContent.GetSound("Back").Play(int.Parse(SaveData.saveValues["SoundEffectVolume"], System.Globalization.CultureInfo.InvariantCulture) / 100f, 0f, 0f);
                     if(Accessibility.showDisambiguation)
                         Accessibility.TTS("Console hidden.");
@@ -158,7 +164,8 @@ namespace NonsensicalVideoGenerator
             }
             // (DEBUG) Fill the console with nonsense.
             //ConsoleOutput.WriteLine(Math.Sin(gameTime.TotalGameTime.TotalSeconds).ToString(System.Globalization.CultureInfo.InvariantCulture));
-            return handleInput && !overrideReturn;
+            // Return true unless overridden.
+            return overrideReturn ? true : false;
         }
         public void Draw(GameTime gameTime, SpriteBatch spriteBatch)
         {
