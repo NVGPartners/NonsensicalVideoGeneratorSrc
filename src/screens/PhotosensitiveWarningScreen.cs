@@ -281,19 +281,20 @@ namespace NonsensicalVideoGenerator
                     if (MouseInput.MouseState.LeftButton == ButtonState.Pressed && MouseInput.LastMouseState.LeftButton == ButtonState.Released
                         || newKeyboardState.GetPressedKeys().Length > 0 && oldKeyboardState.GetPressedKeys().Length == 0)
                     {
-                        if(!dontAskAgain)
+                        if(!dontAskAgain || askAccessibility)
                         {
+                            dontAskAgain = true;
                             if(askAccessibility)
                             {
                                 SaveData.saveValues["FirstBoot"] = "false";
                                 SaveData.Save();
                                 askAccessibility = false;
+                                dontAskAgain = false;
                             }
                             else
                             {
                                 ConsoleOutput.WriteLine("User acknowledged photosensitive warning.", Color.LightGreen);
                             }
-                            dontAskAgain = true;
                             accepted = true;
                             GlobalContent.GetSound("Select").Play(int.Parse(SaveData.saveValues["SoundEffectVolume"], System.Globalization.CultureInfo.InvariantCulture) / 100f, 0f, 0f);
                         }
