@@ -834,7 +834,7 @@ namespace NonsensicalVideoGenerator
                         + " -c:v libx264"
                         + " -crf 18"
                         + " -preset veryfast"
-                        + " -vf scale=" + SaveData.saveValues["VideoWidth"] + "x" + SaveData.saveValues["VideoHeight"] + ",setsar=1:1,fps=fps=30"
+                        + (SaveData.saveValues["ConstrainAspectRatio"] == "true" ? " -vf scale=" + SaveData.saveValues["VideoWidth"] + "x" + SaveData.saveValues["VideoHeight"] + ",setsar=1:1,fps=fps=30" : " -vf \"scale=(iw*sar)*min(" + SaveData.saveValues["VideoWidth"] + "/(iw*sar)\\," + SaveData.saveValues["VideoHeight"] + "/ih):ih*min(" + SaveData.saveValues["VideoWidth"] + "/(iw*sar)\\," + SaveData.saveValues["VideoHeight"] + "/ih),pad=" + SaveData.saveValues["VideoWidth"] + ":" + SaveData.saveValues["VideoHeight"] + ":(" + SaveData.saveValues["VideoWidth"] + "-iw*min(" + SaveData.saveValues["VideoWidth"] + "/iw\\," + SaveData.saveValues["VideoHeight"] + "/ih))/2:(" + SaveData.saveValues["VideoHeight"] + "-ih*min(" + SaveData.saveValues["VideoWidth"] + "/iw\\," + SaveData.saveValues["VideoHeight"] + "/ih))/2,setsar=1:1,fps=fps=30\"")
                         + " -y"
                         + " \"" + output + "\"";
                 startInfo.UseShellExecute = false;
@@ -937,7 +937,7 @@ namespace NonsensicalVideoGenerator
                         + " -c:v libx264"
                         + " -crf 18"
                         + " -preset veryfast"
-                        + " -vf scale=" + SaveData.saveValues["VideoWidth"] + "x" + SaveData.saveValues["VideoHeight"] + ",setsar=1:1,fps=fps=30"
+                        + (SaveData.saveValues["ConstrainAspectRatio"] == "true" ? " -vf scale=" + SaveData.saveValues["VideoWidth"] + "x" + SaveData.saveValues["VideoHeight"] + ",setsar=1:1,fps=fps=30" : " -vf \"scale=(iw*sar)*min(" + SaveData.saveValues["VideoWidth"] + "/(iw*sar)\\," + SaveData.saveValues["VideoHeight"] + "/ih):ih*min(" + SaveData.saveValues["VideoWidth"] + "/(iw*sar)\\," + SaveData.saveValues["VideoHeight"] + "/ih),pad=" + SaveData.saveValues["VideoWidth"] + ":" + SaveData.saveValues["VideoHeight"] + ":(" + SaveData.saveValues["VideoWidth"] + "-iw*min(" + SaveData.saveValues["VideoWidth"] + "/iw\\," + SaveData.saveValues["VideoHeight"] + "/ih))/2:(" + SaveData.saveValues["VideoHeight"] + "-ih*min(" + SaveData.saveValues["VideoWidth"] + "/iw\\," + SaveData.saveValues["VideoHeight"] + "/ih))/2,setsar=1:1,fps=fps=30\"")
                         + " -y"
                         + " \"" + output + "\"";
                 startInfo.UseShellExecute = false;
@@ -1040,7 +1040,7 @@ namespace NonsensicalVideoGenerator
                                 + " -crf 18"
                                 + " -preset veryfast"
                                 + " -af apad"
-                                + " -vf scale=" + SaveData.saveValues["VideoWidth"] + "x" + SaveData.saveValues["VideoHeight"] + ",setsar=1:1,fps=fps=30"
+                                + (SaveData.saveValues["ConstrainAspectRatio"] == "true" ? " -vf scale=" + SaveData.saveValues["VideoWidth"] + "x" + SaveData.saveValues["VideoHeight"] + ",setsar=1:1,fps=fps=30" : " -vf \"scale=(iw*sar)*min(" + SaveData.saveValues["VideoWidth"] + "/(iw*sar)\\," + SaveData.saveValues["VideoHeight"] + "/ih):ih*min(" + SaveData.saveValues["VideoWidth"] + "/(iw*sar)\\," + SaveData.saveValues["VideoHeight"] + "/ih),pad=" + SaveData.saveValues["VideoWidth"] + ":" + SaveData.saveValues["VideoHeight"] + ":(" + SaveData.saveValues["VideoWidth"] + "-iw*min(" + SaveData.saveValues["VideoWidth"] + "/iw\\," + SaveData.saveValues["VideoHeight"] + "/ih))/2:(" + SaveData.saveValues["VideoHeight"] + "-ih*min(" + SaveData.saveValues["VideoWidth"] + "/iw\\," + SaveData.saveValues["VideoHeight"] + "/ih))/2,setsar=1:1,fps=fps=30\"")
                                 + " -ar 32000 -shortest -avoid_negative_ts make_zero -fflags +genpts"
                                 + " -y"
                                 + " \"" + Path.Combine(temporaryDirectory, "concat" + i2 + ".mp4") + "\"";

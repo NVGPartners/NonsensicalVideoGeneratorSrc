@@ -52,7 +52,8 @@ namespace NonsensicalVideoGenerator
             {"MaxUniqueClips", "0"},
             {"DeleteClipsAfterMaxUniqueClips", "false"},
             {"DisableClipsAfterMaxUniqueClips", "false"},
-            {"EnableDiscordRPC", "true"}
+            {"EnableDiscordRPC", "true"},
+            {"ConstrainAspectRatio", "true"}
         };
         public static string saveFileName = "Options.json";
         public static bool Save()

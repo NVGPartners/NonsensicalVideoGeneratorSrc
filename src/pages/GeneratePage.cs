@@ -180,6 +180,7 @@ namespace NonsensicalVideoGenerator
                         controllerPage3.interactables["MaxUniqueClips"].Tooltip = SaveData.saveValues["MaxUniqueClips"];
                         ((Switch)controllerPage3.interactables["DeleteClipsAfterMaxUniqueClips"]).SwitchState = SaveData.saveValues["DeleteClipsAfterMaxUniqueClips"] == "true";
                         ((Switch)controllerPage3.interactables["DisableClipsAfterMaxUniqueClips"]).SwitchState = SaveData.saveValues["DisableClipsAfterMaxUniqueClips"] == "true";
+                        ((Switch)controllerPage3.interactables["ConstrainAspectRatio"]).SwitchState = SaveData.saveValues["ConstrainAspectRatio"] == "true";
                         return true;
                 }
                 return false;
@@ -282,6 +283,21 @@ namespace NonsensicalVideoGenerator
                 return false;
             }, contentManager.Load<Texture2D>("graphics/actions/render")));
             // PAGE 3
+            controllerPage3.Add("ConstrainAspectRatio", new Switch("Constrain Aspect Ratio", "Clips will retain their original aspect ratio when disabled.", new Vector2(139, 60+19*3), (int i) => {
+                bool switchState = (i & 256) != 0;
+                if((i & 2) != 0)
+                {
+                    string oldValue = SaveData.saveValues["ConstrainAspectRatio"];
+                    SaveData.saveValues["ConstrainAspectRatio"] = switchState.ToString().ToLower();
+                    if(oldValue != SaveData.saveValues["ConstrainAspectRatio"])
+                    {
+                        SaveData.saveValues["ConstrainAspectRatio"] = "false";
+                        (controllerPage3.interactables["ConstrainAspectRatio"] as Switch).SwitchState = false;
+                        SaveData.Save();
+                    }
+                }
+                return switchState;
+            }, SaveData.saveValues["ConstrainAspectRatio"] == "true"));
             controllerPage3.Add("DisableClipsAfterMaxUniqueClips", new Switch("Disable Clips After Max Reached", "Disable clips after they reach the max unique clip count.", new Vector2(139, 60+19*2), (int i) => {
                 bool switchState = (i & 256) != 0;
                 if((i & 2) != 0)
