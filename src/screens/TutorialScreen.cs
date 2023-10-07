@@ -304,10 +304,10 @@ namespace NonsensicalVideoGenerator
                 "Enjoy using Nonsensical Video Generator!",
                 "",
                 "If there are still issues, the continue button will be disabled.",
-                "In that case, broken plugins would have been detected.",
-                "Check console with F5 to see which plugins are broken, if so.",
+                "In that case, broken addons would have been detected.",
+                "Check console with F5 to see which addons are broken, if so.",
                 "",
-                "Click \"Continue\" to scan plugins and continue if successful."
+                "Click \"Continue\" to scan addons and continue if successful."
             },
             new List<string>()
             { // PLUGIN CONSENT FORM
@@ -760,7 +760,7 @@ namespace NonsensicalVideoGenerator
                             UserConsent.Accept(UserConsent.consentForm?.pluginName);
                             GlobalContent.GetSound("Back").Play(int.Parse(SaveData.saveValues["SoundEffectVolume"], System.Globalization.CultureInfo.InvariantCulture) / 100f, 0f, 0f);
                             toggle = false;
-                            Global.generator.progressText = $"Plugin {UserConsent.consentForm?.pluginName} accepted.";
+                            Global.generator.progressText = $"Addon {UserConsent.consentForm?.pluginName} accepted.";
                             if(!bool.Parse(SaveData.saveValues["DisableMotion"]))
                             {
                                 tween.TweenTo(this, t => t.offset, new Vector2(GlobalGraphics.Scale(-640), GlobalGraphics.Scale(240)), 0.5f)

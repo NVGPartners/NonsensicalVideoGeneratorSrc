@@ -26,7 +26,7 @@ namespace NonsensicalVideoGenerator
                     return Tab.Generate;
                 case "Library":
                     return Tab.Library;
-                case "Effects":
+                case "Addons":
                     return Tab.Effects;
                 case "Options":
                     return Tab.Options;
@@ -81,7 +81,7 @@ namespace NonsensicalVideoGenerator
                     break;
                 case Tab.Effects:
                     presence.Assets.SmallImageKey = "effects";
-                    presence.Assets.SmallImageText = "Effects Tab";
+                    presence.Assets.SmallImageText = "Addons Tab";
                     break;
                 case Tab.Options:
                     presence.Assets.SmallImageKey = "options";

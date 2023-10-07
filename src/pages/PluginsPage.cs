@@ -17,8 +17,8 @@ namespace NonsensicalVideoGenerator
     /// </summary>
     public class PluginsPage : IPage
     {
-        public string Name { get; set; } = "Effects";
-        public string Tooltip { get; } = "Add, remove, or modify effect plugins.";
+        public string Name { get; set; } = "Addons";
+        public string Tooltip { get; } = "Add, remove, or modify Workshop addons.";
         private int scrollOffset = 0;
         private int maxScrollOffset = 0;
         private bool dragging = false;
@@ -40,9 +40,8 @@ namespace NonsensicalVideoGenerator
             // 136, 57 PluginEntry
             // 294, 69-214 ScrollHandle (9x9)
             Texture2D pluginPage = GlobalContent.GetTexture("PluginPage");
-            Texture2D pluginSettings = GlobalContent.GetTexture("PluginSettings");
-            Texture2D createPlugin = GlobalContent.GetTexture("CreatePlugin");
             Texture2D pluginEntry = GlobalContent.GetTexture("PluginEntry");
+            Texture2D pluginEntryBlank = GlobalContent.GetTexture("PluginEntryBlank");
             Texture2D scrollHandle = GlobalContent.GetTexture("ScrollHandle");
             Texture2D interactiveSwitchOn = GlobalContent.GetTexture("InteractiveSwitchOn");
             Texture2D interactiveSwitchOff = GlobalContent.GetTexture("InteractiveSwitchOff");
@@ -67,16 +66,10 @@ namespace NonsensicalVideoGenerator
                 int plcount = PluginHandler.GetPluginCount() + 1;
                 for(int i = 0; i < plcount; i++)
                 {
-                    // Alternate colors so it's easier to see
-                    spriteBatch.Draw(pluginEntry, new Rectangle(GlobalGraphics.Scale(136), GlobalGraphics.Scale(57 + i * pluginEntry.Height + i), pluginEntry.Width * GlobalGraphics.scale, pluginEntry.Height * GlobalGraphics.scale), new Color(i % 2 == 0 ? 255 : 192, i % 2 == 0 ? 255 : 192, i % 2 == 0 ? 255 : 192));
                     if(i < plcount-1)
                     {
-                        if(Global.canRender)
-                        {
-                            spriteBatch.Draw(pluginSettings, new Rectangle(GlobalGraphics.Scale(226), GlobalGraphics.Scale(59 + i * pluginEntry.Height + i), pluginSettings.Width * GlobalGraphics.scale, pluginSettings.Height * GlobalGraphics.scale), new Color(i % 2 == 0 ? 255 : 192, i % 2 == 0 ? 255 : 192, i % 2 == 0 ? 255 : 192));
-                            spriteBatch.DrawString(munroSmall, "Settings", new Vector2(GlobalGraphics.Scale(233+1), GlobalGraphics.Scale(58+1 + i * pluginEntry.Height + i)), Color.Black);
-                            spriteBatch.DrawString(munroSmall, "Settings", new Vector2(GlobalGraphics.Scale(233), GlobalGraphics.Scale(58 + i * pluginEntry.Height + i)), Color.White);
-                        }
+                        // Alternate colors so it's easier to see
+                        spriteBatch.Draw(pluginEntry, new Rectangle(GlobalGraphics.Scale(136), GlobalGraphics.Scale(57 + i * pluginEntry.Height + i), pluginEntry.Width * GlobalGraphics.scale, pluginEntry.Height * GlobalGraphics.scale), new Color(i % 2 == 0 ? 255 : 192, i % 2 == 0 ? 255 : 192, i % 2 == 0 ? 255 : 192));
                         spriteBatch.DrawString(munroSmall, PluginHandler.plugins[i].GetDisplayName(), new Vector2(GlobalGraphics.Scale(141+1), GlobalGraphics.Scale(58+1 + i * pluginEntry.Height + i)), Color.Black);
                         spriteBatch.DrawString(munroSmall, PluginHandler.plugins[i].GetDisplayName(), new Vector2(GlobalGraphics.Scale(141), GlobalGraphics.Scale(58 + i * pluginEntry.Height + i)), Color.White);
                         if(Global.canRender)
@@ -91,10 +84,11 @@ namespace NonsensicalVideoGenerator
                     }
                     else
                     {
+                        // Alternate colors so it's easier to see
+                        spriteBatch.Draw(pluginEntryBlank, new Rectangle(GlobalGraphics.Scale(136), GlobalGraphics.Scale(57 + i * pluginEntry.Height + i), pluginEntry.Width * GlobalGraphics.scale, pluginEntry.Height * GlobalGraphics.scale), new Color(i % 2 == 0 ? 255 : 192, i % 2 == 0 ? 255 : 192, i % 2 == 0 ? 255 : 192));
                         // create plugin
-                        spriteBatch.Draw(createPlugin, new Rectangle(GlobalGraphics.Scale(265), GlobalGraphics.Scale(59 + i * pluginEntry.Height + i), createPlugin.Width * GlobalGraphics.scale, createPlugin.Height * GlobalGraphics.scale), new Color(i % 2 == 0 ? 255 : 192, i % 2 == 0 ? 255 : 192, i % 2 == 0 ? 255 : 192));
-                        spriteBatch.DrawString(munroSmall, "Workshop Effect Management", new Vector2(GlobalGraphics.Scale(141+1), GlobalGraphics.Scale(58+1 + i * pluginEntry.Height + i)), Color.Black);
-                        spriteBatch.DrawString(munroSmall, "Workshop Effect Management", new Vector2(GlobalGraphics.Scale(141), GlobalGraphics.Scale(58 + i * pluginEntry.Height + i)), Color.White);
+                        spriteBatch.DrawString(munroSmall, "Addon Management", new Vector2(GlobalGraphics.Scale(141+1), GlobalGraphics.Scale(58+1 + i * pluginEntry.Height + i)), Color.Black);
+                        spriteBatch.DrawString(munroSmall, "Addon Management", new Vector2(GlobalGraphics.Scale(141), GlobalGraphics.Scale(58 + i * pluginEntry.Height + i)), Color.White);
                     }
                 }
                 // End offset
@@ -159,9 +153,9 @@ namespace NonsensicalVideoGenerator
                             if (MouseInput.MouseState.X >= GlobalGraphics.Scale(269) && MouseInput.MouseState.X < GlobalGraphics.Scale(290)
                                 && MouseInput.MouseState.Y >= GlobalGraphics.Scale(59 + (i * 16) - scrollOffset) && MouseInput.MouseState.Y < GlobalGraphics.Scale(70 + (i * 16) - scrollOffset))
                             {
-                                internalTooltip = Global.canRender ?"Click to toggle plugin." : "Loading...";
+                                internalTooltip = Global.canRender ?"Click to toggle addon." : "Loading...";
                             }
-                            int inRange = 228;
+                            int inRange = 254;
                             if(!Global.canRender)
                             {
                                 inRange = 267; // No settings button
@@ -183,10 +177,10 @@ namespace NonsensicalVideoGenerator
                             }
                             if(Global.canRender)
                             {
-                                if (MouseInput.MouseState.X >= GlobalGraphics.Scale(230) && MouseInput.MouseState.X < GlobalGraphics.Scale(267)
+                                if (MouseInput.MouseState.X >= GlobalGraphics.Scale(256) && MouseInput.MouseState.X < GlobalGraphics.Scale(267)
                                     && MouseInput.MouseState.Y >= GlobalGraphics.Scale(59 + (i * 16) - scrollOffset) && MouseInput.MouseState.Y < GlobalGraphics.Scale(70 + (i * 16) - scrollOffset))
                                 {
-                                    internalTooltip = "Edit plugin settings.";
+                                    internalTooltip = "Edit settings.";
                                 }
                             }
                         }
@@ -196,7 +190,7 @@ namespace NonsensicalVideoGenerator
                             if (MouseInput.MouseState.X >= GlobalGraphics.Scale(138) && MouseInput.MouseState.X < GlobalGraphics.Scale(290)
                                 && MouseInput.MouseState.Y >= GlobalGraphics.Scale(59 + (i * 16) - scrollOffset) && MouseInput.MouseState.Y < GlobalGraphics.Scale(70 + (i * 16) - scrollOffset))
                             {
-                                internalTooltip = "Create custom effects.";
+                                internalTooltip = "Create or reload addons.";
                             }
                         }
                     }
@@ -341,7 +335,7 @@ namespace NonsensicalVideoGenerator
                     {
                         if(i < plcount-1)
                         {
-                            int inRange = 228;
+                            int inRange = 254;
                             if(!Global.canRender)
                             {
                                 inRange = 267; // No settings button
@@ -351,7 +345,7 @@ namespace NonsensicalVideoGenerator
                             if(Global.canRender)
                             {
                                 // Settings Button
-                                Accessibility.CompatAccessibility(new Rectangle(GlobalGraphics.Scale(230), GlobalGraphics.Scale(59 + (i * 16) - scrollOffset), GlobalGraphics.Scale(37), GlobalGraphics.Scale((70 + (i * 16) - scrollOffset) - (59 + (i * 16) - scrollOffset))), "Settings for \"" + PluginHandler.plugins[i].GetDisplayName() + "\"");
+                                Accessibility.CompatAccessibility(new Rectangle(GlobalGraphics.Scale(256), GlobalGraphics.Scale(59 + (i * 16) - scrollOffset), GlobalGraphics.Scale(11), GlobalGraphics.Scale((70 + (i * 16) - scrollOffset) - (59 + (i * 16) - scrollOffset))), "Settings for \"" + PluginHandler.plugins[i].GetDisplayName() + "\"");
                             }
                             // Main Button
                             Accessibility.CompatAccessibility(new Rectangle(GlobalGraphics.Scale(138), GlobalGraphics.Scale(59 + (i * 16) - scrollOffset), GlobalGraphics.Scale(inRange-138), GlobalGraphics.Scale((70 + (i * 16) - scrollOffset) - (59 + (i * 16) - scrollOffset))), "Open container for \"" + PluginHandler.plugins[i].GetDisplayName() + "\"");
@@ -359,7 +353,7 @@ namespace NonsensicalVideoGenerator
                         else
                         {
                             // create plugin
-                            Accessibility.CompatAccessibility(new Rectangle(GlobalGraphics.Scale(138), GlobalGraphics.Scale(59 + (i * 16) - scrollOffset), GlobalGraphics.Scale(152), GlobalGraphics.Scale((70 + (i * 16) - scrollOffset) - (59 + (i * 16) - scrollOffset))), "Workshop Effect Management (Create custom effects.)");
+                            Accessibility.CompatAccessibility(new Rectangle(GlobalGraphics.Scale(138), GlobalGraphics.Scale(59 + (i * 16) - scrollOffset), GlobalGraphics.Scale(152), GlobalGraphics.Scale((70 + (i * 16) - scrollOffset) - (59 + (i * 16) - scrollOffset))), "Addon Management (Create or reload addons.)");
                         }
                     }
                     if(MouseInput.MouseState.LeftButton == ButtonState.Pressed && MouseInput.LastMouseState.LeftButton == ButtonState.Released)
@@ -386,7 +380,7 @@ namespace NonsensicalVideoGenerator
                                     return true;
                                 }
                                 // Open folder containing plugin
-                                int inRange = 228;
+                                int inRange = 254;
                                 if(!Global.canRender)
                                 {
                                     inRange = 267; // No settings button
@@ -434,7 +428,7 @@ namespace NonsensicalVideoGenerator
                                 // Settings button
                                 if(Global.canRender)
                                 {
-                                    if (MouseInput.MouseState.X >= GlobalGraphics.Scale(230) && MouseInput.MouseState.X < GlobalGraphics.Scale(267)
+                                    if (MouseInput.MouseState.X >= GlobalGraphics.Scale(256) && MouseInput.MouseState.X < GlobalGraphics.Scale(267)
                                         && MouseInput.MouseState.Y >= GlobalGraphics.Scale(59 + (i * 16) - scrollOffset) && MouseInput.MouseState.Y < GlobalGraphics.Scale(70 + (i * 16) - scrollOffset))
                                     {
                                         GlobalContent.GetSound("Select").Play(int.Parse(SaveData.saveValues["SoundEffectVolume"], System.Globalization.CultureInfo.InvariantCulture) / 100f, 0f, 0f);
@@ -617,7 +611,7 @@ namespace NonsensicalVideoGenerator
                                                                         fileDialog.FileName = "workshop.jpg";
                                                                         if(fileDialog.ShowDialog() == System.Windows.Forms.DialogResult.OK)
                                                                         {
-                                                                            Name = "Effects";
+                                                                            Name = "Addons";
                                                                             editingSettings = false;
                                                                             controller.Clear();
                                                                             Global.generator.progressText = "Uploading...";
@@ -628,13 +622,13 @@ namespace NonsensicalVideoGenerator
                                                                 }
                                                                 return false;
                                                             }));
-                                                            controller.Add("Back", new Button("Back", "Go back to effect plugin list.", new Vector2(119+167, 60+10+19*8), (int i) => {
+                                                            controller.Add("Back", new Button("Back", "Go back to effect addon list.", new Vector2(119+167, 60+10+19*8), (int i) => {
                                                                 switch(i)
                                                                 {
                                                                     case 2: // left click
                                                                         GlobalContent.GetSound("Back").Play(int.Parse(SaveData.saveValues["SoundEffectVolume"], System.Globalization.CultureInfo.InvariantCulture) / 100f, 0f, 0f);
                                                                         controller.Clear();
-                                                                        Name = "Effects";
+                                                                        Name = "Addons";
                                                                         editingSettings = false;
                                                                         return true;
                                                                 }
@@ -646,13 +640,13 @@ namespace NonsensicalVideoGenerator
                                                 }));
                                             }
                                         }
-                                        controller.Add("Back", new Button("Back", "Go back to effect plugin list.", new Vector2(119+36, 60+10+19*8), (int i) => {
+                                        controller.Add("Back", new Button("Back", "Go back to addon list.", new Vector2(119+36, 60+10+19*8), (int i) => {
                                             switch(i)
                                             {
                                                 case 2: // left click
                                                     GlobalContent.GetSound("Back").Play(int.Parse(SaveData.saveValues["SoundEffectVolume"], System.Globalization.CultureInfo.InvariantCulture) / 100f, 0f, 0f);
                                                     controller.Clear();
-                                                    Name = "Effects";
+                                                    Name = "Addons";
                                                     editingSettings = false;
                                                     return true;
                                             }
@@ -743,12 +737,15 @@ namespace NonsensicalVideoGenerator
                                                             string oldValue = PluginHandler.plugins[settingsIndex].settings[keyFromIndex].ToString();
                                                             if(!controller.interactables.ContainsKey(keyFromIndex))
                                                             {
-                                                                Global.editing = "";
+                                                                GlobalContent.GetSound("Error").Play(int.Parse(SaveData.saveValues["SoundEffectVolume"], System.Globalization.CultureInfo.InvariantCulture) / 100f, 0f, 0f);
                                                                 return true;
                                                             }
                                                             PluginHandler.plugins[settingsIndex].settings[keyFromIndex] = controller.interactables[keyFromIndex].Tooltip;
                                                             if(oldValue != PluginHandler.plugins[settingsIndex].settings[keyFromIndex].ToString())
+                                                            {
                                                                 PluginHandler.SavePluginSettings();
+                                                                GlobalContent.GetSound("RenderComplete").Play(int.Parse(SaveData.saveValues["SoundEffectVolume"], System.Globalization.CultureInfo.InvariantCulture) / 100f, 0f, 0f);
+                                                            }
                                                         }
                                                         return false;
                                                     }).Register();
@@ -803,11 +800,10 @@ namespace NonsensicalVideoGenerator
         public void LoadContent(ContentManager contentManager, GraphicsDevice graphicsDevice)
         {
             GlobalContent.AddTexture("PluginPage", contentManager.Load<Texture2D>("graphics/pluginpage"));
-            GlobalContent.AddTexture("PluginSettings", contentManager.Load<Texture2D>("graphics/pluginsettings"));
-            GlobalContent.AddTexture("CreatePlugin", contentManager.Load<Texture2D>("graphics/createplugin"));
+            GlobalContent.AddTexture("PluginEntryBlank", contentManager.Load<Texture2D>("graphics/pluginentryblank"));
             GlobalContent.AddTexture("PluginEntry", contentManager.Load<Texture2D>("graphics/pluginentry"));
             GlobalContent.AddTexture("ScrollHandle", contentManager.Load<Texture2D>("graphics/scrollhandle"));
-            controllerPluginCreation.Add("PluginMinimal", new Switch("Minimal Template", "Use a minimal effect file template.", new Vector2(139, 60+19*2), (int i) => {
+            controllerPluginCreation.Add("PluginMinimal", new Switch("Minimal Template", "Use a minimal Lua file template.", new Vector2(139, 60+19*2), (int i) => {
                 bool switchState = (i & 256) != 0;
                 if((i & 2) != 0)
                 {
@@ -815,12 +811,12 @@ namespace NonsensicalVideoGenerator
                 }
                 return switchState;
             }, customPluginMinimal));
-            controllerPluginCreation.Add("PluginName", new TextEntry("Effect File Name", "The internal file name of the effect.", customPluginFileName, new Vector2(139, 60+19), 50, 25, 4, (int i) => {
+            controllerPluginCreation.Add("PluginName", new TextEntry("Addon File Name", "The internal file name of the addon.", customPluginFileName, new Vector2(139, 60+19), 50, 25, 4, (int i) => {
                 controllerPluginCreation.interactables["PluginName"].Tooltip = controllerPluginCreation.interactables["PluginName"].Tooltip.ToLower();
                 customPluginFileName = controllerPluginCreation.interactables["PluginName"].Tooltip;
                 return false;
             }));
-            controllerPluginCreation.Add("PluginPrettyName", new TextEntry("Effect Name", "The human-readable name of the effect.", customPluginName, new Vector2(139, 60), 50, 25, 5, (int i) => {
+            controllerPluginCreation.Add("PluginPrettyName", new TextEntry("Addon Name", "The human-readable name of the addon.", customPluginName, new Vector2(139, 60), 50, 25, 5, (int i) => {
                 customPluginName = controllerPluginCreation.interactables["PluginPrettyName"].Tooltip;
                 return false;
             }));
@@ -835,7 +831,7 @@ namespace NonsensicalVideoGenerator
                 }
                 return false;
             }));
-            controllerPluginCreation.Add("ReloadPlugins", new Button("Reload All", "Force reload all effects.", new Vector2(119+100, 60+10+19*7), (int i) => {
+            controllerPluginCreation.Add("ReloadPlugins", new Button("Reload All", "Force reload all addons.", new Vector2(119+100, 60+10+19*7), (int i) => {
                 switch(i)
                 {
                     case 2:
@@ -848,7 +844,7 @@ namespace NonsensicalVideoGenerator
                 }
                 return false;
             }));
-            controllerPluginCreation.Add("CreatePlugin", new Button("Create", "Create the effect as specified.", new Vector2(139+141, 60+10+19*8), (int i) => {
+            controllerPluginCreation.Add("CreatePlugin", new Button("Create", "Create the addon as specified.", new Vector2(139+141, 60+10+19*8), (int i) => {
                 switch(i)
                 {
                     case 2:

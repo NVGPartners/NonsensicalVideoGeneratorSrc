@@ -89,7 +89,7 @@ namespace NonsensicalVideoGenerator
                     }
                     if(!pluginLoaded)
                     {
-                        ConsoleOutput.WriteLine("Plugin " + consentForm.pluginName + " is not loaded. Removing consent form.", Color.Red);
+                        ConsoleOutput.WriteLine("Addon " + consentForm.pluginName + " is not loaded. Removing consent form.", Color.Red);
                         // Remove consent form from json file
                         consentForms.Remove(consentForm);
                         File.WriteAllText(consentFileName, JsonConvert.SerializeObject(consentForms, Formatting.Indented));

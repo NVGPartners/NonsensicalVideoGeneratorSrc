@@ -23,6 +23,7 @@
 			"FileExclusion" "*Options.json*"
 			"FileExclusion" "*steam_appid.txt*"
 			"FileExclusion" "*PluginSettings.json*"
+			"FileExclusion" "*UserConsent.json*"
 		}
 	}
 }

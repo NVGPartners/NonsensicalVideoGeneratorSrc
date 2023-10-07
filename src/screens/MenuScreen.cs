@@ -111,7 +111,7 @@ namespace NonsensicalVideoGenerator
             {
                 name = Pagination.GetPage(i).Name;
                 if(i == 2)
-                    name = "Effects";
+                    name = "Addons";
                 spriteBatch.DrawString(GlobalGraphics.fontMunro, name, new Vector2(GlobalGraphics.Scale(7+1), GlobalGraphics.Scale(136 + (pageOffset * i)+1)), Color.Black);
                 spriteBatch.DrawString(GlobalGraphics.fontMunro, name, new Vector2(GlobalGraphics.Scale(7), GlobalGraphics.Scale(136 + (pageOffset * i))), Color.White);
             }
@@ -173,7 +173,7 @@ namespace NonsensicalVideoGenerator
                 {
                     string name = Pagination.GetPage(i).Name;
                     if(i == 2)
-                        name = "Effects";
+                        name = "Addons";
                     Accessibility.CompatAccessibility(new Rectangle(GlobalGraphics.Scale(4), GlobalGraphics.Scale(i * 16 + 134), GlobalGraphics.Scale(45), GlobalGraphics.Scale(16)), name + " (" + Pagination.GetPage(i).Tooltip + ")");
                 }
                 // Bounds of each segment
@@ -199,7 +199,7 @@ namespace NonsensicalVideoGenerator
                             {
                                 string name = Pagination.GetPage(segment).Name;
                                 if(segment == 2)
-                                    name = "Effects";
+                                    name = "Addons";
                                 DiscordRPC.curtab = DiscordRPC.ToTab(name);
                                 if(segment == Pagination.GetPageCount() - 2)
                                 {

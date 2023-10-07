@@ -70,7 +70,7 @@ namespace NonsensicalVideoGenerator
                 }
                 catch
                 {
-                    ConsoleOutput.WriteLine("Failed to load Workshop plugins.");
+                    ConsoleOutput.WriteLine("Failed to load Workshop addons.");
                     PluginHandler.LoadPluginsThreaded();
                 }
             }
@@ -137,7 +137,7 @@ namespace NonsensicalVideoGenerator
             new string[]
             {
                 "Check out the GitHub wiki to learn how",
-                "to use the program and create plugins."
+                "to use the program and create addons."
             },
             new string[]
             {

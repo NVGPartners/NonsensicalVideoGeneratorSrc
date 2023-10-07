@@ -304,7 +304,7 @@ namespace NonsensicalVideoGenerator
                         || matchString.Contains(">")
                         || matchString.Contains("<"))
                     {
-                        ConsoleOutput.WriteLine("A plugin attempted to pipe or redirect output.", Color.Red);
+                        ConsoleOutput.WriteLine("An addon attempted to pipe or redirect output.", Color.Red);
                         illegal = true;
                         break;
                     }
@@ -313,13 +313,13 @@ namespace NonsensicalVideoGenerator
             // Disallow directory and drive traversal
             if (args.Contains("..") || args.Contains(":\\"))
             {
-                ConsoleOutput.WriteLine("A plugin attempted to perform directory traversal.", Color.Red);
+                ConsoleOutput.WriteLine("An addon attempted to perform directory traversal.", Color.Red);
                 illegal = true;
             }
             // Don't allow batch or ps1 files to be created
             if (args.Contains(".bat") || args.Contains(".ps1"))
             {
-                ConsoleOutput.WriteLine("A plugin attempted to create a batch or powershell script.", Color.Red);
+                ConsoleOutput.WriteLine("An addon attempted to create a batch or powershell script.", Color.Red);
                 illegal = true;
             }
             if(illegal)
@@ -501,12 +501,12 @@ namespace NonsensicalVideoGenerator
         {
             if(consentForm != null && !consentForm.CheckConsentParam(Consents.AddToLibrary, ReplacePlaceholders(path)))
             {
-                ConsoleOutput.WriteLine("Plugin attempted to add a file to the library without permission.", Color.Red);
+                ConsoleOutput.WriteLine("Addon attempted to add a file to the library without permission.", Color.Red);
                 return;
             }
             if(!ValidateInput(path))
             {
-                ConsoleOutput.WriteLine("Plugin attempted to add a file to the library with an invalid path.", Color.Red);
+                ConsoleOutput.WriteLine("Addon attempted to add a file to the library with an invalid path.", Color.Red);
                 return;
             }
             // Validate rootType and subType
@@ -569,19 +569,19 @@ namespace NonsensicalVideoGenerator
         {
             if(consentForm != null && !consentForm.CheckConsentParam(Consents.DownloadFiles, ReplacePlaceholders(url)))
             {
-                ConsoleOutput.WriteLine("Plugin attempted to download a file without permission.", Color.Red);
+                ConsoleOutput.WriteLine("Addon attempted to download a file without permission.", Color.Red);
                 return;
             }
             if(!ValidateInput(ReplacePlaceholders(url)))
             {
-                ConsoleOutput.WriteLine("Plugin attempted to download a file with an invalid URL.", Color.Red);
+                ConsoleOutput.WriteLine("Addon attempted to download a file with an invalid URL.", Color.Red);
                 return;
             }
             if(subType == "")
                 rootType = jobDirectory;
             else if(consentForm != null && !consentForm.CheckConsentParam(Consents.AddToLibrary, Path.GetFileName(ReplacePlaceholders(url))))
             {
-                ConsoleOutput.WriteLine("Plugin attempted to add a file to the library without permission.", Color.Red);
+                ConsoleOutput.WriteLine("Addon attempted to add a file to the library without permission.", Color.Red);
                 return;
             }
             PluginHandler.commands.Add(new Command(CommandType.Download, ReplacePlaceholders(url) + " " + rootType + " " + subType, jobDirectory));
@@ -591,17 +591,17 @@ namespace NonsensicalVideoGenerator
         {
             if(consentForm != null && !consentForm.CheckConsentParam(Consents.ExecutePrograms, ReplacePlaceholders(program)))
             {
-                ConsoleOutput.WriteLine("Plugin attempted to execute a program without permission.", Color.Red);
+                ConsoleOutput.WriteLine("Addon attempted to execute a program without permission.", Color.Red);
                 return;
             }
             if(!ValidateInput(ReplacePlaceholders(program)))
             {
-                ConsoleOutput.WriteLine("Plugin attempted to execute a program with an invalid program name.", Color.Red);
+                ConsoleOutput.WriteLine("Addon attempted to execute a program with an invalid program name.", Color.Red);
                 return;
             }
             if(!ValidateInput(ReplacePlaceholders(args)))
             {
-                ConsoleOutput.WriteLine("Plugin attempted to execute a program with invalid arguments.", Color.Red);
+                ConsoleOutput.WriteLine("Addon attempted to execute a program with invalid arguments.", Color.Red);
                 return;
             }
             // If program is yt-dlp, allow it to be executed from cwd
@@ -665,7 +665,7 @@ namespace NonsensicalVideoGenerator
             {
                 return new PluginReturnValue(false, Path.GetFileName(path));
             }
-            ConsoleOutput.WriteLine($"Calling plugin {Path.GetFileName(path)}", Color.LightBlue);
+            ConsoleOutput.WriteLine($"Calling Addon {Path.GetFileName(path)}", Color.LightBlue);
             switch (type)
             {
                 case PluginType.Lua:
@@ -807,7 +807,7 @@ namespace NonsensicalVideoGenerator
                         DynValue luaQuery = luaScript.Call(luaScript.Globals["Query"]);
                         if (luaQuery.Type != DataType.Table)
                         {
-                            ConsoleOutput.WriteLine($"Plugin {Path.GetFileName(path)} returned invalid query.", Color.Red);
+                            ConsoleOutput.WriteLine($"Addon {Path.GetFileName(path)} returned invalid query.", Color.Red);
                             return false;
                         }
                         // Parse output.
@@ -831,7 +831,7 @@ namespace NonsensicalVideoGenerator
                             }
                             // Print count
                             //if (libraryCount > 0)
-                                //ConsoleOutput.WriteLine($"Plugin {Path.GetFileName(path)} added {libraryCount} libraries.", Color.LightBlue);
+                                //ConsoleOutput.WriteLine($"Addon {Path.GetFileName(path)} added {libraryCount} libraries.", Color.LightBlue);
                         }
                         DynValue luaSettings = luaQuery.Table.Get("settings");
                         if (luaSettings.Type == DataType.Table)
@@ -894,7 +894,7 @@ namespace NonsensicalVideoGenerator
                             }
                             // Print count
                             //if (settingCount > 0)
-                                //ConsoleOutput.WriteLine($"Plugin {Path.GetFileName(path)} added {settingCount} settings.", Color.LightBlue);
+                                //ConsoleOutput.WriteLine($"Addon {Path.GetFileName(path)} added {settingCount} settings.", Color.LightBlue);
                         }
                         DynValue luaConsentForms = luaQuery.Table.Get("userconsent");
                         if (luaConsentForms.Type == DataType.Table)
@@ -1073,9 +1073,9 @@ namespace NonsensicalVideoGenerator
         public static void LoadPlugin(string path, PluginType type, string rootPath, string workshopid = "")
         {
             Plugin plugin = new(path, type, rootPath);
-            Global.generator.progressText = $"Loading plugin {Path.GetFileName(path)}...";
+            Global.generator.progressText = $"Loading Addon {Path.GetFileName(path)}...";
             if(!plugin.Query())
-                throw new Exception($"Failed to query plugin {Path.GetFileName(path)}.");
+                throw new Exception($"Failed to query Addon {Path.GetFileName(path)}.");
             plugins.Add(plugin);
             // Add entry to pluginsettings if it doesn't exist.
             Dictionary<string, object> pluginSettings = new();
@@ -1102,7 +1102,7 @@ namespace NonsensicalVideoGenerator
                     File.WriteAllText(pluginSettingsPath, JsonConvert.SerializeObject(existingPluginSettings, Formatting.Indented));
                 }
             }
-            ConsoleOutput.WriteLine($"Loaded plugin {key}.", Color.LightBlue);
+            ConsoleOutput.WriteLine($"Loaded Addon {key}.", Color.LightBlue);
         }
         private static void LoadPluginsRecursive(string path, PluginType type, string root = "")
         {
@@ -1124,7 +1124,7 @@ namespace NonsensicalVideoGenerator
                                 }
                                 else if(basename != "user")
                                 {
-                                    ConsoleOutput.WriteLine($"Deleting plugin {basename} because it is not subscribed to.", Color.Red);
+                                    ConsoleOutput.WriteLine($"Deleting Addon {basename} because it is not subscribed to.", Color.Red);
                                     File.Delete(file);
                                 }
                             }
@@ -1302,7 +1302,7 @@ namespace NonsensicalVideoGenerator
             {
                 Directory.CreateDirectory(pluginPath);
             }
-            ConsoleOutput.WriteLine($"Searching for plugins in {pluginPath}...", Color.LightBlue);
+            ConsoleOutput.WriteLine($"Searching for addons in {pluginPath}...", Color.LightBlue);
             List<string> pluginDirs = new()
             {
                 "workshop",
@@ -1332,7 +1332,7 @@ namespace NonsensicalVideoGenerator
                             type = PluginType.Lua;
                             break;
                     }
-                    ConsoleOutput.WriteLine($"Loading {dirName} plugins...", Color.LightBlue);
+                    ConsoleOutput.WriteLine($"Loading {dirName} addons...", Color.LightBlue);
                     if (type == PluginType.None)
                         continue;
                     LoadPluginsRecursive(file, type);
@@ -1365,7 +1365,7 @@ namespace NonsensicalVideoGenerator
                     {
                         UserConsent.needsConsent = true;
                         UserConsent.consentForm = plugin.consentForm;
-                        Global.generator.progressText = $"Plugin {plugin.GetDisplayName()} requires consent.";
+                        Global.generator.progressText = $"Addon {plugin.GetDisplayName()} requires consent.";
                         FramePlayer.canPlayBgMusic = false;
                         ScreenManager.PushNavigation("Initial Setup");
                         ScreenManager.GetScreen<TutorialScreen>("Initial Setup")?.Show();
@@ -1382,8 +1382,8 @@ namespace NonsensicalVideoGenerator
             }
             catch (Exception e)
             {
-                ConsoleOutput.WriteLine($"Error loading plugins: {e.Message}", Color.Red);
-                Global.generator.progressText = $"Error loading plugins!";
+                ConsoleOutput.WriteLine($"Error loading addons: {e.Message}", Color.Red);
+                Global.generator.progressText = $"Error loading addons!";
                 GlobalContent.GetSound("Error").Play(int.Parse(SaveData.saveValues["SoundEffectVolume"], System.Globalization.CultureInfo.InvariantCulture) / 100f, 0f, 0f);
                 return false;
             }
@@ -1446,7 +1446,7 @@ namespace NonsensicalVideoGenerator
             }
             catch(Exception e)
             {
-                ConsoleOutput.WriteLine($"Error creating plugin: {e.Message}", Color.Red);
+                ConsoleOutput.WriteLine($"Error creating addon: {e.Message}", Color.Red);
                 file = "";
                 return false;
             }
@@ -1463,7 +1463,7 @@ namespace NonsensicalVideoGenerator
             {
                 Global.generator.progressText = "Steam is not running.";
                 GlobalContent.GetSound("Error").Play(int.Parse(SaveData.saveValues["SoundEffectVolume"], System.Globalization.CultureInfo.InvariantCulture) / 100f, 0f, 0f);
-                ConsoleOutput.WriteLine("Steam is not running, cannot publish plugin.", Color.Red);
+                ConsoleOutput.WriteLine("Steam is not running, cannot publish addon.", Color.Red);
                 publishPlugin = null;
                 publishing = false;
                 return;
@@ -1705,7 +1705,7 @@ namespace NonsensicalVideoGenerator
                 return;
             }
             // Submit the update.
-            SteamAPICall_t call = SteamUGC.SubmitItemUpdate(handle, "Updated plugin.");
+            SteamAPICall_t call = SteamUGC.SubmitItemUpdate(handle, "Updated addon.");
             updateItemResult.Set(call);
             Global.generator.progressText = "Publishing...";
         }
@@ -1724,7 +1724,7 @@ namespace NonsensicalVideoGenerator
             }
             Global.generator.progressText = "Successfully published.";
             GlobalContent.GetSound("RenderComplete").Play(int.Parse(SaveData.saveValues["SoundEffectVolume"], System.Globalization.CultureInfo.InvariantCulture) / 100f, 0f, 0f);
-            ConsoleOutput.WriteLine($"Successfully published plugin {publishPlugin.GetDisplayName()} to the workshop.", Color.Green);
+            ConsoleOutput.WriteLine($"Successfully published addon {publishPlugin.GetDisplayName()} to the workshop.", Color.Green);
             publishPlugin.submittedId = param.m_nPublishedFileId.ToString();
             // Write the plugin's workshop id to .publish in the plugin's directory.
             string publishFile = Path.Combine(Path.GetDirectoryName(publishPlugin.path), ".publish");

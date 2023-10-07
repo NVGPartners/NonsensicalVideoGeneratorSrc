@@ -56,6 +56,12 @@ namespace NonsensicalVideoGenerator
                     {
                         if(Global.editing == Name + "Input")
                         {
+                            // Check to make sure there's actually some text
+                            if (Tooltip == "")
+                            {
+                                GlobalContent.GetSound("Error").Play(int.Parse(SaveData.saveValues["SoundEffectVolume"], System.Globalization.CultureInfo.InvariantCulture) / 100f, 0f, 0f);
+                                return true;
+                            }
                             Callback(State);
                             Global.editing = "";
                             //Accessibility.allowAccessibility = true;
@@ -64,11 +70,23 @@ namespace NonsensicalVideoGenerator
                         }
                         else if(Global.editing == "")
                         {
+                            // Check to make sure there's actually some text
+                            if (Tooltip == "")
+                            {
+                                GlobalContent.GetSound("Error").Play(int.Parse(SaveData.saveValues["SoundEffectVolume"], System.Globalization.CultureInfo.InvariantCulture) / 100f, 0f, 0f);
+                                return true;
+                            }
                             Callback(State);
                             Global.editing = Name + "Input";
                             //Accessibility.allowAccessibility = false;
                             GlobalContent.GetSound("Option").Play(int.Parse(SaveData.saveValues["SoundEffectVolume"], System.Globalization.CultureInfo.InvariantCulture) / 100f, 0f, 0f);
                             Global.mask.AddUnmaskedObject("TextEntry", new SimpleObject(scaledBounds, Color.Transparent, GlobalGraphics.pixel, () => {
+                                // Check to make sure there's actually some text
+                                if (Tooltip == "")
+                                {
+                                    GlobalContent.GetSound("Error").Play(int.Parse(SaveData.saveValues["SoundEffectVolume"], System.Globalization.CultureInfo.InvariantCulture) / 100f, 0f, 0f);
+                                    return true;
+                                }
                                 Callback(State);
                                 Global.editing = "";
                                 //Accessibility.allowAccessibility = true;
@@ -88,6 +106,12 @@ namespace NonsensicalVideoGenerator
                             }
                             else
                             {
+                                // Check to make sure there's actually some text
+                                if (Tooltip == "")
+                                {
+                                    GlobalContent.GetSound("Error").Play(int.Parse(SaveData.saveValues["SoundEffectVolume"], System.Globalization.CultureInfo.InvariantCulture) / 100f, 0f, 0f);
+                                    return true;
+                                }
                                 Callback(State);
                                 GlobalContent.GetSound("Back").Play(int.Parse(SaveData.saveValues["SoundEffectVolume"], System.Globalization.CultureInfo.InvariantCulture) / 100f, 0f, 0f);
                                 Global.mask.Disable();
@@ -102,6 +126,12 @@ namespace NonsensicalVideoGenerator
                     // Check for enter
                     if ((newKeyboardState.IsKeyDown(Keys.Enter) && !oldKeyboardState.IsKeyDown(Keys.Enter)) || (newKeyboardState.IsKeyDown(Keys.Escape) && !oldKeyboardState.IsKeyDown(Keys.Escape)))
                     {
+                        // Check to make sure there's actually some text
+                        if (Tooltip == "")
+                        {
+                            GlobalContent.GetSound("Error").Play(int.Parse(SaveData.saveValues["SoundEffectVolume"], System.Globalization.CultureInfo.InvariantCulture) / 100f, 0f, 0f);
+                            return true;
+                        }
                         Callback(0);
                         Global.editing = "";
                         Accessibility.allowAccessibility = true;

@@ -290,11 +290,7 @@ namespace NonsensicalVideoGenerator
                     string oldValue = SaveData.saveValues["ConstrainAspectRatio"];
                     SaveData.saveValues["ConstrainAspectRatio"] = switchState.ToString().ToLower();
                     if(oldValue != SaveData.saveValues["ConstrainAspectRatio"])
-                    {
-                        SaveData.saveValues["ConstrainAspectRatio"] = "false";
-                        (controllerPage3.interactables["ConstrainAspectRatio"] as Switch).SwitchState = false;
                         SaveData.Save();
-                    }
                 }
                 return switchState;
             }, SaveData.saveValues["ConstrainAspectRatio"] == "true"));

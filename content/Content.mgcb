@@ -181,7 +181,7 @@
 /processorParam:TextureFormat=Color
 /build:graphics/bannerbg.png
 
-#begin graphics/createplugin.png
+#begin graphics/pluginentryblank.png
 /importer:TextureImporter
 /processor:TextureProcessor
 /processorParam:ColorKeyColor=255,0,255,255
@@ -191,7 +191,7 @@
 /processorParam:ResizeToPowerOfTwo=False
 /processorParam:MakeSquare=False
 /processorParam:TextureFormat=Color
-/build:graphics/createplugin.png
+/build:graphics/pluginentryblank.png
 
 #begin graphics/icon.png
 /importer:TextureImporter
@@ -1212,18 +1212,6 @@
 /processorParam:MakeSquare=False
 /processorParam:TextureFormat=Color
 /build:graphics/pluginpage.png
-
-#begin graphics/pluginsettings.png
-/importer:TextureImporter
-/processor:TextureProcessor
-/processorParam:ColorKeyColor=255,0,255,255
-/processorParam:ColorKeyEnabled=True
-/processorParam:GenerateMipmaps=False
-/processorParam:PremultiplyAlpha=True
-/processorParam:ResizeToPowerOfTwo=False
-/processorParam:MakeSquare=False
-/processorParam:TextureFormat=Color
-/build:graphics/pluginsettings.png
 
 #begin graphics/progress.png
 /importer:TextureImporter
