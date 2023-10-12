@@ -741,17 +741,9 @@ namespace NonsensicalVideoGenerator
                                 return new PluginReturnValue(false, Path.GetFileName(path));
                             }
                         }
-                        catch (Exception e)
+                        catch (ScriptRuntimeException e)
                         {
-                            ConsoleOutput.WriteLine(e.Message, Color.Red);
-                            if (e.StackTrace != null)
-                                ConsoleOutput.WriteLine(e.StackTrace, Color.Red);
-                            if (e.InnerException != null)
-                            {
-                                ConsoleOutput.WriteLine(e.InnerException.Message, Color.Red);
-                                if (e.InnerException.StackTrace != null)
-                                    ConsoleOutput.WriteLine(e.InnerException.StackTrace, Color.Red);
-                            }
+                            ConsoleOutput.WriteLine(e.DecoratedMessage, Color.Red);
                             return new PluginReturnValue(false, Path.GetFileName(path));
                         }
                     }
@@ -791,7 +783,7 @@ namespace NonsensicalVideoGenerator
                     {
                         luaScript.DoFile(path);
                     }
-                    catch(Exception e)
+                    catch(SyntaxErrorException e)
                     {
                         if(workshopId != "" && rootPath.Contains("user"))
                         {
@@ -1380,9 +1372,9 @@ namespace NonsensicalVideoGenerator
                     }
                 }
             }
-            catch (Exception e)
+            catch (SyntaxErrorException e)
             {
-                ConsoleOutput.WriteLine($"Error loading addons: {e.Message}", Color.Red);
+                ConsoleOutput.WriteLine(e.DecoratedMessage, Color.Red);
                 Global.generator.progressText = $"Error loading addons!";
                 GlobalContent.GetSound("Error").Play(int.Parse(SaveData.saveValues["SoundEffectVolume"], System.Globalization.CultureInfo.InvariantCulture) / 100f, 0f, 0f);
                 return false;
