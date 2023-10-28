@@ -74,13 +74,16 @@ namespace NonsensicalVideoGenerator
                         switch(PluginHandler.plugins[i].GetAddonType())
                         {
                             case AddonType.Effect: // blue 
-                                curColor = new Color(192, 192, 255);
+                                //curColor = new Color(192, 192, 255);
+                                curColor = new Color(i % 2 == 0 ? 192 : 128, i % 2 == 0 ? 192 : 128, i % 2 == 0 ? 255 : 192);
                                 break;
                             case AddonType.PostRenderEffect: // green
-                                curColor = new Color(192, 255, 192);
+                                //curColor = new Color(192, 255, 192);
+                                curColor = new Color(i % 2 == 0 ? 128 : 64, i % 2 == 0 ? 255 : 192, i % 2 == 0 ? 128 : 64);
                                 break;
                             case AddonType.Theme: // red
-                                curColor = new Color(255, 192, 192);
+                                //curColor = new Color(255, 192, 192);
+                                curColor = new Color(i % 2 == 0 ? 255 : 192, i % 2 == 0 ? 128 : 64, i % 2 == 0 ? 128 : 64);
                                 break;
                         }
                         spriteBatch.Draw(pluginEntry, new Rectangle(GlobalGraphics.Scale(136), GlobalGraphics.Scale(57 + i * pluginEntry.Height + i), pluginEntry.Width * GlobalGraphics.scale, pluginEntry.Height * GlobalGraphics.scale), curColor);

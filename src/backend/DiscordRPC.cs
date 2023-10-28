@@ -44,6 +44,8 @@ namespace NonsensicalVideoGenerator
         }
         public static void Update()
         {
+            if(client == null)
+                return;
             if(Global.generator.progressText != curstate)
             {
                 curstate = Global.generator.progressText;
@@ -58,6 +60,8 @@ namespace NonsensicalVideoGenerator
         }
         public static void UpdatePresence()
         {
+            if(client == null)
+                return;
             RichPresence presence = new RichPresence()
             {
                 Details = Global.videoTitle + ".mp4",
@@ -96,6 +100,8 @@ namespace NonsensicalVideoGenerator
         }
         public static void Shutdown()
         {
+            if(client == null)
+                return;
             client.Dispose();
         }
     }

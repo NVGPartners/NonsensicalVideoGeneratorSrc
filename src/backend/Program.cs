@@ -12,6 +12,7 @@ namespace NonsensicalVideoGenerator
         {
             ConsoleOutput.Clear();
             SaveData.Load();
+            DisabledMedia.Load();
 #if MONOGAME
             using (var game = new UserInterface())
                 game.Run();

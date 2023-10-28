@@ -1591,7 +1591,18 @@ namespace NonsensicalVideoGenerator
                     nam = nam.Replace(".lua", "");
                 // Capitalize first letter
                 nam = nam.First().ToString().ToUpper() + nam.Substring(1);
-                nam += " Effect";
+                switch(publishPlugin.GetAddonType())
+                {
+                    case AddonType.Effect:
+                        nam += " Effect";
+                        break;
+                    case AddonType.PostRenderEffect:
+                        nam += " Post-Render Effect";
+                        break;
+                    case AddonType.Theme:
+                        nam += " Theme";
+                        break;
+                }
                 cont = SteamUGC.SetItemTitle(handle, nam);
             }
             if(!cont)

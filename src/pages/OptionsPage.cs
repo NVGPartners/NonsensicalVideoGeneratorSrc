@@ -30,6 +30,21 @@ namespace NonsensicalVideoGenerator
         public void LoadContent(ContentManager contentManager, GraphicsDevice graphicsDevice)
         {
             // Add dials
+            controller.Add("MuteMusicWhileTabbedOut", new Switch("Mute Music While Inactive", "Don't play music while NVG is in the background.", new Vector2(139, 60+19*6), (int i) => {
+                bool switchState = (i & 256) != 0;
+                if((i & 2) != 0)
+                {
+                    string oldValue = SaveData.saveValues["MuteMusicWhileTabbedOut"];
+                    SaveData.saveValues["MuteMusicWhileTabbedOut"] = switchState.ToString().ToLower();
+                    if(oldValue != SaveData.saveValues["MuteMusicWhileTabbedOut"])
+                        SaveData.Save();
+                    if(switchState)
+                        DiscordRPC.Initialize();
+                    else
+                        DiscordRPC.Shutdown();
+                }
+                return switchState;
+            }, SaveData.saveValues["MuteMusicWhileTabbedOut"] == "true"));
             controller.Add("EnableDiscordRPC", new Switch("Enable Discord RPC", "Tell others that you're using NVG.", new Vector2(139, 60+19*5), (int i) => {
                 bool switchState = (i & 256) != 0;
                 if((i & 2) != 0)

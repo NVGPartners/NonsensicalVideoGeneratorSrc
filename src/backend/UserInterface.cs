@@ -190,7 +190,7 @@ namespace NonsensicalVideoGenerator
                         MediaPlayer.Resume();
                         _musicState = MusicState.Playing;
                     }
-                    if((_windowState == WindowState.Unfocused && _musicState == MusicState.Playing) || !FramePlayer.canPlayBgMusic)
+                    if((SaveData.saveValues["MuteMusicWhileTabbedOut"] == "true" && (_windowState == WindowState.Unfocused) || false && _musicState == MusicState.Playing) || !FramePlayer.canPlayBgMusic)
                     {
                         // Fade out music.
                         if(MediaPlayer.Volume > 0.1f)

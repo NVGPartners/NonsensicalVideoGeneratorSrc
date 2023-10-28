@@ -212,12 +212,8 @@ namespace NonsensicalVideoGenerator
                         // If path is disabled, disable it.
                         // SaveData.saveValues["DisabledMedia"] is a string-stored json object
                         // that contains a list of disabled media paths.
-                        if (SaveData.saveValues["DisabledMedia"] != "")
-                        {
-                            List<string> disabled = JsonConvert.DeserializeObject<List<string>>(SaveData.saveValues["DisabledMedia"]);
-                            if (disabled.Contains(file))
-                                libFile.Enabled = false;
-                        }
+                        if (DisabledMedia.Contains(file))
+                            libFile.Enabled = false;
                         libraryFiles.Add(libFile);
                         break;
                     }
@@ -245,17 +241,14 @@ namespace NonsensicalVideoGenerator
                     LoadRecursive(path, type);
                 }
                 // Once complete, re-make SaveData.saveValues["DisabledMedia"] with disabled media
-                List<string> disabled = new();
                 foreach (LibraryFile file in libraryFiles)
                 {
                     if (!file.Enabled)
                     {
-                        if (!disabled.Contains(file.Path))
-                            disabled.Add(file.Path);
+                        DisabledMedia.Add(file.Path);
                     }
                 }
-                SaveData.saveValues["DisabledMedia"] = JsonConvert.SerializeObject(disabled);
-                SaveData.Save();
+                DisabledMedia.Save();
             }
             catch (Exception e)
             {
@@ -355,14 +348,8 @@ namespace NonsensicalVideoGenerator
                 // if disabled and in library, remove from SaveData.saveValues["DisabledMedia"]
                 // a string-stored json object
                 // that contains a list of disabled media paths.
-                if (SaveData.saveValues["DisabledMedia"] != "")
-                {
-                    List<string> disabled = JsonConvert.DeserializeObject<List<string>>(SaveData.saveValues["DisabledMedia"]);
-                    if (disabled.Contains(file.Path))
-                        disabled.Remove(file.Path);
-                    SaveData.saveValues["DisabledMedia"] = JsonConvert.SerializeObject(disabled);
-                    SaveData.Save();
-                }
+                DisabledMedia.Remove(file.Path);
+                DisabledMedia.Save();
                 File.Delete(file.Path);
                 //if(FileOperationAPIWrapper.Send(file.Path))
                     //libraryFiles.Remove(file);
@@ -390,14 +377,8 @@ namespace NonsensicalVideoGenerator
                         // Enable: Remove from SaveData.saveValues["DisabledMedia"]
                         // a string-stored json object
                         // that contains a list of disabled media paths.
-                        if (SaveData.saveValues["DisabledMedia"] != "")
-                        {
-                            List<string> disabled = JsonConvert.DeserializeObject<List<string>>(SaveData.saveValues["DisabledMedia"]);
-                            if (disabled.Contains(file.Path))
-                                disabled.Remove(file.Path);
-                            SaveData.saveValues["DisabledMedia"] = JsonConvert.SerializeObject(disabled);
-                            SaveData.Save();
-                        }
+                        DisabledMedia.Remove(file.Path);
+                        DisabledMedia.Save();
                     }
                     else
                     {
@@ -409,14 +390,8 @@ namespace NonsensicalVideoGenerator
                         // Disable: Add to SaveData.saveValues["DisabledMedia"]
                         // a string-stored json object
                         // that contains a list of disabled media paths.
-                        if (SaveData.saveValues["DisabledMedia"] != "")
-                        {
-                            List<string> disabled = JsonConvert.DeserializeObject<List<string>>(SaveData.saveValues["DisabledMedia"]);
-                            if (!disabled.Contains(file.Path))
-                                disabled.Add(file.Path);
-                            SaveData.saveValues["DisabledMedia"] = JsonConvert.SerializeObject(disabled);
-                            SaveData.Save();
-                        }
+                        DisabledMedia.Add(file.Path);
+                        DisabledMedia.Save();
                     }
                     libraryFiles[i] = file;
                     libraryFiles[i].Enabled = enabled;
