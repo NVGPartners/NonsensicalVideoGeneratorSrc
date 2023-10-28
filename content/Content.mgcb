@@ -181,18 +181,6 @@
 /processorParam:TextureFormat=Color
 /build:graphics/bannerbg.png
 
-#begin graphics/pluginentryblank.png
-/importer:TextureImporter
-/processor:TextureProcessor
-/processorParam:ColorKeyColor=255,0,255,255
-/processorParam:ColorKeyEnabled=True
-/processorParam:GenerateMipmaps=False
-/processorParam:PremultiplyAlpha=True
-/processorParam:ResizeToPowerOfTwo=False
-/processorParam:MakeSquare=False
-/processorParam:TextureFormat=Color
-/build:graphics/pluginentryblank.png
-
 #begin graphics/icon.png
 /importer:TextureImporter
 /processor:TextureProcessor
@@ -1201,6 +1189,18 @@
 /processorParam:TextureFormat=Color
 /build:graphics/pluginentry.png
 
+#begin graphics/pluginentryblank.png
+/importer:TextureImporter
+/processor:TextureProcessor
+/processorParam:ColorKeyColor=255,0,255,255
+/processorParam:ColorKeyEnabled=True
+/processorParam:GenerateMipmaps=False
+/processorParam:PremultiplyAlpha=True
+/processorParam:ResizeToPowerOfTwo=False
+/processorParam:MakeSquare=False
+/processorParam:TextureFormat=Color
+/build:graphics/pluginentryblank.png
+
 #begin graphics/pluginpage.png
 /importer:TextureImporter
 /processor:TextureProcessor
@@ -1350,6 +1350,24 @@
 /processor:SongProcessor
 /processorParam:Quality=Best
 /build:music/theme3.ogg
+
+#begin music/theme4.ogg
+/importer:OggImporter
+/processor:SongProcessor
+/processorParam:Quality=Best
+/build:music/theme4.ogg
+
+#begin music/theme5.ogg
+/importer:OggImporter
+/processor:SongProcessor
+/processorParam:Quality=Best
+/build:music/theme5.ogg
+
+#begin music/theme6.ogg
+/importer:OggImporter
+/processor:SongProcessor
+/processorParam:Quality=Best
+/build:music/theme6.ogg
 
 #begin sound/addsource.wav
 /importer:WavImporter

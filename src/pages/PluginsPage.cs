@@ -66,10 +66,24 @@ namespace NonsensicalVideoGenerator
                 int plcount = PluginHandler.GetPluginCount() + 1;
                 for(int i = 0; i < plcount; i++)
                 {
+                    // Alternate colors so it's easier to see
+                    Color curColor = new Color(i % 2 == 0 ? 255 : 192, i % 2 == 0 ? 255 : 192, i % 2 == 0 ? 255 : 192);
                     if(i < plcount-1)
                     {
-                        // Alternate colors so it's easier to see
-                        spriteBatch.Draw(pluginEntry, new Rectangle(GlobalGraphics.Scale(136), GlobalGraphics.Scale(57 + i * pluginEntry.Height + i), pluginEntry.Width * GlobalGraphics.scale, pluginEntry.Height * GlobalGraphics.scale), new Color(i % 2 == 0 ? 255 : 192, i % 2 == 0 ? 255 : 192, i % 2 == 0 ? 255 : 192));
+                        // Different addon types have different colors
+                        switch(PluginHandler.plugins[i].GetAddonType())
+                        {
+                            case AddonType.Effect: // blue 
+                                curColor = new Color(192, 192, 255);
+                                break;
+                            case AddonType.PostRenderEffect: // green
+                                curColor = new Color(192, 255, 192);
+                                break;
+                            case AddonType.Theme: // red
+                                curColor = new Color(255, 192, 192);
+                                break;
+                        }
+                        spriteBatch.Draw(pluginEntry, new Rectangle(GlobalGraphics.Scale(136), GlobalGraphics.Scale(57 + i * pluginEntry.Height + i), pluginEntry.Width * GlobalGraphics.scale, pluginEntry.Height * GlobalGraphics.scale), curColor);
                         spriteBatch.DrawString(munroSmall, PluginHandler.plugins[i].GetDisplayName(), new Vector2(GlobalGraphics.Scale(141+1), GlobalGraphics.Scale(58+1 + i * pluginEntry.Height + i)), Color.Black);
                         spriteBatch.DrawString(munroSmall, PluginHandler.plugins[i].GetDisplayName(), new Vector2(GlobalGraphics.Scale(141), GlobalGraphics.Scale(58 + i * pluginEntry.Height + i)), Color.White);
                         if(Global.canRender)
@@ -85,7 +99,7 @@ namespace NonsensicalVideoGenerator
                     else
                     {
                         // Alternate colors so it's easier to see
-                        spriteBatch.Draw(pluginEntryBlank, new Rectangle(GlobalGraphics.Scale(136), GlobalGraphics.Scale(57 + i * pluginEntry.Height + i), pluginEntry.Width * GlobalGraphics.scale, pluginEntry.Height * GlobalGraphics.scale), new Color(i % 2 == 0 ? 255 : 192, i % 2 == 0 ? 255 : 192, i % 2 == 0 ? 255 : 192));
+                        spriteBatch.Draw(pluginEntryBlank, new Rectangle(GlobalGraphics.Scale(136), GlobalGraphics.Scale(57 + i * pluginEntry.Height + i), pluginEntry.Width * GlobalGraphics.scale, pluginEntry.Height * GlobalGraphics.scale), curColor);
                         // create plugin
                         spriteBatch.DrawString(munroSmall, "Addon Management", new Vector2(GlobalGraphics.Scale(141+1), GlobalGraphics.Scale(58+1 + i * pluginEntry.Height + i)), Color.Black);
                         spriteBatch.DrawString(munroSmall, "Addon Management", new Vector2(GlobalGraphics.Scale(141), GlobalGraphics.Scale(58 + i * pluginEntry.Height + i)), Color.White);
@@ -658,6 +672,8 @@ namespace NonsensicalVideoGenerator
                                         foreach(KeyValuePair<string, object> s in PluginHandler.plugins[i].settings)
                                         {
                                             // if s is Display Name, skip
+                                            if(s.Key == "Addon Type")
+                                                continue;
                                             if(s.Key == "Display Name")
                                                 continue;
                                             if(!PluginHandler.plugins[i].settingTypes.Keys.Contains(s.Key))

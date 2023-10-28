@@ -32,6 +32,7 @@ namespace NonsensicalVideoGenerator
         private MusicState _musicState = MusicState.Paused;
         private int _musicActive = 0;
         private int music;
+        private bool alreadyPlayedFirstSong = false;
         public UserInterface()
         {
             ConsoleOutput.WriteLine("Creating new UserInterface instance...", Color.Transparent);
@@ -116,6 +117,14 @@ namespace NonsensicalVideoGenerator
         }
         private void FindMusic()
         {
+            if(!alreadyPlayedFirstSong)
+            {
+                alreadyPlayedFirstSong = true;
+                music = 5; // halloween
+                _musicState = MusicState.Playing;
+                MediaPlayer.Play(GlobalContent.GetSongByIndex(music));
+                return;
+            }
             music = Global.generator.globalRandom.Next(0, GlobalContent.GetSongCount());
             // Make sure music is in range.
             if(music < 0 || music >= GlobalContent.GetSongCount())

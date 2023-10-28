@@ -36,6 +36,9 @@ namespace NonsensicalVideoGenerator
         Library_Overlay = 256,
         Library_Render = 512,
         Library_Custom = 1024,
+        Addon_Effect = 2048,
+        Addon_PostRenderEffect = 4096,
+        Addon_Theme = 8192,
     }
     public enum PluginType
     {
@@ -252,6 +255,12 @@ namespace NonsensicalVideoGenerator
         Label,
         Switch,
     }
+    public enum AddonType
+    {
+        Effect,
+        PostRenderEffect,
+        Theme
+    }
     public class Plugin
     {
         public string path { get; set; }
@@ -272,6 +281,28 @@ namespace NonsensicalVideoGenerator
             this.type = type;
             this.rootPath = rootPath;
             this.enabled = enabled;
+        }
+        public AddonType GetAddonType()
+        {
+            // Setting "Addon Type" is optional
+            if (settings.ContainsKey("Addon Type"))
+            {
+                switch ((string)settings["Addon Type"])
+                {
+                    case "effect":
+                        return AddonType.Effect;
+                    case "postrendereffect":
+                        return AddonType.PostRenderEffect;
+                    case "theme":
+                        return AddonType.Theme;
+                    default:
+                        return AddonType.Effect;
+                }
+            }
+            else
+            {
+                return AddonType.Effect;
+            }
         }
         public string GetDisplayName()
         {
@@ -1381,7 +1412,7 @@ namespace NonsensicalVideoGenerator
             }
             return true;
         }
-        public static PluginReturnValue PickRandom(Random rnd, string video)
+        public static PluginReturnValue PickRandom(Random rnd, string video, AddonType addonType = AddonType.Effect)
         {
             if(plugins.Count == 0)
             {
@@ -1392,7 +1423,7 @@ namespace NonsensicalVideoGenerator
                 };
             }
             // Pick a random plugin that isn't disabled.
-            List<Plugin> enabledPlugins = plugins.FindAll(plugin => plugin.enabled);
+            List<Plugin> enabledPlugins = plugins.FindAll(plugin => plugin.enabled && plugin.GetAddonType() == addonType);
             if(enabledPlugins.Count == 0)
             {
                 return new PluginReturnValue()
@@ -1464,6 +1495,19 @@ namespace NonsensicalVideoGenerator
             publishPlugin = plugin;
             flags = tagflags;
             workshopIcon = iconPath;
+            // Add Addon_Effect, Addon_PostRenderEffect, or Addon_Theme to tags
+            switch(plugin.GetAddonType())
+            {
+                case AddonType.Effect:
+                    flags |= WorkshopTag.Addon_Effect;
+                    break;
+                case AddonType.PostRenderEffect:
+                    flags |= WorkshopTag.Addon_PostRenderEffect;
+                    break;
+                case AddonType.Theme:
+                    flags |= WorkshopTag.Addon_Theme;
+                    break;
+            }
             // Delete .publish in the plugin's directory if it exists
             string publishFile = Path.Combine(Path.GetDirectoryName(plugin.path), ".publish");
             if(File.Exists(publishFile))
@@ -1567,7 +1611,7 @@ namespace NonsensicalVideoGenerator
                 foreach(KeyValuePair<string, object> setting in publishPlugin.settings)
                 {
                     // Hide display name and create description, add options too
-                    if(setting.Key.ToLower() != "display name" && publishPlugin.settingTypes.ContainsKey(setting.Key))
+                    if(setting.Key.ToLower() != "addon type" && setting.Key.ToLower() != "display name" && publishPlugin.settingTypes.ContainsKey(setting.Key))
                     {
                         if(publishPlugin.settingTypes[setting.Key] == SettingType.Label)
                         {
@@ -1685,6 +1729,18 @@ namespace NonsensicalVideoGenerator
             {
                 tags.Add("Custom");
             }
+            if((flags & WorkshopTag.Addon_Effect) != 0)
+            {
+                tags.Add("Effect");
+            }
+            if((flags & WorkshopTag.Addon_PostRenderEffect) != 0)
+            {
+                tags.Add("Post-Render Effect");
+            }
+            if((flags & WorkshopTag.Addon_Theme) != 0)
+            {
+                tags.Add("Theme");
+            }
             // Submit tags
             cont = SteamUGC.SetItemTags(handle, tags.ToArray());
             if(!cont)
@@ -1724,6 +1780,7 @@ namespace NonsensicalVideoGenerator
             publishPlugin = null;
             publishing = false;
         }
+        // Only for effect types
         public static int GetPluginCount(bool enabledOnly = false)
         {
             if(!Global.pluginsLoaded)
@@ -1731,7 +1788,7 @@ namespace NonsensicalVideoGenerator
             // Get enabled plugin count.
             if(enabledOnly)
             {
-                return plugins.FindAll(plugin => plugin.enabled).Count;
+                return plugins.FindAll(plugin => plugin.enabled == true).Count;
             }
             else
             {

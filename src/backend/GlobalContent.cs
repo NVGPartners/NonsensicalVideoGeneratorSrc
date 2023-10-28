@@ -91,12 +91,9 @@ namespace NonsensicalVideoGenerator
             AddSong("Theme", contentManager.Load<Song>("music/theme"), "This Is Nonsense!", "KiwifruitDev");
             AddSong("Theme2", contentManager.Load<Song>("music/theme2"), "A Nonsensical Song", "Bobby I Guess");
             AddSong("Theme3", contentManager.Load<Song>("music/theme3"), "Yet Another Nonsensical Song", "Bobby I Guess");
-            //AddSong("Theme3", contentManager.Load<Song>("music/theme3"), "Creation", "Bobby I Guess");
-            // Dynamic implementation is required for these two songs.
-            // They're context-sensitive, so we'll add them at a later time.
-            // TODO: Add songs to mgcb when they're added.
-            //AddSong("Theme4", contentManager.Load<Song>("music/theme4"));
-            //AddSong("Theme5", contentManager.Load<Song>("music/theme5"));
+            AddSong("Theme4", contentManager.Load<Song>("music/theme4"), "Creation", "Bobby I Guess");
+            AddSong("Theme5", contentManager.Load<Song>("music/theme5"), "Where We Began", "Bobby I Guess");
+            AddSong("Theme6", contentManager.Load<Song>("music/theme6"), "Halloween", "Bobby I Guess");
             // Create pixel shape.
             Texture2D pixel = new Texture2D(graphicsDevice, 1, 1);
             pixel.SetData(new[] { Color.White });

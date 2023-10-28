@@ -1,4 +1,4 @@
--- Welcome to your very own %filename% custom clip effect!
+-- Welcome to your very own %filename% custom addon!
 
 -- For more information on how to modify this file, please visit:
 -- https://github.com/KiwifruitDev/NonsensicalVideoGenerator/wiki
@@ -7,16 +7,26 @@
 -- alongside which user-customizable options to display.
 function Query()
     return {
-        -- Set up "plugin" settings for this effect.
+        -- Set up settings for this addon.
         ["settings"] = {
-            -- This is what the user will see in the effects tab.
+            -- This determines the type of addon this is.
+            -- Only these values are allowed:
+            -- effect: An effect that gets applied at random.
+            -- postrendereffect: An effect that gets applied after rendering.
+            -- theme: Not yet implemented, a theme for the software.
+            {
+                ["name"] = "Addon Type",
+                ["value"] = "effect",
+                ["type"] = "label"
+            },
+            -- This is what the user will see in the addons tab.
             -- "Display Name" is always hidden from the settings menu.
             {
                 ["name"] = "Display Name",
                 ["value"] = "%prettyname%",
                 ["type"] = "label"
             },
-            -- Description is what the user will see once entering the effect settings.
+            -- Description is what the user will see once entering the addon settings.
             -- This is also the default description when publishing to the Workshop.
             {
                 ["name"] = "Description",
@@ -54,9 +64,9 @@ function Query()
                 ["type"] = "int"
             }
         },
-        -- If your effect would like to use a custom media directory, you can set it up here.
+        -- If your addon would like to use a custom media directory, you can set it up here.
         -- Libraries are displayed in the Library tab of the program and store a specific type of media.
-        -- When uploading an effect using this feature, make sure to tick the "Custom Library" tag.
+        -- When uploading an addon using this feature, make sure to tick the "Custom Library" tag.
         -- Use functions.getRandomLibraryFile("video", "example") to pick from this library.
         -- Remove the --[[ and ]] below to enable this feature.
         --[[
@@ -90,8 +100,9 @@ local speedUpOrDown = false
 
 -- This function is where generation is started.
 -- It is called once per clip and is passed a few variables.
+-- If "postrendereffect" is selected as the addon type, options.inputVideo will be the rendered video.
 -- options: A table containing the input and output video paths, alongside a few other things.
--- pluginSettings: A table containing the user-customizable settings for this effect.
+-- pluginSettings: A table containing the user-customizable settings for this addon.
 -- functions: A table containing useful functions, such as calling FFmpeg and generating random numbers.
 function StartGeneration(options, pluginSettings, functions)
     -- Let's breakdown what we're doing here.
@@ -116,11 +127,11 @@ function StartGeneration(options, pluginSettings, functions)
     -- Set local variables.
     -- Here, we're going to generate a random number between 1 and 100.
     -- Using the chance variable, the user can select the weight of how
-    -- often the effect will be applied within the settings menu.
+    -- often the addon will be applied within the settings menu.
     speedUpOrDown = functions.randomInt(1, 100) <= chance and true or false
 
     -- Choose which effect to apply.
-    -- Because this effect flips between two types of effects,
+    -- Because this addon flips between two types of effects,
     -- we're going to use a boolean to determine which one to apply.
     if speedUpOrDown then
         -- Speed up was chosen.
@@ -179,7 +190,7 @@ function StopGeneration(options, pluginSettings, functions)
         print("Slow down was chosen!")
     end
 
-    -- If you return false, the console will report that this effect failed to apply.
+    -- If you return false, the console will report that this addon failed to apply.
     -- Because we successfully applied the effect, we're going to return true.
     return true
 end

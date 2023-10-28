@@ -574,6 +574,75 @@ namespace NonsensicalVideoGenerator
                     if (vidThreadWorker?.CancellationPending == true)
                         return;
                     bool finished = true;
+                    // Try to call post-render effects.
+                    int numberOfPlugins = PluginHandler.GetPluginCount(true);
+                    if(numberOfPlugins > 0)
+                    {
+                        progressText = "Toasting effects...";
+                        // We rolled for an effect, let's pick one.
+                        PluginReturnValue effect = PluginHandler.PickRandom(globalRandom, tempOutput, AddonType.PostRenderEffect);
+                        if(effect.success)
+                        {
+                            // Check if effect job path contains output.mp4, if so, plugin was indeed successful.
+                            // so replace tempOutput with output.mp4
+                            // Search for output.mp4 in job folder.
+                            string[] files = Directory.GetFiles(effect.jobFolder);
+                            bool foundOutput = false;
+                            foreach(string file in files)
+                            {
+                                if(Path.GetFileName(file) == "output.mp4")
+                                {
+                                    // Make sure this is a valid file with ffprobe.
+                                    ProcessStartInfo ffprobe = new ProcessStartInfo()
+                                    {
+                                        FileName = Global.useSystemFFprobe ? "ffprobe" : @".\ffprobe.exe",
+                                        Arguments = "-v error -select_streams v:0 -show_entries stream=codec_name -of default=noprint_wrappers=1:nokey=1 \"" + file + "\"",
+                                        UseShellExecute = false,
+                                        RedirectStandardOutput = true,
+                                        CreateNoWindow = true
+                                    };
+                                    Process? ffprobeProcess = new Process();
+                                    ffprobeProcess.StartInfo = ffprobe;
+                                    string isVideo = null;
+                                    ffprobeProcess.OutputDataReceived += (sender, e) =>
+                                    {
+                                        isVideo += e.Data;
+                                    };
+                                    ffprobeProcess.Start();
+                                    ffprobeProcess.BeginOutputReadLine();
+                                    ffprobeProcess.WaitForExit();
+                                    if (isVideo != null && isVideo != "" && isVideo != "N/A")
+                                    {
+                                        foundOutput = true;
+                                    }
+                                    break;
+                                }
+                            }
+                            if(foundOutput)
+                            {
+                                // Delete existing tempOutput
+                                if(File.Exists(tempOutput))
+                                    File.Delete(tempOutput);
+                                try
+                                {
+                                    File.Move(effect.jobFolder + "output.mp4", tempOutput);
+                                }
+                                catch(Exception ex)
+                                {
+                                    ConsoleOutput.WriteLine("Failed to move output.mp4 to " + tempOutput +": " + ex.Message, Color.Red);
+                                    effect.success = false;
+                                }
+                            }
+                            else
+                            {
+                                effect.success = false;
+                            }
+                            // Delete job folder.
+                            if(!bool.Parse(SaveData.saveValues["HiddenKeepTemporaryJobFolders"]))
+                                Directory.Delete(effect.jobFolder, true);
+                        }
+                        ConsoleOutput.WriteLine(effect.success ? "Applied "+effect.pluginName+" to render." : "Failed to apply "+effect.pluginName+" to render.", effect.success ? Color.LightGreen : Color.Red);
+                    }
                     // Save to library if it exists.
                     if (File.Exists(tempOutput))
                     {
