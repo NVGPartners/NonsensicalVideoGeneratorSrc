@@ -526,7 +526,7 @@ namespace NonsensicalVideoGenerator
                 bool youtube = youtubes[i];
                 ConsoleOutput.WriteLine("Downloading clip from " + downloadUrl + "...", Color.Yellow);
                 // Download the clip.
-                string filename = Path.GetFileName(downloadUrl);
+                string filename = Path.GetFileName(downloadUrl).Replace(" ", "").Split('?')[0].Split('&')[0].Split('#')[0];
                 string path = Path.Combine(libraryRootPath, libraryPaths[downloadType], filename);
                 try
                 {
@@ -599,8 +599,10 @@ namespace NonsensicalVideoGenerator
             foreach(string clipUrl in clipUrls)
             {
                 // Download a clip from a URL and add it to the library.
-                string filename = Path.GetFileName(clipUrl).Replace(" ", "");
+                // Remove everything after ?, &, or #.
+                string filename = Path.GetFileName(clipUrl).Replace(" ", "").Split('?')[0].Split('&')[0].Split('#')[0];
                 string path = Path.Combine(libraryRootPath, libraryPaths[key], filename);
+                ConsoleOutput.WriteLine("Downloading clip " + filename + "...", Color.Yellow);
                 // Does it end in a file extension?
                 if (!filename.Contains("."))
                 {
@@ -609,7 +611,7 @@ namespace NonsensicalVideoGenerator
                     {
                         // Error: We don't know what to do with this.
                         ConsoleOutput.WriteLine("Failed to download clip: URL is unknown.", Color.Red);
-                        return false;
+                        continue;
                     }
                     // It's a YouTube url.
                     youtubes.Add(true);
@@ -630,12 +632,15 @@ namespace NonsensicalVideoGenerator
                     {
                         // Error: We don't know what to do with this.
                         ConsoleOutput.WriteLine("Failed to download clip: Invalid file extension.", Color.Red);
-                        return false;
+                        continue;
                     }
                     youtubes.Add(false);
                 }
                 downloadUrls.Add(clipUrl);
             }
+            // If there are no clips to download, return false.
+            if (downloadUrls.Count == 0)
+                return false;
             try
             {
                 // Start download thread
@@ -660,6 +665,7 @@ namespace NonsensicalVideoGenerator
             catch (Exception e)
             {
                 ConsoleOutput.WriteLine("Failed to download clip: " + e.Message, Color.Red);
+                ConsoleOutput.WriteLine(e.StackTrace, Color.Red);
                 return false;
             }
         }

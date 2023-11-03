@@ -274,6 +274,8 @@ namespace NonsensicalVideoGenerator
                             {
                                 GlobalContent.GetSound("Prompt").Play(int.Parse(SaveData.saveValues["SoundEffectVolume"], System.Globalization.CultureInfo.InvariantCulture) / 100f, 0f, 0f);
                             }
+                            // Seed random generator
+                            Global.generator.globalRandom = new Random(Global.generator.globalRandom.Next());
                         }
                         else
                         {

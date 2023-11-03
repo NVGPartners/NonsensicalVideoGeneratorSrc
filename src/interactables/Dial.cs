@@ -17,7 +17,7 @@ namespace NonsensicalVideoGenerator
         public string Tooltip { get; set; }
         public int State { get; set; } // 0: none, 1: hovering, 2: dragging, 3: stopped dragging
         public Vector2 Position { get; set; }
-        public Func<int, bool> Callback { get; set; }
+        public Func<int, string, bool> Callback { get; set; }
         public Rectangle bounds;
         private Rectangle scaledBounds;
         private int minValue = 0;
@@ -28,7 +28,7 @@ namespace NonsensicalVideoGenerator
         private int originalDegrees;
         private bool revolution = false;
         private Vector2 start;
-        public Dial(string defaultName, string defaultTooltip, Vector2 defaultPosition, int defaultValue, int minValue, int maxValue, Func<int, bool> defaultCallback)
+        public Dial(string defaultName, string defaultTooltip, Vector2 defaultPosition, int defaultValue, int minValue, int maxValue, Func<int, string, bool> defaultCallback)
         {
             Name = defaultName;
             Tooltip = defaultTooltip;
@@ -125,7 +125,7 @@ namespace NonsensicalVideoGenerator
                         // Set the value
                         degrees = (int)angle;
                         // Callback with the value
-                        if(Callback(value))
+                        if(Callback(value, Name))
                         {
                             // True means revert the value
                             value = originalValue;

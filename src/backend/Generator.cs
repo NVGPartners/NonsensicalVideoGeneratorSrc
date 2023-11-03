@@ -344,8 +344,10 @@ namespace NonsensicalVideoGenerator
             progressText = "Parsing library...";
             LibraryData.Load();
 
+            int maxClips = int.Parse(SaveData.saveValues["MaxClipCount"], System.Globalization.CultureInfo.InvariantCulture);
+
             // Check to ensure that the source pool is not empty.
-            if(LibraryData.GetFileCount(DefaultLibraryTypes.Material) == 0)
+            if(LibraryData.GetFileCount(DefaultLibraryTypes.Material) == 0 && maxClips > 0)
             {
                 ConsoleOutput.WriteLine("No material files found in library.", Color.Red);
                 failureReason = "No material files found in library.";
@@ -368,7 +370,6 @@ namespace NonsensicalVideoGenerator
             */
             ConsoleOutput.WriteLine("Seed: " + seed.ToString(System.Globalization.CultureInfo.InvariantCulture), Color.Gray);
             globalRandom = new Random(seed);
-            int maxClips = int.Parse(SaveData.saveValues["MaxClipCount"], System.Globalization.CultureInfo.InvariantCulture);
             
             ConsoleOutput.WriteLine("Max clips: " + maxClips.ToString(System.Globalization.CultureInfo.InvariantCulture), Color.Gray);
 

@@ -17,11 +17,11 @@ namespace NonsensicalVideoGenerator
         public string Tooltip { get; set; }
         public int State { get; set; } // 0: none, 1: hovering, 2: left click, 3: right click, 4: middle click, 5: forward, 6: back, 7: scroll up, 8: scroll down
         public Vector2 Position { get; set; }
-        public Func<int, bool> Callback { get; set; }
+        public Func<int, string, bool> Callback { get; set; }
         public Vector2 textSize;
         public Vector2 textPosition;
         public Rectangle bounds;
-        public Button(string defaultName, string defaultTooltip, Vector2 defaultPosition, Func<int, bool> defaultCallback)
+        public Button(string defaultName, string defaultTooltip, Vector2 defaultPosition, Func<int, string, bool> defaultCallback)
         {
             Name = defaultName;
             Tooltip = defaultTooltip;
@@ -64,7 +64,7 @@ namespace NonsensicalVideoGenerator
                 if (mouseButton > -1)
                 {
                     State = mouseButton;
-                    bool result = Callback(mouseButton);
+                    bool result = Callback(mouseButton, Name);
                     if (result)
                         return true;
                 }

@@ -197,35 +197,35 @@ namespace NonsensicalVideoGenerator
                 {
                     case 0:
                         if(offset.X == 0)
-                            NextPage1(2);
+                            NextPage1(2, "");
                         break;
                     case 1:
                         if(offset.X == -GlobalGraphics.scaledWidth)
-                            NextPage2(2);
+                            NextPage2(2, "");
                         break;
                     case 2:
                         if(offset.X == -GlobalGraphics.scaledWidth)
-                            PreviousPage1(2);
+                            PreviousPage1(2, "");
                         break;
                     case 3:
                         if(offset.X == -GlobalGraphics.scaledWidth * 2)
-                            PreviousPage2(2);
+                            PreviousPage2(2, "");
                         break;
                     case 4:
                         if(offset.X == -GlobalGraphics.scaledWidth * 2)
-                            ContinueButton(2);
+                            ContinueButton(2, "");
                         break;
                     case 5:
                         if(offset.X == -GlobalGraphics.scaledWidth)
-                            ButtonFFmpeg(2);
+                            ButtonFFmpeg(2, "");
                         break;
                     case 6:
                         if(offset.X == -GlobalGraphics.scaledWidth*3)
-                            ContinueButton2(2);
+                            ContinueButton2(2, "");
                         break;
                     case 7:
                         if(offset.X == -GlobalGraphics.scaledWidth*3)
-                            ContinueButton3(2);
+                            ContinueButton3(2, "");
                         break;
                 }
                 returned = true;
@@ -548,7 +548,7 @@ namespace NonsensicalVideoGenerator
         private bool check3 = false;
         private BackgroundWorker pluginWorker;
         private BackgroundWorker ffmpegDownloadWorker;
-        public bool PreviousPage1(int i)
+        public bool PreviousPage1(int i, string n)
         {
             switch(i)
             {
@@ -582,7 +582,7 @@ namespace NonsensicalVideoGenerator
             }
             return false;
         }
-        public bool PreviousPage2(int i)
+        public bool PreviousPage2(int i, string n)
         {
             switch(i)
             {
@@ -613,7 +613,7 @@ namespace NonsensicalVideoGenerator
             }
             return false;
         }
-        public bool ButtonFFmpeg(int i)
+        public bool ButtonFFmpeg(int i, string n)
         {
             switch(i)
             {
@@ -692,7 +692,7 @@ namespace NonsensicalVideoGenerator
             }
             return false;
         }
-        public bool ContinueButton(int i)
+        public bool ContinueButton(int i, string n)
         {
             switch(i)
             {
@@ -746,7 +746,7 @@ namespace NonsensicalVideoGenerator
             }
             return false;
         }
-        public bool ContinueButton3(int i)
+        public bool ContinueButton3(int i, string n)
         {
             switch(i)
             {
@@ -798,7 +798,7 @@ namespace NonsensicalVideoGenerator
             }
             return false;
         }
-        public bool ContinueButton2(int i)
+        public bool ContinueButton2(int i, string n)
         {
             switch(i)
             {
@@ -837,11 +837,12 @@ namespace NonsensicalVideoGenerator
             }
             return false;
         }
-        public bool NextPage1(int i)
+        public bool NextPage1(int i, string n)
         {
             switch(i)
             {
                 case 2: // left click
+                    
                     if(!UserConsent.needsConsent)
                     {
                         // Get dependencies.
@@ -887,7 +888,7 @@ namespace NonsensicalVideoGenerator
             }
             return false;
         }
-        public bool NextPage2(int i)
+        public bool NextPage2(int i, string n)
         {
             switch(i)
             {

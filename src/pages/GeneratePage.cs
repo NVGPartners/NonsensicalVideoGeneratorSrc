@@ -98,7 +98,7 @@ namespace NonsensicalVideoGenerator
         public void LoadContent(ContentManager contentManager, GraphicsDevice graphicsDevice)
         {
             // Actions
-            actionController.Add("ActionConsole", new ActionButton("View console output.", new Vector2(113, 182), (int i) => {
+            actionController.Add("ActionConsole", new ActionButton("View console output.", new Vector2(113, 182), (int i, string n) => {
                 switch(i)
                 {
                     case 2: // left click
@@ -124,7 +124,7 @@ namespace NonsensicalVideoGenerator
                 }
                 return false;
             }, contentManager.Load<Texture2D>("graphics/actions/console")));
-            actionController.Add("ActionReset", new ActionButton("Reset to default parameters.", new Vector2(113, 167), (int i) => {
+            actionController.Add("ActionReset", new ActionButton("Reset to default parameters.", new Vector2(113, 167), (int i, string n) => {
                 switch(i)
                 {
                     case 2: // left click
@@ -185,7 +185,7 @@ namespace NonsensicalVideoGenerator
                 }
                 return false;
             }, contentManager.Load<Texture2D>("graphics/actions/reset")));
-            actionController.Add("ActionPlayLast", new ActionButton("Play last rendered video.", new Vector2(113, 152), (int i) => {
+            actionController.Add("ActionPlayLast", new ActionButton("Play last rendered video.", new Vector2(113, 152), (int i, string n) => {
                 switch(i)
                 {
                     case 2: // left click
@@ -217,7 +217,7 @@ namespace NonsensicalVideoGenerator
                 }
                 return false;
             }, contentManager.Load<Texture2D>("graphics/actions/playlast")));
-            actionController.Add("ActionRender", new ActionButton("Start generating a new video.", new Vector2(113, 137), (int i) => {
+            actionController.Add("ActionRender", new ActionButton("Start generating a new video.", new Vector2(113, 137), (int i, string n) => {
                 switch(i)
                 {
                     case 2: // left click
@@ -283,7 +283,7 @@ namespace NonsensicalVideoGenerator
                 return false;
             }, contentManager.Load<Texture2D>("graphics/actions/render")));
             // PAGE 3
-            controllerPage3.Add("ConstrainAspectRatio", new Switch("Constrain Aspect Ratio", "Clips will retain their original aspect ratio when disabled.", new Vector2(139, 60+19*3), (int i) => {
+            controllerPage3.Add("ConstrainAspectRatio", new Switch("Constrain Aspect Ratio", "Clips will retain their original aspect ratio when disabled.", new Vector2(139, 60+19*3), (int i, string n) => {
                 bool switchState = (i & 256) != 0;
                 if((i & 2) != 0)
                 {
@@ -294,7 +294,7 @@ namespace NonsensicalVideoGenerator
                 }
                 return switchState;
             }, SaveData.saveValues["ConstrainAspectRatio"] == "true"));
-            controllerPage3.Add("DisableClipsAfterMaxUniqueClips", new Switch("Disable Clips After Max Reached", "Disable clips after they reach the max unique clip count.", new Vector2(139, 60+19*2), (int i) => {
+            controllerPage3.Add("DisableClipsAfterMaxUniqueClips", new Switch("Disable Clips After Max Reached", "Disable clips after they reach the max unique clip count.", new Vector2(139, 60+19*2), (int i, string n) => {
                 bool switchState = (i & 256) != 0;
                 if((i & 2) != 0)
                 {
@@ -309,7 +309,7 @@ namespace NonsensicalVideoGenerator
                 }
                 return switchState;
             }, SaveData.saveValues["DisableClipsAfterMaxUniqueClips"] == "true"));
-            controllerPage3.Add("DeleteClipsAfterMaxUniqueClips", new Switch("Delete Clips After Max Reached", "Delete clips after they reach the max unique clip count.", new Vector2(139, 60+19), (int i) => {
+            controllerPage3.Add("DeleteClipsAfterMaxUniqueClips", new Switch("Delete Clips After Max Reached", "Delete clips after they reach the max unique clip count.", new Vector2(139, 60+19), (int i, string n) => {
                 bool switchState = (i & 256) != 0;
                 if((i & 2) != 0)
                 {
@@ -324,7 +324,7 @@ namespace NonsensicalVideoGenerator
                 }
                 return switchState;
             }, SaveData.saveValues["DeleteClipsAfterMaxUniqueClips"] == "true"));
-            controllerPage3.Add("MaxUniqueClips", new TextEntry("Max Unique Media", "The max times a unique media file can be used.", SaveData.saveValues["MaxUniqueClips"], new Vector2(139, 60), 24, 3, 1, (int i) => {
+            controllerPage3.Add("MaxUniqueClips", new TextEntry("Max Unique Media", "The max times a unique media file can be used.", SaveData.saveValues["MaxUniqueClips"], new Vector2(139, 60), 24, 3, 1, (int i, string n) => {
                 int oldValue = int.Parse(SaveData.saveValues["MaxUniqueClips"], System.Globalization.CultureInfo.InvariantCulture);
                 // Range: 0-100
                 if(int.Parse(controllerPage3.interactables["MaxUniqueClips"].Tooltip, System.Globalization.CultureInfo.InvariantCulture) < 0)
@@ -335,7 +335,7 @@ namespace NonsensicalVideoGenerator
                 return false;
             }));
             controllerPage3.Add("Page3Label", new Label("Page 3", new Vector2(144, 64+19*8)));
-            controllerPage3.Add("PrevPage", new Button("Next Page", "Next page of options.", new Vector2(239+36, 60+10+19*8), (int i) => {
+            controllerPage3.Add("PrevPage", new Button("Next Page", "Next page of options.", new Vector2(239+36, 60+10+19*8), (int i, string n) => {
                 switch(i)
                 {
                     case 2: // left click
@@ -346,7 +346,7 @@ namespace NonsensicalVideoGenerator
                 return false;
             }));                  
             // RENDERING MODE
-            controllerRendering.Add("Cancel", new Button("Cancel", "Stop rendering.", new Vector2(119+36, 60+10+19*8), (int i) => {
+            controllerRendering.Add("Cancel", new Button("Cancel", "Stop rendering.", new Vector2(119+36, 60+10+19*8), (int i, string n) => {
                 switch(i)
                 {
                     case 2: // left click
@@ -356,7 +356,7 @@ namespace NonsensicalVideoGenerator
                 }
                 return false;
             }));
-            controllerRendering.Add("ForceConcatenate", new Button("Combine Clips Now", "Stop rendering and force concatenation.", new Vector2(119+36+104, 60+10+19*8), (int i) => {
+            controllerRendering.Add("ForceConcatenate", new Button("Combine Clips Now", "Stop rendering and force concatenation.", new Vector2(119+36+104, 60+10+19*8), (int i, string n) => {
                 switch(i)
                 {
                     case 2: // left click
@@ -368,7 +368,7 @@ namespace NonsensicalVideoGenerator
             }));
             // ADVANCED MODE
             controllerAdvanced.Add("AdvancedLabel", new Label("Page 2", new Vector2(144, 64+19*8)));
-            controllerAdvanced.Add("BackToRegularOptions", new Button("Next Page", "Next page of options.", new Vector2(239+36, 60+10+19*8), (int i) => {
+            controllerAdvanced.Add("BackToRegularOptions", new Button("Next Page", "Next page of options.", new Vector2(239+36, 60+10+19*8), (int i, string n) => {
                 switch(i)
                 {
                     case 2: // left click
@@ -378,7 +378,7 @@ namespace NonsensicalVideoGenerator
                 }
                 return false;
             }));
-            controllerAdvanced.Add("PlayOverlayInFull", new Switch("Overlays Play in Full", "Play overlays at their full length.", new Vector2(139, 60+19*6), (int i) => {
+            controllerAdvanced.Add("PlayOverlayInFull", new Switch("Overlays Play in Full", "Play overlays at their full length.", new Vector2(139, 60+19*6), (int i, string n) => {
                 bool switchState = (i & 256) != 0;
                 if((i & 2) != 0)
                 {
@@ -389,7 +389,7 @@ namespace NonsensicalVideoGenerator
                 }
                 return switchState;
             }, SaveData.saveValues["PlayOverlayInFull"] == "true"));                       
-            controllerAdvanced.Add("TransitionEffectChance", new TextEntry("Transition Effect Chance", "How often transitions get effects, from 0-100.", SaveData.saveValues["TransitionEffectChance"], new Vector2(139, 60+19*5), 24, 3, 1, (int i) => {
+            controllerAdvanced.Add("TransitionEffectChance", new TextEntry("Transition Effect Chance", "How often transitions get effects, from 0-100.", SaveData.saveValues["TransitionEffectChance"], new Vector2(139, 60+19*5), 24, 3, 1, (int i, string n) => {
                 int oldValue = int.Parse(SaveData.saveValues["TransitionEffectChance"], System.Globalization.CultureInfo.InvariantCulture);
                 // Range: 0-100
                 if(int.Parse(controllerAdvanced.interactables["TransitionEffectChance"].Tooltip, System.Globalization.CultureInfo.InvariantCulture) < 0)
@@ -401,7 +401,7 @@ namespace NonsensicalVideoGenerator
                     SaveData.Save();
                 return false;
             }));
-            controllerAdvanced.Add("TransitionEffects", new Switch("Transition Effects", "Allow transitions to use effects.", new Vector2(139, 60+19*4), (int i) => {
+            controllerAdvanced.Add("TransitionEffects", new Switch("Transition Effects", "Allow transitions to use effects.", new Vector2(139, 60+19*4), (int i, string n) => {
                 bool switchState = (i & 256) != 0;
                 if((i & 2) != 0)
                 {
@@ -412,7 +412,7 @@ namespace NonsensicalVideoGenerator
                 }
                 return switchState;
             }, SaveData.saveValues["TransitionEffects"] == "true"));
-            controllerAdvanced.Add("TransitionChance", new TextEntry("Transition Chance", "How often transitions are rolled, from 0-100.", SaveData.saveValues["TransitionChance"], new Vector2(139, 60+19*3), 24, 3, 1, (int i) => {
+            controllerAdvanced.Add("TransitionChance", new TextEntry("Transition Chance", "How often transitions are rolled, from 0-100.", SaveData.saveValues["TransitionChance"], new Vector2(139, 60+19*3), 24, 3, 1, (int i, string n) => {
                 int oldValue = int.Parse(SaveData.saveValues["TransitionChance"], System.Globalization.CultureInfo.InvariantCulture);
                 if(int.Parse(controllerAdvanced.interactables["TransitionChance"].Tooltip, System.Globalization.CultureInfo.InvariantCulture) < 0)
                     controllerAdvanced.interactables["TransitionChance"].Tooltip = "0";
@@ -423,7 +423,7 @@ namespace NonsensicalVideoGenerator
                     SaveData.Save();
                 return false;
             }));
-            controllerAdvanced.Add("EffectChance", new TextEntry("Effect Chance", "How often any effect are used, from 0-100.", SaveData.saveValues["EffectChance"], new Vector2(139, 60+19*2), 24, 3, 1, (int i) => {
+            controllerAdvanced.Add("EffectChance", new TextEntry("Effect Chance", "How often any effect are used, from 0-100.", SaveData.saveValues["EffectChance"], new Vector2(139, 60+19*2), 24, 3, 1, (int i, string n) => {
                 int oldValue = int.Parse(SaveData.saveValues["EffectChance"], System.Globalization.CultureInfo.InvariantCulture);
                 if(int.Parse(controllerAdvanced.interactables["EffectChance"].Tooltip, System.Globalization.CultureInfo.InvariantCulture) < 0)
                     controllerAdvanced.interactables["EffectChance"].Tooltip = "0";
@@ -434,7 +434,7 @@ namespace NonsensicalVideoGenerator
                     SaveData.Save();
                 return false;
             }));
-            controllerAdvanced.Add("OverlayChance", new TextEntry("Overlay Chance", "How often overlays are rolled, from 0-100.", SaveData.saveValues["OverlayChance"], new Vector2(139, 60+19), 24, 3, 1, (int i) => {
+            controllerAdvanced.Add("OverlayChance", new TextEntry("Overlay Chance", "How often overlays are rolled, from 0-100.", SaveData.saveValues["OverlayChance"], new Vector2(139, 60+19), 24, 3, 1, (int i, string n) => {
                 int oldValue = int.Parse(SaveData.saveValues["OverlayChance"], System.Globalization.CultureInfo.InvariantCulture);
                 if(int.Parse(controllerAdvanced.interactables["OverlayChance"].Tooltip, System.Globalization.CultureInfo.InvariantCulture) < 0)
                     controllerAdvanced.interactables["OverlayChance"].Tooltip = "0";
@@ -445,7 +445,7 @@ namespace NonsensicalVideoGenerator
                     SaveData.Save();
                 return false;
             }));
-            controllerAdvanced.Add("Height", new TextEntry("Output Resolution", "Height: how tall the result is.", SaveData.saveValues["VideoHeight"], new Vector2(170, 60), 24, 4, 1, (int i) => {
+            controllerAdvanced.Add("Height", new TextEntry("Output Resolution", "Height: how tall the result is.", SaveData.saveValues["VideoHeight"], new Vector2(170, 60), 24, 4, 1, (int i, string n) => {
                 string oldValue = SaveData.saveValues["VideoHeight"];
                 // minimum must be 240
                 if(int.Parse(controllerAdvanced.interactables["Height"].Tooltip, System.Globalization.CultureInfo.InvariantCulture) < 128)
@@ -461,7 +461,7 @@ namespace NonsensicalVideoGenerator
                     SaveData.Save();
                 return false;
             }));
-            controllerAdvanced.Add("Width", new TextEntry("     ", "Width: how wide the result is.", SaveData.saveValues["VideoWidth"], new Vector2(139, 60), 24, 4, 1, (int i) => {
+            controllerAdvanced.Add("Width", new TextEntry("     ", "Width: how wide the result is.", SaveData.saveValues["VideoWidth"], new Vector2(139, 60), 24, 4, 1, (int i, string n) => {
                 string oldValue = SaveData.saveValues["VideoWidth"];
                 // minimum must be 320
                 if(int.Parse(controllerAdvanced.interactables["Width"].Tooltip, System.Globalization.CultureInfo.InvariantCulture) < 128)
@@ -479,7 +479,7 @@ namespace NonsensicalVideoGenerator
             }));
             // REGULAR MODE
             // Add buttons
-            controller.Add("MoreOptions", new Button("Next Page", "Next page of options.", new Vector2(239+36, 60+10+19*8), (int i) => {
+            controller.Add("MoreOptions", new Button("Next Page", "Next page of options.", new Vector2(239+36, 60+10+19*8), (int i, string n) => {
                 switch(i)
                 {
                     case 2: // left click
@@ -489,7 +489,7 @@ namespace NonsensicalVideoGenerator
                 }
                 return false;
             }));
-            controller.Add("StartRendering", new Button("Start Rendering", "Start generating a new video.", new Vector2(139+36, 60+10+19*8), (int i) => {
+            controller.Add("StartRendering", new Button("Start Rendering", "Start generating a new video.", new Vector2(139+36, 60+10+19*8), (int i, string n) => {
                 switch(i)
                 {
                     case 2: // left click
@@ -555,7 +555,7 @@ namespace NonsensicalVideoGenerator
                 return false;
             }));
             // Add text entries
-            controller.Add("MaxStreamDuration", new TextEntry("Random Clip Length", "End of random length range.", SaveData.saveValues["MaxStreamDuration"], new Vector2(172, 60+19*3), 26, 5, 2, (int i) => {
+            controller.Add("MaxStreamDuration", new TextEntry("Random Clip Length", "End of random length range.", SaveData.saveValues["MaxStreamDuration"], new Vector2(172, 60+19*3), 26, 5, 2, (int i, string n) => {
                 string oldValue = SaveData.saveValues["MaxStreamDuration"];
                 if(float.Parse(controller.interactables["MaxStreamDuration"].Tooltip, System.Globalization.CultureInfo.InvariantCulture) < 0.2)
                     controller.interactables["MaxStreamDuration"].Tooltip = "0.2";
@@ -564,7 +564,7 @@ namespace NonsensicalVideoGenerator
                     SaveData.Save();
                 return false;
             }));
-            controller.Add("MinStreamDuration", new TextEntry("  ", "Start of random length range.", SaveData.saveValues["MinStreamDuration"], new Vector2(139, 60+19*3), 26, 5, 2, (int i) => {
+            controller.Add("MinStreamDuration", new TextEntry("  ", "Start of random length range.", SaveData.saveValues["MinStreamDuration"], new Vector2(139, 60+19*3), 26, 5, 2, (int i, string n) => {
                 string oldValue = SaveData.saveValues["MinStreamDuration"];
                 //if(float.Parse(controller.interactables["MinStreamDuration"].Tooltip, System.Globalization.CultureInfo.InvariantCulture) < 0.2)
                     //controller.interactables["MinStreamDuration"].Tooltip = "0.2";
@@ -573,7 +573,7 @@ namespace NonsensicalVideoGenerator
                     SaveData.Save();
                 return false;
             }));
-            controller.Add("ClipCount", new TextEntry("Clip Segment Count", "How many clips to generate.", SaveData.saveValues["MaxClipCount"], new Vector2(139, 60+19*2), 24, 3, 1, (int i) => {
+            controller.Add("ClipCount", new TextEntry("Clip Segment Count", "How many clips to generate.", SaveData.saveValues["MaxClipCount"], new Vector2(139, 60+19*2), 24, 3, 1, (int i, string n) => {
                 string oldValue = SaveData.saveValues["MaxClipCount"];
                 if(int.Parse(controller.interactables["ClipCount"].Tooltip, System.Globalization.CultureInfo.InvariantCulture) < 0)
                     controller.interactables["ClipCount"].Tooltip = "0";
@@ -587,7 +587,7 @@ namespace NonsensicalVideoGenerator
                 return false;
             }));
             // Add switches
-            controller.Add("InsertOutro", new Switch("Insert Outro", "Ends with a random outro.", new Vector2(219, 60+19), (int i) => {
+            controller.Add("InsertOutro", new Switch("Insert Outro", "Ends with a random outro.", new Vector2(219, 60+19), (int i, string n) => {
                 bool switchState = (i & 256) != 0;
                 if((i & 2) != 0)
                 {
@@ -598,7 +598,7 @@ namespace NonsensicalVideoGenerator
                 }
                 return switchState;
             }, SaveData.saveValues["OutrosEnabled"] == "true"));
-            controller.Add("InsertIntro", new Switch("Insert Intro", "Begins with a random intro.", new Vector2(139, 60+19), (int i) => {
+            controller.Add("InsertIntro", new Switch("Insert Intro", "Begins with a random intro.", new Vector2(139, 60+19), (int i, string n) => {
                 bool switchState = (i & 256) != 0;
                 if((i & 2) != 0)
                 {
@@ -609,7 +609,7 @@ namespace NonsensicalVideoGenerator
                 }
                 return switchState;
             }, SaveData.saveValues["IntrosEnabled"] == "true"));
-            controller.Add("SaveToLibrary", new Switch("Play Automatically", "Immediately start playing once complete.", new Vector2(139, 60), (int i) => {
+            controller.Add("SaveToLibrary", new Switch("Play Automatically", "Immediately start playing once complete.", new Vector2(139, 60), (int i, string n) => {
                 bool switchState = (i & 256) != 0;
                 if((i & 2) != 0)
                 {

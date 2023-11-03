@@ -184,6 +184,11 @@ namespace NonsensicalVideoGenerator
                 "You can hold shift while deleting media from",
                 "the library to instantly delete them."
             },
+            new string[]
+            {
+                "Clicking on the Nonsensical Video Generator",
+                "logo will re-seed the random number generator."
+            },
         };
         public void Show()
         {
@@ -396,7 +401,7 @@ namespace NonsensicalVideoGenerator
             }
             else
             {
-                controller.Add("Mute", new Switch("", "Mutes in-app background music.", new Vector2(147, 60-4+19*5), (int i) => {
+                controller.Add("Mute", new Switch("", "Mutes in-app background music.", new Vector2(147, 60-4+19*5), (int i, string n) => {
                     bool switchState = (i & 256) != 0;
                     if((i & 2) != 0)
                     {
@@ -407,7 +412,7 @@ namespace NonsensicalVideoGenerator
                     }
                     return switchState;
                 }, SaveData.saveValues["MusicVolume"] == "0"));
-                controller.Add("MotionDisable", new Switch("", "Turns off screen tweening and other elements.", new Vector2(147, 60+2+19*3), (int i) => {
+                controller.Add("MotionDisable", new Switch("", "Turns off screen tweening and other elements.", new Vector2(147, 60+2+19*3), (int i, string n) => {
                     bool switchState = (i & 256) != 0;
                     if((i & 2) != 0)
                     {

@@ -17,7 +17,7 @@ namespace NonsensicalVideoGenerator
         public string Tooltip { get; set; }
         public int State { get; set; } // Never used, use ClickableLabel for input or tooltip functionality.
         public Vector2 Position { get; set; }
-        public Func<int, bool> Callback { get; set; }
+        public Func<int, string, bool> Callback { get; set; }
         private string Font = "Munro";
         private bool UseShadow = true;
         private Color TextColor = Color.White;
@@ -27,14 +27,14 @@ namespace NonsensicalVideoGenerator
             Name = defaultName;
             Tooltip = "";
             Position = defaultPosition;
-            Callback = new Func<int, bool>(i => false); // Dummy function
+            Callback = new Func<int, string, bool>((i, n) => false); // Dummy function
         }
         public Label(string defaultName, Vector2 defaultPosition, bool defaultUseShadow, Color defaultTextColor, Color defaultShadowColor, string defaultFont = "Munro")
         {
             Name = defaultName;
             Tooltip = "";
             Position = defaultPosition;
-            Callback = new Func<int, bool>(i => false); // Dummy function
+            Callback = new Func<int, string, bool>((i, n) => false); // Dummy function
             Font = defaultFont;
             UseShadow = defaultUseShadow;
             TextColor = defaultTextColor;

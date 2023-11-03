@@ -14,7 +14,7 @@ namespace NonsensicalVideoGenerator
     public class ActionButton : Button
     {
         public Texture2D Icon { get; set; }
-        public ActionButton(string defaultTooltip, Vector2 defaultPosition, Func<int, bool> defaultCallback, Texture2D icon) : base("", defaultTooltip, defaultPosition, defaultCallback)
+        public ActionButton(string defaultTooltip, Vector2 defaultPosition, Func<int, string, bool> defaultCallback, Texture2D icon) : base("", defaultTooltip, defaultPosition, defaultCallback)
         {
             Icon = icon;
         }
@@ -52,7 +52,7 @@ namespace NonsensicalVideoGenerator
                 if (mouseButton > -1)
                 {
                     State = mouseButton;
-                    bool result = Callback(mouseButton);
+                    bool result = Callback(mouseButton, Name);
                     if (result)
                         return true;
                 }

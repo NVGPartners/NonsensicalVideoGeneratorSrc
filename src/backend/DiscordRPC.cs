@@ -1,4 +1,5 @@
 using System;
+using System.Drawing;
 using DiscordRPC;
 
 namespace NonsensicalVideoGenerator
@@ -38,71 +39,99 @@ namespace NonsensicalVideoGenerator
         }
         public static void Initialize()
         {
-            timestamp = DateTime.UtcNow;
-            client = new DiscordRpcClient("1133301113219727460");
-            client.Initialize();
+            try
+            {
+                timestamp = DateTime.UtcNow;
+                client = new DiscordRpcClient("1133301113219727460");
+                client.Initialize();
+            }
+            catch(Exception e)
+            {
+                ConsoleOutput.WriteLine("Discord RPC error: " + e.Message, Microsoft.Xna.Framework.Color.Red);
+            }
         }
         public static void Update()
         {
-            if(client == null)
-                return;
-            if(Global.generator.progressText != curstate)
+            try
             {
-                curstate = Global.generator.progressText;
-                UpdatePresence();
+                if(client == null)
+                    return;
+                if(Global.generator.progressText != curstate)
+                {
+                    curstate = Global.generator.progressText;
+                    UpdatePresence();
+                }
+                if(curtab != prevtab)
+                {
+                    prevtab = curtab;
+                    UpdatePresence();
+                }
+                client.Invoke();
             }
-            if(curtab != prevtab)
+            catch(Exception e)
             {
-                prevtab = curtab;
-                UpdatePresence();
+                ConsoleOutput.WriteLine("Discord RPC error: " + e.Message, Microsoft.Xna.Framework.Color.Red);
             }
-            client.Invoke();
         }
         public static void UpdatePresence()
         {
-            if(client == null)
-                return;
-            RichPresence presence = new RichPresence()
+            try
             {
-                Details = Global.videoTitle + ".mp4",
-                State = curstate,
-                Assets = new Assets()
+                if(client == null)
+                    return;
+                RichPresence presence = new RichPresence()
                 {
-                    LargeImageKey = "icon",
-                    LargeImageText = "v" + Global.productVersion,
-                },
-                Timestamps = new Timestamps(timestamp),
-            };
-            switch(curtab)
-            {
-                case Tab.Generate:
-                    presence.Assets.SmallImageKey = "generate";
-                    presence.Assets.SmallImageText = "Generate Tab";
-                    break;
-                case Tab.Library:
-                    presence.Assets.SmallImageKey = "library";
-                    presence.Assets.SmallImageText = "Library Tab";
-                    break;
-                case Tab.Effects:
-                    presence.Assets.SmallImageKey = "effects";
-                    presence.Assets.SmallImageText = "Addons Tab";
-                    break;
-                case Tab.Options:
-                    presence.Assets.SmallImageKey = "options";
-                    presence.Assets.SmallImageText = "Options Tab";
-                    break;
-                case Tab.Game:
-                    presence.Assets.SmallImageKey = "game";
-                    presence.Assets.SmallImageText = "Game Tab";
-                    break;
+                    Details = Global.videoTitle + ".mp4",
+                    State = curstate,
+                    Assets = new Assets()
+                    {
+                        LargeImageKey = "icon",
+                        LargeImageText = "v" + Global.productVersion,
+                    },
+                    Timestamps = new Timestamps(timestamp),
+                };
+                switch(curtab)
+                {
+                    case Tab.Generate:
+                        presence.Assets.SmallImageKey = "generate";
+                        presence.Assets.SmallImageText = "Generate Tab";
+                        break;
+                    case Tab.Library:
+                        presence.Assets.SmallImageKey = "library";
+                        presence.Assets.SmallImageText = "Library Tab";
+                        break;
+                    case Tab.Effects:
+                        presence.Assets.SmallImageKey = "effects";
+                        presence.Assets.SmallImageText = "Addons Tab";
+                        break;
+                    case Tab.Options:
+                        presence.Assets.SmallImageKey = "options";
+                        presence.Assets.SmallImageText = "Options Tab";
+                        break;
+                    case Tab.Game:
+                        presence.Assets.SmallImageKey = "game";
+                        presence.Assets.SmallImageText = "Game Tab";
+                        break;
+                }
+                client.SetPresence(presence);
             }
-            client.SetPresence(presence);
+            catch(Exception e)
+            {
+                ConsoleOutput.WriteLine("Discord RPC error: " + e.Message, Microsoft.Xna.Framework.Color.Red);
+            }
         }
         public static void Shutdown()
         {
-            if(client == null)
-                return;
-            client.Dispose();
+            try
+            {
+                if(client == null)
+                    return;
+                client.Dispose();
+            }
+            catch(Exception e)
+            {
+                ConsoleOutput.WriteLine("Discord RPC error: " + e.Message, Microsoft.Xna.Framework.Color.Red);
+            }
         }
     }
 }

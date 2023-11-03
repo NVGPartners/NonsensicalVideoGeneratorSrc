@@ -73,13 +73,9 @@ namespace NonsensicalVideoGenerator
                 }
                 if(worker.CancellationPending || !processing)
                     return;
-#if MONOGAME
-                int w = GlobalGraphics.Scale(104);
-                int h = GlobalGraphics.Scale(82);
-#else
-                int w = 360;
-                int h = 240;
-#endif
+                int scale =  int.Parse(SaveData.saveValues["VideoPlaybackScale"], System.Globalization.CultureInfo.InvariantCulture);
+                int w = 104 * scale;
+                int h = 82 * scale;
                 ProcessStartInfo startInfo = new()
                 {
                     FileName = "ffmpeg",

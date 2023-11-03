@@ -136,6 +136,13 @@ namespace NonsensicalVideoGenerator
         }
         protected override void Update(GameTime gameTime)
         {
+            // DEBUG: Pressing Mouse3 at any time will FindMusic()
+            /*
+            if(MouseInput.MouseState.MiddleButton == Microsoft.Xna.Framework.Input.ButtonState.Pressed && MouseInput.LastMouseState.MiddleButton == Microsoft.Xna.Framework.Input.ButtonState.Released)
+            {
+                FindMusic();
+            }
+            */
             if(bool.Parse(SaveData.saveValues["EnableDiscordRPC"]))
                 DiscordRPC.Update();
             // fix text entries
@@ -170,7 +177,7 @@ namespace NonsensicalVideoGenerator
                 }
                 else
                 {
-                    if((_windowState == WindowState.Focused && _musicState == MusicState.Playing) && FramePlayer.canPlayBgMusic)
+                    if((SaveData.saveValues["MuteMusicWhileTabbedOut"] == "true" ? _windowState == WindowState.Focused : true) && _musicState == MusicState.Playing && FramePlayer.canPlayBgMusic)
                     {
                         // Fade in music.
                         float vol = int.Parse(SaveData.saveValues["MusicVolume"], System.Globalization.CultureInfo.InvariantCulture) / 100f;
@@ -185,20 +192,23 @@ namespace NonsensicalVideoGenerator
                     {
                         FindMusic();
                     }
-                    if((_windowState == WindowState.Focused && _musicState == MusicState.Paused) && FramePlayer.canPlayBgMusic)
+                    if(SaveData.saveValues["MuteMusicWhileTabbedOut"] == "true")
                     {
-                        MediaPlayer.Resume();
-                        _musicState = MusicState.Playing;
-                    }
-                    if((SaveData.saveValues["MuteMusicWhileTabbedOut"] == "true" && (_windowState == WindowState.Unfocused) || false && _musicState == MusicState.Playing) || !FramePlayer.canPlayBgMusic)
-                    {
-                        // Fade out music.
-                        if(MediaPlayer.Volume > 0.1f)
-                            MediaPlayer.Volume -= 0.1f;
-                        else
+                        if(_windowState == WindowState.Focused && _musicState == MusicState.Paused && FramePlayer.canPlayBgMusic)
                         {
-                            MediaPlayer.Pause();
-                            _musicState = MusicState.Paused;
+                            MediaPlayer.Resume();
+                            _musicState = MusicState.Playing;
+                        }
+                        if((_windowState == WindowState.Unfocused && _musicState == MusicState.Playing) || !FramePlayer.canPlayBgMusic)
+                        {
+                            // Fade out music.
+                            if(MediaPlayer.Volume > 0.1f)
+                                MediaPlayer.Volume -= 0.1f;
+                            else
+                            {
+                                MediaPlayer.Pause();
+                                _musicState = MusicState.Paused;
+                            }
                         }
                     }
                 }

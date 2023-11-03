@@ -18,9 +18,9 @@ namespace NonsensicalVideoGenerator
         public int State { get; set; } // 0: none, 1: hovering, 2: left click, 3: right click, 4: middle click, 5: forward, 6: back, 7: scroll up, 8: scroll down
         public bool SwitchState { get; set; } // false: off, true: on
         public Vector2 Position { get; set; }
-        public Func<int, bool> Callback { get; set; }
+        public Func<int, string, bool> Callback { get; set; }
         public Rectangle bounds;
-        public Switch(string defaultName, string defaultTooltip, Vector2 defaultPosition, Func<int, bool> defaultCallback, bool defaultSwitchState)
+        public Switch(string defaultName, string defaultTooltip, Vector2 defaultPosition, Func<int, string, bool> defaultCallback, bool defaultSwitchState)
         {
             Name = defaultName;
             Tooltip = defaultTooltip;
@@ -68,7 +68,7 @@ namespace NonsensicalVideoGenerator
                 State = (int)Math.Log(mouseButtonFlags, 2) + 1;
                 if (SwitchState)
                     mouseButtonFlags |= 256;
-                SwitchState = Callback(mouseButtonFlags);
+                SwitchState = Callback(mouseButtonFlags, Name);
                 if((mouseButtonFlags & 2) == 2)
                     return true;
             }

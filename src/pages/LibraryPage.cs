@@ -400,17 +400,34 @@ namespace NonsensicalVideoGenerator
                             // Cancelled?
                             if (loadVideosThread != null && loadVideosThread.CancellationPending)
                                 return;
-                            // Convert to texture
-                            System.Drawing.Bitmap bitmap = new System.Drawing.Bitmap(bitmapSource.PixelWidth, bitmapSource.PixelHeight, System.Drawing.Imaging.PixelFormat.Format32bppPArgb);
-                            BitmapData data = bitmap.LockBits(new System.Drawing.Rectangle(System.Drawing.Point.Empty, bitmap.Size), ImageLockMode.WriteOnly, System.Drawing.Imaging.PixelFormat.Format32bppPArgb);
+                            // Convert bitmap to texture
+                            int texScale = int.Parse(SaveData.saveValues["VideoPlaybackScale"], System.Globalization.CultureInfo.InvariantCulture);
+                            int texWidth = 29 * texScale;
+                            int texHeight = 23 * texScale;
+                            System.Drawing.Bitmap bitmap = new System.Drawing.Bitmap(bitmapSource.PixelWidth, bitmapSource.PixelHeight, System.Drawing.Imaging.PixelFormat.Format32bppArgb);
+                            BitmapData data = bitmap.LockBits(new System.Drawing.Rectangle(System.Drawing.Point.Empty, bitmap.Size), ImageLockMode.WriteOnly, System.Drawing.Imaging.PixelFormat.Format32bppArgb);
                             bitmapSource.CopyPixels(System.Windows.Int32Rect.Empty, data.Scan0, data.Height * data.Stride, data.Stride);
                             bitmap.UnlockBits(data);
-                            Texture2D texture = new(graphicsDevice, bitmap.Width, bitmap.Height);
-                            Color[] colorData = new Color[bitmap.Width * bitmap.Height];
-                            for (int i = 0; i < colorData.Length; i++)
+                            // Scale bitmap to 29x23
+                            System.Drawing.Bitmap scaledBitmap = new System.Drawing.Bitmap(texWidth, texHeight);
+                            System.Drawing.Graphics graphics = System.Drawing.Graphics.FromImage(scaledBitmap);
+                            graphics.DrawImage(bitmap, new System.Drawing.Rectangle(0, 0, texWidth, texHeight));
+                            // Check to make sure we're still on the same page
+                            if (currentPage != page)
+                                return;
+                            // Cancelled?
+                            if (loadVideosThread != null && loadVideosThread.CancellationPending)
+                                return;
+                            // Convert bitmap to color data
+                            Texture2D texture = new Texture2D(graphicsDevice, texWidth, texHeight);
+                            Color[] colorData = new Color[texWidth * texHeight];
+                            for (int i = 0; i < texWidth; i++)
                             {
-                                System.Drawing.Color color = bitmap.GetPixel(i % bitmap.Width, i / bitmap.Width);
-                                colorData[i] = new Color(color.R, color.G, color.B, color.A);
+                                for (int j = 0; j < texHeight; j++)
+                                {
+                                    System.Drawing.Color color = scaledBitmap.GetPixel(i, j);
+                                    colorData[i + (j * texWidth)] = new Color(color.R, color.G, color.B, color.A);
+                                }
                             }
                             texture.SetData(colorData);
                             // Check to make sure we're still on the same page

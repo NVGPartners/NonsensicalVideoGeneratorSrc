@@ -19,7 +19,7 @@ namespace NonsensicalVideoGenerator
         public string Tooltip { get; set; } // This is the actual text, not a tooltip. 
         public int State { get; set; } // 0: none, 1: entering text
         public Vector2 Position { get; set; }
-        public Func<int, bool> Callback { get; set; }
+        public Func<int, string, bool> Callback { get; set; }
         public Rectangle bounds;
         private Rectangle scaledBounds;
         private int maxChars = 0;
@@ -27,7 +27,7 @@ namespace NonsensicalVideoGenerator
         private string hiddenToolTip = ""; // The actual tooltip variable.
         private KeyboardState oldKeyboardState;
         private KeyboardState newKeyboardState;
-        public TextEntry(string defaultName, string defaultTooltip, string defaultText, Vector2 defaultPosition, int width, int maxChars, int mode, Func<int, bool> defaultCallback)
+        public TextEntry(string defaultName, string defaultTooltip, string defaultText, Vector2 defaultPosition, int width, int maxChars, int mode, Func<int, string, bool> defaultCallback)
         {
             Name = defaultName;
             hiddenToolTip = defaultTooltip;
@@ -62,7 +62,7 @@ namespace NonsensicalVideoGenerator
                                 GlobalContent.GetSound("Error").Play(int.Parse(SaveData.saveValues["SoundEffectVolume"], System.Globalization.CultureInfo.InvariantCulture) / 100f, 0f, 0f);
                                 return true;
                             }
-                            Callback(State);
+                            Callback(State, Name);
                             Global.editing = "";
                             //Accessibility.allowAccessibility = true;
                             GlobalContent.GetSound("Option").Play(int.Parse(SaveData.saveValues["SoundEffectVolume"], System.Globalization.CultureInfo.InvariantCulture) / 100f, 0f, 0f);
@@ -76,7 +76,7 @@ namespace NonsensicalVideoGenerator
                                 GlobalContent.GetSound("Error").Play(int.Parse(SaveData.saveValues["SoundEffectVolume"], System.Globalization.CultureInfo.InvariantCulture) / 100f, 0f, 0f);
                                 return true;
                             }
-                            Callback(State);
+                            Callback(State, Name);
                             Global.editing = Name + "Input";
                             //Accessibility.allowAccessibility = false;
                             GlobalContent.GetSound("Option").Play(int.Parse(SaveData.saveValues["SoundEffectVolume"], System.Globalization.CultureInfo.InvariantCulture) / 100f, 0f, 0f);
@@ -87,7 +87,7 @@ namespace NonsensicalVideoGenerator
                                     GlobalContent.GetSound("Error").Play(int.Parse(SaveData.saveValues["SoundEffectVolume"], System.Globalization.CultureInfo.InvariantCulture) / 100f, 0f, 0f);
                                     return true;
                                 }
-                                Callback(State);
+                                Callback(State, Name);
                                 Global.editing = "";
                                 //Accessibility.allowAccessibility = true;
                                 GlobalContent.GetSound("Option").Play(int.Parse(SaveData.saveValues["SoundEffectVolume"], System.Globalization.CultureInfo.InvariantCulture) / 100f, 0f, 0f);
@@ -112,7 +112,7 @@ namespace NonsensicalVideoGenerator
                                     GlobalContent.GetSound("Error").Play(int.Parse(SaveData.saveValues["SoundEffectVolume"], System.Globalization.CultureInfo.InvariantCulture) / 100f, 0f, 0f);
                                     return true;
                                 }
-                                Callback(State);
+                                Callback(State, Name);
                                 GlobalContent.GetSound("Back").Play(int.Parse(SaveData.saveValues["SoundEffectVolume"], System.Globalization.CultureInfo.InvariantCulture) / 100f, 0f, 0f);
                                 Global.mask.Disable();
                             }
@@ -132,7 +132,7 @@ namespace NonsensicalVideoGenerator
                             GlobalContent.GetSound("Error").Play(int.Parse(SaveData.saveValues["SoundEffectVolume"], System.Globalization.CultureInfo.InvariantCulture) / 100f, 0f, 0f);
                             return true;
                         }
-                        Callback(0);
+                        Callback(0, Name);
                         Global.editing = "";
                         Accessibility.allowAccessibility = true;
                         GlobalContent.GetSound("Option").Play(int.Parse(SaveData.saveValues["SoundEffectVolume"], System.Globalization.CultureInfo.InvariantCulture) / 100f, 0f, 0f);

@@ -26,7 +26,6 @@ namespace NonsensicalVideoGenerator
         private bool editingSettings = false;
         private bool pluginCreation = false;
         private int settingsIndex = 0;
-        private int setting = 0;
         private string internalTooltip = "";
         public string customPluginName = "Untitled";
         public string customPluginFileName = "untitled";
@@ -458,7 +457,7 @@ namespace NonsensicalVideoGenerator
                                         {
                                             if(PluginHandler.plugins[i].submittedId != "")
                                             {
-                                                controller.Add("VisitWorkshopPage", new Button("View Workshop", "View this effect on the Workshop.", new Vector2(119+100, 60+10+19*7), (int i) => {
+                                                controller.Add("VisitWorkshopPage", new Button("View Workshop", "View this effect on the Workshop.", new Vector2(119+100, 60+10+19*7), (int i, string n) => {
                                                     switch(i)
                                                     {
                                                         case 2:
@@ -474,7 +473,7 @@ namespace NonsensicalVideoGenerator
                                             }
                                             if(PluginHandler.plugins[i].rootPath.Contains("user"))
                                             {
-                                                controller.Add("Delete", new Button("Delete", "", new Vector2(119+100, 60+10+19*8), (int i) => {
+                                                controller.Add("Delete", new Button("Delete", "", new Vector2(119+100, 60+10+19*8), (int i, string n) => {
                                                     switch(i)
                                                     {
                                                         case 2:
@@ -497,14 +496,14 @@ namespace NonsensicalVideoGenerator
                                                     }
                                                     return false;
                                                 }));
-                                                controller.Add("Publish", new Button("Publish", "Publish to Steam Workshop.", new Vector2(139+139, 60+10+19*8), (int i) => {
+                                                controller.Add("Publish", new Button("Publish", "Publish to Steam Workshop.", new Vector2(139+139, 60+10+19*8), (int i, string n) => {
                                                     switch(i)
                                                     {
                                                         case 2: // left click
                                                             GlobalContent.GetSound("Select").Play(int.Parse(SaveData.saveValues["SoundEffectVolume"], System.Globalization.CultureInfo.InvariantCulture) / 100f, 0f, 0f);
                                                             Name = "Workshop Tags: " + PluginHandler.plugins[settingsIndex].GetDisplayName();
                                                             controller.Clear();
-                                                            controller.Add("LibraryCustom", new Switch("Custom Library", "Uses a custom library type.", new Vector2(139, 60+19*8), (int i) => {
+                                                            controller.Add("LibraryCustom", new Switch("Custom Library", "Uses a custom library type.", new Vector2(139, 60+19*8), (int i, string n) => {
                                                                 bool switchState = (i & 256) != 0;
                                                                 if((i & 2) != 0)
                                                                 {
@@ -515,7 +514,7 @@ namespace NonsensicalVideoGenerator
                                                                 }
                                                                 return switchState;
                                                             }, (selectedFlagsWorkshop & WorkshopTag.Library_Custom) != 0));
-                                                            controller.Add("LibraryOverlay", new Switch("Overlay Library", "Uses the overlay library type.", new Vector2(139, 60+19*7), (int i) => {
+                                                            controller.Add("LibraryOverlay", new Switch("Overlay Library", "Uses the overlay library type.", new Vector2(139, 60+19*7), (int i, string n) => {
                                                                 bool switchState = (i & 256) != 0;
                                                                 if((i & 2) != 0)
                                                                 {
@@ -526,7 +525,7 @@ namespace NonsensicalVideoGenerator
                                                                 }
                                                                 return switchState;
                                                             }, (selectedFlagsWorkshop & WorkshopTag.Library_Overlay) != 0));
-                                                            controller.Add("LibraryOutro", new Switch("Outro Library", "Uses the outro library type.", new Vector2(139, 60+19*6), (int i) => {
+                                                            controller.Add("LibraryOutro", new Switch("Outro Library", "Uses the outro library type.", new Vector2(139, 60+19*6), (int i, string n) => {
                                                                 bool switchState = (i & 256) != 0;
                                                                 if((i & 2) != 0)
                                                                 {
@@ -537,7 +536,7 @@ namespace NonsensicalVideoGenerator
                                                                 }
                                                                 return switchState;
                                                             }, (selectedFlagsWorkshop & WorkshopTag.Library_Outro) != 0));
-                                                            controller.Add("LibraryIntro", new Switch("Intro Library", "Uses the intro library type.", new Vector2(139, 60+19*5), (int i) => {
+                                                            controller.Add("LibraryIntro", new Switch("Intro Library", "Uses the intro library type.", new Vector2(139, 60+19*5), (int i, string n) => {
                                                                 bool switchState = (i & 256) != 0;
                                                                 if((i & 2) != 0)
                                                                 {
@@ -548,7 +547,7 @@ namespace NonsensicalVideoGenerator
                                                                 }
                                                                 return switchState;
                                                             }, (selectedFlagsWorkshop & WorkshopTag.Library_Intro) != 0));
-                                                            controller.Add("LibraryTransition", new Switch("Transition Library", "Uses the transition library type.", new Vector2(139, 60+19*4), (int i) => {
+                                                            controller.Add("LibraryTransition", new Switch("Transition Library", "Uses the transition library type.", new Vector2(139, 60+19*4), (int i, string n) => {
                                                                 bool switchState = (i & 256) != 0;
                                                                 if((i & 2) != 0)
                                                                 {
@@ -559,7 +558,7 @@ namespace NonsensicalVideoGenerator
                                                                 }
                                                                 return switchState;
                                                             }, (selectedFlagsWorkshop & WorkshopTag.Library_Transition) != 0));
-                                                            controller.Add("LibraryMaterial", new Switch("Material Library", "Uses the material library type.", new Vector2(139, 60+19*3), (int i) => {
+                                                            controller.Add("LibraryMaterial", new Switch("Material Library", "Uses the material library type.", new Vector2(139, 60+19*3), (int i, string n) => {
                                                                 bool switchState = (i & 256) != 0;
                                                                 if((i & 2) != 0)
                                                                 {
@@ -570,7 +569,7 @@ namespace NonsensicalVideoGenerator
                                                                 }
                                                                 return switchState;
                                                             }, (selectedFlagsWorkshop & WorkshopTag.Library_Material) != 0));
-                                                            controller.Add("LibraryMusic", new Switch("Music Library", "Uses the music library type.", new Vector2(139, 60+19*2), (int i) => {
+                                                            controller.Add("LibraryMusic", new Switch("Music Library", "Uses the music library type.", new Vector2(139, 60+19*2), (int i, string n) => {
                                                                 bool switchState = (i & 256) != 0;
                                                                 if((i & 2) != 0)
                                                                 {
@@ -581,7 +580,7 @@ namespace NonsensicalVideoGenerator
                                                                 }
                                                                 return switchState;
                                                             }, (selectedFlagsWorkshop & WorkshopTag.Library_Music) != 0));
-                                                            controller.Add("LibrarySFX", new Switch("Sound FX Library", "Uses the sound fx library type.", new Vector2(139, 60+19), (int i) => {
+                                                            controller.Add("LibrarySFX", new Switch("Sound FX Library", "Uses the sound fx library type.", new Vector2(139, 60+19), (int i, string n) => {
                                                                 bool switchState = (i & 256) != 0;
                                                                 if((i & 2) != 0)
                                                                 {
@@ -592,7 +591,7 @@ namespace NonsensicalVideoGenerator
                                                                 }
                                                                 return switchState;
                                                             }, (selectedFlagsWorkshop & WorkshopTag.Library_SFX) != 0));
-                                                            controller.Add("Audio", new Switch("Audio", "Applies audio effects.", new Vector2(139+55, 60), (int i) => {
+                                                            controller.Add("Audio", new Switch("Audio", "Applies audio effects.", new Vector2(139+55, 60), (int i, string n) => {
                                                                 bool switchState = (i & 256) != 0;
                                                                 if((i & 2) != 0)
                                                                 {
@@ -603,7 +602,7 @@ namespace NonsensicalVideoGenerator
                                                                 }
                                                                 return switchState;
                                                             }, (selectedFlagsWorkshop & WorkshopTag.Effect_AudioOnly) != 0));
-                                                            controller.Add("Video", new Switch("Video", "Applies video effects.", new Vector2(139, 60), (int i) => {
+                                                            controller.Add("Video", new Switch("Video", "Applies video effects.", new Vector2(139, 60), (int i, string n) => {
                                                                 bool switchState = (i & 256) != 0;
                                                                 if((i & 2) != 0)
                                                                 {
@@ -615,7 +614,7 @@ namespace NonsensicalVideoGenerator
                                                                 }
                                                                 return switchState;
                                                             }, (selectedFlagsWorkshop & WorkshopTag.Effect_VideoOnly) != 0));
-                                                            controller.Add("Submit", new Button("Submit", "Submit to Steam Workshop.", new Vector2(139+139, 60+10+19*7), (int i) => {
+                                                            controller.Add("Submit", new Button("Submit", "Submit to Steam Workshop.", new Vector2(139+139, 60+10+19*7), (int i, string n) => {
                                                                 switch(i)
                                                                 {
                                                                     case 2: // left click
@@ -639,7 +638,7 @@ namespace NonsensicalVideoGenerator
                                                                 }
                                                                 return false;
                                                             }));
-                                                            controller.Add("Back", new Button("Back", "Go back to effect addon list.", new Vector2(119+167, 60+10+19*8), (int i) => {
+                                                            controller.Add("Back", new Button("Back", "Go back to effect addon list.", new Vector2(119+167, 60+10+19*8), (int i, string n) => {
                                                                 switch(i)
                                                                 {
                                                                     case 2: // left click
@@ -657,7 +656,7 @@ namespace NonsensicalVideoGenerator
                                                 }));
                                             }
                                         }
-                                        controller.Add("Back", new Button("Back", "Go back to addon list.", new Vector2(119+36, 60+10+19*8), (int i) => {
+                                        controller.Add("Back", new Button("Back", "Go back to addon list.", new Vector2(119+36, 60+10+19*8), (int i, string n) => {
                                             switch(i)
                                             {
                                                 case 2: // left click
@@ -705,54 +704,30 @@ namespace NonsensicalVideoGenerator
                                                     te = new Label((string)PluginHandler.plugins[i].settings[s.Key], new Vector2(139, 60+4+19*sindex));
                                                     break;
                                                 case SettingType.Switch:
-                                                    te = new Switch(s.Key, PluginHandler.plugins[i].settingTooltips[s.Key], new Vector2(139, 60+19*sindex), (int i) => {
+                                                    te = new Switch(s.Key, PluginHandler.plugins[i].settingTooltips[s.Key], new Vector2(139, 60+19*sindex), (int i, string keyFromIndex) => {
                                                         bool switchState = (i & 256) != 0;
-                                                        if((i & 1) != 0)
-                                                        {
-                                                            // Set "setting" to the setting index where mouse cursor y is
-                                                            int y = MouseInput.MouseState.Y / GlobalGraphics.scale;
-                                                            Rectangle source = new(139, 70, 25, 15);
-                                                            int separator = 4;
-                                                            setting = (y - source.Y - separator) / (source.Height + separator);
-                                                            if(setting < 0)
-                                                                setting = 0;
-                                                            while(PluginHandler.plugins[settingsIndex].settingTypes.ElementAt(setting).Value == SettingType.Label)
-                                                                setting++;
-                                                            if(setting >= PluginHandler.plugins[settingsIndex].settings.Count)
-                                                                setting = PluginHandler.plugins[settingsIndex].settings.Count - 1;
-                                                        }
                                                         if((i & 2) != 0)
                                                         {
-                                                            // Use "setting" to get the key of the setting
-                                                            string keyFromIndex = PluginHandler.plugins[settingsIndex].settings.Keys.ElementAt(setting);
                                                             string oldValue = PluginHandler.plugins[settingsIndex].settings[keyFromIndex].ToString();
+                                                            if(!controller.interactables.ContainsKey(keyFromIndex))
+                                                            {
+                                                                GlobalContent.GetSound("Error").Play(int.Parse(SaveData.saveValues["SoundEffectVolume"], System.Globalization.CultureInfo.InvariantCulture) / 100f, 0f, 0f);
+                                                                return true;
+                                                            }
                                                             PluginHandler.plugins[settingsIndex].settings[keyFromIndex] = switchState ? "1" : "0";
                                                             if(oldValue != PluginHandler.plugins[settingsIndex].settings[keyFromIndex].ToString())
+                                                            {
                                                                 PluginHandler.SavePluginSettings();
-                                                            else
-                                                                GlobalContent.GetSound("Error").Play(int.Parse(SaveData.saveValues["SoundEffectVolume"], System.Globalization.CultureInfo.InvariantCulture) / 100f, 0f, 0f);
+                                                            }
                                                         }
                                                         return switchState;
                                                     }, PluginHandler.plugins[i].settings[s.Key].ToString() == "1");
                                                     break;
                                                 case SettingType.TextInput:
                                                 default:
-                                                    te = new TextEntry(s.Key, PluginHandler.plugins[i].settingTooltips[s.Key], PluginHandler.plugins[i].settings[s.Key].ToString(), new Vector2(139, 60+19*sindex), 50, 25, ty, (int i) => {
+                                                    te = new TextEntry(s.Key, PluginHandler.plugins[i].settingTooltips[s.Key], PluginHandler.plugins[i].settings[s.Key].ToString(), new Vector2(139, 60+19*sindex), 50, 25, ty, (int i, string keyFromIndex) => {
                                                         if(i == 0)
                                                         {
-                                                            // Set "setting" to the setting index where mouse cursor y is
-                                                            int y = MouseInput.MouseState.Y / GlobalGraphics.scale;
-                                                            Rectangle source = new(139, 60, 53, 15);
-                                                            int separator = 4;
-                                                            setting = (y - source.Y - separator) / (source.Height + separator);
-                                                            if(setting < 0)
-                                                                setting = 0;
-                                                            while(PluginHandler.plugins[settingsIndex].settingTypes.ElementAt(setting).Value == SettingType.Label)
-                                                                setting++;
-                                                            if(setting >= PluginHandler.plugins[settingsIndex].settings.Count)
-                                                                setting = PluginHandler.plugins[settingsIndex].settings.Count - 1;
-                                                            // Use "setting" to get the key of the setting
-                                                            string keyFromIndex = PluginHandler.plugins[settingsIndex].settings.Keys.ElementAt(setting);
                                                             string oldValue = PluginHandler.plugins[settingsIndex].settings[keyFromIndex].ToString();
                                                             if(!controller.interactables.ContainsKey(keyFromIndex))
                                                             {
@@ -763,7 +738,6 @@ namespace NonsensicalVideoGenerator
                                                             if(oldValue != PluginHandler.plugins[settingsIndex].settings[keyFromIndex].ToString())
                                                             {
                                                                 PluginHandler.SavePluginSettings();
-                                                                GlobalContent.GetSound("RenderComplete").Play(int.Parse(SaveData.saveValues["SoundEffectVolume"], System.Globalization.CultureInfo.InvariantCulture) / 100f, 0f, 0f);
                                                             }
                                                         }
                                                         return false;
@@ -822,7 +796,7 @@ namespace NonsensicalVideoGenerator
             GlobalContent.AddTexture("PluginEntryBlank", contentManager.Load<Texture2D>("graphics/pluginentryblank"));
             GlobalContent.AddTexture("PluginEntry", contentManager.Load<Texture2D>("graphics/pluginentry"));
             GlobalContent.AddTexture("ScrollHandle", contentManager.Load<Texture2D>("graphics/scrollhandle"));
-            controllerPluginCreation.Add("PluginMinimal", new Switch("Minimal Template", "Use a minimal Lua file template.", new Vector2(139, 60+19*2), (int i) => {
+            controllerPluginCreation.Add("PluginMinimal", new Switch("Minimal Template", "Use a minimal Lua file template.", new Vector2(139, 60+19*2), (int i, string n) => {
                 bool switchState = (i & 256) != 0;
                 if((i & 2) != 0)
                 {
@@ -830,16 +804,16 @@ namespace NonsensicalVideoGenerator
                 }
                 return switchState;
             }, customPluginMinimal));
-            controllerPluginCreation.Add("PluginName", new TextEntry("Addon File Name", "The internal file name of the addon.", customPluginFileName, new Vector2(139, 60+19), 50, 25, 4, (int i) => {
+            controllerPluginCreation.Add("PluginName", new TextEntry("Addon File Name", "The internal file name of the addon.", customPluginFileName, new Vector2(139, 60+19), 50, 25, 4, (int i, string n) => {
                 controllerPluginCreation.interactables["PluginName"].Tooltip = controllerPluginCreation.interactables["PluginName"].Tooltip.ToLower();
                 customPluginFileName = controllerPluginCreation.interactables["PluginName"].Tooltip;
                 return false;
             }));
-            controllerPluginCreation.Add("PluginPrettyName", new TextEntry("Addon Name", "The human-readable name of the addon.", customPluginName, new Vector2(139, 60), 50, 25, 5, (int i) => {
+            controllerPluginCreation.Add("PluginPrettyName", new TextEntry("Addon Name", "The human-readable name of the addon.", customPluginName, new Vector2(139, 60), 50, 25, 5, (int i, string n) => {
                 customPluginName = controllerPluginCreation.interactables["PluginPrettyName"].Tooltip;
                 return false;
             }));
-            controllerPluginCreation.Add("Back", new Button("Back", "Go back.", new Vector2(119+36, 60+10+19*8), (int i) => {
+            controllerPluginCreation.Add("Back", new Button("Back", "Go back.", new Vector2(119+36, 60+10+19*8), (int i, string n) => {
                 switch(i)
                 {
                     case 2: // left click
@@ -850,7 +824,7 @@ namespace NonsensicalVideoGenerator
                 }
                 return false;
             }));
-            controllerPluginCreation.Add("ReloadPlugins", new Button("Reload All", "Force reload all addons.", new Vector2(119+100, 60+10+19*7), (int i) => {
+            controllerPluginCreation.Add("ReloadPlugins", new Button("Reload All", "Force reload all addons.", new Vector2(119+100, 60+10+19*7), (int i, string n) => {
                 switch(i)
                 {
                     case 2:
@@ -863,7 +837,7 @@ namespace NonsensicalVideoGenerator
                 }
                 return false;
             }));
-            controllerPluginCreation.Add("CreatePlugin", new Button("Create", "Create the addon as specified.", new Vector2(139+141, 60+10+19*8), (int i) => {
+            controllerPluginCreation.Add("CreatePlugin", new Button("Create", "Create the addon as specified.", new Vector2(139+141, 60+10+19*8), (int i, string n) => {
                 switch(i)
                 {
                     case 2:

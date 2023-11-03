@@ -16,7 +16,7 @@ namespace NonsensicalVideoGenerator
         public string Tooltip { get; set; }
         public int State { get; set; }
         public Vector2 Position { get; set; }
-        public Func<int, bool> Callback { get; set; }
+        public Func<int, string, bool> Callback { get; set; }
     }
 }
 #endif

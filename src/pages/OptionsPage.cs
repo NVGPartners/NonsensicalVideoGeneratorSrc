@@ -30,7 +30,17 @@ namespace NonsensicalVideoGenerator
         public void LoadContent(ContentManager contentManager, GraphicsDevice graphicsDevice)
         {
             // Add dials
-            controller.Add("MuteMusicWhileTabbedOut", new Switch("Mute Music While Inactive", "Don't play music while NVG is in the background.", new Vector2(139, 60+19*6), (int i) => {
+            controller.Add("VideoPlaybackScale", new TextEntry("Video Playback Resolution", "The screen scale multiplier for video playback.", SaveData.saveValues["VideoPlaybackScale"], new Vector2(139, 60+19*7), 24, 3, 1, (int i, string n) => {
+                int oldValue = int.Parse(SaveData.saveValues["VideoPlaybackScale"], System.Globalization.CultureInfo.InvariantCulture);
+                // Range: 1-4
+                if(int.Parse(controller.interactables["VideoPlaybackScale"].Tooltip, System.Globalization.CultureInfo.InvariantCulture) < 1)
+                    controller.interactables["VideoPlaybackScale"].Tooltip = "1";
+                if(int.Parse(controller.interactables["VideoPlaybackScale"].Tooltip, System.Globalization.CultureInfo.InvariantCulture) > 4)
+                    controller.interactables["VideoPlaybackScale"].Tooltip = "4";
+                SaveData.saveValues["VideoPlaybackScale"] = controller.interactables["VideoPlaybackScale"].Tooltip;
+                return false;
+            }));
+            controller.Add("MuteMusicWhileTabbedOut", new Switch("Mute Music While Inactive", "Don't play music while NVG is in the background.", new Vector2(139, 60+19*6), (int i, string n) => {
                 bool switchState = (i & 256) != 0;
                 if((i & 2) != 0)
                 {
@@ -45,7 +55,7 @@ namespace NonsensicalVideoGenerator
                 }
                 return switchState;
             }, SaveData.saveValues["MuteMusicWhileTabbedOut"] == "true"));
-            controller.Add("EnableDiscordRPC", new Switch("Enable Discord RPC", "Tell others that you're using NVG.", new Vector2(139, 60+19*5), (int i) => {
+            controller.Add("EnableDiscordRPC", new Switch("Enable Discord RPC", "Tell others that you're using NVG.", new Vector2(139, 60+19*5), (int i, string n) => {
                 bool switchState = (i & 256) != 0;
                 if((i & 2) != 0)
                 {
@@ -60,7 +70,7 @@ namespace NonsensicalVideoGenerator
                 }
                 return switchState;
             }, SaveData.saveValues["EnableDiscordRPC"] == "true"));
-            controller.Add("MotionDisable", new Switch("Disable Motion", "Turns off screen tweening and other elements.", new Vector2(139, 60+19*4), (int i) => {
+            controller.Add("MotionDisable", new Switch("Disable Motion", "Turns off screen tweening and other elements.", new Vector2(139, 60+19*4), (int i, string n) => {
                 bool switchState = (i & 256) != 0;
                 if((i & 2) != 0)
                 {
@@ -71,11 +81,11 @@ namespace NonsensicalVideoGenerator
                 }
                 return switchState;
             }, SaveData.saveValues["DisableMotion"] == "true"));
-            controller.Add("Scale", new TextEntry("Screen Resolution Multiplier", "2, 3, or 4. A restart will be performed.", SaveData.saveValues["ScreenScale"], new Vector2(139, 60+19*3), 24, 3, 1, (int i) => {
+            controller.Add("Scale", new TextEntry("Screen Resolution", "The screen scale multiplier for the UI. Restarts when set.", SaveData.saveValues["ScreenScale"], new Vector2(139, 60+19*3), 24, 3, 1, (int i, string n) => {
                 int oldValue = int.Parse(SaveData.saveValues["ScreenScale"], System.Globalization.CultureInfo.InvariantCulture);
                 // Range: 1-4
-                if(int.Parse(controller.interactables["Scale"].Tooltip, System.Globalization.CultureInfo.InvariantCulture) < 2)
-                    controller.interactables["Scale"].Tooltip = "2";
+                if(int.Parse(controller.interactables["Scale"].Tooltip, System.Globalization.CultureInfo.InvariantCulture) < 1)
+                    controller.interactables["Scale"].Tooltip = "1";
                 if(int.Parse(controller.interactables["Scale"].Tooltip, System.Globalization.CultureInfo.InvariantCulture) > 4)
                     controller.interactables["Scale"].Tooltip = "4";
                 SaveData.saveValues["ScreenScale"] = controller.interactables["Scale"].Tooltip;
@@ -97,7 +107,7 @@ namespace NonsensicalVideoGenerator
                 }
                 return false;
             }));
-            controller.Add("VideoVolume", new TextEntry("Media Playback Volume", "In-app media volume level, from 0-100.", SaveData.saveValues["VideoVolume"], new Vector2(139, 60+19*2), 24, 3, 1, (int i) => {
+            controller.Add("VideoVolume", new TextEntry("Media Playback Volume", "In-app media volume level, from 0-100.", SaveData.saveValues["VideoVolume"], new Vector2(139, 60+19*2), 24, 3, 1, (int i, string n) => {
                 string oldValue = SaveData.saveValues["VideoVolume"];
                 if(int.Parse(controller.interactables["VideoVolume"].Tooltip, System.Globalization.CultureInfo.InvariantCulture) < 0)
                     controller.interactables["VideoVolume"].Tooltip = "0";
@@ -108,7 +118,7 @@ namespace NonsensicalVideoGenerator
                     SaveData.Save();
                 return false;
             }));
-            controller.Add("SFXVolume", new TextEntry("Sound Effect Volume", "Sound effect volume level, from 0-100.", SaveData.saveValues["SoundEffectVolume"], new Vector2(139, 60+19), 24, 3, 1, (int i) => {
+            controller.Add("SFXVolume", new TextEntry("Sound Effect Volume", "Sound effect volume level, from 0-100.", SaveData.saveValues["SoundEffectVolume"], new Vector2(139, 60+19), 24, 3, 1, (int i, string n) => {
                 string oldValue = SaveData.saveValues["SoundEffectVolume"];
                 if(int.Parse(controller.interactables["SFXVolume"].Tooltip, System.Globalization.CultureInfo.InvariantCulture) < 0)
                     controller.interactables["SFXVolume"].Tooltip = "0";
@@ -119,7 +129,7 @@ namespace NonsensicalVideoGenerator
                     SaveData.Save();
                 return false;
             }));
-            controller.Add("MusicVolume", new TextEntry("Music Volume", "Background music volume level, from 0-100.", SaveData.saveValues["MusicVolume"], new Vector2(139, 60), 24, 3, 1, (int i) => {
+            controller.Add("MusicVolume", new TextEntry("Music Volume", "Background music volume level, from 0-100.", SaveData.saveValues["MusicVolume"], new Vector2(139, 60), 24, 3, 1, (int i, string n) => {
                 string oldValue = SaveData.saveValues["MusicVolume"];
                 if(int.Parse(controller.interactables["MusicVolume"].Tooltip, System.Globalization.CultureInfo.InvariantCulture) < 0)
                     controller.interactables["MusicVolume"].Tooltip = "0";

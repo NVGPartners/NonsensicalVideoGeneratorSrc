@@ -100,35 +100,34 @@ namespace NonsensicalVideoGenerator
             }
             // Tween
             tween.Update((float)gameTime.ElapsedGameTime.TotalSeconds);
-            bool overrideReturn = false;
             int scrollWeight = newKeyboardState.IsKeyDown(Keys.LeftShift) || newKeyboardState.IsKeyDown(Keys.RightShift) ? 5 : 1;
             // Show/hide console when you press f5
+            bool returnValue = !showing && !hiding && (toggle ? true : handleInput);
             if ((newKeyboardState.IsKeyDown(Keys.F5) && !oldKeyboardState.IsKeyDown(Keys.F5))
                 || newKeyboardState.IsKeyDown(Keys.OemTilde) && !oldKeyboardState.IsKeyDown(Keys.OemTilde)
-                || MouseInput.MouseState.LeftButton == ButtonState.Pressed && MouseInput.LastMouseState.LeftButton == ButtonState.Released
+                || (MouseInput.MouseState.LeftButton == ButtonState.Pressed
+                && MouseInput.LastMouseState.LeftButton == ButtonState.Released
+                && returnValue)
                 && Global.ready)
             {
-                if(screenType == ScreenType.Drawn)
+                bool toggled = Toggle();
+                if(toggled)
                 {
                     Global.editing = "";
                     Accessibility.allowAccessibility = true;
-                    overrideReturn = true;
                 }
-                if(!MouseInput.MouseState.LeftButton.Equals(ButtonState.Pressed) && Toggle())
+                ConsoleOutput.ResetScroll();
+                if(Accessibility.showDisambiguation)
                 {
-                    ConsoleOutput.ResetScroll();
-                    GlobalContent.GetSound("Select").Play(int.Parse(SaveData.saveValues["SoundEffectVolume"], System.Globalization.CultureInfo.InvariantCulture) / 100f, 0f, 0f);
-                    if(Accessibility.showDisambiguation)
+                    if(!toggled)
+                        Accessibility.TTS("Console hidden.");
+                    else
                         Accessibility.TTS("Console shown.");
                 }
-                else if(screenType == ScreenType.Drawn && !hiding && !showing)
-                {
-                    if(MouseInput.MouseState.LeftButton.Equals(ButtonState.Pressed))
-                        Toggle();
+                if(!toggled)
                     GlobalContent.GetSound("Back").Play(int.Parse(SaveData.saveValues["SoundEffectVolume"], System.Globalization.CultureInfo.InvariantCulture) / 100f, 0f, 0f);
-                    if(Accessibility.showDisambiguation)
-                        Accessibility.TTS("Console hidden.");
-                }
+                else
+                    GlobalContent.GetSound("Select").Play(int.Parse(SaveData.saveValues["SoundEffectVolume"], System.Globalization.CultureInfo.InvariantCulture) / 100f, 0f, 0f);
             }
             // Scrolling will set ConsoleOutput.paused to true.
             if (MouseInput.MouseState.ScrollWheelValue != MouseInput.LastMouseState.ScrollWheelValue)
@@ -164,8 +163,8 @@ namespace NonsensicalVideoGenerator
             }
             // (DEBUG) Fill the console with nonsense.
             //ConsoleOutput.WriteLine(Math.Sin(gameTime.TotalGameTime.TotalSeconds).ToString(System.Globalization.CultureInfo.InvariantCulture));
-            // Return true unless overridden.
-            return overrideReturn ? true : false;
+            // Return true if the console is open.
+            return returnValue;
         }
         public void Draw(GameTime gameTime, SpriteBatch spriteBatch)
         {
