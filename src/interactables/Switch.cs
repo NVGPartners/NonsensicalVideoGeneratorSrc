@@ -87,13 +87,13 @@ namespace NonsensicalVideoGenerator
             spriteBatch.Draw(switchGraphic, new Rectangle(GlobalGraphics.Scale(bounds.X), GlobalGraphics.Scale(bounds.Y), GlobalGraphics.Scale(switchGraphic.Width), GlobalGraphics.Scale(switchGraphic.Height)), Color.White);
             spriteBatch.Draw(SwitchState ? onGraphic : offGraphic, new Rectangle(GlobalGraphics.Scale(bounds.X + 4), GlobalGraphics.Scale(bounds.Y + 3), GlobalGraphics.Scale(SwitchState ? onGraphic.Width : offGraphic.Width), GlobalGraphics.Scale(SwitchState ? onGraphic.Height : offGraphic.Height)), Color.White);
             // Text & shadow
-            spriteBatch.DrawString(GlobalGraphics.fontMunro, Name, new Vector2(GlobalGraphics.Scale(bounds.X + 29 + 1), GlobalGraphics.Scale(bounds.Y + 2 + 1)), Color.Black);
-            spriteBatch.DrawString(GlobalGraphics.fontMunro, Name, new Vector2(GlobalGraphics.Scale(bounds.X + 29), GlobalGraphics.Scale(bounds.Y + 2)), Color.White);
+            spriteBatch.DrawString(GlobalContent.GetFont("Munro"), Name, new Vector2(GlobalGraphics.Scale(bounds.X + 29 + 1), GlobalGraphics.Scale(bounds.Y + 2 + 1)), Color.Black);
+            spriteBatch.DrawString(GlobalContent.GetFont("Munro"), Name, new Vector2(GlobalGraphics.Scale(bounds.X + 29), GlobalGraphics.Scale(bounds.Y + 2)), Color.White);
             // If hovering, draw tooltip
             if (State >= 1 && Tooltip != "")
             {
                 // Get text size
-                Vector2 tooltipSize = GlobalGraphics.fontMunroSmall.MeasureString(Tooltip);
+                Vector2 tooltipSize = GlobalContent.GetFont("MunroSmall").MeasureString(Tooltip);
                 // Position is relative to mouse position but tries to avoid going off screen
                 Vector2 position = new(MouseInput.MouseState.Position.X + 10, MouseInput.MouseState.Position.Y + 10);
                 // Make sure it doesn't go off the right side of the screen
@@ -104,14 +104,11 @@ namespace NonsensicalVideoGenerator
                     position.Y = GlobalGraphics.scaledHeight - tooltipSize.Y - GlobalGraphics.Scale(2); 
                 spriteBatch.Draw(GlobalContent.GetTexture("Pixel"), new Rectangle((int)position.X, (int)position.Y, (int)tooltipSize.X + GlobalGraphics.Scale(2), (int)tooltipSize.Y - GlobalGraphics.Scale(2)), new Color(0, 0, 0, 255));
                 // White text
-                spriteBatch.DrawString(GlobalGraphics.fontMunroSmall, Tooltip, new Vector2(position.X + GlobalGraphics.Scale(2), position.Y - GlobalGraphics.Scale(2)), Color.White);
+                spriteBatch.DrawString(GlobalContent.GetFont("MunroSmall"), Tooltip, new Vector2(position.X + GlobalGraphics.Scale(2), position.Y - GlobalGraphics.Scale(2)), Color.White);
             }
         }
         public void LoadContent(ContentManager contentManager, GraphicsDevice graphicsDevice)
         {
-            GlobalContent.AddTexture("InteractiveSwitch", contentManager.Load<Texture2D>("graphics/interactiveswitch"));
-            GlobalContent.AddTexture("InteractiveSwitchOn", contentManager.Load<Texture2D>("graphics/interactiveswitchon"));
-            GlobalContent.AddTexture("InteractiveSwitchOff", contentManager.Load<Texture2D>("graphics/interactiveswitchoff"));
         }
     }
 }

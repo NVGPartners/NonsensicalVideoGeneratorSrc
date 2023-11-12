@@ -122,12 +122,12 @@ namespace NonsensicalVideoGenerator
             // Draw the center title bar text.
             string pageTitle = Pagination.GetSubPageName();
             // Center within bounds of x 128 and x 312
-            Vector2 titleSize = GlobalGraphics.fontMunroSmall.MeasureString(pageTitle);
-            spriteBatch.DrawString(GlobalGraphics.fontMunroSmall, pageTitle, new Vector2(GlobalGraphics.Scale(220) - titleSize.X / 2, GlobalGraphics.Scale(37)), Color.White);
+            Vector2 titleSize = GlobalContent.GetFont("MunroSmall").MeasureString(pageTitle);
+            spriteBatch.DrawString(GlobalContent.GetFont("MunroSmall"), pageTitle, new Vector2(GlobalGraphics.Scale(220) - titleSize.X / 2, GlobalGraphics.Scale(37)), Color.White);
             // Draw action window text
             string altTitle = "Actions";
-            Vector2 titleSize2 = GlobalGraphics.fontMunroSmall.MeasureString(altTitle);
-            spriteBatch.DrawString(GlobalGraphics.fontMunroSmall, altTitle, new Vector2(GlobalGraphics.Scale(108), GlobalGraphics.Scale(151)), Color.White, MathHelper.ToRadians(-90), new Vector2(titleSize2.X, titleSize2.Y), 1, SpriteEffects.None, 0);
+            Vector2 titleSize2 = GlobalContent.GetFont("MunroSmall").MeasureString(altTitle);
+            spriteBatch.DrawString(GlobalContent.GetFont("MunroSmall"), altTitle, new Vector2(GlobalGraphics.Scale(108), GlobalGraphics.Scale(151)), Color.White, MathHelper.ToRadians(-90), new Vector2(titleSize2.X, titleSize2.Y), 1, SpriteEffects.None, 0);
             // Pagination
             Pagination.Draw(gameTime, spriteBatch);
             // End offset spritebatch
@@ -141,13 +141,16 @@ namespace NonsensicalVideoGenerator
         public void LoadContent(ContentManager contentManager, GraphicsDevice graphicsDevice)
         {
             // Main Window
-            GlobalContent.AddTexture("MainWindow", contentManager.Load<Texture2D>("graphics/mainwindow"));
+            GlobalContent.AddTexture("MainWindow", ThemeManager.LoadLayeredContent<Texture2D>("graphics/mainwindow"));
             // Pagination
             Pagination.LoadContent(contentManager, graphicsDevice);
-            if(Global.pluginsLoaded)
-                Show();
-            else
-                Hide();
+            if(!Global.canRender)
+            {
+                if(Global.pluginsLoaded)
+                    Show();
+                else
+                    Hide();
+            }
         }
     }
 }

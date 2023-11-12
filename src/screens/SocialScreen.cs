@@ -194,7 +194,7 @@ namespace NonsensicalVideoGenerator
             if(tooltip != "")
             {
                 // Get text size
-                Vector2 tooltipSize = GlobalGraphics.fontMunroSmall.MeasureString(tooltip);
+                Vector2 tooltipSize = GlobalContent.GetFont("MunroSmall").MeasureString(tooltip);
                 // Position is relative to mouse position but tries to avoid going off screen
                 Vector2 position = new(MouseInput.MouseState.Position.X + 10, MouseInput.MouseState.Position.Y + 10);
                 // Make sure it doesn't go off the right side of the screen
@@ -205,12 +205,12 @@ namespace NonsensicalVideoGenerator
                     position.Y = GlobalGraphics.scaledHeight - tooltipSize.Y - GlobalGraphics.Scale(2); 
                 spriteBatch.Draw(GlobalContent.GetTexture("Pixel"), new Rectangle((int)position.X, (int)position.Y, (int)tooltipSize.X + GlobalGraphics.Scale(2), (int)tooltipSize.Y - GlobalGraphics.Scale(2)), new Color(0, 0, 0, 255));
                 // White text
-                spriteBatch.DrawString(GlobalGraphics.fontMunroSmall, tooltip, new Vector2(position.X + GlobalGraphics.Scale(2), position.Y - GlobalGraphics.Scale(2)), Color.White);
+                spriteBatch.DrawString(GlobalContent.GetFont("MunroSmall"), tooltip, new Vector2(position.X + GlobalGraphics.Scale(2), position.Y - GlobalGraphics.Scale(2)), Color.White);
             }
         }
         public void LoadContent(ContentManager contentManager, GraphicsDevice graphicsDevice)
         {
-            GlobalContent.AddTexture("SocialScreen", contentManager.Load<Texture2D>("graphics/socialscreen"));
+            GlobalContent.AddTexture("SocialScreen", ThemeManager.LoadLayeredContent<Texture2D>("graphics/socialscreen"));
         }
     }
 }

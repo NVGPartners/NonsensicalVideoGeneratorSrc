@@ -179,16 +179,16 @@ namespace NonsensicalVideoGenerator
                 spriteBatch.Draw(dialValues[0], new Rectangle(GlobalGraphics.Scale(bounds.X + 2), GlobalGraphics.Scale(bounds.Y + 2), GlobalGraphics.Scale(dialValues[0].Width), GlobalGraphics.Scale(dialValues[0].Height)), Color.White);
             }
             // Draw text + shadow
-            spriteBatch.DrawString(GlobalGraphics.fontMunro, value.ToString(System.Globalization.CultureInfo.InvariantCulture), new Vector2(GlobalGraphics.Scale(bounds.X + 17 + 1), GlobalGraphics.Scale(bounds.Y + 1 + 1)), Color.Black);
-            spriteBatch.DrawString(GlobalGraphics.fontMunro, value.ToString(System.Globalization.CultureInfo.InvariantCulture), new Vector2(GlobalGraphics.Scale(bounds.X + 17), GlobalGraphics.Scale(bounds.Y + 1)), Color.White);
+            spriteBatch.DrawString(GlobalContent.GetFont("Munro"), value.ToString(System.Globalization.CultureInfo.InvariantCulture), new Vector2(GlobalGraphics.Scale(bounds.X + 17 + 1), GlobalGraphics.Scale(bounds.Y + 1 + 1)), Color.Black);
+            spriteBatch.DrawString(GlobalContent.GetFont("Munro"), value.ToString(System.Globalization.CultureInfo.InvariantCulture), new Vector2(GlobalGraphics.Scale(bounds.X + 17), GlobalGraphics.Scale(bounds.Y + 1)), Color.White);
             // Label
-            spriteBatch.DrawString(GlobalGraphics.fontMunro, Name, new Vector2(GlobalGraphics.Scale(bounds.X + bounds.Width + 4 + 1), GlobalGraphics.Scale(bounds.Y + 2 + 1)), Color.Black);
-            spriteBatch.DrawString(GlobalGraphics.fontMunro, Name, new Vector2(GlobalGraphics.Scale(bounds.X + bounds.Width + 4), GlobalGraphics.Scale(bounds.Y + 2)), Color.White);
+            spriteBatch.DrawString(GlobalContent.GetFont("Munro"), Name, new Vector2(GlobalGraphics.Scale(bounds.X + bounds.Width + 4 + 1), GlobalGraphics.Scale(bounds.Y + 2 + 1)), Color.Black);
+            spriteBatch.DrawString(GlobalContent.GetFont("Munro"), Name, new Vector2(GlobalGraphics.Scale(bounds.X + bounds.Width + 4), GlobalGraphics.Scale(bounds.Y + 2)), Color.White);
             // If hovering, draw tooltip
             if (State == 1 && Tooltip != "")
             {
                 // Get text size
-                Vector2 tooltipSize = GlobalGraphics.fontMunroSmall.MeasureString(Tooltip);
+                Vector2 tooltipSize = GlobalContent.GetFont("MunroSmall").MeasureString(Tooltip);
                 // Position is relative to mouse position but tries to avoid going off screen
                 Vector2 position = new(MouseInput.MouseState.Position.X + 10, MouseInput.MouseState.Position.Y + 10);
                 // Make sure it doesn't go off the right side of the screen
@@ -199,15 +199,11 @@ namespace NonsensicalVideoGenerator
                     position.Y = GlobalGraphics.scaledHeight - tooltipSize.Y - GlobalGraphics.Scale(2); 
                 spriteBatch.Draw(GlobalContent.GetTexture("Pixel"), new Rectangle((int)position.X, (int)position.Y, (int)tooltipSize.X + GlobalGraphics.Scale(2), (int)tooltipSize.Y - GlobalGraphics.Scale(2)), new Color(0, 0, 0, 255));
                 // White text
-                spriteBatch.DrawString(GlobalGraphics.fontMunroSmall, Tooltip, new Vector2(position.X + GlobalGraphics.Scale(2), position.Y - GlobalGraphics.Scale(2)), Color.White);
+                spriteBatch.DrawString(GlobalContent.GetFont("MunroSmall"), Tooltip, new Vector2(position.X + GlobalGraphics.Scale(2), position.Y - GlobalGraphics.Scale(2)), Color.White);
             }
         }
         public void LoadContent(ContentManager contentManager, GraphicsDevice graphicsDevice)
         {
-            GlobalContent.AddTexture("InteractiveDial", contentManager.Load<Texture2D>("graphics/interactivedial"));
-            // Values
-            for(int i = 0; i < 30; i++)
-                GlobalContent.AddTexture("InteractiveDialValue" + i, contentManager.Load<Texture2D>("graphics/interactivedialvalue" + i));
         }
     }
 }

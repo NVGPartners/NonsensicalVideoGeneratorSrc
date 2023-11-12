@@ -73,7 +73,7 @@ namespace NonsensicalVideoGenerator
             if (State >= 1 && Tooltip != "")
             {
                 // Get text size
-                Vector2 tooltipSize = GlobalGraphics.fontMunroSmall.MeasureString(Tooltip);
+                Vector2 tooltipSize = GlobalContent.GetFont("MunroSmall").MeasureString(Tooltip);
                 // Position is relative to mouse position but tries to avoid going off screen
                 Vector2 position = new(MouseInput.MouseState.Position.X + 10, MouseInput.MouseState.Position.Y + 10);
                 // Make sure it doesn't go off the right side of the screen
@@ -84,13 +84,11 @@ namespace NonsensicalVideoGenerator
                     position.Y = GlobalGraphics.scaledHeight - tooltipSize.Y - GlobalGraphics.Scale(2); 
                 spriteBatch.Draw(GlobalContent.GetTexture("Pixel"), new Rectangle((int)position.X, (int)position.Y, (int)tooltipSize.X + GlobalGraphics.Scale(2), (int)tooltipSize.Y - GlobalGraphics.Scale(2)), new Color(0, 0, 0, 255));
                 // White text
-                spriteBatch.DrawString(GlobalGraphics.fontMunroSmall, Tooltip, new Vector2(position.X + GlobalGraphics.Scale(2), position.Y - GlobalGraphics.Scale(2)), Color.White);
+                spriteBatch.DrawString(GlobalContent.GetFont("MunroSmall"), Tooltip, new Vector2(position.X + GlobalGraphics.Scale(2), position.Y - GlobalGraphics.Scale(2)), Color.White);
             }
         }
         public override void LoadContent(ContentManager contentManager, GraphicsDevice graphicsDevice)
         {
-            // Action button
-            GlobalContent.AddTexture("ActionButton", contentManager.Load<Texture2D>("graphics/actionbutton"));
         }
     }
 }

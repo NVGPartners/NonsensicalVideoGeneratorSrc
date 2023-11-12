@@ -13,7 +13,7 @@ function Query()
             -- Only these values are allowed:
             -- effect: An effect that gets applied at random.
             -- postrendereffect: An effect that gets applied after rendering.
-            -- theme: Not yet implemented, a theme for the software.
+            -- theme: A theme for the software. Only Query() is called.
             {
                 ["name"] = "Addon Type",
                 ["value"] = "effect",

@@ -112,20 +112,20 @@ namespace NonsensicalVideoGenerator
                 name = Pagination.GetPage(i).Name;
                 if(i == 2)
                     name = "Addons";
-                spriteBatch.DrawString(GlobalGraphics.fontMunro, name, new Vector2(GlobalGraphics.Scale(7+1), GlobalGraphics.Scale(136 + (pageOffset * i)+1)), Color.Black);
-                spriteBatch.DrawString(GlobalGraphics.fontMunro, name, new Vector2(GlobalGraphics.Scale(7), GlobalGraphics.Scale(136 + (pageOffset * i))), Color.White);
+                spriteBatch.DrawString(GlobalContent.GetFont("Munro"), name, new Vector2(GlobalGraphics.Scale(7+1), GlobalGraphics.Scale(136 + (pageOffset * i)+1)), Color.Black);
+                spriteBatch.DrawString(GlobalContent.GetFont("Munro"), name, new Vector2(GlobalGraphics.Scale(7), GlobalGraphics.Scale(136 + (pageOffset * i))), Color.White);
             }
             Texture2D menuwindow = GlobalContent.GetTexture("MenuWindow");
             spriteBatch.Draw(menuwindow, new Rectangle(GlobalGraphics.Scale(0), GlobalGraphics.Scale(132), GlobalGraphics.Scale(menuwindow.Width), GlobalGraphics.Scale(menuwindow.Height)), Color.White);
             // Draw window title
-            Vector2 titleSize = GlobalGraphics.fontMunroSmall.MeasureString(title);
-            spriteBatch.DrawString(GlobalGraphics.fontMunroSmall, title, new Vector2(GlobalGraphics.Scale(52), GlobalGraphics.Scale(203)), Color.White, MathHelper.ToRadians(90), new Vector2(titleSize.X, titleSize.Y), 1, SpriteEffects.None, 0);
+            Vector2 titleSize = GlobalContent.GetFont("MunroSmall").MeasureString(title);
+            spriteBatch.DrawString(GlobalContent.GetFont("MunroSmall"), title, new Vector2(GlobalGraphics.Scale(52), GlobalGraphics.Scale(203)), Color.White, MathHelper.ToRadians(90), new Vector2(titleSize.X, titleSize.Y), 1, SpriteEffects.None, 0);
             // If hovering, draw tooltip
             if (hovering && !Global.exiting)
             {
                 string tooltip = Pagination.GetPage(hoveringPage).Tooltip;
                 // Get text size
-                Vector2 tooltipSize = GlobalGraphics.fontMunroSmall.MeasureString(tooltip);
+                Vector2 tooltipSize = GlobalContent.GetFont("MunroSmall").MeasureString(tooltip);
                 // Position is relative to mouse position but tries to avoid going off screen
                 Vector2 position = new(MouseInput.MouseState.Position.X + 10, MouseInput.MouseState.Position.Y + 10);
                 // Make sure it doesn't go off the right side of the screen
@@ -136,7 +136,7 @@ namespace NonsensicalVideoGenerator
                     position.Y = GlobalGraphics.scaledHeight - tooltipSize.Y - GlobalGraphics.Scale(2); 
                 spriteBatch.Draw(GlobalContent.GetTexture("Pixel"), new Rectangle((int)position.X, (int)position.Y, (int)tooltipSize.X + GlobalGraphics.Scale(2), (int)tooltipSize.Y - GlobalGraphics.Scale(2)), new Color(0, 0, 0, 255));
                 // White text
-                spriteBatch.DrawString(GlobalGraphics.fontMunroSmall, tooltip, new Vector2(position.X + GlobalGraphics.Scale(2), position.Y - GlobalGraphics.Scale(2)), Color.White);
+                spriteBatch.DrawString(GlobalContent.GetFont("MunroSmall"), tooltip, new Vector2(position.X + GlobalGraphics.Scale(2), position.Y - GlobalGraphics.Scale(2)), Color.White);
             }
             // End offset spritebatch
             spriteBatch.End();
@@ -233,15 +233,18 @@ namespace NonsensicalVideoGenerator
         public void LoadContent(ContentManager contentManager, GraphicsDevice graphicsDevice)
         {
             // Menu Window
-            GlobalContent.AddTexture("MenuWindow", contentManager.Load<Texture2D>("graphics/menuwindow"));
-            GlobalContent.AddTexture("MenuWindowBG", contentManager.Load<Texture2D>("graphics/menuwindowbg"));
-            GlobalContent.AddTexture("MenuSelected", contentManager.Load<Texture2D>("graphics/menuselected"));
-            GlobalContent.AddTexture("MenuSelected2", contentManager.Load<Texture2D>("graphics/menuselected2"));
-            GlobalContent.AddTexture("MenuSelected3", contentManager.Load<Texture2D>("graphics/menuselected3"));
-            if(Global.pluginsLoaded)
-                Show();
-            else
-                Hide();
+            GlobalContent.AddTexture("MenuWindow", ThemeManager.LoadLayeredContent<Texture2D>("graphics/menuwindow"));
+            GlobalContent.AddTexture("MenuWindowBG", ThemeManager.LoadLayeredContent<Texture2D>("graphics/menuwindowbg"));
+            GlobalContent.AddTexture("MenuSelected", ThemeManager.LoadLayeredContent<Texture2D>("graphics/menuselected"));
+            GlobalContent.AddTexture("MenuSelected2", ThemeManager.LoadLayeredContent<Texture2D>("graphics/menuselected2"));
+            GlobalContent.AddTexture("MenuSelected3", ThemeManager.LoadLayeredContent<Texture2D>("graphics/menuselected3"));
+            if(!Global.canRender)
+            {
+                if(Global.pluginsLoaded)
+                    Show();
+                else
+                    Hide();
+            }
         }
     }
 }

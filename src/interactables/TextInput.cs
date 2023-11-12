@@ -27,6 +27,7 @@ namespace NonsensicalVideoGenerator
         private string hiddenToolTip = ""; // The actual tooltip variable.
         private KeyboardState oldKeyboardState;
         private KeyboardState newKeyboardState;
+        private bool registered = false;
         public TextEntry(string defaultName, string defaultTooltip, string defaultText, Vector2 defaultPosition, int width, int maxChars, int mode, Func<int, string, bool> defaultCallback)
         {
             Name = defaultName;
@@ -40,6 +41,11 @@ namespace NonsensicalVideoGenerator
         }
         public bool Update(GameTime gameTime, bool handleInput)
         {
+            if(!registered)
+            {
+                Register();
+                registered = true;
+            }
             // Calculate bounds
             scaledBounds = new((int)(bounds.X * GlobalGraphics.scale), (int)(bounds.Y * GlobalGraphics.scale), (int)(bounds.Width * GlobalGraphics.scale), (int)(bounds.Height * GlobalGraphics.scale));
             if (handleInput)
@@ -80,7 +86,7 @@ namespace NonsensicalVideoGenerator
                             Global.editing = Name + "Input";
                             //Accessibility.allowAccessibility = false;
                             GlobalContent.GetSound("Option").Play(int.Parse(SaveData.saveValues["SoundEffectVolume"], System.Globalization.CultureInfo.InvariantCulture) / 100f, 0f, 0f);
-                            Global.mask.AddUnmaskedObject("TextEntry", new SimpleObject(scaledBounds, Color.Transparent, GlobalGraphics.pixel, () => {
+                            Global.mask.AddUnmaskedObject("TextEntry", new SimpleObject(scaledBounds, Color.Transparent, GlobalContent.GetTexture("Pixel"), () => {
                                 // Check to make sure there's actually some text
                                 if (Tooltip == "")
                                 {
@@ -208,8 +214,8 @@ namespace NonsensicalVideoGenerator
             // Inner text
             try
             {
-                spriteBatch.DrawString(GlobalGraphics.fontMunro, Tooltip, new Vector2(GlobalGraphics.Scale(bounds.X + 4 + 1), GlobalGraphics.Scale(bounds.Y + 1 + 1)), Color.Black);
-                spriteBatch.DrawString(GlobalGraphics.fontMunro, Tooltip, new Vector2(GlobalGraphics.Scale(bounds.X + 4), GlobalGraphics.Scale(bounds.Y + 1)), Color.White);
+                spriteBatch.DrawString(GlobalContent.GetFont("Munro"), Tooltip, new Vector2(GlobalGraphics.Scale(bounds.X + 4 + 1), GlobalGraphics.Scale(bounds.Y + 1 + 1)), Color.Black);
+                spriteBatch.DrawString(GlobalContent.GetFont("Munro"), Tooltip, new Vector2(GlobalGraphics.Scale(bounds.X + 4), GlobalGraphics.Scale(bounds.Y + 1)), Color.White);
             }
             catch (ArgumentException)
             {
@@ -219,23 +225,23 @@ namespace NonsensicalVideoGenerator
             // Draw cursor every 500ms
             if ((Global.editing == Name + "Input") && gameTime.TotalGameTime.TotalMilliseconds % 500 < 250)
             {
-                int cursorX = (int)GlobalGraphics.fontMunro.MeasureString(Tooltip).X;
+                int cursorX = (int)GlobalContent.GetFont("Munro").MeasureString(Tooltip).X;
                 // could have just used a line here
-                spriteBatch.DrawString(GlobalGraphics.fontMunro, ":", new Vector2(cursorX + GlobalGraphics.Scale(bounds.X + 4 + 1), GlobalGraphics.Scale(bounds.Y + 1 + 1)), Color.Black);
-                spriteBatch.DrawString(GlobalGraphics.fontMunro, ":", new Vector2(cursorX + GlobalGraphics.Scale(bounds.X + 4 + 1), GlobalGraphics.Scale(bounds.Y + 1)), Color.Black);
-                spriteBatch.DrawString(GlobalGraphics.fontMunro, ":", new Vector2(cursorX + GlobalGraphics.Scale(bounds.X + 4 + 1), GlobalGraphics.Scale(bounds.Y)), Color.Black);
-                spriteBatch.DrawString(GlobalGraphics.fontMunro, ":", new Vector2(cursorX + GlobalGraphics.Scale(bounds.X + 4), GlobalGraphics.Scale(bounds.Y + 1)), Color.White);
-                spriteBatch.DrawString(GlobalGraphics.fontMunro, ":", new Vector2(cursorX + GlobalGraphics.Scale(bounds.X + 4), GlobalGraphics.Scale(bounds.Y)), Color.White);
-                spriteBatch.DrawString(GlobalGraphics.fontMunro, ":", new Vector2(cursorX + GlobalGraphics.Scale(bounds.X + 4), GlobalGraphics.Scale(bounds.Y - 1)), Color.White);
+                spriteBatch.DrawString(GlobalContent.GetFont("Munro"), ":", new Vector2(cursorX + GlobalGraphics.Scale(bounds.X + 4 + 1), GlobalGraphics.Scale(bounds.Y + 1 + 1)), Color.Black);
+                spriteBatch.DrawString(GlobalContent.GetFont("Munro"), ":", new Vector2(cursorX + GlobalGraphics.Scale(bounds.X + 4 + 1), GlobalGraphics.Scale(bounds.Y + 1)), Color.Black);
+                spriteBatch.DrawString(GlobalContent.GetFont("Munro"), ":", new Vector2(cursorX + GlobalGraphics.Scale(bounds.X + 4 + 1), GlobalGraphics.Scale(bounds.Y)), Color.Black);
+                spriteBatch.DrawString(GlobalContent.GetFont("Munro"), ":", new Vector2(cursorX + GlobalGraphics.Scale(bounds.X + 4), GlobalGraphics.Scale(bounds.Y + 1)), Color.White);
+                spriteBatch.DrawString(GlobalContent.GetFont("Munro"), ":", new Vector2(cursorX + GlobalGraphics.Scale(bounds.X + 4), GlobalGraphics.Scale(bounds.Y)), Color.White);
+                spriteBatch.DrawString(GlobalContent.GetFont("Munro"), ":", new Vector2(cursorX + GlobalGraphics.Scale(bounds.X + 4), GlobalGraphics.Scale(bounds.Y - 1)), Color.White);
             }
             // Label
-            spriteBatch.DrawString(GlobalGraphics.fontMunro, Name, new Vector2(GlobalGraphics.Scale(bounds.X + bounds.Width + 7 + 1), GlobalGraphics.Scale(bounds.Y + 2 + 1)), Color.Black);
-            spriteBatch.DrawString(GlobalGraphics.fontMunro, Name, new Vector2(GlobalGraphics.Scale(bounds.X + bounds.Width + 7), GlobalGraphics.Scale(bounds.Y + 2)), Color.White);
+            spriteBatch.DrawString(GlobalContent.GetFont("Munro"), Name, new Vector2(GlobalGraphics.Scale(bounds.X + bounds.Width + 7 + 1), GlobalGraphics.Scale(bounds.Y + 2 + 1)), Color.Black);
+            spriteBatch.DrawString(GlobalContent.GetFont("Munro"), Name, new Vector2(GlobalGraphics.Scale(bounds.X + bounds.Width + 7), GlobalGraphics.Scale(bounds.Y + 2)), Color.White);
             // Tooltip
             if (scaledBounds.Contains(MouseInput.MouseState.Position) && Tooltip != "")
             {
                 // Get text size
-                Vector2 tooltipSize = GlobalGraphics.fontMunroSmall.MeasureString(hiddenToolTip);
+                Vector2 tooltipSize = GlobalContent.GetFont("MunroSmall").MeasureString(hiddenToolTip);
                 // Position is relative to mouse position but tries to avoid going off screen
                 Vector2 position = new(MouseInput.MouseState.Position.X + 10, MouseInput.MouseState.Position.Y + 10);
                 // Make sure it doesn't go off the right side of the screen
@@ -246,14 +252,11 @@ namespace NonsensicalVideoGenerator
                     position.Y = GlobalGraphics.scaledHeight - tooltipSize.Y - GlobalGraphics.Scale(2); 
                 spriteBatch.Draw(GlobalContent.GetTexture("Pixel"), new Rectangle((int)position.X, (int)position.Y, (int)tooltipSize.X + GlobalGraphics.Scale(2), (int)tooltipSize.Y - GlobalGraphics.Scale(2)), new Color(0, 0, 0, 255));
                 // White text
-                spriteBatch.DrawString(GlobalGraphics.fontMunroSmall, hiddenToolTip, new Vector2(position.X + GlobalGraphics.Scale(2), position.Y - GlobalGraphics.Scale(2)), Color.White);
+                spriteBatch.DrawString(GlobalContent.GetFont("MunroSmall"), hiddenToolTip, new Vector2(position.X + GlobalGraphics.Scale(2), position.Y - GlobalGraphics.Scale(2)), Color.White);
             }
         }
         public void LoadContent(ContentManager contentManager, GraphicsDevice graphicsDevice)
         {
-            GlobalContent.AddTexture("InteractiveTextEntrySide", contentManager.Load<Texture2D>("graphics/interactivetextentryside"));
-            GlobalContent.AddTexture("InteractiveTextEntryInner", contentManager.Load<Texture2D>("graphics/interactivetextentryinner"));
-            Register();
         }
         public TextEntry Register()
         {

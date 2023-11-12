@@ -177,8 +177,8 @@ namespace NonsensicalVideoGenerator
             spriteBatch.Draw(pixel, new Rectangle(0, 0, GlobalGraphics.scaledWidth, GlobalGraphics.scaledHeight), new Color(0, 0, 0, 255));
             // Draw the center title bar text.`
             string newTitle = title + " - Toggle with F5";
-            Vector2 titleSize = GlobalGraphics.fontMunroSmall.MeasureString(newTitle);
-            spriteBatch.DrawString(GlobalGraphics.fontMunroSmall, newTitle, new Vector2(GlobalGraphics.scaledWidth / 2 - titleSize.X / 2, (6 * GlobalGraphics.scale) - GlobalGraphics.Scale(1)), Color.White);
+            Vector2 titleSize = GlobalContent.GetFont("MunroSmall").MeasureString(newTitle);
+            spriteBatch.DrawString(GlobalContent.GetFont("MunroSmall"), newTitle, new Vector2(GlobalGraphics.scaledWidth / 2 - titleSize.X / 2, (6 * GlobalGraphics.scale) - GlobalGraphics.Scale(1)), Color.White);
             // Draw lines.
             int lineHeight = 8 * GlobalGraphics.scale;
             int lineSpacing = 2 * GlobalGraphics.scale;
@@ -187,15 +187,15 @@ namespace NonsensicalVideoGenerator
             {
                 foreach (ColoredString line in ConsoleOutput.GetOutput())
                 {
-                    Vector2 lineSize = GlobalGraphics.fontMunroSmall.MeasureString(line.Text);
-                    spriteBatch.DrawString(GlobalGraphics.fontMunroSmall, line.Text, new Vector2(GlobalGraphics.Scale(8), lineY), line.Color);
+                    Vector2 lineSize = GlobalContent.GetFont("MunroSmall").MeasureString(line.Text);
+                    spriteBatch.DrawString(GlobalContent.GetFont("MunroSmall"), line.Text, new Vector2(GlobalGraphics.Scale(8), lineY), line.Color);
                     lineY += lineHeight;
                 }
             }
             catch {}
             // Draw assembly version.
             string version = "- v" + Global.productVersion + " - View full output in console.txt -" + (ConsoleOutput.proxyOutput.Count > ConsoleOutput.maxLines ? (" Line " + (ConsoleOutput.scrollAmount > -1 ? (ConsoleOutput.scrollAmount + 1).ToString(System.Globalization.CultureInfo.InvariantCulture) : (ConsoleOutput.proxyOutput.Count - ConsoleOutput.maxLines + 1).ToString(System.Globalization.CultureInfo.InvariantCulture)) + "/" + ConsoleOutput.proxyOutput.Count.ToString(System.Globalization.CultureInfo.InvariantCulture) + " -") : "");
-            spriteBatch.DrawString(GlobalGraphics.fontMunroSmall, version, new Vector2(GlobalGraphics.Scale(8), lineY), Color.White);
+            spriteBatch.DrawString(GlobalContent.GetFont("MunroSmall"), version, new Vector2(GlobalGraphics.Scale(8), lineY), Color.White);
             // End offset spritebatch
             spriteBatch.End();
             // Remake spritebatch

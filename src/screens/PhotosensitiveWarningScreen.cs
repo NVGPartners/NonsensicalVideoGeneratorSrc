@@ -202,11 +202,11 @@ namespace NonsensicalVideoGenerator
         }
         public void Draw(GameTime gameTime, SpriteBatch spriteBatch)
         {
-            SpriteFont fontMunro = GlobalGraphics.fontMunro;
+            SpriteFont fontMunro = GlobalContent.GetFont("Munro");
             if(!fadingIn)
             {
                 // Draw black background.
-                spriteBatch.Draw(GlobalGraphics.pixel, new Rectangle(0, 0, GlobalGraphics.scaledWidth, GlobalGraphics.scaledHeight), new Color(0, 0, 0, 255));
+                spriteBatch.Draw(GlobalContent.GetTexture("Pixel"), new Rectangle(0, 0, GlobalGraphics.scaledWidth, GlobalGraphics.scaledHeight), new Color(0, 0, 0, 255));
                 // Draw text center aligned.
                 for (int i = 0; i < warningText.Count; i++)
                 {
@@ -221,9 +221,9 @@ namespace NonsensicalVideoGenerator
                 }
             }
             // Draw overlay over last text.
-            spriteBatch.Draw(GlobalGraphics.pixel, new Rectangle(0, GlobalGraphics.Scale(24 + (warningText.Count - 1) * 16), GlobalGraphics.scaledWidth, GlobalGraphics.Scale(16)), new Color(0, 0, 0, lastTextOpacity));
+            spriteBatch.Draw(GlobalContent.GetTexture("Pixel"), new Rectangle(0, GlobalGraphics.Scale(24 + (warningText.Count - 1) * 16), GlobalGraphics.scaledWidth, GlobalGraphics.Scale(16)), new Color(0, 0, 0, lastTextOpacity));
             // Draw black overlay.
-            spriteBatch.Draw(GlobalGraphics.pixel, new Rectangle(0, 0, GlobalGraphics.scaledWidth, GlobalGraphics.scaledHeight), new Color(0, 0, 0, overlayOpacity));
+            spriteBatch.Draw(GlobalContent.GetTexture("Pixel"), new Rectangle(0, 0, GlobalGraphics.scaledWidth, GlobalGraphics.scaledHeight), new Color(0, 0, 0, overlayOpacity));
         }
         public bool Update(GameTime gameTime, bool handleInput)
         {

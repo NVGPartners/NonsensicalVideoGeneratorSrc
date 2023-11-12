@@ -97,6 +97,12 @@ namespace NonsensicalVideoGenerator
         }
         public void LoadContent(ContentManager contentManager, GraphicsDevice graphicsDevice)
         {
+            // Clear all controllers
+            actionController.Clear();
+            controller.Clear();
+            controllerAdvanced.Clear();
+            controllerRendering.Clear();
+            controllerPage3.Clear();
             // Actions
             actionController.Add("ActionConsole", new ActionButton("View console output.", new Vector2(113, 182), (int i, string n) => {
                 switch(i)
@@ -123,7 +129,7 @@ namespace NonsensicalVideoGenerator
                         return true;
                 }
                 return false;
-            }, contentManager.Load<Texture2D>("graphics/actions/console")));
+            }, ThemeManager.LoadLayeredContent<Texture2D>("graphics/actions/console")));
             actionController.Add("ActionReset", new ActionButton("Reset to default parameters.", new Vector2(113, 167), (int i, string n) => {
                 switch(i)
                 {
@@ -184,7 +190,7 @@ namespace NonsensicalVideoGenerator
                         return true;
                 }
                 return false;
-            }, contentManager.Load<Texture2D>("graphics/actions/reset")));
+            }, ThemeManager.LoadLayeredContent<Texture2D>("graphics/actions/reset")));
             actionController.Add("ActionPlayLast", new ActionButton("Play last rendered video.", new Vector2(113, 152), (int i, string n) => {
                 switch(i)
                 {
@@ -216,7 +222,7 @@ namespace NonsensicalVideoGenerator
                         return true;
                 }
                 return false;
-            }, contentManager.Load<Texture2D>("graphics/actions/playlast")));
+            }, ThemeManager.LoadLayeredContent<Texture2D>("graphics/actions/playlast")));
             actionController.Add("ActionRender", new ActionButton("Start generating a new video.", new Vector2(113, 137), (int i, string n) => {
                 switch(i)
                 {
@@ -281,7 +287,7 @@ namespace NonsensicalVideoGenerator
                         return true;
                 }
                 return false;
-            }, contentManager.Load<Texture2D>("graphics/actions/render")));
+            }, ThemeManager.LoadLayeredContent<Texture2D>("graphics/actions/render")));
             // PAGE 3
             controllerPage3.Add("ConstrainAspectRatio", new Switch("Constrain Aspect Ratio", "Clips will retain their original aspect ratio when disabled.", new Vector2(139, 60+19*3), (int i, string n) => {
                 bool switchState = (i & 256) != 0;

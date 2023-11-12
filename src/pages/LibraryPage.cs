@@ -47,6 +47,7 @@ namespace NonsensicalVideoGenerator
         private int organizeType = -1;
         private string tooltip = "";
         private string clipUrl = "";
+        private bool registered = false;
         private static bool downloading = false;
         private static KeyboardState oldKeyboardState;
         private static KeyboardState newKeyboardState;
@@ -69,37 +70,32 @@ namespace NonsensicalVideoGenerator
         }
         public void LoadContent(ContentManager contentManager, GraphicsDevice graphicsDevice)
         {
-            GameWindow? window = UserInterface.instance?.Window;
-            if (window != null)
-            {
-                window.TextInput += TextInput;
-            }
             // Library assets
-            GlobalContent.AddTexture("DeleteConfirm", contentManager.Load<Texture2D>("graphics/library/deleteconfirm"));
-            GlobalContent.AddTexture("AddVideoOverlay", contentManager.Load<Texture2D>("graphics/library/addvideooverlay"));
-            GlobalContent.AddTexture("RenderAddVideoOverlay", contentManager.Load<Texture2D>("graphics/library/renderaddvideooverlay"));
-            GlobalContent.AddTexture("HeaderButton", contentManager.Load<Texture2D>("graphics/library/headerbutton"));
-            GlobalContent.AddTexture("HeaderButtonSelected", contentManager.Load<Texture2D>("graphics/library/headerbuttonselected"));
-            GlobalContent.AddTexture("Separator", contentManager.Load<Texture2D>("graphics/library/separator"));
-            GlobalContent.AddTexture("SubTypeButton", contentManager.Load<Texture2D>("graphics/library/subtypebutton"));
-            GlobalContent.AddTexture("SubTypeButtonSelected", contentManager.Load<Texture2D>("graphics/library/subtypebuttonselected"));
-            GlobalContent.AddTexture("TypeButton", contentManager.Load<Texture2D>("graphics/library/typebutton"));
-            GlobalContent.AddTexture("TypeButtonSelected", contentManager.Load<Texture2D>("graphics/library/typebuttonselected"));
-            GlobalContent.AddTexture("VideoHolder", contentManager.Load<Texture2D>("graphics/library/videoholder"));
-            GlobalContent.AddTexture("VideoOff", contentManager.Load<Texture2D>("graphics/library/videooff"));
-            GlobalContent.AddTexture("VideoOn", contentManager.Load<Texture2D>("graphics/library/videoon"));
-            GlobalContent.AddTexture("RenderNoButton", contentManager.Load<Texture2D>("graphics/library/rendernobutton"));
-            GlobalContent.AddTexture("SubTypeButtonOrganize", contentManager.Load<Texture2D>("graphics/library/subtypebuttonorganize"));
-            GlobalContent.AddTexture("StaticOverlay", contentManager.Load<Texture2D>("graphics/library/staticoverlay"));
+            GlobalContent.AddTexture("DeleteConfirm", ThemeManager.LoadLayeredContent<Texture2D>("graphics/library/deleteconfirm"));
+            GlobalContent.AddTexture("AddVideoOverlay", ThemeManager.LoadLayeredContent<Texture2D>("graphics/library/addvideooverlay"));
+            GlobalContent.AddTexture("RenderAddVideoOverlay", ThemeManager.LoadLayeredContent<Texture2D>("graphics/library/renderaddvideooverlay"));
+            GlobalContent.AddTexture("HeaderButton", ThemeManager.LoadLayeredContent<Texture2D>("graphics/library/headerbutton"));
+            GlobalContent.AddTexture("HeaderButtonSelected", ThemeManager.LoadLayeredContent<Texture2D>("graphics/library/headerbuttonselected"));
+            GlobalContent.AddTexture("Separator", ThemeManager.LoadLayeredContent<Texture2D>("graphics/library/separator"));
+            GlobalContent.AddTexture("SubTypeButton", ThemeManager.LoadLayeredContent<Texture2D>("graphics/library/subtypebutton"));
+            GlobalContent.AddTexture("SubTypeButtonSelected", ThemeManager.LoadLayeredContent<Texture2D>("graphics/library/subtypebuttonselected"));
+            GlobalContent.AddTexture("TypeButton", ThemeManager.LoadLayeredContent<Texture2D>("graphics/library/typebutton"));
+            GlobalContent.AddTexture("TypeButtonSelected", ThemeManager.LoadLayeredContent<Texture2D>("graphics/library/typebuttonselected"));
+            GlobalContent.AddTexture("VideoHolder", ThemeManager.LoadLayeredContent<Texture2D>("graphics/library/videoholder"));
+            GlobalContent.AddTexture("VideoOff", ThemeManager.LoadLayeredContent<Texture2D>("graphics/library/videooff"));
+            GlobalContent.AddTexture("VideoOn", ThemeManager.LoadLayeredContent<Texture2D>("graphics/library/videoon"));
+            GlobalContent.AddTexture("RenderNoButton", ThemeManager.LoadLayeredContent<Texture2D>("graphics/library/rendernobutton"));
+            GlobalContent.AddTexture("SubTypeButtonOrganize", ThemeManager.LoadLayeredContent<Texture2D>("graphics/library/subtypebuttonorganize"));
+            GlobalContent.AddTexture("StaticOverlay", ThemeManager.LoadLayeredContent<Texture2D>("graphics/library/staticoverlay"));
             // TV Static Animation: 13 frames as graphics/library/staticanim/staticanim0 to graphics/library/staticanim/staticanim12
             for(int i = 0; i < 13; i++)
             {
-                GlobalContent.AddTexture("StaticAnim" + i, contentManager.Load<Texture2D>("graphics/library/staticanim/staticanim" + i));
+                GlobalContent.AddTexture("StaticAnim" + i, ThemeManager.LoadLayeredContent<Texture2D>("graphics/library/staticanim/staticanim" + i));
             }
             // Vinyl Record Animation: 2 frames as graphics/library/audioanim/audioanim0 to graphics/library/audioanim/audioanim1
             for(int i = 0; i < 2; i++)
             {
-                GlobalContent.AddTexture("AudioAnim" + i, contentManager.Load<Texture2D>("graphics/library/audioanim/audioanim" + i));
+                GlobalContent.AddTexture("AudioAnim" + i, ThemeManager.LoadLayeredContent<Texture2D>("graphics/library/audioanim/audioanim" + i));
             }
             // Get textures
             Texture2D addVideoOverlay = GlobalContent.GetTexture("AddVideoOverlay");
@@ -114,6 +110,7 @@ namespace NonsensicalVideoGenerator
             Texture2D videoOff = GlobalContent.GetTexture("VideoOff");
             Texture2D videoOn = GlobalContent.GetTexture("VideoOn");
             // Set up rectangles
+            rects.Clear();
             rects.Add("VideoButton", new Rectangle(GlobalGraphics.Scale(135), GlobalGraphics.Scale(56), GlobalGraphics.Scale(typeButton.Width), GlobalGraphics.Scale(typeButton.Height)));
             rects.Add("AudioButton", new Rectangle(GlobalGraphics.Scale(166), GlobalGraphics.Scale(56), GlobalGraphics.Scale(typeButton.Width), GlobalGraphics.Scale(typeButton.Height)));
             rects.Add("HeaderButton", new Rectangle(GlobalGraphics.Scale(200), GlobalGraphics.Scale(56), GlobalGraphics.Scale(headerButton.Width), GlobalGraphics.Scale(headerButton.Height)));
@@ -121,6 +118,7 @@ namespace NonsensicalVideoGenerator
             rects.Add("PageRightButton", new Rectangle(GlobalGraphics.Scale(276), GlobalGraphics.Scale(223), GlobalGraphics.Scale(typeButton.Width), GlobalGraphics.Scale(typeButton.Height)));
             // Interactable
             controller.LoadContent(contentManager, graphicsDevice);
+            demandChange = true;
         }
         public static void Done(bool success)
         {
@@ -164,7 +162,7 @@ namespace NonsensicalVideoGenerator
             Texture2D videoOff = GlobalContent.GetTexture("VideoOff");
             Texture2D videoOn = GlobalContent.GetTexture("VideoOn");
             Texture2D renderNoButton = GlobalContent.GetTexture("RenderNoButton");
-            SpriteFont munroSmall = GlobalContent.GetFont("MunroSmall");
+            SpriteFont  munroSmall = GlobalContent.GetFont("MunroSmall");
             // Draw background
             spriteBatch.Draw(pixel, new Rectangle(GlobalGraphics.Scale(135), GlobalGraphics.Scale(56), GlobalGraphics.Scale(170), GlobalGraphics.Scale(15)), Color.Gray);
             spriteBatch.Draw(pixel, new Rectangle(GlobalGraphics.Scale(135), GlobalGraphics.Scale(219), GlobalGraphics.Scale(170), GlobalGraphics.Scale(17)), Color.Gray);
@@ -344,11 +342,11 @@ namespace NonsensicalVideoGenerator
                 try
                 {
                     // Get text size
-                    tooltipSize = GlobalGraphics.fontMunroSmall.MeasureString(tooltip);
+                    tooltipSize = GlobalContent.GetFont("MunroSmall").MeasureString(tooltip);
                 }
                 catch (Exception)
                 {
-                    tooltipSize = GlobalGraphics.fontMunroSmall.MeasureString("(INVALID TEXT)");
+                    tooltipSize = GlobalContent.GetFont("MunroSmall").MeasureString("(INVALID TEXT)");
                     string extension = Path.GetExtension(tooltip);
                     tooltip = "(INVALID TEXT)" + extension;
                 }
@@ -362,7 +360,7 @@ namespace NonsensicalVideoGenerator
                     position.Y = GlobalGraphics.scaledHeight - tooltipSize.Y - GlobalGraphics.Scale(2); 
                 spriteBatch.Draw(GlobalContent.GetTexture("Pixel"), new Rectangle((int)position.X, (int)position.Y, (int)tooltipSize.X + GlobalGraphics.Scale(2), (int)tooltipSize.Y - GlobalGraphics.Scale(2)), new Color(0, 0, 0, 255));
                 // White text
-                spriteBatch.DrawString(GlobalGraphics.fontMunroSmall, tooltip, new Vector2(position.X + GlobalGraphics.Scale(2), position.Y - GlobalGraphics.Scale(2)), Color.White);
+                spriteBatch.DrawString(GlobalContent.GetFont("MunroSmall"), tooltip, new Vector2(position.X + GlobalGraphics.Scale(2), position.Y - GlobalGraphics.Scale(2)), Color.White);
             }
         }
         // Thread for loading videos
@@ -509,6 +507,15 @@ namespace NonsensicalVideoGenerator
         }
         public bool Update(GameTime gameTime, bool handleInput)
         {
+            if(!registered)
+            {
+                GameWindow? window = UserInterface.instance?.Window;
+                if (window != null)
+                {
+                    window.TextInput += TextInput;
+                }
+                registered = true;
+            }
             if(Global.justCompletedRender)
             {
                 // Reimport all and demand change

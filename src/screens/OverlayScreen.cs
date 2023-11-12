@@ -37,13 +37,12 @@ namespace NonsensicalVideoGenerator
         {
             // Draw mask.
             Global.mask.Draw(gameTime, spriteBatch);
-            if (Global.exiting)
-                spriteBatch.Draw(GlobalGraphics.pixel, new Rectangle(0, 0, GlobalGraphics.scaledWidth, GlobalGraphics.scaledHeight), new Color(0, 0, 0, exitOpacity));
+            spriteBatch.Draw(GlobalContent.GetTexture("Pixel"), new Rectangle(0, 0, GlobalGraphics.scaledWidth, GlobalGraphics.scaledHeight), new Color(0, 0, 0, exitOpacity));
             // Draw the border.
-            spriteBatch.Draw(GlobalGraphics.pixel, new Rectangle(0, 0, GlobalGraphics.scaledWidth, 4 * GlobalGraphics.scale), bgColor);
-            spriteBatch.Draw(GlobalGraphics.pixel, new Rectangle(0, GlobalGraphics.scaledHeight - 4 * GlobalGraphics.scale, GlobalGraphics.scaledWidth, 4 * GlobalGraphics.scale), bgColor);
-            spriteBatch.Draw(GlobalGraphics.pixel, new Rectangle(0, 0, 4 * GlobalGraphics.scale, GlobalGraphics.scaledHeight), bgColor);
-            spriteBatch.Draw(GlobalGraphics.pixel, new Rectangle(GlobalGraphics.scaledWidth - 4 * GlobalGraphics.scale, 0, 4 * GlobalGraphics.scale, GlobalGraphics.scaledHeight), bgColor);
+            spriteBatch.Draw(GlobalContent.GetTexture("Pixel"), new Rectangle(0, 0, GlobalGraphics.scaledWidth, 4 * GlobalGraphics.scale), bgColor);
+            spriteBatch.Draw(GlobalContent.GetTexture("Pixel"), new Rectangle(0, GlobalGraphics.scaledHeight - 4 * GlobalGraphics.scale, GlobalGraphics.scaledWidth, 4 * GlobalGraphics.scale), bgColor);
+            spriteBatch.Draw(GlobalContent.GetTexture("Pixel"), new Rectangle(0, 0, 4 * GlobalGraphics.scale, GlobalGraphics.scaledHeight), bgColor);
+            spriteBatch.Draw(GlobalContent.GetTexture("Pixel"), new Rectangle(GlobalGraphics.scaledWidth - 4 * GlobalGraphics.scale, 0, 4 * GlobalGraphics.scale, GlobalGraphics.scaledHeight), bgColor);
         }
         public bool Update(GameTime gameTime, bool handleInput)
         {
@@ -52,16 +51,33 @@ namespace NonsensicalVideoGenerator
                 return true;
             if(Global.exiting)
             {
-                exitOpacity += 0.0075f;
+                exitOpacity += Global.exitOpacityIncrease;
                 if(exitOpacity >= 1)
                 {
-                    try
+                    if(!Global.fakeExit)
                     {
-                        SteamAPI.Shutdown();
-                    } catch {}
-                    if(UserInterface.instance != null)
-                        UserInterface.instance.Exit();
+                        try
+                        {
+                            SteamAPI.Shutdown();
+                        } catch {}
+                        if(UserInterface.instance != null)
+                            UserInterface.instance.Exit();
+                    }
+                    else
+                    {
+                        Global.exiting = false;
+                        if(Global.exitFunc())
+                        {
+                            Global.readyTime = gameTime.TotalGameTime.TotalMilliseconds;
+                        }
+                        Global.exitFunc = () => false;
+                    }
                 }
+                return true;
+            }
+            else if(exitOpacity > 0)
+            {
+                exitOpacity -= Global.exitOpacityIncrease;
                 return true;
             }
             if(Global.dragDrop)

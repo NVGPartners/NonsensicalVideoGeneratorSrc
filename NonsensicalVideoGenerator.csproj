@@ -3,9 +3,9 @@
     <AssemblyName>NonsensicalVideoGenerator</AssemblyName>
     <AssemblyProduct>NonsensicalVideoGenerator</AssemblyProduct>
     <AssemblyTitle>Nonsensical Video Generator</AssemblyTitle>
-    <FileVersion>1.0.0.17</FileVersion>
-    <AssemblyVersion>1.0.0.17</AssemblyVersion>
-    <Version>1.0.0.17</Version>
+    <FileVersion>1.0.0.19</FileVersion>
+    <AssemblyVersion>1.0.0.19</AssemblyVersion>
+    <Version>1.0.0.19</Version>
     <AssemblyCopyright>Copyright © KiwifruitDev 2023</AssemblyCopyright>
     <AssemblyTrademark>Newtonsoft.Json licensed under MIT; MonoGame licensed under Ms-PL; MoonSharp licensed under BSD-3-Clause; Steamworks.NET licensed under MIT; Munro licensed under SIL OFL</AssemblyTrademark>
     <Authors>KiwifruitDev</Authors>
@@ -55,7 +55,7 @@
 	<ItemGroup>
     <BasePlugins Include="$(ProjectDir)baseplugins\user\stock\*.*" />
     <WorkshopPlugins Include="$(ProjectDir)baseplugins\user\**\*.*" />
-    <BaseTemplates Include="$(ProjectDir)basetemplates\*.*" />
+    <BaseTemplates Include="$(ProjectDir)basetemplates\**\*.*" />
     <BaseHTML Include="$(ProjectDir)basehtml\**\*.*" />
  	</ItemGroup>
 	<Target Name="CopyPlugins" AfterTargets="Build">
@@ -71,8 +71,8 @@
     <MakeDir Directories="$(ProjectDir)bin\x64\Debug\net6.0-windows\templates" />
 		<Copy SourceFiles="@(BasePlugins)" DestinationFiles="$(ProjectDir)bin\x64\Release\net6.0-windows\plugins\user\stock\%(Filename)%(Extension)" />
 		<Copy SourceFiles="@(WorkshopPlugins)" DestinationFiles="$(ProjectDir)bin\x64\Debug\net6.0-windows\plugins\user\%(RecursiveDir)%(Filename)%(Extension)" />
-    <Copy SourceFiles="@(BaseTemplates)" DestinationFiles="$(ProjectDir)bin\x64\Release\net6.0-windows\templates\%(Filename)%(Extension)" />
-    <Copy SourceFiles="@(BaseTemplates)" DestinationFiles="$(ProjectDir)bin\x64\Debug\net6.0-windows\templates\%(Filename)%(Extension)" />
+    <Copy SourceFiles="@(BaseTemplates)" DestinationFiles="$(ProjectDir)bin\x64\Release\net6.0-windows\templates\%(RecursiveDir)%(Filename)%(Extension)" />
+    <Copy SourceFiles="@(BaseTemplates)" DestinationFiles="$(ProjectDir)bin\x64\Debug\net6.0-windows\templates\%(RecursiveDir)%(Filename)%(Extension)" />
     <!-- .\packages\Steamworks.NET\steam_api64.dll -->
     <Copy SourceFiles=".\packages\Steamworks.NET\steam_api64.dll" DestinationFiles="$(ProjectDir)bin\x64\Release\net6.0-windows\steam_api64.dll" />
     <Copy SourceFiles=".\packages\Steamworks.NET\steam_api64.dll" DestinationFiles="$(ProjectDir)bin\x64\Debug\net6.0-windows\steam_api64.dll" />

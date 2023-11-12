@@ -340,14 +340,14 @@ namespace NonsensicalVideoGenerator
             spriteBatch.Draw(tutorialWindow, new Rectangle(GlobalGraphics.Scale(8+960), GlobalGraphics.Scale(36), GlobalGraphics.Scale(tutorialWindow.Width), GlobalGraphics.Scale(tutorialWindow.Height)), Color.White);
             controller.Draw(gameTime, spriteBatch);
             // Draw the center title bar text
-            Vector2 titleSize1 = GlobalGraphics.fontMunroSmall.MeasureString(title + ": Page 1/3");
-            spriteBatch.DrawString(GlobalGraphics.fontMunroSmall, title + ": Page 1/3", new Vector2(GlobalGraphics.scaledWidth / 2 - titleSize1.X / 2, (6 * GlobalGraphics.scale) - GlobalGraphics.Scale(1-32)), Color.White);
-            Vector2 titleSize2 = GlobalGraphics.fontMunroSmall.MeasureString(title + ": Page 2/3");
-            spriteBatch.DrawString(GlobalGraphics.fontMunroSmall, title + ": Page 2/3", new Vector2(GlobalGraphics.scaledWidth / 2 - titleSize2.X / 2 + GlobalGraphics.Scale(320), (6 * GlobalGraphics.scale) - GlobalGraphics.Scale(1-32)), Color.White);
-            Vector2 titleSize3 = GlobalGraphics.fontMunroSmall.MeasureString(title + ": Page 3/3");
-            spriteBatch.DrawString(GlobalGraphics.fontMunroSmall, title + ": Page 3/3", new Vector2(GlobalGraphics.scaledWidth / 2 - titleSize3.X / 2 + GlobalGraphics.Scale(640), (6 * GlobalGraphics.scale) - GlobalGraphics.Scale(1-32)), Color.White);
-            Vector2 titleSize4 = GlobalGraphics.fontMunroSmall.MeasureString("User Consent Form");
-            spriteBatch.DrawString(GlobalGraphics.fontMunroSmall, "User Consent Form", new Vector2(GlobalGraphics.scaledWidth / 2 - titleSize4.X / 2 + GlobalGraphics.Scale(960), (6 * GlobalGraphics.scale) - GlobalGraphics.Scale(1-32)), Color.White);
+            Vector2 titleSize1 = GlobalContent.GetFont("MunroSmall").MeasureString(title + ": Page 1/3");
+            spriteBatch.DrawString(GlobalContent.GetFont("MunroSmall"), title + ": Page 1/3", new Vector2(GlobalGraphics.scaledWidth / 2 - titleSize1.X / 2, (6 * GlobalGraphics.scale) - GlobalGraphics.Scale(1-32)), Color.White);
+            Vector2 titleSize2 = GlobalContent.GetFont("MunroSmall").MeasureString(title + ": Page 2/3");
+            spriteBatch.DrawString(GlobalContent.GetFont("MunroSmall"), title + ": Page 2/3", new Vector2(GlobalGraphics.scaledWidth / 2 - titleSize2.X / 2 + GlobalGraphics.Scale(320), (6 * GlobalGraphics.scale) - GlobalGraphics.Scale(1-32)), Color.White);
+            Vector2 titleSize3 = GlobalContent.GetFont("MunroSmall").MeasureString(title + ": Page 3/3");
+            spriteBatch.DrawString(GlobalContent.GetFont("MunroSmall"), title + ": Page 3/3", new Vector2(GlobalGraphics.scaledWidth / 2 - titleSize3.X / 2 + GlobalGraphics.Scale(640), (6 * GlobalGraphics.scale) - GlobalGraphics.Scale(1-32)), Color.White);
+            Vector2 titleSize4 = GlobalContent.GetFont("MunroSmall").MeasureString("User Consent Form");
+            spriteBatch.DrawString(GlobalContent.GetFont("MunroSmall"), "User Consent Form", new Vector2(GlobalGraphics.scaledWidth / 2 - titleSize4.X / 2 + GlobalGraphics.Scale(960), (6 * GlobalGraphics.scale) - GlobalGraphics.Scale(1-32)), Color.White);
             // Draw tutorial text
             for(int i = 0; i < tutorialText.Length; i++)
             {
@@ -359,9 +359,9 @@ namespace NonsensicalVideoGenerator
                     dummyText = dummyText.Replace("%FFPROBE%", "Checking...");
                     dummyText = dummyText.Replace("%IMAGEMAGICK%", "Checking...");
                     dummyText = dummyText.Replace("%YTDLP%", "Checking...");
-                    Vector2 textSize = GlobalGraphics.fontMunroSmall.MeasureString(dummyText);
-                    spriteBatch.DrawString(GlobalGraphics.fontMunroSmall, dummyText, new Vector2(GlobalGraphics.Scale(8+16+1+320*i), GlobalGraphics.Scale(60+offsetText+1)), Color.Black);
-                    spriteBatch.DrawString(GlobalGraphics.fontMunroSmall, dummyText, new Vector2(GlobalGraphics.Scale(8+16+320*i), GlobalGraphics.Scale(60+offsetText)), Color.White);
+                    Vector2 textSize = GlobalContent.GetFont("MunroSmall").MeasureString(dummyText);
+                    spriteBatch.DrawString(GlobalContent.GetFont("MunroSmall"), dummyText, new Vector2(GlobalGraphics.Scale(8+16+1+320*i), GlobalGraphics.Scale(60+offsetText+1)), Color.Black);
+                    spriteBatch.DrawString(GlobalContent.GetFont("MunroSmall"), dummyText, new Vector2(GlobalGraphics.Scale(8+16+320*i), GlobalGraphics.Scale(60+offsetText)), Color.White);
                     // Draw red overlay if prerequisite is not met
                     if(GlobalGraphics.scale == 2)
                     {
@@ -383,7 +383,7 @@ namespace NonsensicalVideoGenerator
                                     offset = 43;
                                     break;
                             }
-                            spriteBatch.DrawString(GlobalGraphics.fontMunroSmall, "Not found", new Vector2(GlobalGraphics.Scale(offset+8+16+320*i), GlobalGraphics.Scale(60+offsetText)), Color.OrangeRed);
+                            spriteBatch.DrawString(GlobalContent.GetFont("MunroSmall"), "Not found", new Vector2(GlobalGraphics.Scale(offset+8+16+320*i), GlobalGraphics.Scale(60+offsetText)), Color.OrangeRed);
                         }
                         if(tutorialText[i][j].Contains("Downloading..."))
                         {
@@ -397,7 +397,7 @@ namespace NonsensicalVideoGenerator
                                     offset = 47;
                                     break;
                             }
-                            spriteBatch.DrawString(GlobalGraphics.fontMunroSmall, "Downloading...", new Vector2(GlobalGraphics.Scale(offset+8+16+320*i), GlobalGraphics.Scale(60+offsetText)), Color.BlueViolet);
+                            spriteBatch.DrawString(GlobalContent.GetFont("MunroSmall"), "Downloading...", new Vector2(GlobalGraphics.Scale(offset+8+16+320*i), GlobalGraphics.Scale(60+offsetText)), Color.BlueViolet);
                         }
                         if(tutorialText[i][j].Contains("Extracting..."))
                         {
@@ -411,7 +411,7 @@ namespace NonsensicalVideoGenerator
                                     offset = 47;
                                     break;
                             }
-                            spriteBatch.DrawString(GlobalGraphics.fontMunroSmall, "Extracting...", new Vector2(GlobalGraphics.Scale(offset+8+16+320*i), GlobalGraphics.Scale(60+offsetText)), Color.BlueViolet);
+                            spriteBatch.DrawString(GlobalContent.GetFont("MunroSmall"), "Extracting...", new Vector2(GlobalGraphics.Scale(offset+8+16+320*i), GlobalGraphics.Scale(60+offsetText)), Color.BlueViolet);
                         }
                         if(tutorialText[i][j].Contains("Using system PATH"))
                         {
@@ -431,7 +431,7 @@ namespace NonsensicalVideoGenerator
                                     offset = 43;
                                     break;
                             }
-                            spriteBatch.DrawString(GlobalGraphics.fontMunroSmall, "Using system PATH", new Vector2(GlobalGraphics.Scale(offset+8+16+320*i), GlobalGraphics.Scale(60+offsetText)), Color.SeaGreen);
+                            spriteBatch.DrawString(GlobalContent.GetFont("MunroSmall"), "Using system PATH", new Vector2(GlobalGraphics.Scale(offset+8+16+320*i), GlobalGraphics.Scale(60+offsetText)), Color.SeaGreen);
                         }
                         // Draw green overlay if prerequisite is met
                         if(tutorialText[i][j].Contains("Installed"))
@@ -452,13 +452,13 @@ namespace NonsensicalVideoGenerator
                                     offset = 43;
                                     break;
                             }
-                            spriteBatch.DrawString(GlobalGraphics.fontMunroSmall, "Installed", new Vector2(GlobalGraphics.Scale(offset+8+16+320*i), GlobalGraphics.Scale(60+offsetText)), Color.LimeGreen);
+                            spriteBatch.DrawString(GlobalContent.GetFont("MunroSmall"), "Installed", new Vector2(GlobalGraphics.Scale(offset+8+16+320*i), GlobalGraphics.Scale(60+offsetText)), Color.LimeGreen);
                         }
                         // Draw red overlay if update check failed
                         if(tutorialText[i][j].Contains("Failed"))
                         {
                             int offset = 68;
-                            spriteBatch.DrawString(GlobalGraphics.fontMunroSmall, "Failed", new Vector2(GlobalGraphics.Scale(offset+8+16+320*i), GlobalGraphics.Scale(60+offsetText)), Color.OrangeRed);
+                            spriteBatch.DrawString(GlobalContent.GetFont("MunroSmall"), "Failed", new Vector2(GlobalGraphics.Scale(offset+8+16+320*i), GlobalGraphics.Scale(60+offsetText)), Color.OrangeRed);
                         }
                         // Draw yellow overlay if checking
                         if(dummyText.Contains("Checking..."))
@@ -479,7 +479,7 @@ namespace NonsensicalVideoGenerator
                                     offset = 43;
                                     break;
                             }
-                            spriteBatch.DrawString(GlobalGraphics.fontMunroSmall, "Checking...", new Vector2(GlobalGraphics.Scale(offset+8+16+320*i), GlobalGraphics.Scale(60+offsetText)), Color.Yellow);
+                            spriteBatch.DrawString(GlobalContent.GetFont("MunroSmall"), "Checking...", new Vector2(GlobalGraphics.Scale(offset+8+16+320*i), GlobalGraphics.Scale(60+offsetText)), Color.Yellow);
                         }
                     }
                     offsetText += 8;
@@ -946,8 +946,10 @@ namespace NonsensicalVideoGenerator
         }
         public void LoadContent(ContentManager contentManager, GraphicsDevice graphicsDevice)
         {
+            // Clear all controllers
+            controller.Clear();
             // Tutorial window
-            GlobalContent.AddTexture("TutorialWindow", contentManager.Load<Texture2D>("graphics/tutorialwindow"));
+            GlobalContent.AddTexture("TutorialWindow", ThemeManager.LoadLayeredContent<Texture2D>("graphics/tutorialwindow"));
             // PAGE 1
             controller.Add("Button1", new Button("Next Page", "", new Vector2(237+32+2, 217+12-6), NextPage1));
             // PAGE 2

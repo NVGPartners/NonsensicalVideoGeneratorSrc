@@ -100,7 +100,7 @@ namespace NonsensicalVideoGenerator
         {
             if (enabled)
             {
-                spriteBatch.Draw(GlobalGraphics.pixel, new Rectangle(0, 0, GlobalGraphics.scaledWidth, GlobalGraphics.scaledHeight), color);
+                spriteBatch.Draw(GlobalContent.GetTexture("Pixel"), new Rectangle(0, 0, GlobalGraphics.scaledWidth, GlobalGraphics.scaledHeight), color);
                 foreach (KeyValuePair<string, SimpleObject> unmaskedObject in unmaskedObjects)
                 {
                     unmaskedObject.Value.Draw(gameTime, spriteBatch);

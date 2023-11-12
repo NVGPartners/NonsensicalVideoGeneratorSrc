@@ -20,6 +20,9 @@ namespace NonsensicalVideoGenerator
 #endif
         public static bool justCompletedRender = true;
         public static bool exiting = false;
+        public static bool fakeExit = false;
+        public static float exitOpacityIncrease = 0.0075f;
+        public static Func<bool> exitFunc = () => false;
         public static bool shuffled = false;
         public static bool pluginsLoaded = true;
         public static bool dragDrop = false;

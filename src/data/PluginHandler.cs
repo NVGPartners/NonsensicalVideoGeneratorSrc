@@ -1204,6 +1204,7 @@ namespace NonsensicalVideoGenerator
                         File.Copy(file, dest);
                         ConsoleOutput.WriteLine($"Installed ID {Path.GetFileName(file)} from workshop.", Color.RoyalBlue);
                     }
+                    DirectoryCopy(folder, itemPath);
                 }
                 pluginWorker = new();
                 pluginWorker.DoWork += PluginWorker_DoWork;
@@ -1380,6 +1381,7 @@ namespace NonsensicalVideoGenerator
                 LoadPluginSettings();
                 Global.generator.progressText = $"{plugins.Count} effects loaded.";
                 Global.canRender = true;
+                ThemeManager.LoadThemes();
                 LibraryData.SequentialName();
                 // Check to see if there are any plugins that need consent forms filled out.
                 foreach(Plugin plugin in plugins)
@@ -1445,12 +1447,49 @@ namespace NonsensicalVideoGenerator
             }
             return called;
         }
-        public static bool CreatePlugin(string filename, string prettyname, bool minimal, out string file)
+        private static void DirectoryCopy(string sourceDirName, string destDirName)
+        {
+            // Get the subdirectories for the specified directory.
+            DirectoryInfo dir = new(sourceDirName);
+            DirectoryInfo[] dirs = dir.GetDirectories();
+            // If the destination directory doesn't exist, create it.
+            if (!Directory.Exists(destDirName))
+            {
+                Directory.CreateDirectory(destDirName);
+            }
+            // Get the files in the directory and copy them to the new location.
+            FileInfo[] files = dir.GetFiles();
+            foreach (FileInfo file in files)
+            {
+                string temppath = Path.Combine(destDirName, file.Name);
+                if(File.Exists(temppath))
+                {
+                    File.Delete(temppath);
+                }
+                file.CopyTo(temppath, false);
+            }
+            // Copy subdirectories and their contents to new location.
+            foreach (DirectoryInfo subdir in dirs)
+            {
+                string temppath = Path.Combine(destDirName, subdir.Name);
+                DirectoryCopy(subdir.FullName, temppath);
+            }
+        }
+        public static bool CreatePlugin(string filename, string prettyname, int templateType, out string file)
         {
             try
             {
                 // copy .\templates\minimal.lua or .\templates\effect.lua to .\plugins\user\filename\filename.lua
-                string template = minimal ? "minimal.lua" : "effect.lua";
+                string template = "effect.lua";
+                switch(templateType)
+                {
+                    case 1:
+                        template = "minimal.lua";
+                        break;
+                    case 2:
+                        template = "theme.lua";
+                        break;
+                }
                 string templatePath = Path.Combine("templates", template);
                 string pluginPath = Path.Combine("plugins", "user", filename);
                 string pluginFile = Path.Combine(pluginPath, filename + ".lua");
@@ -1459,6 +1498,13 @@ namespace NonsensicalVideoGenerator
                     Directory.CreateDirectory(pluginPath);
                 }
                 File.Copy(templatePath, pluginFile);
+                // If this is a theme, copy templates/defaultlayer recursively as /layer
+                if(templateType == 2)
+                {
+                    string defaultLayerPath = Path.Combine("templates", "defaultlayer");
+                    string layerPath = Path.Combine(pluginPath, "layer");
+                    DirectoryCopy(defaultLayerPath, layerPath);
+                }
                 // Replace "effect" with filename in the file.
                 string fileContents = File.ReadAllText(pluginFile);
                 fileContents = fileContents.Replace("%filename%", filename + ".lua");
@@ -1805,6 +1851,10 @@ namespace NonsensicalVideoGenerator
             {
                 return plugins.Count;
             }
+        }
+        public static List<Plugin> GetEnabledPluginsOfType(AddonType type)
+        {
+            return plugins.FindAll(plugin => plugin.enabled == true && plugin.GetAddonType() == type);
         }
     }
 }

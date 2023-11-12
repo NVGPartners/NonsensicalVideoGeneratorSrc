@@ -29,7 +29,7 @@ namespace NonsensicalVideoGenerator
         private string internalTooltip = "";
         public string customPluginName = "Untitled";
         public string customPluginFileName = "untitled";
-        public bool customPluginMinimal = false;
+        public int templateType = 0;
         public WorkshopTag selectedFlagsWorkshop = WorkshopTag.None;
         private readonly InteractableController controller = new();
         private readonly InteractableController controllerPluginCreation = new();
@@ -133,7 +133,7 @@ namespace NonsensicalVideoGenerator
             if (internalTooltip != "")
             {
                 // Get text size
-                Vector2 tooltipSize = GlobalGraphics.fontMunroSmall.MeasureString(internalTooltip);
+                Vector2 tooltipSize = GlobalContent.GetFont("MunroSmall").MeasureString(internalTooltip);
                 // Position is relative to mouse position but tries to avoid going off screen
                 Vector2 position = new(MouseInput.MouseState.Position.X + 10, MouseInput.MouseState.Position.Y + 10);
                 // Make sure it doesn't go off the right side of the screen
@@ -144,7 +144,7 @@ namespace NonsensicalVideoGenerator
                     position.Y = GlobalGraphics.scaledHeight - tooltipSize.Y - GlobalGraphics.Scale(2); 
                 spriteBatch.Draw(GlobalContent.GetTexture("Pixel"), new Rectangle((int)position.X, (int)position.Y, (int)tooltipSize.X + GlobalGraphics.Scale(2), (int)tooltipSize.Y - GlobalGraphics.Scale(2)), new Color(0, 0, 0, 255));
                 // White text
-                spriteBatch.DrawString(GlobalGraphics.fontMunroSmall, internalTooltip, new Vector2(position.X + GlobalGraphics.Scale(2), position.Y - GlobalGraphics.Scale(2)), Color.White);
+                spriteBatch.DrawString(GlobalContent.GetFont("MunroSmall"), internalTooltip, new Vector2(position.X + GlobalGraphics.Scale(2), position.Y - GlobalGraphics.Scale(2)), Color.White);
             }
         }
         public bool Update(GameTime gameTime, bool handleInput)
@@ -386,6 +386,35 @@ namespace NonsensicalVideoGenerator
                                     if(Global.canRender)
                                     {
                                         PluginHandler.plugins[i].enabled = !PluginHandler.plugins[i].enabled;
+                                        if(PluginHandler.plugins[i].enabled == false
+                                            && PluginHandler.plugins[i].GetAddonType() == AddonType.Theme
+                                            && SaveData.saveValues["ActiveTheme"] == Path.GetFileName(PluginHandler.plugins[i].path))
+                                        {
+                                            SaveData.saveValues["ActiveTheme"] = "";
+                                            SaveData.Save();
+                                            ThemeManager.ApplyTheme(DefaultThemes.Nonsensical);
+                                        }
+                                        else if(PluginHandler.plugins[i].enabled == true
+                                            && PluginHandler.plugins[i].GetAddonType() == AddonType.Theme)
+                                        {
+                                            // Disable all other themes
+                                            foreach(Plugin theme in PluginHandler.GetEnabledPluginsOfType(AddonType.Theme))
+                                            {
+                                                if(theme != PluginHandler.plugins[i])
+                                                {
+                                                    theme.enabled = false;
+                                                }
+                                            }
+                                            SaveData.saveValues["ActiveTheme"] = Path.GetFileName(PluginHandler.plugins[i].path);
+                                            SaveData.Save();
+                                            ThemeManager.LoadThemes();
+                                            ThemeManager.themes.ForEach((Theme theme) => {
+                                                if(theme.name == PluginHandler.plugins[i].GetDisplayName())
+                                                {
+                                                    ThemeManager.ApplyTheme(theme);
+                                                }
+                                            });
+                                        }
                                         PluginHandler.SavePluginSettings();
                                         GlobalContent.GetSound("Option").Play(int.Parse(SaveData.saveValues["SoundEffectVolume"], System.Globalization.CultureInfo.InvariantCulture) / 100f, 0f, 0f);
                                     }
@@ -480,6 +509,14 @@ namespace NonsensicalVideoGenerator
                                                             // Delete and reload plugins
                                                             try
                                                             {
+                                                                // If this was a theme, reset the theme
+                                                                if(PluginHandler.plugins[settingsIndex].GetAddonType() == AddonType.Theme
+                                                                    && SaveData.saveValues["ActiveTheme"] == Path.GetFileName(PluginHandler.plugins[settingsIndex].path))
+                                                                {
+                                                                    SaveData.saveValues["ActiveTheme"] = "";
+                                                                    ThemeManager.LoadThemes();
+                                                                    ThemeManager.ApplyTheme(DefaultThemes.Nonsensical);
+                                                                }
                                                                 Directory.Delete(Path.GetDirectoryName(PluginHandler.plugins[settingsIndex].path), true);
                                                                 GlobalContent.GetSound("Select").Play(int.Parse(SaveData.saveValues["SoundEffectVolume"], System.Globalization.CultureInfo.InvariantCulture) / 100f, 0f, 0f);
                                                                 if(SteamManager.initialized)
@@ -487,6 +524,7 @@ namespace NonsensicalVideoGenerator
                                                                 else
                                                                     PluginHandler.LoadPluginsThreaded();
                                                                 editingSettings = false;
+                                                                scrollOffset = 0;
                                                             }
                                                             catch
                                                             {
@@ -792,18 +830,37 @@ namespace NonsensicalVideoGenerator
         }
         public void LoadContent(ContentManager contentManager, GraphicsDevice graphicsDevice)
         {
-            GlobalContent.AddTexture("PluginPage", contentManager.Load<Texture2D>("graphics/pluginpage"));
-            GlobalContent.AddTexture("PluginEntryBlank", contentManager.Load<Texture2D>("graphics/pluginentryblank"));
-            GlobalContent.AddTexture("PluginEntry", contentManager.Load<Texture2D>("graphics/pluginentry"));
-            GlobalContent.AddTexture("ScrollHandle", contentManager.Load<Texture2D>("graphics/scrollhandle"));
+            // Clear all controllers
+            controller.Clear();
+            controllerPluginCreation.Clear();
+            GlobalContent.AddTexture("PluginPage", ThemeManager.LoadLayeredContent<Texture2D>("graphics/pluginpage"));
+            GlobalContent.AddTexture("PluginEntryBlank", ThemeManager.LoadLayeredContent<Texture2D>("graphics/pluginentryblank"));
+            GlobalContent.AddTexture("PluginEntry", ThemeManager.LoadLayeredContent<Texture2D>("graphics/pluginentry"));
+            GlobalContent.AddTexture("ScrollHandle", ThemeManager.LoadLayeredContent<Texture2D>("graphics/scrollhandle"));
+            controllerPluginCreation.Add("PluginTheme", new Switch("Theme Template", "Create a theme for NVG.", new Vector2(139, 60+19*3), (int i, string n) => {
+                bool switchState = (i & 256) != 0;
+                if((i & 2) != 0)
+                {
+                    (controllerPluginCreation.interactables["PluginMinimal"] as Switch).SwitchState = false;
+                    if(switchState)
+                        templateType = 2;
+                    else
+                        templateType = 0;
+                }
+                return switchState;
+            }, templateType == 2));
             controllerPluginCreation.Add("PluginMinimal", new Switch("Minimal Template", "Use a minimal Lua file template.", new Vector2(139, 60+19*2), (int i, string n) => {
                 bool switchState = (i & 256) != 0;
                 if((i & 2) != 0)
                 {
-                    customPluginMinimal = switchState;
+                    (controllerPluginCreation.interactables["PluginTheme"] as Switch).SwitchState = false;
+                    if(switchState)
+                        templateType = 1;
+                    else
+                        templateType = 0;
                 }
                 return switchState;
-            }, customPluginMinimal));
+            }, templateType == 1));
             controllerPluginCreation.Add("PluginName", new TextEntry("Addon File Name", "The internal file name of the addon.", customPluginFileName, new Vector2(139, 60+19), 50, 25, 4, (int i, string n) => {
                 controllerPluginCreation.interactables["PluginName"].Tooltip = controllerPluginCreation.interactables["PluginName"].Tooltip.ToLower();
                 customPluginFileName = controllerPluginCreation.interactables["PluginName"].Tooltip;
@@ -833,6 +890,7 @@ namespace NonsensicalVideoGenerator
                             PluginHandler.LoadWorkshop();
                         else
                             PluginHandler.LoadPluginsThreaded();
+                        scrollOffset = 0;
                         return true;
                 }
                 return false;
@@ -842,7 +900,7 @@ namespace NonsensicalVideoGenerator
                 {
                     case 2:
                         pluginCreation = false;
-                        if(PluginHandler.CreatePlugin(customPluginFileName, customPluginName, customPluginMinimal, out string file))
+                        if(PluginHandler.CreatePlugin(customPluginFileName, customPluginName, templateType, out string file))
                         {
                             GlobalContent.GetSound("Select").Play(int.Parse(SaveData.saveValues["SoundEffectVolume"], System.Globalization.CultureInfo.InvariantCulture) / 100f, 0f, 0f);
                             // load plugins
@@ -851,6 +909,7 @@ namespace NonsensicalVideoGenerator
                             else
                                 PluginHandler.LoadPluginsThreaded();
                             editingSettings = false;
+                            scrollOffset = 0;
                         }
                         else
                         {

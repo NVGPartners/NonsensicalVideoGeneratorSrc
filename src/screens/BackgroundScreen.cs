@@ -160,7 +160,7 @@ namespace NonsensicalVideoGenerator
         public void Draw(GameTime gameTime, SpriteBatch spriteBatch)
         {
             // Draw background with new hue.
-            spriteBatch.Draw(GlobalGraphics.pixel, new Rectangle(0, 0, GlobalGraphics.scaledWidth, GlobalGraphics.scaledHeight), backgroundColor);
+            spriteBatch.Draw(GlobalContent.GetTexture("Pixel"), new Rectangle(0, 0, GlobalGraphics.scaledWidth, GlobalGraphics.scaledHeight), backgroundColor);
             if(!bool.Parse(SaveData.saveValues["DisableMotion"]))
             {
                 // Draw circles indicating misclicks.
@@ -190,7 +190,7 @@ namespace NonsensicalVideoGenerator
         }
         public void LoadContent(ContentManager contentManager, GraphicsDevice graphicsDevice)
         {
-            GlobalContent.AddTexture("Tile", contentManager.Load<Texture2D>("graphics/tile"));
+            GlobalContent.AddTexture("Tile", ThemeManager.LoadLayeredContent<Texture2D>("graphics/tile"));
         }
     }
 }

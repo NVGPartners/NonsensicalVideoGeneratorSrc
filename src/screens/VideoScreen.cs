@@ -286,10 +286,10 @@ namespace NonsensicalVideoGenerator
         public void LoadContent(ContentManager contentManager, GraphicsDevice graphicsDevice)
         {
             // Video Window
-            GlobalContent.AddTexture("VidWindow", contentManager.Load<Texture2D>("graphics/vidwindow"));
-            GlobalContent.AddTexture("VidButton", contentManager.Load<Texture2D>("graphics/vidbutton"));
-            GlobalContent.AddTexture("VidBG", contentManager.Load<Texture2D>("graphics/vidbg"));
-            GlobalContent.AddTexture("VidOverlay", contentManager.Load<Texture2D>("graphics/vidoverlay"));
+            GlobalContent.AddTexture("VidWindow", ThemeManager.LoadLayeredContent<Texture2D>("graphics/vidwindow"));
+            GlobalContent.AddTexture("VidButton", ThemeManager.LoadLayeredContent<Texture2D>("graphics/vidbutton"));
+            GlobalContent.AddTexture("VidBG", ThemeManager.LoadLayeredContent<Texture2D>("graphics/vidbg"));
+            GlobalContent.AddTexture("VidOverlay", ThemeManager.LoadLayeredContent<Texture2D>("graphics/vidoverlay"));
         }
     }
 }

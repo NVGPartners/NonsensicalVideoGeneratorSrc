@@ -55,7 +55,8 @@ namespace NonsensicalVideoGenerator
             {"EnableDiscordRPC", "true"},
             {"ConstrainAspectRatio", "true"},
             {"MuteMusicWhileTabbedOut", "true"},
-            {"VideoPlaybackScale", "2"}
+            {"VideoPlaybackScale", "2"},
+            {"ActiveTheme", ""}
         };
         public static string saveFileName = "Options.json";
         public static bool Save()

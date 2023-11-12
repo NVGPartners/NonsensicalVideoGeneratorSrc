@@ -290,11 +290,11 @@ namespace NonsensicalVideoGenerator
         public void LoadContent(ContentManager contentManager, GraphicsDevice graphicsDevice)
         {
             // Logo.
-            GlobalContent.AddTexture("Logo", contentManager.Load<Texture2D>("graphics/logo"));
-            GlobalContent.AddTexture("LogoMask", contentManager.Load<Texture2D>("graphics/logomask"));
-            GlobalContent.AddTexture("Icon", contentManager.Load<Texture2D>("graphics/icon"));
-            GlobalContent.AddTexture("IconMask", contentManager.Load<Texture2D>("graphics/iconmask"));
-            GlobalContent.AddTexture("LogoBG", contentManager.Load<Texture2D>("graphics/bannerbg"));
+            GlobalContent.AddTexture("Logo", ThemeManager.LoadLayeredContent<Texture2D>("graphics/logo"));
+            GlobalContent.AddTexture("LogoMask", ThemeManager.LoadLayeredContent<Texture2D>("graphics/logomask"));
+            GlobalContent.AddTexture("Icon", ThemeManager.LoadLayeredContent<Texture2D>("graphics/icon"));
+            GlobalContent.AddTexture("IconMask", ThemeManager.LoadLayeredContent<Texture2D>("graphics/iconmask"));
+            GlobalContent.AddTexture("LogoBG", ThemeManager.LoadLayeredContent<Texture2D>("graphics/bannerbg"));
         }
     }
 #endif

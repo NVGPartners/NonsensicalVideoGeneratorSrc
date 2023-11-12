@@ -1333,11 +1333,11 @@
 /processorParam:TextureFormat=Color
 /build:graphics/vidwindow.png
 
-#begin music/theme.ogg
+#begin music/theme1.ogg
 /importer:OggImporter
 /processor:SongProcessor
 /processorParam:Quality=Best
-/build:music/theme.ogg
+/build:music/theme1.ogg
 
 #begin music/theme2.ogg
 /importer:OggImporter

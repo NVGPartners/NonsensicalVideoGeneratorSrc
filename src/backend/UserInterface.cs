@@ -32,7 +32,7 @@ namespace NonsensicalVideoGenerator
         private MusicState _musicState = MusicState.Paused;
         private int _musicActive = 0;
         private int music;
-        private bool alreadyPlayedFirstSong = false;
+        private bool alreadyPlayedFirstSong = true;
         public UserInterface()
         {
             ConsoleOutput.WriteLine("Creating new UserInterface instance...", Color.Transparent);
@@ -132,7 +132,15 @@ namespace NonsensicalVideoGenerator
                 music = 0;
             }
             _musicState = MusicState.Playing;
-            MediaPlayer.Play(GlobalContent.GetSongByIndex(music));
+            try
+            {
+                MediaPlayer.Play(GlobalContent.GetSongByIndex(music));
+            }
+            catch(Exception ex)
+            {
+                music = 0;
+                //ConsoleOutput.WriteLine("Failed to play music: " + ex.Message, Color.Red);
+            }
         }
         protected override void Update(GameTime gameTime)
         {
@@ -162,7 +170,15 @@ namespace NonsensicalVideoGenerator
                 if(_musicActive != music)
                 {
                     _musicActive = music;
-                    MediaPlayer.Play(GlobalContent.GetSongByIndex(_musicActive));
+                    try
+                    {
+                        MediaPlayer.Play(GlobalContent.GetSongByIndex(_musicActive));
+                    }
+                    catch(Exception ex)
+                    {
+                        _musicActive = 0;
+                        //ConsoleOutput.WriteLine("Failed to play music: " + ex.Message, Color.Red);
+                    }
                     MediaPlayer.Volume = 0f;
                 }
                 if(Global.exiting)
