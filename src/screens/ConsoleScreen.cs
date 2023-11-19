@@ -174,7 +174,7 @@ namespace NonsensicalVideoGenerator
             spriteBatch.Begin(SpriteSortMode.Deferred, BlendState.AlphaBlend, SamplerState.PointClamp, null, null, null, Matrix.CreateTranslation(offset.X, offset.Y, 0));
             // Draw the background.
             Texture2D pixel = GlobalContent.GetTexture("Pixel");
-            spriteBatch.Draw(pixel, new Rectangle(0, 0, GlobalGraphics.scaledWidth, GlobalGraphics.scaledHeight), new Color(0, 0, 0, 255));
+            spriteBatch.Draw(pixel, new Rectangle(0, 0, GlobalGraphics.scaledWidth, GlobalGraphics.scaledHeight), ThemeManager.GetColor("BackgroundConsoleScreen"));
             // Draw the center title bar text.`
             string newTitle = title + " - Toggle with F5";
             Vector2 titleSize = GlobalContent.GetFont("MunroSmall").MeasureString(newTitle);

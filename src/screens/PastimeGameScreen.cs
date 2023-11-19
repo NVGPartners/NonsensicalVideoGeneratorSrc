@@ -46,8 +46,8 @@ namespace NonsensicalVideoGenerator
             // The spacing variable determines the spacing between the two bars.
             hitboxes[0] = new Rectangle(GlobalGraphics.Scale(distance), GlobalGraphics.Scale(spacingPlacementY - (spacing/2)), GlobalGraphics.Scale(width), GlobalGraphics.Scale(height));
             hitboxes[1] = new Rectangle(GlobalGraphics.Scale(distance), GlobalGraphics.Scale(spacingPlacementY - (spacing*2) - height), GlobalGraphics.Scale(width), GlobalGraphics.Scale(height));
-            spriteBatch.Draw(GlobalContent.GetTexture("Pixel"), hitboxes[0], Color.Black);
-            spriteBatch.Draw(GlobalContent.GetTexture("Pixel"), hitboxes[1], Color.Black);
+            spriteBatch.Draw(GlobalContent.GetTexture("Pixel"), hitboxes[0], ThemeManager.GetColor("ObstaclePastimeGameScreen"));
+            spriteBatch.Draw(GlobalContent.GetTexture("Pixel"), hitboxes[1], ThemeManager.GetColor("ObstaclePastimeGameScreen"));
         }
         public void LoadContent(ContentManager contentManager, GraphicsDevice graphicsDevice)
         {

@@ -240,7 +240,7 @@ namespace NonsensicalVideoGenerator
         }
         protected override void Draw(GameTime gameTime)
         {
-            GraphicsDevice.Clear(new Color(0, 0, 0)); // Black background.
+            GraphicsDevice.Clear(ThemeManager.GetColor("ClearColor")); // Black background.
             if(_spriteBatch != null)
             {
                 _spriteBatch.Begin(SpriteSortMode.Deferred,

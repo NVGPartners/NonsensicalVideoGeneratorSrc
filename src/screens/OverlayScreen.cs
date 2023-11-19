@@ -88,7 +88,7 @@ namespace NonsensicalVideoGenerator
             else
             {
                 // Reset the color
-                bgColor = new Color(128, 128, 128);
+                bgColor = ThemeManager.GetColor("BackgroundOverlayScreen");
             }
             return false;
         }

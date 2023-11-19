@@ -56,7 +56,9 @@ namespace NonsensicalVideoGenerator
             {"ConstrainAspectRatio", "true"},
             {"MuteMusicWhileTabbedOut", "true"},
             {"VideoPlaybackScale", "2"},
-            {"ActiveTheme", ""}
+            {"ActiveTheme", ""},
+            {"TimeOut", "30"},
+            {"EnableTimeOut", "true"}
         };
         public static string saveFileName = "Options.json";
         public static bool Save()

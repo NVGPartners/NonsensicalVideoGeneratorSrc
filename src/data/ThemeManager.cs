@@ -25,6 +25,7 @@ namespace NonsensicalVideoGenerator
         public string prefix;
         public bool mgcb;
         public int songCount;
+        public Dictionary<string, Color> colorTable;
         public Theme(string name, string description, string prefix, int songCount, bool mgcb = false)
         {
             this.name = name;
@@ -33,29 +34,65 @@ namespace NonsensicalVideoGenerator
             this.songCount = songCount;
             this.mgcb = mgcb;
         }
+        public Theme(string name, string description, string prefix, int songCount, Dictionary<string, Color> colorTable, bool mgcb = false)
+        {
+            this.name = name;
+            this.description = description;
+            this.prefix = prefix;
+            this.songCount = songCount;
+            this.colorTable = colorTable;
+            this.mgcb = mgcb;
+        }
+        public Color GetColor(string colorName)
+        {
+            if(colorTable.ContainsKey(colorName))
+            {
+                return colorTable[colorName];
+            }
+            else
+            {
+                return Color.Transparent;
+            }
+        }
     }
     public static class DefaultThemes
     {
-        public static Theme Nonsensical = new Theme("Nonsensical", "The default theme.", "", 5, true);
-        public static Theme Studio = new Theme("Studio", "Reminiscent of days past.", "layers/studio/", 5, true);
-        public static Theme Halloween = new Theme("Halloween", "A spooky theme.", "layers/halloween/", 1, true);
-        public static Theme Christmas = new Theme("Christmas", "A festive theme.", "layers/christmas/", 5, true);
+        public static Theme Nonsensical = new Theme("Nonsensical", "The default theme.", "", 5, new Dictionary<string, Color>() {
+            {"ClearColor", new Color(0, 0, 0, 255)},
+            {"ShadowActionButtonInteractable", new Color(0, 0, 0, 255)},
+            {"ShadowButtonInteractable", new Color(0, 0, 0, 255)},
+            {"ShadowDialInteractable", new Color(0, 0, 0, 255)},
+            {"ShadowSwitchInteractable", new Color(0, 0, 0, 255)},
+            {"ShadowTextInputInteractable", new Color(0, 0, 0, 255)},
+            {"BackgroundTooltip", new Color(0, 0, 0, 255)},
+            {"BackgroundConsoleScreen", new Color(0, 0, 0, 255)},
+            {"OverlayContentScreen", new Color(0, 0, 0, 96)},
+            {"VideoHolderStaticAnimFilledLibraryPage", new Color(64, 64, 64, 255)},
+            {"VideoHolderAddOverlayLibraryPage", new Color(255, 255, 255, 128)},
+            {"PluginEntryGenericPluginsPage", new Color(255, 255, 255, 255)},
+            {"PluginEntryGenericAltPluginsPage", new Color(192, 192, 192, 255)},
+            {"PluginEntryEffectPluginsPage", new Color(192, 192, 255, 255)},
+            {"PluginEntryEffectAltPluginsPage", new Color(128, 128, 192, 255)},
+            {"PluginEntryPostRenderEffectPluginsPage", new Color(128, 255, 128, 255)},
+            {"PluginEntryPostRenderEffectAltPluginsPage", new Color(64, 192, 64, 255)},
+            {"PluginEntryThemePluginsPage", new Color(255, 128, 128, 255)},
+            {"PluginEntryThemeAltPluginsPage", new Color(192, 64, 64, 255)},
+            {"BackgroundOverlayScreen", new Color(128, 128, 128, 255)},
+            {"BackgroundLibraryPage", Color.Gray},
+            {"ObstaclePastimeGameScreen", Color.Black},
+            {"BackgroundScreen", new Color(64, 64, 64, 255)},
+            {"TileBackgroundScreen", new Color(102, 102, 102, 255)},
+        }, true);
         public static List<Theme> themes = new List<Theme>()
         {
-            Nonsensical,
-            Studio,
-            Halloween,
-            Christmas
+            Nonsensical
         };
     }
     public static class ThemeManager
     {
         public static List<Theme> themes = new List<Theme>()
         {
-            DefaultThemes.Nonsensical,
-            DefaultThemes.Studio,
-            DefaultThemes.Halloween,
-            DefaultThemes.Christmas
+            DefaultThemes.Nonsensical
         };
         public static Theme activeTheme = DefaultThemes.Nonsensical;
         public static void LoadThemes()
@@ -66,9 +103,11 @@ namespace NonsensicalVideoGenerator
                 themes.Add(theme);
             }
             bool themeChanged = false;
+            Theme newTheme = DefaultThemes.Nonsensical;
             List<Plugin> themeList = PluginHandler.GetEnabledPluginsOfType(AddonType.Theme);
             foreach (Plugin theme in themeList)
             {
+                theme.GetThemeMetadata();
                 string themeName = theme.GetDisplayName();
                 string themeDescription = "";
                 int songCount = DefaultThemes.Nonsensical.songCount;
@@ -112,12 +151,15 @@ namespace NonsensicalVideoGenerator
                         }
                     }
                 }
-                Theme thisTheme = new Theme(themeName, themeDescription, layerPath, songCount);
+                Theme thisTheme = new Theme(themeName, themeDescription, layerPath, songCount)
+                {
+                    colorTable = theme.themeColors
+                };
                 themes.Add(thisTheme);
                 if(SaveData.saveValues["ActiveTheme"] == Path.GetFileName(theme.path))
                 {
-                    activeTheme = thisTheme;
                     themeChanged = true;
+                    newTheme = thisTheme;
                 }
                 else
                 {
@@ -128,8 +170,7 @@ namespace NonsensicalVideoGenerator
             }
             if(themeChanged)
             {
-                ConsoleOutput.WriteLine($"Theme changed to {activeTheme.name}.", Color.Yellow);
-                ApplyTheme(activeTheme);
+                ApplyTheme(newTheme);
             }
             else
             {
@@ -192,7 +233,7 @@ namespace NonsensicalVideoGenerator
         }
         public static void ApplyTheme(Theme theme)
         {
-            activeTheme = theme;
+            ConsoleOutput.WriteLine($"Theme changed to {theme.name}.", Color.Yellow);
             Global.exiting = true;
             Global.exitOpacityIncrease = 16 / 255f;
             Global.fakeExit = true;
@@ -201,6 +242,7 @@ namespace NonsensicalVideoGenerator
             MediaPlayer.Stop();
             Global.exitFunc = () =>
             {
+                activeTheme = theme;
                 UserInterface.instance.Content.Unload();
                 // Load default content.
                 GlobalContent.LoadDefaultContent(UserInterface.instance.Content, UserInterface.instance.GraphicsDevice);
@@ -210,6 +252,15 @@ namespace NonsensicalVideoGenerator
                 FramePlayer.canPlayBgMusic = true;
                 return true;
             };
+        }
+        public static Color GetColor(string colorName)
+        {
+            Color color = activeTheme.GetColor(colorName);
+            if(color == Color.Transparent)
+            {
+                color = DefaultThemes.Nonsensical.GetColor(colorName);
+            }
+            return color;
         }
     }
 }

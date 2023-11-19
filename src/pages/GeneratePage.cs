@@ -57,11 +57,11 @@ namespace NonsensicalVideoGenerator
             // Interactable
             if(Global.generator.generatorActive)
             {
-                spriteBatch.Draw(GlobalContent.GetTexture("Pixel"), new Rectangle(GlobalGraphics.Scale(137), GlobalGraphics.Scale(56), GlobalGraphics.Scale(167-1), GlobalGraphics.Scale(180)), new Color(0, 0, 0, 96));
-                spriteBatch.Draw(GlobalContent.GetTexture("Pixel"), new Rectangle(GlobalGraphics.Scale(136), GlobalGraphics.Scale(57), GlobalGraphics.Scale(1), GlobalGraphics.Scale(179)), new Color(0, 0, 0, 96));
-                spriteBatch.Draw(GlobalContent.GetTexture("Pixel"), new Rectangle(GlobalGraphics.Scale(304-1), GlobalGraphics.Scale(57), GlobalGraphics.Scale(1), GlobalGraphics.Scale(179)), new Color(0, 0, 0, 96));
-                spriteBatch.Draw(GlobalContent.GetTexture("Pixel"), new Rectangle(GlobalGraphics.Scale(135), GlobalGraphics.Scale(58), GlobalGraphics.Scale(1), GlobalGraphics.Scale(178)), new Color(0, 0, 0, 96));
-                spriteBatch.Draw(GlobalContent.GetTexture("Pixel"), new Rectangle(GlobalGraphics.Scale(305-1), GlobalGraphics.Scale(58), GlobalGraphics.Scale(1), GlobalGraphics.Scale(178)), new Color(0, 0, 0, 96));
+                spriteBatch.Draw(GlobalContent.GetTexture("Pixel"), new Rectangle(GlobalGraphics.Scale(137), GlobalGraphics.Scale(56), GlobalGraphics.Scale(167-1), GlobalGraphics.Scale(180)), ThemeManager.GetColor("OverlayContentScreen"));
+                spriteBatch.Draw(GlobalContent.GetTexture("Pixel"), new Rectangle(GlobalGraphics.Scale(136), GlobalGraphics.Scale(57), GlobalGraphics.Scale(1), GlobalGraphics.Scale(179)), ThemeManager.GetColor("OverlayContentScreen"));
+                spriteBatch.Draw(GlobalContent.GetTexture("Pixel"), new Rectangle(GlobalGraphics.Scale(304-1), GlobalGraphics.Scale(57), GlobalGraphics.Scale(1), GlobalGraphics.Scale(179)), ThemeManager.GetColor("OverlayContentScreen"));
+                spriteBatch.Draw(GlobalContent.GetTexture("Pixel"), new Rectangle(GlobalGraphics.Scale(135), GlobalGraphics.Scale(58), GlobalGraphics.Scale(1), GlobalGraphics.Scale(178)), ThemeManager.GetColor("OverlayContentScreen"));
+                spriteBatch.Draw(GlobalContent.GetTexture("Pixel"), new Rectangle(GlobalGraphics.Scale(305-1), GlobalGraphics.Scale(58), GlobalGraphics.Scale(1), GlobalGraphics.Scale(178)), ThemeManager.GetColor("OverlayContentScreen"));
                 // Draw text to indicate that rendering is in progress
                 SpriteFont font = GlobalContent.GetFont("Munro");
                 string text = "Rendering is in progress.";
@@ -74,11 +74,11 @@ namespace NonsensicalVideoGenerator
             {
                 if(page > 0)
                 {
-                    spriteBatch.Draw(GlobalContent.GetTexture("Pixel"), new Rectangle(GlobalGraphics.Scale(137), GlobalGraphics.Scale(56), GlobalGraphics.Scale(167-1), GlobalGraphics.Scale(180)), new Color(0, 0, 0, 96));
-                    spriteBatch.Draw(GlobalContent.GetTexture("Pixel"), new Rectangle(GlobalGraphics.Scale(136), GlobalGraphics.Scale(57), GlobalGraphics.Scale(1), GlobalGraphics.Scale(179)), new Color(0, 0, 0, 96));
-                    spriteBatch.Draw(GlobalContent.GetTexture("Pixel"), new Rectangle(GlobalGraphics.Scale(304-1), GlobalGraphics.Scale(57), GlobalGraphics.Scale(1), GlobalGraphics.Scale(179)), new Color(0, 0, 0, 96));
-                    spriteBatch.Draw(GlobalContent.GetTexture("Pixel"), new Rectangle(GlobalGraphics.Scale(135), GlobalGraphics.Scale(58), GlobalGraphics.Scale(1), GlobalGraphics.Scale(178)), new Color(0, 0, 0, 96));
-                    spriteBatch.Draw(GlobalContent.GetTexture("Pixel"), new Rectangle(GlobalGraphics.Scale(305-1), GlobalGraphics.Scale(58), GlobalGraphics.Scale(1), GlobalGraphics.Scale(178)), new Color(0, 0, 0, 96));
+                    spriteBatch.Draw(GlobalContent.GetTexture("Pixel"), new Rectangle(GlobalGraphics.Scale(137), GlobalGraphics.Scale(56), GlobalGraphics.Scale(167-1), GlobalGraphics.Scale(180)), ThemeManager.GetColor("OverlayContentScreen"));
+                    spriteBatch.Draw(GlobalContent.GetTexture("Pixel"), new Rectangle(GlobalGraphics.Scale(136), GlobalGraphics.Scale(57), GlobalGraphics.Scale(1), GlobalGraphics.Scale(179)), ThemeManager.GetColor("OverlayContentScreen"));
+                    spriteBatch.Draw(GlobalContent.GetTexture("Pixel"), new Rectangle(GlobalGraphics.Scale(304-1), GlobalGraphics.Scale(57), GlobalGraphics.Scale(1), GlobalGraphics.Scale(179)), ThemeManager.GetColor("OverlayContentScreen"));
+                    spriteBatch.Draw(GlobalContent.GetTexture("Pixel"), new Rectangle(GlobalGraphics.Scale(135), GlobalGraphics.Scale(58), GlobalGraphics.Scale(1), GlobalGraphics.Scale(178)), ThemeManager.GetColor("OverlayContentScreen"));
+                    spriteBatch.Draw(GlobalContent.GetTexture("Pixel"), new Rectangle(GlobalGraphics.Scale(305-1), GlobalGraphics.Scale(58), GlobalGraphics.Scale(1), GlobalGraphics.Scale(178)), ThemeManager.GetColor("OverlayContentScreen"));
                 }
                 switch(page)
                 {
@@ -289,6 +289,27 @@ namespace NonsensicalVideoGenerator
                 return false;
             }, ThemeManager.LoadLayeredContent<Texture2D>("graphics/actions/render")));
             // PAGE 3
+            controllerPage3.Add("EnableTimeOut", new Switch("", "Cancel operations if they take too long.", new Vector2(139, 60+19*4), (int i, string n) => {
+                bool switchState = (i & 256) != 0;
+                if((i & 2) != 0)
+                {
+                    string oldValue = SaveData.saveValues["EnableTimeOut"];
+                    SaveData.saveValues["EnableTimeOut"] = switchState.ToString().ToLower();
+                    if(oldValue != SaveData.saveValues["EnableTimeOut"])
+                        SaveData.Save();
+                }
+                return switchState;
+            }, SaveData.saveValues["EnableTimeOut"] == "true"));
+            controllerPage3.Add("TimeOut", new TextEntry("Time Out", "How long until operations are canceled, in seconds.", SaveData.saveValues["TimeOut"], new Vector2(168, 60+19*4), 24, 3, 1, (int i, string n) => {
+                int oldValue = int.Parse(SaveData.saveValues["TimeOut"], System.Globalization.CultureInfo.InvariantCulture);
+                // Range: 0-100
+                if(int.Parse(controllerPage3.interactables["TimeOut"].Tooltip, System.Globalization.CultureInfo.InvariantCulture) < 0)
+                    controllerPage3.interactables["TimeOut"].Tooltip = "0";
+                SaveData.saveValues["TimeOut"] = controllerPage3.interactables["TimeOut"].Tooltip;
+                if(oldValue != int.Parse(SaveData.saveValues["TimeOut"], System.Globalization.CultureInfo.InvariantCulture))
+                    SaveData.Save();
+                return false;
+            }));
             controllerPage3.Add("ConstrainAspectRatio", new Switch("Constrain Aspect Ratio", "Clips will retain their original aspect ratio when disabled.", new Vector2(139, 60+19*3), (int i, string n) => {
                 bool switchState = (i & 256) != 0;
                 if((i & 2) != 0)

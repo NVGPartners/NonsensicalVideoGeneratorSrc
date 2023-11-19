@@ -274,6 +274,7 @@ namespace NonsensicalVideoGenerator
         public Dictionary<string, string> settingTooltips = new();
         public Dictionary<string, SettingType> settingTypes = new();
         public static Dictionary<string, string> placeholders = new();
+        public Dictionary<string, Color> themeColors = new();
         public ConsentForm? consentForm;
         public Plugin(string path, PluginType type, string rootPath, bool enabled = true)
         {
@@ -982,6 +983,92 @@ namespace NonsensicalVideoGenerator
                 return false;
             return UserConsent.CheckConsentForm(consentForm);
         }
+        public void GetThemeMetadata()
+        {
+            themeColors.Clear();
+            switch (type)
+            {
+                case PluginType.Lua:
+                    if(luaScript == null)
+                        return;
+                    // Run Generate function if it exists.
+                    if (luaScript.Globals["ThemeMetadata"] != null)
+                    {
+                        try
+                        {
+                            // Add settings to pluginSettings table
+                            Table pluginSettings = new(luaScript);
+                            foreach (KeyValuePair<string, object> setting in settings)
+                            {
+                                pluginSettings[setting.Key] = setting.Value;
+                            }
+                            // Call
+                            DynValue result = luaScript.Call(luaScript.Globals["ThemeMetadata"], pluginSettings);
+                            if (result.Type == DataType.Table && result.Table != null)
+                            {
+                                foreach (TablePair pair in result.Table.Pairs)
+                                {
+                                    if (pair.Key.Type == DataType.String)
+                                    {
+                                        switch(pair.Key.String)
+                                        {
+                                            case "colorTable":
+                                                if (pair.Value.Type == DataType.Table)
+                                                {
+                                                    foreach (TablePair colorPair in pair.Value.Table.Pairs)
+                                                    {
+                                                        if (colorPair.Key.Type == DataType.String && colorPair.Value.Type == DataType.Table)
+                                                        {
+                                                            Color color = Color.Transparent;
+                                                            if (colorPair.Value.Table.Length == 3)
+                                                            {
+                                                                color = new Color(
+                                                                    (int)(colorPair.Value.Table.Get(1).Number),
+                                                                    (int)(colorPair.Value.Table.Get(2).Number),
+                                                                    (int)(colorPair.Value.Table.Get(3).Number)
+                                                                );
+                                                            }
+                                                            else if (colorPair.Value.Table.Length == 4)
+                                                            {
+                                                                color = new Color(
+                                                                    (int)(colorPair.Value.Table.Get(1).Number),
+                                                                    (int)(colorPair.Value.Table.Get(2).Number),
+                                                                    (int)(colorPair.Value.Table.Get(3).Number),
+                                                                    (int)(colorPair.Value.Table.Get(4).Number)
+                                                                );
+                                                            }
+                                                            if (color != Color.Transparent)
+                                                            {
+                                                                themeColors.Add(colorPair.Key.String, color);
+                                                            }
+                                                        }
+                                                    }
+                                                }
+                                                break;
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                        catch (ScriptRuntimeException e)
+                        {
+                            ConsoleOutput.WriteLine(e.DecoratedMessage, Color.Red);
+                        }
+                    }
+                    break;
+            }
+        }
+        public Color GetColor(string color)
+        {
+            if (themeColors.ContainsKey(color))
+            {
+                return themeColors[color];
+            }
+            else
+            {
+                return Color.Transparent;
+            }
+        }
     }
     public class LibraryCombinedType
     {
@@ -1099,7 +1186,6 @@ namespace NonsensicalVideoGenerator
             Global.generator.progressText = $"Loading Addon {Path.GetFileName(path)}...";
             if(!plugin.Query())
                 throw new Exception($"Failed to query Addon {Path.GetFileName(path)}.");
-            plugins.Add(plugin);
             // Add entry to pluginsettings if it doesn't exist.
             Dictionary<string, object> pluginSettings = new();
             pluginSettings.Add("settings", plugin.settings);
@@ -1125,6 +1211,7 @@ namespace NonsensicalVideoGenerator
                     File.WriteAllText(pluginSettingsPath, JsonConvert.SerializeObject(existingPluginSettings, Formatting.Indented));
                 }
             }
+            plugins.Add(plugin);
             ConsoleOutput.WriteLine($"Loaded Addon {key}.", Color.LightBlue);
         }
         private static void LoadPluginsRecursive(string path, PluginType type, string root = "")

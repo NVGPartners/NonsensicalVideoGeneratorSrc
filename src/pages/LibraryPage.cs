@@ -164,9 +164,9 @@ namespace NonsensicalVideoGenerator
             Texture2D renderNoButton = GlobalContent.GetTexture("RenderNoButton");
             SpriteFont  munroSmall = GlobalContent.GetFont("MunroSmall");
             // Draw background
-            spriteBatch.Draw(pixel, new Rectangle(GlobalGraphics.Scale(135), GlobalGraphics.Scale(56), GlobalGraphics.Scale(170), GlobalGraphics.Scale(15)), Color.Gray);
-            spriteBatch.Draw(pixel, new Rectangle(GlobalGraphics.Scale(135), GlobalGraphics.Scale(219), GlobalGraphics.Scale(170), GlobalGraphics.Scale(17)), Color.Gray);
-            spriteBatch.Draw(pixel, new Rectangle(GlobalGraphics.Scale(135), GlobalGraphics.Scale(71), GlobalGraphics.Scale(65), GlobalGraphics.Scale(148)), Color.Gray);
+            spriteBatch.Draw(pixel, new Rectangle(GlobalGraphics.Scale(135), GlobalGraphics.Scale(56), GlobalGraphics.Scale(170), GlobalGraphics.Scale(15)), ThemeManager.GetColor("BackgroundLibraryPage"));
+            spriteBatch.Draw(pixel, new Rectangle(GlobalGraphics.Scale(135), GlobalGraphics.Scale(219), GlobalGraphics.Scale(170), GlobalGraphics.Scale(17)), ThemeManager.GetColor("BackgroundLibraryPage"));
+            spriteBatch.Draw(pixel, new Rectangle(GlobalGraphics.Scale(135), GlobalGraphics.Scale(71), GlobalGraphics.Scale(65), GlobalGraphics.Scale(148)), ThemeManager.GetColor("BackgroundLibraryPage"));
             // Draw separators and video holders
             int a, b;
             for (a = 0; a < 3; a++)
@@ -191,7 +191,7 @@ namespace NonsensicalVideoGenerator
                             video = true;
                             if(currentRootType == LibraryRootType.Video)
                             {
-                                spriteBatch.Draw(GlobalContent.GetTexture("StaticAnim" + staticAnim), staticRect, new Color(64, 64, 64, 255));
+                                spriteBatch.Draw(GlobalContent.GetTexture("StaticAnim" + staticAnim), staticRect, ThemeManager.GetColor("VideoHolderStaticAnimFilledLibraryPage"));
                                 int pagelessPosition = position - (12 * page);
                                 if(videoPlayers.ContainsKey(pagelessPosition))
                                 {
@@ -208,7 +208,7 @@ namespace NonsensicalVideoGenerator
                             spriteBatch.Draw(GlobalContent.GetTexture("StaticAnim" + staticAnim), staticRect, Color.White);
                             if(currentLibraryType != DefaultLibraryTypes.Render)
                             {
-                                spriteBatch.Draw(GlobalContent.GetTexture("StaticOverlay"), staticRect, new Color(255, 255, 255, 128));
+                                spriteBatch.Draw(GlobalContent.GetTexture("StaticOverlay"), staticRect, ThemeManager.GetColor("VideoHolderAddOverlayLibraryPage"));
                             }
                         }
                         // Draw video holder
@@ -358,7 +358,7 @@ namespace NonsensicalVideoGenerator
                 // Make sure it doesn't go off the bottom of the screen
                 if (position.Y + tooltipSize.Y + GlobalGraphics.Scale(2) > GlobalGraphics.scaledHeight)
                     position.Y = GlobalGraphics.scaledHeight - tooltipSize.Y - GlobalGraphics.Scale(2); 
-                spriteBatch.Draw(GlobalContent.GetTexture("Pixel"), new Rectangle((int)position.X, (int)position.Y, (int)tooltipSize.X + GlobalGraphics.Scale(2), (int)tooltipSize.Y - GlobalGraphics.Scale(2)), new Color(0, 0, 0, 255));
+                spriteBatch.Draw(GlobalContent.GetTexture("Pixel"), new Rectangle((int)position.X, (int)position.Y, (int)tooltipSize.X + GlobalGraphics.Scale(2), (int)tooltipSize.Y - GlobalGraphics.Scale(2)), ThemeManager.GetColor("BackgroundTooltip"));
                 // White text
                 spriteBatch.DrawString(GlobalContent.GetFont("MunroSmall"), tooltip, new Vector2(position.X + GlobalGraphics.Scale(2), position.Y - GlobalGraphics.Scale(2)), Color.White);
             }

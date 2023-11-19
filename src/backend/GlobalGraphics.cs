@@ -16,8 +16,6 @@ namespace NonsensicalVideoGenerator
         public static int scale = int.Parse(SaveData.saveValues["ScreenScale"], System.Globalization.CultureInfo.InvariantCulture);
         public static int scaledWidth = (int)(width * scale);
         public static int scaledHeight = (int)(height * scale);
-        public static int shadowScale = 1;
-        public static Color shadowColor = Color.Black;
         public static int Scale(int value)
         {
             return (int)(value * scale);
@@ -40,26 +38,6 @@ namespace NonsensicalVideoGenerator
             spriteBatch.Draw(GlobalContent.GetTexture("Pixel"), new Rectangle(x + Scale(1), y + Scale(1), (int)measured.X - Scale(2), (int)measured.Y - Scale(2)), color);
             spriteBatch.DrawString(GlobalContent.GetFont("MunroSmall"), text, new Vector2(x+Scale(2), y-Scale(4)), textColor);
             return new Rectangle(x, y, (int)measured.X, (int)measured.Y);
-        }
-        public static Rectangle DrawButton(SpriteBatch spriteBatch, int x, int y, Color color, string text, Color textColor)
-        {
-            return DrawButton(spriteBatch, x, y, color, text, textColor, new Color(128, 128, 128));
-        }
-        public static Rectangle DrawButton(SpriteBatch spriteBatch, int x, int y, Color color, string text)
-        {
-            return DrawButton(spriteBatch, x, y, color, text, Color.White);
-        }
-        public static Rectangle DrawButton(SpriteBatch spriteBatch, int x, int y, string text)
-        {
-            return DrawButton(spriteBatch, x, y, Color.Black, text);
-        }
-        public static Rectangle DrawButtonShadow(SpriteBatch spriteBatch, int x, int y, string text, Color color)
-        {
-            return DrawButton(spriteBatch, x+Scale(shadowScale), y+Scale(shadowScale), color, text, color, color);
-        }
-        public static Rectangle DrawButtonShadow(SpriteBatch spriteBatch, int x, int y, string text)
-        {
-            return DrawButtonShadow(spriteBatch, x, y, text, shadowColor);
         }
         public static void DrawCircle(SpriteBatch spriteBatch, Vector2 pos, int radius, Color color, bool hollow = true)
         {

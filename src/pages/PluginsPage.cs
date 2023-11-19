@@ -66,7 +66,9 @@ namespace NonsensicalVideoGenerator
                 for(int i = 0; i < plcount; i++)
                 {
                     // Alternate colors so it's easier to see
-                    Color curColor = new Color(i % 2 == 0 ? 255 : 192, i % 2 == 0 ? 255 : 192, i % 2 == 0 ? 255 : 192);
+                    Color curColor = ThemeManager.GetColor("PluginEntryGenericPluginsPage");
+                    if(i % 2 != 0)
+                        curColor = ThemeManager.GetColor("PluginEntryGenericAltPluginsPage");
                     if(i < plcount-1)
                     {
                         // Different addon types have different colors
@@ -74,15 +76,21 @@ namespace NonsensicalVideoGenerator
                         {
                             case AddonType.Effect: // blue 
                                 //curColor = new Color(192, 192, 255);
-                                curColor = new Color(i % 2 == 0 ? 192 : 128, i % 2 == 0 ? 192 : 128, i % 2 == 0 ? 255 : 192);
+                                curColor = ThemeManager.GetColor("PluginEntryEffectPluginsPage");
+                                if(i % 2 != 0)
+                                    curColor = ThemeManager.GetColor("PluginEntryEffectAltPluginsPage");
                                 break;
                             case AddonType.PostRenderEffect: // green
                                 //curColor = new Color(192, 255, 192);
-                                curColor = new Color(i % 2 == 0 ? 128 : 64, i % 2 == 0 ? 255 : 192, i % 2 == 0 ? 128 : 64);
+                                curColor = ThemeManager.GetColor("PluginEntryPostRenderEffectPluginsPage");
+                                if(i % 2 != 0)
+                                    curColor = ThemeManager.GetColor("PluginEntryPostRenderEffectAltPluginsPage");
                                 break;
                             case AddonType.Theme: // red
                                 //curColor = new Color(255, 192, 192);
-                                curColor = new Color(i % 2 == 0 ? 255 : 192, i % 2 == 0 ? 128 : 64, i % 2 == 0 ? 128 : 64);
+                                curColor = ThemeManager.GetColor("PluginEntryThemePluginsPage");
+                                if(i % 2 != 0)
+                                    curColor = ThemeManager.GetColor("PluginEntryThemeAltPluginsPage");
                                 break;
                         }
                         spriteBatch.Draw(pluginEntry, new Rectangle(GlobalGraphics.Scale(136), GlobalGraphics.Scale(57 + i * pluginEntry.Height + i), pluginEntry.Width * GlobalGraphics.scale, pluginEntry.Height * GlobalGraphics.scale), curColor);
@@ -114,11 +122,11 @@ namespace NonsensicalVideoGenerator
             else
             {
                 // Draw background
-                spriteBatch.Draw(GlobalContent.GetTexture("Pixel"), new Rectangle(GlobalGraphics.Scale(137), GlobalGraphics.Scale(56), GlobalGraphics.Scale(167-1), GlobalGraphics.Scale(180)), new Color(0, 0, 0, 96));
-                spriteBatch.Draw(GlobalContent.GetTexture("Pixel"), new Rectangle(GlobalGraphics.Scale(136), GlobalGraphics.Scale(57), GlobalGraphics.Scale(1), GlobalGraphics.Scale(179)), new Color(0, 0, 0, 96));
-                spriteBatch.Draw(GlobalContent.GetTexture("Pixel"), new Rectangle(GlobalGraphics.Scale(304-1), GlobalGraphics.Scale(57), GlobalGraphics.Scale(1), GlobalGraphics.Scale(179)), new Color(0, 0, 0, 96));
-                spriteBatch.Draw(GlobalContent.GetTexture("Pixel"), new Rectangle(GlobalGraphics.Scale(135), GlobalGraphics.Scale(58), GlobalGraphics.Scale(1), GlobalGraphics.Scale(178)), new Color(0, 0, 0, 96));
-                spriteBatch.Draw(GlobalContent.GetTexture("Pixel"), new Rectangle(GlobalGraphics.Scale(305-1), GlobalGraphics.Scale(58), GlobalGraphics.Scale(1), GlobalGraphics.Scale(178)), new Color(0, 0, 0, 96));
+                spriteBatch.Draw(GlobalContent.GetTexture("Pixel"), new Rectangle(GlobalGraphics.Scale(137), GlobalGraphics.Scale(56), GlobalGraphics.Scale(167-1), GlobalGraphics.Scale(180)), ThemeManager.GetColor("OverlayContentScreen"));
+                spriteBatch.Draw(GlobalContent.GetTexture("Pixel"), new Rectangle(GlobalGraphics.Scale(136), GlobalGraphics.Scale(57), GlobalGraphics.Scale(1), GlobalGraphics.Scale(179)), ThemeManager.GetColor("OverlayContentScreen"));
+                spriteBatch.Draw(GlobalContent.GetTexture("Pixel"), new Rectangle(GlobalGraphics.Scale(304-1), GlobalGraphics.Scale(57), GlobalGraphics.Scale(1), GlobalGraphics.Scale(179)), ThemeManager.GetColor("OverlayContentScreen"));
+                spriteBatch.Draw(GlobalContent.GetTexture("Pixel"), new Rectangle(GlobalGraphics.Scale(135), GlobalGraphics.Scale(58), GlobalGraphics.Scale(1), GlobalGraphics.Scale(178)), ThemeManager.GetColor("OverlayContentScreen"));
+                spriteBatch.Draw(GlobalContent.GetTexture("Pixel"), new Rectangle(GlobalGraphics.Scale(305-1), GlobalGraphics.Scale(58), GlobalGraphics.Scale(1), GlobalGraphics.Scale(178)), ThemeManager.GetColor("OverlayContentScreen"));
                 if(pluginCreation)
                 {
                     // Interactable
@@ -142,7 +150,7 @@ namespace NonsensicalVideoGenerator
                 // Make sure it doesn't go off the bottom of the screen
                 if (position.Y + tooltipSize.Y + GlobalGraphics.Scale(2) > GlobalGraphics.scaledHeight)
                     position.Y = GlobalGraphics.scaledHeight - tooltipSize.Y - GlobalGraphics.Scale(2); 
-                spriteBatch.Draw(GlobalContent.GetTexture("Pixel"), new Rectangle((int)position.X, (int)position.Y, (int)tooltipSize.X + GlobalGraphics.Scale(2), (int)tooltipSize.Y - GlobalGraphics.Scale(2)), new Color(0, 0, 0, 255));
+                spriteBatch.Draw(GlobalContent.GetTexture("Pixel"), new Rectangle((int)position.X, (int)position.Y, (int)tooltipSize.X + GlobalGraphics.Scale(2), (int)tooltipSize.Y - GlobalGraphics.Scale(2)), ThemeManager.GetColor("BackgroundTooltip"));
                 // White text
                 spriteBatch.DrawString(GlobalContent.GetFont("MunroSmall"), internalTooltip, new Vector2(position.X + GlobalGraphics.Scale(2), position.Y - GlobalGraphics.Scale(2)), Color.White);
             }

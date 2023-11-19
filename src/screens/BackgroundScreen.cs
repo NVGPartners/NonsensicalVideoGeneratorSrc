@@ -58,8 +58,6 @@ namespace NonsensicalVideoGenerator
         private int scrollY = 0;
         private float counter = 360;
         private float hueColor = 0;
-        private Color backgroundColor = Color.Black;
-        private Color tileColor = Color.Black;
         private List<MisclickCircle> circles = new List<MisclickCircle>();
         /// <summary>
         /// Converts HSV color values to RGB
@@ -110,9 +108,6 @@ namespace NonsensicalVideoGenerator
             // Wrap to 0 after 360.
             if (hueColor >= 360)
                 hueColor = 0;
-            // Update background color and tile color hue.
-            HSVToRGB((int)hueColor, int.Parse(SaveData.saveValues["BackgroundSaturation"], System.Globalization.CultureInfo.InvariantCulture), 25, out backgroundColor);
-            HSVToRGB((int)hueColor, int.Parse(SaveData.saveValues["BackgroundSaturation"], System.Globalization.CultureInfo.InvariantCulture), 40, out tileColor);
             // Input.
             if(handleInput)
             {
@@ -160,7 +155,7 @@ namespace NonsensicalVideoGenerator
         public void Draw(GameTime gameTime, SpriteBatch spriteBatch)
         {
             // Draw background with new hue.
-            spriteBatch.Draw(GlobalContent.GetTexture("Pixel"), new Rectangle(0, 0, GlobalGraphics.scaledWidth, GlobalGraphics.scaledHeight), backgroundColor);
+            spriteBatch.Draw(GlobalContent.GetTexture("Pixel"), new Rectangle(0, 0, GlobalGraphics.scaledWidth, GlobalGraphics.scaledHeight), ThemeManager.GetColor("BackgroundScreen"));
             if(!bool.Parse(SaveData.saveValues["DisableMotion"]))
             {
                 // Draw circles indicating misclicks.
@@ -177,7 +172,7 @@ namespace NonsensicalVideoGenerator
                 {
                     for(int y = 0; y < totalCount; y += tile.Height)
                     {
-                        spriteBatch.Draw(tile, new Rectangle(GlobalGraphics.Scale(x + scrollX), GlobalGraphics.Scale(y + scrollY), GlobalGraphics.Scale(tile.Width), GlobalGraphics.Scale(tile.Height)), tileColor);
+                        spriteBatch.Draw(tile, new Rectangle(GlobalGraphics.Scale(x + scrollX), GlobalGraphics.Scale(y + scrollY), GlobalGraphics.Scale(tile.Width), GlobalGraphics.Scale(tile.Height)),  ThemeManager.GetColor("TileBackgroundScreen"));
                     }
                 }
                 // (DEBUG) Draw scroll position.

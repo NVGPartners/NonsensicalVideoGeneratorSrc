@@ -56,8 +56,7 @@ namespace NonsensicalVideoGenerator
         public BackgroundWorker? timeoutWorker { get; set; }
         
         public BackgroundWorker? killWorker { get; set; }
-        public static readonly int defaultTimeout = 60;
-        public int timeout = defaultTimeout; // in seconds
+        public int timeout = 0;
         public string tempOutput = Path.Combine(Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location), "library", "video", "renders", "temp.mp4");
         public void KillChildProcesses()
         {
@@ -225,7 +224,7 @@ namespace NonsensicalVideoGenerator
         // Timeout handler
         public void TimeoutThread(object? sender, DoWorkEventArgs e)
         {
-            while (true)
+            while (bool.Parse(SaveData.saveValues["EnableTimeOut"]))
             {
                 if (timeoutWorker?.CancellationPending == true)
                     return;
@@ -398,7 +397,7 @@ namespace NonsensicalVideoGenerator
                             RandomInt(0, 100) < int.Parse(SaveData.saveValues["TransitionChance"], System.Globalization.CultureInfo.InvariantCulture),
                             false
                         );
-                        timeout = defaultTimeout;
+                        timeout = int.Parse(SaveData.saveValues["TimeOut"], System.Globalization.CultureInfo.InvariantCulture);
                         if (vidThreadWorker?.CancellationPending == true)
                             return;
                         ConsoleOutput.WriteLine("Starting clip " + (i + 1) + "/" + maxClips + "...", Color.Gray);
@@ -771,7 +770,7 @@ namespace NonsensicalVideoGenerator
                     timeoutWorker.WorkerSupportsCancellation = true;
                 }
                 forceConcatenate = false;
-                timeout = defaultTimeout;
+                timeout = int.Parse(SaveData.saveValues["TimeOut"], System.Globalization.CultureInfo.InvariantCulture);
                 tempOutput = Path.Combine(Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location), "library", "video", "renders", Global.videoTitle + ".mp4");
                 timeoutWorker.RunWorkerAsync();
                 vidThreadWorker.RunWorkerAsync();
