@@ -787,7 +787,7 @@ namespace NonsensicalVideoGenerator
                                                             }
                                                         }
                                                         return false;
-                                                    }).Register();
+                                                    });
                                                     break;
                                             }
                                             tes.Add(te);
