@@ -43,5 +43,6 @@ namespace NonsensicalVideoGenerator
         public static bool usedDifferentOutro = false;
         public static bool highScore50 = false;
         public static Generator generator = new Generator();
+        public static List<string> parameters = new List<string>();
     }
 }

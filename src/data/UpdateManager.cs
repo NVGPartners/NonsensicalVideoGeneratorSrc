@@ -30,6 +30,9 @@ namespace NonsensicalVideoGenerator
         public static bool checkedForUpdates = false;
         public static bool DoesCommandExist(string command)
         {
+            // skip if needed and return false
+            if(Global.parameters.Contains("-nopath"))
+                return false;
             string output = "";
             ProcessStartInfo startInfo = new()
             {
