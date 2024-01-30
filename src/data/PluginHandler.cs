@@ -1691,11 +1691,6 @@ namespace NonsensicalVideoGenerator
                 return;
             }
             Global.generator.progressText = "Creating Workshop item...";
-        
-            string achievement = "ACHIEVEMENT_WORKSHOP_SUBMIT";
-            ConsoleOutput.WriteLine("Awarding achievement: "+achievement, Color.LightBlue);
-            SteamUserStats.SetAchievement(achievement);
-
             UpdateWorkshopItem(param.m_nPublishedFileId);
         }
         public static void UpdateWorkshopItem(PublishedFileId_t id)
