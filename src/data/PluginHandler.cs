@@ -79,13 +79,13 @@ namespace NonsensicalVideoGenerator
                 switch (type)
                 {
                     case CommandType.FFmpeg:
-                        return Global.useSystemFFmpeg ? "ffmpeg" : Path.Combine(Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location), "ffmpeg.exe");
+                        return Global.useSystemFFmpeg ? "ffmpeg" : Path.Combine(Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location) ?? ".", "ffmpeg.exe");
                     case CommandType.FFprobe:
-                        return Global.useSystemFFprobe ? "ffprobe" : Path.Combine(Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location), "ffprobe.exe");
+                        return Global.useSystemFFprobe ? "ffprobe" : Path.Combine(Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location) ?? ".", "ffprobe.exe");
                     case CommandType.Magick:
                         return "magick"; // only system PATH is supported
                     case CommandType.YtDlp:
-                        return Global.useSystemYtDlp ? "yt-dlp" : Path.Combine(Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location), "yt-dlp.exe");
+                        return Global.useSystemYtDlp ? "yt-dlp" : Path.Combine(Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location) ?? ".", "yt-dlp.exe");
                     default:
                         return customCommand;
                 }
@@ -134,7 +134,7 @@ namespace NonsensicalVideoGenerator
                 {
                     FileName = command,
                     Arguments = args,
-                    WorkingDirectory = workingDirectory ?? Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location),
+                    WorkingDirectory = workingDirectory ?? (Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location) ?? "."),
                     UseShellExecute = false,
                     RedirectStandardOutput = true,
                     RedirectStandardError = true,
@@ -211,12 +211,12 @@ namespace NonsensicalVideoGenerator
                     subType = "";
                 }
                 // If libraryRoot is not empty, download to library instead of job folder
-                string downloadPath = subType != "" ? Path.Join(Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location), "library", rootType, subType) : rootType;
+                string downloadPath = subType != "" ? Path.Join(Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location) ?? ".", "library", rootType, subType) : rootType;
                 string combinedPath = Path.Combine(downloadPath, Path.GetFileName(url));
                 // get complete path
                 combinedPath = Path.GetFullPath(combinedPath);
                 // create directory if it doesn't exist
-                Directory.CreateDirectory(Path.GetDirectoryName(combinedPath));
+                Directory.CreateDirectory(Path.GetDirectoryName(combinedPath) ?? ".");
                 if (File.Exists(combinedPath))
                 {
                     ConsoleOutput.WriteLine($"File {combinedPath} already exists.", Color.LightBlue);
@@ -476,12 +476,12 @@ namespace NonsensicalVideoGenerator
         // FFmpeg installed for lua
         public static bool FFmpegInstalled()
         {
-            return Global.useSystemFFmpeg || File.Exists(Path.Combine(Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location), "ffmpeg.exe"));
+            return Global.useSystemFFmpeg || File.Exists(Path.Combine(Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location) ?? ".", "ffmpeg.exe"));
         }
         // FFprobe installed for lua
         public static bool FFprobeInstalled()
         {
-            return Global.useSystemFFprobe || File.Exists(Path.Combine(Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location), "ffprobe.exe"));
+            return Global.useSystemFFprobe || File.Exists(Path.Combine(Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location) ?? ".", "ffprobe.exe"));
         }
         // Magick installed for lua
         public static bool MagickInstalled()
@@ -566,7 +566,7 @@ namespace NonsensicalVideoGenerator
             }
             // Add to library
             ConsoleOutput.WriteLine($"Loading {ReplacePlaceholders(path)} to library", Color.LightBlue);
-            LibraryFile libfile = new(Path.GetFileNameWithoutExtension(ReplacePlaceholders(path)), Path.Combine("temp", Path.GetDirectoryName(jobDirectory), ReplacePlaceholders(path)), dummyType);
+            LibraryFile libfile = new(Path.GetFileNameWithoutExtension(ReplacePlaceholders(path)), Path.Combine("temp", Path.GetDirectoryName(jobDirectory) ?? ".", ReplacePlaceholders(path)), dummyType);
             if(LibraryData.Load(libfile) == null)
             {
                 ConsoleOutput.WriteLine($"Failed to load {ReplacePlaceholders(path)} to library", Color.Red);
@@ -583,7 +583,7 @@ namespace NonsensicalVideoGenerator
                 throw new Exception("Invalid rootType");
             }
             // Check library directory
-            string combinedPath = Path.Combine(Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location), "library", rootType, subType, ReplacePlaceholders(path));
+            string combinedPath = Path.Combine(Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location) ?? ".", "library", rootType, subType, ReplacePlaceholders(path));
             // Make sure folder exists
             if (!Directory.Exists(Path.GetDirectoryName(combinedPath)))
             {
@@ -639,7 +639,7 @@ namespace NonsensicalVideoGenerator
             // If program is yt-dlp, allow it to be executed from cwd
             if(program == "yt-dlp")
             {
-                program = Path.Combine(Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location), "yt-dlp.exe");
+                program = Path.Combine(Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location) ?? ".", "yt-dlp.exe");
             }
             // Execute program
             ConsoleOutput.WriteLine($"Executing {ReplacePlaceholders(program)} {ReplacePlaceholders(args)}", Color.LightBlue);
@@ -799,7 +799,7 @@ namespace NonsensicalVideoGenerator
                     if (Path.GetFileName(Path.GetDirectoryName(path)) != "workshop"
                         && Path.GetFileName(Path.GetDirectoryName(path)) != "user")
                     {
-                        workshopId = Path.GetFileName(Path.GetDirectoryName(path));
+                        workshopId = Path.GetFileName(Path.GetDirectoryName(path)) ?? "";
                         // check for .publish inside folder
                         if (File.Exists(Path.Join(Path.GetDirectoryName(path), ".publish")))
                         {
@@ -971,7 +971,7 @@ namespace NonsensicalVideoGenerator
                                     }
                                 }
                             }
-                            consentForm = new ConsentForm(Path.GetFileName(path), GetDisplayName(), consentFlags, workshopId, rootPath, consentSettings);
+                            consentForm = new ConsentForm(Path.GetFileName(path), GetDisplayName(), consentFlags, workshopId ?? "", rootPath, consentSettings);
                         }
                     }
                     return true;
@@ -1136,14 +1136,17 @@ namespace NonsensicalVideoGenerator
                 if (index == -1)
                     continue;
                 plugins[index].enabled = !(pluginSetting.Value["disabled"] as bool? ?? false);
-                Dictionary<string, object>? settings = JsonConvert.DeserializeObject<Dictionary<string, object>>(pluginSetting.Value["settings"].ToString());
-                foreach(KeyValuePair<string, object> setting in settings)
+                Dictionary<string, object>? settings = JsonConvert.DeserializeObject<Dictionary<string, object>>(pluginSetting.Value["settings"].ToString() ?? "{}");
+                if(settings != null)
                 {
-                    if(!plugins[index].settings.ContainsKey(setting.Key))
+                    foreach(KeyValuePair<string, object> setting in settings)
                     {
-                        continue;
+                        if(!plugins[index].settings.ContainsKey(setting.Key))
+                        {
+                            continue;
+                        }
+                        plugins[index].settings[setting.Key] = setting.Value;
                     }
-                    plugins[index].settings[setting.Key] = setting.Value;
                 }
             }
             SavePluginSettings();
@@ -1259,39 +1262,42 @@ namespace NonsensicalVideoGenerator
             allDoneCount++;
             if(count == 0 || allDoneCount == count)
             {
-                foreach (PublishedFileId_t item in subscribedItems)
+                if(subscribedItems != null)
                 {
-                    string itemPath = Path.Combine(pluginPath, "workshop", item.m_PublishedFileId.ToString());
-                    SteamUGC.GetItemInstallInfo(item, out ulong size, out string folder, 1024, out uint timestamp);
-                    if (Directory.Exists(itemPath) == false)
+                    foreach (PublishedFileId_t item in subscribedItems)
                     {
-                        Directory.CreateDirectory(itemPath);
-                    }
-                    // Delete files currently in plugin folder.
-                    foreach (string file in Directory.GetFiles(itemPath))
-                    {
-                        File.Delete(file);
-                    }
-                    // Copy files from workshop folder to plugin folder.
-                    foreach (string file in Directory.GetFiles(folder))
-                    {
-                        string dest = Path.Combine(itemPath, Path.GetFileName(file));
-                        // File hash check.
-                        if(File.Exists(dest))
+                        string itemPath = Path.Combine(pluginPath, "workshop", item.m_PublishedFileId.ToString());
+                        SteamUGC.GetItemInstallInfo(item, out ulong size, out string folder, 1024, out uint timestamp);
+                        if (Directory.Exists(itemPath) == false)
                         {
-                            if (File.ReadAllBytes(file).SequenceEqual(File.ReadAllBytes(dest)))
+                            Directory.CreateDirectory(itemPath);
+                        }
+                        // Delete files currently in plugin folder.
+                        foreach (string file in Directory.GetFiles(itemPath))
+                        {
+                            File.Delete(file);
+                        }
+                        // Copy files from workshop folder to plugin folder.
+                        foreach (string file in Directory.GetFiles(folder))
+                        {
+                            string dest = Path.Combine(itemPath, Path.GetFileName(file));
+                            // File hash check.
+                            if(File.Exists(dest))
                             {
-                                continue;
+                                if (File.ReadAllBytes(file).SequenceEqual(File.ReadAllBytes(dest)))
+                                {
+                                    continue;
+                                }
                             }
+                            if(File.Exists(dest))
+                            {
+                                File.Delete(dest);
+                            }
+                            File.Copy(file, dest);
+                            ConsoleOutput.WriteLine($"Installed ID {Path.GetFileName(file)} from workshop.", Color.RoyalBlue);
                         }
-                        if(File.Exists(dest))
-                        {
-                            File.Delete(dest);
-                        }
-                        File.Copy(file, dest);
-                        ConsoleOutput.WriteLine($"Installed ID {Path.GetFileName(file)} from workshop.", Color.RoyalBlue);
+                        DirectoryCopy(folder, itemPath);
                     }
-                    DirectoryCopy(folder, itemPath);
                 }
                 pluginWorker = new();
                 pluginWorker.DoWork += PluginWorker_DoWork;
@@ -1299,7 +1305,7 @@ namespace NonsensicalVideoGenerator
                 ConsoleOutput.WriteLine("All done.", Color.RoyalBlue);
             }
         }
-        private static void PluginWorker_DoWork(object sender, DoWorkEventArgs e)
+        private static void PluginWorker_DoWork(object? sender, DoWorkEventArgs e)
         {
             Global.pluginsLoaded = PluginHandler.LoadPlugins();
         }
@@ -1642,13 +1648,13 @@ namespace NonsensicalVideoGenerator
                     break;
             }
             // Delete .publish in the plugin's directory if it exists
-            string publishFile = Path.Combine(Path.GetDirectoryName(plugin.path), ".publish");
+            string publishFile = Path.Combine(Path.GetDirectoryName(plugin.path) ?? "", ".publish");
             if(File.Exists(publishFile))
             {
                 File.Delete(publishFile);
             }
             // Also delete non-lua files so Steam doesn't upload them
-            foreach(string file in Directory.GetFiles(Path.GetDirectoryName(plugin.path)))
+            foreach(string file in Directory.GetFiles(Path.GetDirectoryName(plugin.path) ?? ""))
             {
                 if(Path.GetExtension(file) != ".lua")
                 {
@@ -1710,7 +1716,7 @@ namespace NonsensicalVideoGenerator
             }
             // Set the title.
             bool cont = true;
-            if(!updating)
+            if(!updating && publishPlugin != null)
             {
                 string nam = publishPlugin.GetDisplayName();
                 if(nam == "")
@@ -1743,7 +1749,7 @@ namespace NonsensicalVideoGenerator
                 return;
             }
             // Set the description if one exists
-            if(publishPlugin.settings.Count > 0)
+            if(publishPlugin != null && publishPlugin.settings.Count > 0)
             {
                 string description = "";
                 List<string> extsettings = new();
@@ -1787,7 +1793,7 @@ namespace NonsensicalVideoGenerator
                 return;
             }
             // Set the content.
-            string contentPath = Path.GetDirectoryName(publishPlugin.path);
+            string contentPath = publishPlugin != null ? Path.GetDirectoryName(publishPlugin.path) ?? "" : "";
             // Remove leading .\ and such
             while(contentPath.StartsWith("."))
             {
@@ -1803,7 +1809,7 @@ namespace NonsensicalVideoGenerator
             }
             contentPath = contentPath.Replace("/", "\\");
             // Get full path
-            contentPath = Path.Combine(Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location), contentPath);
+            contentPath = Path.Combine(Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location) ?? ".", contentPath);
             ConsoleOutput.WriteLine($"Content path: {contentPath}");
             cont = SteamUGC.SetItemContent(handle, contentPath);
             if(!cont)
@@ -1893,7 +1899,8 @@ namespace NonsensicalVideoGenerator
             }
             // Submit the update.
             SteamAPICall_t call = SteamUGC.SubmitItemUpdate(handle, "Updated addon.");
-            updateItemResult.Set(call);
+            if(updateItemResult != null)
+                updateItemResult.Set(call);
             Global.generator.progressText = "Publishing...";
         }
         public static void OnWorkshopItemUpdated(SubmitItemUpdateResult_t param, bool bIOFailure)
@@ -1911,12 +1918,15 @@ namespace NonsensicalVideoGenerator
             }
             Global.generator.progressText = "Successfully published.";
             GlobalContent.GetSound("RenderComplete").Play(int.Parse(SaveData.saveValues["SoundEffectVolume"], System.Globalization.CultureInfo.InvariantCulture) / 100f, 0f, 0f);
-            ConsoleOutput.WriteLine($"Successfully published addon {publishPlugin.GetDisplayName()} to the workshop.", Color.Green);
-            publishPlugin.submittedId = param.m_nPublishedFileId.ToString();
-            // Write the plugin's workshop id to .publish in the plugin's directory.
-            string publishFile = Path.Combine(Path.GetDirectoryName(publishPlugin.path), ".publish");
-            File.WriteAllText(publishFile, publishPlugin.submittedId.ToString());
-            publishPlugin = null;
+            if(publishPlugin != null)
+            {
+                ConsoleOutput.WriteLine($"Successfully published addon {publishPlugin.GetDisplayName()} to the workshop.", Color.Green);
+                publishPlugin.submittedId = param.m_nPublishedFileId.ToString();
+                // Write the plugin's workshop id to .publish in the plugin's directory.
+                string publishFile = Path.Combine(Path.GetDirectoryName(publishPlugin.path) ?? ".", ".publish");
+                File.WriteAllText(publishFile, publishPlugin.submittedId.ToString());
+                publishPlugin = null;
+            }
             publishing = false;
         }
         // Only for effect types

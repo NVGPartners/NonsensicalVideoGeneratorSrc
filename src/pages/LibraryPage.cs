@@ -46,7 +46,6 @@ namespace NonsensicalVideoGenerator
         private int organizeFile = -1;
         private int organizeType = -1;
         private string tooltip = "";
-        private string clipUrl = "";
         private bool registered = false;
         private static bool downloading = false;
         private static KeyboardState oldKeyboardState;
@@ -364,9 +363,21 @@ namespace NonsensicalVideoGenerator
             }
         }
         // Thread for loading videos
-        private BackgroundWorker loadVideosThread;
+        private BackgroundWorker? loadVideosThread;
         private void LoadVideosThread(object? sender, DoWorkEventArgs e)
         {
+            if(e.Argument == null)
+            {
+                // huh?
+                try
+                {
+                    if(loadVideosThread != null)
+                        loadVideosThread.Dispose();
+                }
+                catch {}
+                loadVideosThread = null;
+                return;
+            }
             // Args: GraphicsDevice graphicsDevice, int currentPage
             object[] args = (object[])e.Argument;
             GraphicsDevice graphicsDevice = (GraphicsDevice)args[0];
@@ -669,6 +680,7 @@ namespace NonsensicalVideoGenerator
                             tts = totalIndicator;
                             break;
                     }
+                    /*
                     bool selected = false;
                     // selectedFlags 1, 2, 4 are each button
                     // bitwise
@@ -678,6 +690,7 @@ namespace NonsensicalVideoGenerator
                         selected = true;
                     if((selectedFlags & 4) == 4 && rects.Keys.ElementAt(i) == "HeaderButton")
                         selected = true;
+                    */
                     Accessibility.CompatAccessibility(rects.Values.ElementAt(i), tts);
                 }
                 // Video holders

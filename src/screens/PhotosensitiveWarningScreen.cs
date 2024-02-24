@@ -34,7 +34,7 @@ namespace NonsensicalVideoGenerator
         private static KeyboardState oldKeyboardState;
         private static KeyboardState newKeyboardState;
         // shamelessly copied from tutorial screen
-        private BackgroundWorker updateWorker;
+        private BackgroundWorker? updateWorker;
         private readonly InteractableController controller = new();
         private void ErrorOut()
         {

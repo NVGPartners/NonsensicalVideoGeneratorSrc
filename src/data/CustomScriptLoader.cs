@@ -24,7 +24,7 @@ namespace NonsensicalVideoGenerator
             }
             else
             {
-                return null;
+                return "";
             }
         }
 

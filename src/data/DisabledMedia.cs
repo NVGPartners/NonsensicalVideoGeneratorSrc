@@ -41,7 +41,7 @@ namespace NonsensicalVideoGenerator
                 {
                     try
                     {
-                        DisabledMediaList = JsonConvert.DeserializeObject<List<string>>(SaveData.saveValues["DisabledMedia"]);
+                        DisabledMediaList = JsonConvert.DeserializeObject<List<string>>(SaveData.saveValues["DisabledMedia"]) ?? new List<string>();
                     }
                     catch (Exception e)
                     {
@@ -56,7 +56,7 @@ namespace NonsensicalVideoGenerator
             {
                 if (File.Exists(saveFileName))
                 {
-                    DisabledMediaList = JsonConvert.DeserializeObject<List<string>>(File.ReadAllText(saveFileName));
+                    DisabledMediaList = JsonConvert.DeserializeObject<List<string>>(File.ReadAllText(saveFileName)) ?? new List<string>();
                 }
             }
             catch (Exception e)

@@ -31,7 +31,7 @@ namespace NonsensicalVideoGenerator
             Type screenType = typeof(IScreen);
             Type[] types = AppDomain.CurrentDomain.GetAssemblies()
                 .SelectMany(s => {
-                    Type[] t = null;
+                    Type[] t = new Type[0];
                     try
                     {
                         t = s.GetTypes();
@@ -186,7 +186,7 @@ namespace NonsensicalVideoGenerator
                     MouseInput._mouseState = Mouse.GetState();
                 }
             }
-            bool handleInput = Accessibility.showDisambiguation || (UserInterface.instance.IsActive && MouseInput.MouseState.X >= 0 && MouseInput.MouseState.X <= GlobalGraphics.scaledWidth &&
+            bool handleInput = Accessibility.showDisambiguation || (UserInterface.instance != null && UserInterface.instance.IsActive && MouseInput.MouseState.X >= 0 && MouseInput.MouseState.X <= GlobalGraphics.scaledWidth &&
                 MouseInput.MouseState.Y >= 0 && MouseInput.MouseState.Y <= GlobalGraphics.scaledHeight && !Global.dragDrop);
             if(Accessibility.PreUpdate(gameTime))
                 handleInput = false;

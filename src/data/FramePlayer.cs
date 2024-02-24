@@ -32,7 +32,7 @@ namespace NonsensicalVideoGenerator
         public static bool playing = false;
         public static bool audioPlaying = false;
 #if MONOGAME
-        public static SoundEffectInstance audio;
+        public static SoundEffectInstance? audio;
 #else
         public static SoundPlayer audio;
 #endif
@@ -116,7 +116,8 @@ namespace NonsensicalVideoGenerator
                     Global.generator.progressText = "Loading frame " + i + "/" + curcount + "...";
                     FileStream frameFile = File.OpenRead($".\\temp\\extracted\\frames\\{i}.bmp");
 #if MONOGAME
-                    frames.Add(Texture2D.FromStream(UserInterface.instance.GraphicsDevice, frameFile));
+                    if(UserInterface.instance != null)
+                        frames.Add(Texture2D.FromStream(UserInterface.instance.GraphicsDevice, frameFile));
 #else
                     frames.Add(Image.FromStream(frameFile));
 #endif
@@ -392,11 +393,11 @@ namespace NonsensicalVideoGenerator
             if(Stop())
             {
                 Global.generator.progressText = "Loading media...";
-                currentPath = file.Path;
+                currentPath = file.Path ?? "";
                 // Extract frames and audio
                 if(!processing)
                 {
-                    if(file.Type.RootType == LibraryRootType.Video)
+                    if(file.Type != null && file.Type.RootType == LibraryRootType.Video)
                     {
                         // Run ffmpeg to extract frames and audio to .\temp\extracted\frames\* and .\temp\extracted\audio.wav
                         // Create the directory if it doesn't exist
@@ -427,6 +428,8 @@ namespace NonsensicalVideoGenerator
                     {
                         try
                         {
+                            if(file.Type == null)
+                                throw new Exception("Invalid file type???");
                             // Create the directory if it doesn't exist
                             if (!Directory.Exists(".\\temp\\extracted"))
                             {

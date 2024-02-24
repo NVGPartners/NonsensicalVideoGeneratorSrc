@@ -112,18 +112,29 @@ namespace NonsensicalVideoGenerator
                         {
                             Global.editing = "";
                             Accessibility.allowAccessibility = true;
-                            if(ScreenManager.GetScreen<ConsoleScreen>("Console").Toggle())
+                            ConsoleScreen? consoleScreen = ScreenManager.GetScreen<ConsoleScreen>("Console");
+                            if(consoleScreen != null)
                             {
-                                ConsoleOutput.ResetScroll();
-                                GlobalContent.GetSound("Select").Play(int.Parse(SaveData.saveValues["SoundEffectVolume"], System.Globalization.CultureInfo.InvariantCulture) / 100f, 0f, 0f);
-                                if(Accessibility.showDisambiguation)
-                                    Accessibility.TTS("Console shown.");
+                                if(consoleScreen.Toggle())
+                                {
+                                    ConsoleOutput.ResetScroll();
+                                    GlobalContent.GetSound("Select").Play(int.Parse(SaveData.saveValues["SoundEffectVolume"], System.Globalization.CultureInfo.InvariantCulture) / 100f, 0f, 0f);
+                                    if(Accessibility.showDisambiguation)
+                                        Accessibility.TTS("Console shown.");
+                                }
+                                else
+                                {
+                                    GlobalContent.GetSound("Back").Play(int.Parse(SaveData.saveValues["SoundEffectVolume"], System.Globalization.CultureInfo.InvariantCulture) / 100f, 0f, 0f);
+                                    if(Accessibility.showDisambiguation)
+                                        Accessibility.TTS("Console hidden.");
+                                }
                             }
                             else
                             {
-                                GlobalContent.GetSound("Back").Play(int.Parse(SaveData.saveValues["SoundEffectVolume"], System.Globalization.CultureInfo.InvariantCulture) / 100f, 0f, 0f);
+                                ConsoleOutput.WriteLine("Console not found!!!");
+                                GlobalContent.GetSound("Error").Play(int.Parse(SaveData.saveValues["SoundEffectVolume"], System.Globalization.CultureInfo.InvariantCulture) / 100f, 0f, 0f);
                                 if(Accessibility.showDisambiguation)
-                                    Accessibility.TTS("Console hidden.");
+                                    Accessibility.TTS("Console not found.");
                             }
                         }
                         return true;
@@ -195,7 +206,7 @@ namespace NonsensicalVideoGenerator
                 switch(i)
                 {
                     case 2: // left click
-                        string renderFolder = Path.Combine(Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location), "library", "video", "renders");
+                        string renderFolder = Path.Combine(Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location) ?? ".", "library", "video", "renders");
                         // Get last modified file
                         string lastModifiedFile = "";
                         DateTime lastModified = new(0);
@@ -330,7 +341,9 @@ namespace NonsensicalVideoGenerator
                     if(oldValue != SaveData.saveValues["DisableClipsAfterMaxUniqueClips"])
                     {
                         SaveData.saveValues["DeleteClipsAfterMaxUniqueClips"] = "false";
-                        (controllerPage3.interactables["DeleteClipsAfterMaxUniqueClips"] as Switch).SwitchState = false;
+                        Switch? pageSwitches = controllerPage3.interactables["DeleteClipsAfterMaxUniqueClips"] as Switch;
+                        if(pageSwitches != null)
+                            pageSwitches.SwitchState = false;
                         SaveData.Save();
                     }
                 }
@@ -345,7 +358,9 @@ namespace NonsensicalVideoGenerator
                     if(oldValue != SaveData.saveValues["DeleteClipsAfterMaxUniqueClips"])
                     {
                         SaveData.saveValues["DisableClipsAfterMaxUniqueClips"] = "false";
-                        (controllerPage3.interactables["DisableClipsAfterMaxUniqueClips"] as Switch).SwitchState = false;
+                        Switch? pageSwitches = controllerPage3.interactables["DisableClipsAfterMaxUniqueClips"] as Switch;
+                        if(pageSwitches != null)
+                            pageSwitches.SwitchState = false;
                         SaveData.Save();
                     }
                 }

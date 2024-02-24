@@ -245,7 +245,8 @@ namespace NonsensicalVideoGenerator
                 {
                     if (!file.Enabled)
                     {
-                        DisabledMedia.Add(file.Path);
+                        if(file.Path != null)
+                            DisabledMedia.Add(file.Path);
                     }
                 }
                 DisabledMedia.Save();
@@ -293,7 +294,7 @@ namespace NonsensicalVideoGenerator
             {
                 File.Copy(file.Path, newfile);
             }
-            catch(Exception e)
+            catch
             {
             }
             file.Path = newfile;
@@ -332,7 +333,7 @@ namespace NonsensicalVideoGenerator
         }
         public static void Unload(LibraryFile file)
         {
-            if(file.Path.Contains("defaultoutro.mp4"))
+            if(file.Path != null && file.Path.Contains("defaultoutro.mp4"))
             {
                 ConsoleOutput.WriteLine("Cannot unload default outro.", Color.Red);
                 return;
@@ -514,14 +515,22 @@ namespace NonsensicalVideoGenerator
             return source;
         }
         // Download thread
-        private static BackgroundWorker downloadWorker;
+        private static BackgroundWorker? downloadWorker;
         public static List<string> downloadUrls = new();
-        private static LibraryType downloadType;
+        private static LibraryType? downloadType;
         private static List<bool> youtubes = new();
-        private static void DownloadWorker_DoWork(object sender, DoWorkEventArgs e)
+        private static void DownloadWorker_DoWork(object? sender, DoWorkEventArgs e)
         {
             for(int i = 0; i < downloadUrls.Count; i++)
             {
+                if(downloadType == null)
+                {
+                    ConsoleOutput.WriteLine("Failed to download clip: Invalid download type", Color.Red);
+#if MONOGAME
+                    LibraryPage.Done(false);
+#endif
+                    continue;
+                }
                 string downloadUrl = downloadUrls[i];
                 bool youtube = youtubes[i];
                 ConsoleOutput.WriteLine("Downloading clip from " + downloadUrl + "...", Color.Yellow);
@@ -530,8 +539,12 @@ namespace NonsensicalVideoGenerator
                 string path = Path.Combine(libraryRootPath, libraryPaths[downloadType], filename);
                 try
                 {
-                    if(!Directory.Exists(Path.GetDirectoryName(path)))
-                        Directory.CreateDirectory(Path.GetDirectoryName(path));
+                    string? direxist = Path.GetDirectoryName(path);
+                    if(direxist != null)
+                    {
+                        if(!Directory.Exists(direxist))
+                            Directory.CreateDirectory(direxist);
+                    }
                     if(File.Exists(path))
                         File.Delete(path); // Delete the file if it already exists.
                     if(!youtube)
@@ -554,11 +567,13 @@ namespace NonsensicalVideoGenerator
                         process.StartInfo = startInfo;
                         process.OutputDataReceived += (object sender, DataReceivedEventArgs e) =>
                         {
-                            ConsoleOutput.WriteLine(e.Data, Color.Transparent);
+                            if(e.Data != null)
+                                ConsoleOutput.WriteLine(e.Data, Color.Transparent);
                         };
                         process.ErrorDataReceived += (object sender, DataReceivedEventArgs e) =>
                         {
-                            ConsoleOutput.WriteLine(e.Data, Color.Red);
+                            if(e.Data != null)
+                                ConsoleOutput.WriteLine(e.Data, Color.Red);
                         };
                         process.Start();
                         process.BeginOutputReadLine();
@@ -665,7 +680,8 @@ namespace NonsensicalVideoGenerator
             catch (Exception e)
             {
                 ConsoleOutput.WriteLine("Failed to download clip: " + e.Message, Color.Red);
-                ConsoleOutput.WriteLine(e.StackTrace, Color.Red);
+                if(e.StackTrace != null)
+                    ConsoleOutput.WriteLine(e.StackTrace, Color.Red);
                 return false;
             }
         }

@@ -28,7 +28,8 @@ namespace NonsensicalVideoGenerator
                     if (drm)
                     {
 #if MONOGAME
-                        UserInterface.instance.Exit();
+                        if(UserInterface.instance != null)
+                            UserInterface.instance.Exit();
 #else
                         Environment.Exit(0);
 #endif

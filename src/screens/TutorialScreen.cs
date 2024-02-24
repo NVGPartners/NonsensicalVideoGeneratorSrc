@@ -81,41 +81,45 @@ namespace NonsensicalVideoGenerator
                     bool isPerm2Text = tutorialText[3][i].Contains("%PERM2%");
                     bool isPerm3Text = tutorialText[3][i].Contains("%PERM3%");
                     // consents is a flag enum with 1 bit for each consent (3 bits)
-                    tutorialText[3][i] = tutorialText[3][i].Replace("%PLUGIN%", UserConsent.consentForm?.name ?? "Unknown");
-                    // first bit
-                    tutorialText[3][i] = tutorialText[3][i].Replace("%PERM1%", UserConsent.consentForm.consents.HasFlag(Consents.DownloadFiles) ? "The ability to download these files:" : "");
-                    // second bit
-                    tutorialText[3][i] = tutorialText[3][i].Replace("%PERM2%", UserConsent.consentForm.consents.HasFlag(Consents.ExecutePrograms) ? "The ability to execute these programs:" : "");
-                    // third bit
-                    tutorialText[3][i] = tutorialText[3][i].Replace("%PERM3%", UserConsent.consentForm.consents.HasFlag(Consents.AddToLibrary) ? "The ability to add these files to the library:" : "");
-                    // append to list right here for each param in consent form for flags
-                    if(isPerm1Text)
+                    if(UserConsent.consentForm != null)
                     {
-                        if(UserConsent.consentForm.consentParams.ContainsKey(Consents.DownloadFiles))
+                        tutorialText[3][i] = tutorialText[3][i].Replace("%PLUGIN%", UserConsent.consentForm.name ?? "Unknown");
+                        // first bit
+                        tutorialText[3][i] = tutorialText[3][i].Replace("%PERM1%", UserConsent.consentForm.consents.HasFlag(Consents.DownloadFiles) ? "The ability to download these files:" : "");
+                        // second bit
+                        tutorialText[3][i] = tutorialText[3][i].Replace("%PERM2%", UserConsent.consentForm.consents.HasFlag(Consents.ExecutePrograms) ? "The ability to execute these programs:" : "");
+                        // third bit
+                        tutorialText[3][i] = tutorialText[3][i].Replace("%PERM3%", UserConsent.consentForm.consents.HasFlag(Consents.AddToLibrary) ? "The ability to add these files to the library:" : "");
+
+                        // append to list right here for each param in consent form for flags
+                        if(isPerm1Text)
                         {
-                            foreach(string param in UserConsent.consentForm.consentParams[Consents.DownloadFiles])
+                            if(UserConsent.consentForm.consentParams.ContainsKey(Consents.DownloadFiles))
                             {
-                                tutorialText[3].Insert(i + 1, " - " + param);
+                                foreach(string param in UserConsent.consentForm.consentParams[Consents.DownloadFiles])
+                                {
+                                    tutorialText[3].Insert(i + 1, " - " + param);
+                                }
                             }
                         }
-                    }
-                    if(isPerm2Text)
-                    {
-                        if(UserConsent.consentForm.consentParams.ContainsKey(Consents.ExecutePrograms))
+                        if(isPerm2Text)
                         {
-                            foreach(string param in UserConsent.consentForm.consentParams[Consents.ExecutePrograms])
+                            if(UserConsent.consentForm.consentParams.ContainsKey(Consents.ExecutePrograms))
                             {
-                                tutorialText[3].Insert(i + 1, " - " + param);
+                                foreach(string param in UserConsent.consentForm.consentParams[Consents.ExecutePrograms])
+                                {
+                                    tutorialText[3].Insert(i + 1, " - " + param);
+                                }
                             }
                         }
-                    }
-                    if(isPerm3Text)
-                    {
-                        if(UserConsent.consentForm.consentParams.ContainsKey(Consents.AddToLibrary))
+                        if(isPerm3Text)
                         {
-                            foreach(string param in UserConsent.consentForm.consentParams[Consents.AddToLibrary])
+                            if(UserConsent.consentForm.consentParams.ContainsKey(Consents.AddToLibrary))
                             {
-                                tutorialText[3].Insert(i + 1, " - " + param);
+                                foreach(string param in UserConsent.consentForm.consentParams[Consents.AddToLibrary])
+                                {
+                                    tutorialText[3].Insert(i + 1, " - " + param);
+                                }
                             }
                         }
                     }
@@ -493,7 +497,7 @@ namespace NonsensicalVideoGenerator
                 SamplerState.PointClamp,
                 null, null, null, null);
         }
-        private BackgroundWorker dependencyWorker;
+        private BackgroundWorker? dependencyWorker;
         private void DependencyCheckThread(object? sender, DoWorkEventArgs e)
         {
             // Get dependencies.
@@ -542,12 +546,12 @@ namespace NonsensicalVideoGenerator
             }
             check = false;
             // Dispose of worker
-            dependencyWorker.Dispose();
+            if(dependencyWorker != null)
+                dependencyWorker.Dispose();
             dependencyWorker = null;
         }
         private bool check3 = false;
-        private BackgroundWorker pluginWorker;
-        private BackgroundWorker ffmpegDownloadWorker;
+        private BackgroundWorker? ffmpegDownloadWorker;
         public bool PreviousPage1(int i, string n)
         {
             switch(i)
@@ -628,16 +632,16 @@ namespace NonsensicalVideoGenerator
                         controller.Remove("ButtonFFmpeg");
 
                         // Create temp folder
-                        Directory.CreateDirectory(Path.Combine(Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location), "temp"));
+                        Directory.CreateDirectory(Path.Combine(Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location) ?? ".", "temp"));
 
                         // Download ffmpeg essential release from gyan.dev
                         System.Uri url = new("https://www.gyan.dev/ffmpeg/builds/ffmpeg-release-essentials.zip");
-                        string path = Path.Combine(Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location), "temp", "ffmpeg-release-essentials.zip");
+                        string path = Path.Combine(Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location) ?? ".", "temp", "ffmpeg-release-essentials.zip");
 
                         // Delete file if it exists
-                        if(File.Exists(Path.Combine(Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location), "temp", "ffmpeg-release-essentials.zip")))
+                        if(File.Exists(Path.Combine(Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location) ?? ".", "temp", "ffmpeg-release-essentials.zip")))
                         {
-                            File.Delete(Path.Combine(Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location), "temp", "ffmpeg-release-essentials.zip"));
+                            File.Delete(Path.Combine(Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location) ?? ".", "temp", "ffmpeg-release-essentials.zip"));
                         }
                         
                         // Download ffmpeg
@@ -655,7 +659,7 @@ namespace NonsensicalVideoGenerator
                                     tutorialText[1][3] = " - ffmpeg: Extracting...";
                                     tutorialText[1][4] = " - ffprobe: Extracting...";
                                     ffmpegDownloadWorker = new BackgroundWorker();
-                                    ffmpegDownloadWorker.DoWork += (object sender, DoWorkEventArgs e) => {
+                                    ffmpegDownloadWorker.DoWork += (object? sender, DoWorkEventArgs e) => {
                                         DownloadFFmpegThread();
                                     };
                                     ffmpegDownloadWorker.RunWorkerAsync();
@@ -757,10 +761,12 @@ namespace NonsensicalVideoGenerator
                             && !Global.generator.progressText.ToLower().Contains("downloading"))
                         {
                             GlobalContent.GetSound("Option").Play(int.Parse(SaveData.saveValues["SoundEffectVolume"], System.Globalization.CultureInfo.InvariantCulture) / 100f, 0f, 0f);
-                            UserConsent.Accept(UserConsent.consentForm?.pluginName);
+                            if(UserConsent.consentForm != null)
+                                UserConsent.Accept(UserConsent.consentForm.pluginName);
                             GlobalContent.GetSound("Back").Play(int.Parse(SaveData.saveValues["SoundEffectVolume"], System.Globalization.CultureInfo.InvariantCulture) / 100f, 0f, 0f);
                             toggle = false;
-                            Global.generator.progressText = $"Addon {UserConsent.consentForm?.pluginName} accepted.";
+                            if(UserConsent.consentForm != null)
+                                Global.generator.progressText = $"Addon {UserConsent.consentForm?.pluginName} accepted.";
                             if(!bool.Parse(SaveData.saveValues["DisableMotion"]))
                             {
                                 tween.TweenTo(this, t => t.offset, new Vector2(GlobalGraphics.Scale(-640), GlobalGraphics.Scale(240)), 0.5f)
@@ -811,7 +817,8 @@ namespace NonsensicalVideoGenerator
                             if(UserConsent.needsConsent)
                             {
                                 // Workshop plugin should open workshop page
-                                if(UserConsent.consentForm.workshopId != ""
+                                if(UserConsent.consentForm != null
+                                    && UserConsent.consentForm.workshopId != ""
                                     && UserConsent.consentForm.rootPath.Contains("workshop"))
                                 {
                                     GlobalContent.GetSound("Option").Play(int.Parse(SaveData.saveValues["SoundEffectVolume"], System.Globalization.CultureInfo.InvariantCulture) / 100f, 0f, 0f);
@@ -983,12 +990,12 @@ namespace NonsensicalVideoGenerator
         }
         public void DownloadFFmpegThread()
         {
-            string path = Path.Combine(Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location), "temp", "ffmpeg-release-essentials.zip");
+            string path = Path.Combine(Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location) ?? ".", "temp", "ffmpeg-release-essentials.zip");
 
             // Extract ffmpeg to temp folder
             try
             {
-                ZipFile.ExtractToDirectory(path, Path.Combine(Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location), "temp"), true);
+                ZipFile.ExtractToDirectory(path, Path.Combine(Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location) ?? ".", "temp"), true);
             }
             catch
             {
@@ -1001,7 +1008,7 @@ namespace NonsensicalVideoGenerator
             string ffprobeExePath = "";
             
             // Check to see if ffmpeg-*.*-release-build folder exists inside temp folder
-            string[] directories = Directory.GetDirectories(Path.Combine(Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location), "temp"));
+            string[] directories = Directory.GetDirectories(Path.Combine(Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location) ?? ".", "temp"));
             foreach(string directory in directories)
             {
                 if(directory.Contains("ffmpeg-"))
@@ -1051,7 +1058,7 @@ namespace NonsensicalVideoGenerator
                 // Move ffmpeg.exe and ffprobe.exe to the root folder
                 try
                 {
-                    File.Move(ffmpegExePath, Path.Combine(Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location), "ffmpeg.exe"));
+                    File.Move(ffmpegExePath, Path.Combine(Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location) ?? ".", "ffmpeg.exe"));
                 }
                 catch {}
             }
@@ -1059,7 +1066,7 @@ namespace NonsensicalVideoGenerator
             {
                 try
                 {
-                    File.Move(ffprobeExePath, Path.Combine(Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location), "ffprobe.exe"));
+                    File.Move(ffprobeExePath, Path.Combine(Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location) ?? ".", "ffprobe.exe"));
                 } catch {}
             }
 

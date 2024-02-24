@@ -17,8 +17,6 @@ namespace NonsensicalVideoGenerator
     /// </summary>
     public static class UpdateManager
     {
-        // Query URL
-        private static readonly string queryUrl = "";
         public static string updateUrl = "";
         public static string updateTag = "";
         public static bool ffmpegInstalled = false;
@@ -117,6 +115,7 @@ namespace NonsensicalVideoGenerator
         public static bool CheckForUpdates()
         {
             return false;
+            /*
             try
             {
                 updateFailed = false;
@@ -176,6 +175,7 @@ namespace NonsensicalVideoGenerator
                 updateFailed = true;
                 return false;
             }
+            */
         }
         public static void DownloadUpdate()
         {

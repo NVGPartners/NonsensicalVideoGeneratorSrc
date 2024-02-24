@@ -32,7 +32,7 @@ namespace NonsensicalVideoGenerator
         public Dictionary<Consents, List<string>> consentParams = new Dictionary<Consents, List<string>>();
         public string workshopId;
         public string rootPath;
-        public ConsentForm(string pluginName, string name, Consents consents, string workshopId, string rootPath, Dictionary<Consents, List<string>> consentParams = null)
+        public ConsentForm(string pluginName, string name, Consents consents, string workshopId, string rootPath, Dictionary<Consents, List<string>>? consentParams = null)
         {
             this.pluginName = pluginName;
             this.name = name;
@@ -74,42 +74,45 @@ namespace NonsensicalVideoGenerator
             // Check if the user has already accepted the consent form
             try
             {
-                List<ConsentForm> consentForms = JsonConvert.DeserializeObject<List<ConsentForm>>(File.ReadAllText(consentFileName));
-                foreach(ConsentForm consentForm in consentForms)
+                List<ConsentForm>? consentForms = JsonConvert.DeserializeObject<List<ConsentForm>>(File.ReadAllText(consentFileName) ?? "[]");
+                if(consentForms != null)
                 {
-                    // Check if pluginName is loaded
-                    bool pluginLoaded = false;
-                    foreach(Plugin plugin in PluginHandler.plugins)
+                    foreach(ConsentForm consentForm in consentForms)
                     {
-                        if(Path.GetFileName(plugin.path) == consentForm.pluginName)
+                        // Check if pluginName is loaded
+                        bool pluginLoaded = false;
+                        foreach(Plugin plugin in PluginHandler.plugins)
                         {
-                            // Plugin is loaded
-                            pluginLoaded = true;
+                            if(Path.GetFileName(plugin.path) == consentForm.pluginName)
+                            {
+                                // Plugin is loaded
+                                pluginLoaded = true;
+                            }
                         }
-                    }
-                    if(!pluginLoaded)
-                    {
-                        ConsoleOutput.WriteLine("Addon " + consentForm.pluginName + " is not loaded. Removing consent form.", Color.Red);
-                        // Remove consent form from json file
-                        consentForms.Remove(consentForm);
-                        File.WriteAllText(consentFileName, JsonConvert.SerializeObject(consentForms, Formatting.Indented));
-                        continue;
-                    }
-                    if(consentForm.pluginName == checkConsentForm.pluginName)
-                    {
-                        // Check if the consent form has been updated
-                        if(consentForm.name != checkConsentForm.name || consentForm.consents != checkConsentForm.consents || consentForm.workshopId != checkConsentForm.workshopId || consentForm.rootPath != checkConsentForm.rootPath)
+                        if(!pluginLoaded)
                         {
-                            // Consent form has been updated
-                            needsConsent = true;
-                            UserConsent.consentForm = checkConsentForm;
-                            // Remove existing consent form
+                            ConsoleOutput.WriteLine("Addon " + consentForm.pluginName + " is not loaded. Removing consent form.", Color.Red);
+                            // Remove consent form from json file
                             consentForms.Remove(consentForm);
                             File.WriteAllText(consentFileName, JsonConvert.SerializeObject(consentForms, Formatting.Indented));
-                            return true;
+                            continue;
                         }
-                        // Consent form has already been accepted
-                        return false;
+                        if(consentForm.pluginName == checkConsentForm.pluginName)
+                        {
+                            // Check if the consent form has been updated
+                            if(consentForm.name != checkConsentForm.name || consentForm.consents != checkConsentForm.consents || consentForm.workshopId != checkConsentForm.workshopId || consentForm.rootPath != checkConsentForm.rootPath)
+                            {
+                                // Consent form has been updated
+                                needsConsent = true;
+                                UserConsent.consentForm = checkConsentForm;
+                                // Remove existing consent form
+                                consentForms.Remove(consentForm);
+                                File.WriteAllText(consentFileName, JsonConvert.SerializeObject(consentForms, Formatting.Indented));
+                                return true;
+                            }
+                            // Consent form has already been accepted
+                            return false;
+                        }
                     }
                 }
             }
@@ -159,7 +162,8 @@ namespace NonsensicalVideoGenerator
             Process.Start(psi);
             // Close application
 #if MONOGAME
-            UserInterface.instance.Exit();
+            if(UserInterface.instance != null)
+                UserInterface.instance.Exit();
 #else
             Environment.Exit(0);
 #endif
@@ -172,9 +176,12 @@ namespace NonsensicalVideoGenerator
             if(consentForm.pluginName != pluginName)
                 return;
             // Add consent form to the list of accepted consent forms
-            List<ConsentForm> consentForms = JsonConvert.DeserializeObject<List<ConsentForm>>(File.ReadAllText(consentFileName));
-            consentForms.Add(consentForm);
-            File.WriteAllText(consentFileName, JsonConvert.SerializeObject(consentForms, Formatting.Indented));
+            List<ConsentForm>? consentForms = JsonConvert.DeserializeObject<List<ConsentForm>>(File.ReadAllText(consentFileName) ?? "[]");
+            if(consentForms != null)
+            {
+                consentForms.Add(consentForm);
+                File.WriteAllText(consentFileName, JsonConvert.SerializeObject(consentForms, Formatting.Indented));
+            }
         }
     }
 }

@@ -42,18 +42,21 @@ namespace NonsensicalVideoGenerator
             instance = this;
         }
         // Drag and drop support.
-        private void DragEnter(object sender, DragEventArgs e)
+        private void DragEnter(object? sender, DragEventArgs e)
         {
-            if(e.Data.GetDataPresent(DataFormats.FileDrop))
+            if(e != null && e.Data != null && e.Data.GetDataPresent(DataFormats.FileDrop))
                 e.Effect = DragDropEffects.Copy;
             Global.dragDrop = true;
         }
-        private void DragDrop(object sender, DragEventArgs e)
+        private void DragDrop(object? sender, DragEventArgs e)
         {
-            Global.dragDropFiles = ((string[])e.Data.GetData(DataFormats.FileDrop)).ToList();
-            Global.dragDrop = false;
+            if(e != null && e.Data != null)
+            {
+                Global.dragDropFiles = ((string[])e.Data.GetData(DataFormats.FileDrop)).ToList();
+                Global.dragDrop = false;
+            }
         }
-        private void DragLeave(object sender, EventArgs e)
+        private void DragLeave(object? sender, EventArgs e)
         {
             Global.dragDrop = false;
         }
@@ -136,7 +139,7 @@ namespace NonsensicalVideoGenerator
             {
                 MediaPlayer.Play(GlobalContent.GetSongByIndex(music));
             }
-            catch(Exception ex)
+            catch
             {
                 music = 0;
                 //ConsoleOutput.WriteLine("Failed to play music: " + ex.Message, Color.Red);
@@ -174,7 +177,7 @@ namespace NonsensicalVideoGenerator
                     {
                         MediaPlayer.Play(GlobalContent.GetSongByIndex(_musicActive));
                     }
-                    catch(Exception ex)
+                    catch
                     {
                         _musicActive = 0;
                         //ConsoleOutput.WriteLine("Failed to play music: " + ex.Message, Color.Red);

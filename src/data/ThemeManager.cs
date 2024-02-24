@@ -33,6 +33,7 @@ namespace NonsensicalVideoGenerator
             this.prefix = prefix;
             this.songCount = songCount;
             this.mgcb = mgcb;
+            this.colorTable = new Dictionary<string, Color>();
         }
         public Theme(string name, string description, string prefix, int songCount, Dictionary<string, Color> colorTable, bool mgcb = false)
         {
@@ -129,7 +130,9 @@ namespace NonsensicalVideoGenerator
                 if(!Directory.Exists(layerPath))
                 {
                     // Disable the addon
-                    PluginHandler.plugins.Find(x => x.path == theme.path).enabled = false;
+                    Plugin? foundPlugin = PluginHandler.plugins.Find(x => x.path == theme.path);
+                    if(foundPlugin != null)
+                        foundPlugin.enabled = false;
                     PluginHandler.SavePluginSettings();
                     GlobalContent.GetSound("Error").Play(int.Parse(SaveData.saveValues["SoundEffectVolume"], System.Globalization.CultureInfo.InvariantCulture) / 100f, 0f, 0f);
                     if(activeTheme.prefix != "")
@@ -164,7 +167,9 @@ namespace NonsensicalVideoGenerator
                 else
                 {
                     // Disable the addon
-                    PluginHandler.plugins.Find(x => x.path == theme.path).enabled = false;
+                    Plugin? foundPlugin = PluginHandler.plugins.Find(x => x.path == theme.path);
+                    if(foundPlugin != null)
+                        foundPlugin.enabled = false;
                     PluginHandler.SavePluginSettings();
                 }
             }
@@ -181,6 +186,11 @@ namespace NonsensicalVideoGenerator
         // Replacement for contentManager.Load<T>(path)
         public static T LoadLayeredContent<T>(string path)
         {
+            if(UserInterface.instance == null)
+            {
+                // Can't proceed, MonoGame isn't initialized
+                throw new InvalidOperationException("MonoGame isn't initialized. Cannot load content.");
+            }
             ContentManager contentManager = UserInterface.instance.Content;
             GraphicsDevice graphicsDevice = UserInterface.instance.GraphicsDevice;
             // If active theme uses mgcb, apply prefix and load
@@ -243,11 +253,14 @@ namespace NonsensicalVideoGenerator
             Global.exitFunc = () =>
             {
                 activeTheme = theme;
-                UserInterface.instance.Content.Unload();
-                // Load default content.
-                GlobalContent.LoadDefaultContent(UserInterface.instance.Content, UserInterface.instance.GraphicsDevice);
-                // Load all screen content.
-                ScreenManager.LoadContent(UserInterface.instance.Content, UserInterface.instance.GraphicsDevice);
+                if(UserInterface.instance != null)
+                {
+                    UserInterface.instance.Content.Unload();
+                    // Load default content.
+                    GlobalContent.LoadDefaultContent(UserInterface.instance.Content, UserInterface.instance.GraphicsDevice);
+                    // Load all screen content.
+                    ScreenManager.LoadContent(UserInterface.instance.Content, UserInterface.instance.GraphicsDevice);
+                }
                 GlobalContent.GetSound("Start").Play(int.Parse(SaveData.saveValues["SoundEffectVolume"], System.Globalization.CultureInfo.InvariantCulture) / 100f, 0f, 0f);
                 FramePlayer.canPlayBgMusic = true;
                 return true;

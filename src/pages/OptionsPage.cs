@@ -105,7 +105,8 @@ namespace NonsensicalVideoGenerator
                     {
                         SteamAPI.Shutdown();
                     } catch {}
-                    UserInterface.instance.Exit();
+                    if(UserInterface.instance != null)
+                        UserInterface.instance.Exit();
                 }
                 return false;
             }));

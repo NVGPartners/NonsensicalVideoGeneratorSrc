@@ -56,12 +56,16 @@ namespace NonsensicalVideoGenerator
                     spriteBatch.Draw(scrollHandle, new Rectangle(GlobalGraphics.Scale(294), GlobalGraphics.Scale(69 + scrollOffset * (214 - 69) / maxScrollOffset), scrollHandle.Width * GlobalGraphics.scale, scrollHandle.Height * GlobalGraphics.scale), Color.White);
                 }
                 // End existing spritebatch
-                spriteBatch.End();
-                // Mask to specific area
-                spriteBatch.GraphicsDevice.ScissorRectangle = new Rectangle(GlobalGraphics.Scale(135), GlobalGraphics.Scale(56), GlobalGraphics.Scale(293), GlobalGraphics.Scale(236)); 
-                RasterizerState rasterizerState = new RasterizerState();
-                rasterizerState.ScissorTestEnable = true;
-                spriteBatch.Begin(SpriteSortMode.Deferred, BlendState.AlphaBlend, SamplerState.PointClamp, null, rasterizerState, null, Matrix.CreateTranslation(GlobalGraphics.Scale(ScreenManager.GetScreen<ContentScreen>("Content").offset.X / GlobalGraphics.scale), GlobalGraphics.Scale((ScreenManager.GetScreen<ContentScreen>("Content").offset.Y / GlobalGraphics.scale) + -scrollOffset), 0));
+                ContentScreen? cntscr = ScreenManager.GetScreen<ContentScreen>("Content");
+                if(cntscr != null)
+                {
+                    spriteBatch.End();
+                    // Mask to specific area
+                    spriteBatch.GraphicsDevice.ScissorRectangle = new Rectangle(GlobalGraphics.Scale(135), GlobalGraphics.Scale(56), GlobalGraphics.Scale(293), GlobalGraphics.Scale(236)); 
+                    RasterizerState rasterizerState = new RasterizerState();
+                    rasterizerState.ScissorTestEnable = true;
+                    spriteBatch.Begin(SpriteSortMode.Deferred, BlendState.AlphaBlend, SamplerState.PointClamp, null, rasterizerState, null, Matrix.CreateTranslation(GlobalGraphics.Scale(cntscr.offset.X / GlobalGraphics.scale), GlobalGraphics.Scale((cntscr.offset.Y / GlobalGraphics.scale) + -scrollOffset), 0));
+                }
                 int plcount = PluginHandler.GetPluginCount() + 1;
                 for(int i = 0; i < plcount; i++)
                 {
@@ -525,7 +529,7 @@ namespace NonsensicalVideoGenerator
                                                                     ThemeManager.LoadThemes();
                                                                     ThemeManager.ApplyTheme(DefaultThemes.Nonsensical);
                                                                 }
-                                                                Directory.Delete(Path.GetDirectoryName(PluginHandler.plugins[settingsIndex].path), true);
+                                                                Directory.Delete(Path.GetDirectoryName(PluginHandler.plugins[settingsIndex].path) ?? "", true);
                                                                 GlobalContent.GetSound("Select").Play(int.Parse(SaveData.saveValues["SoundEffectVolume"], System.Globalization.CultureInfo.InvariantCulture) / 100f, 0f, 0f);
                                                                 if(SteamManager.initialized)
                                                                     PluginHandler.LoadWorkshop();
@@ -754,14 +758,14 @@ namespace NonsensicalVideoGenerator
                                                         bool switchState = (i & 256) != 0;
                                                         if((i & 2) != 0)
                                                         {
-                                                            string oldValue = PluginHandler.plugins[settingsIndex].settings[keyFromIndex].ToString();
+                                                            string oldValue = PluginHandler.plugins[settingsIndex].settings[keyFromIndex].ToString() ?? "";
                                                             if(!controller.interactables.ContainsKey(keyFromIndex))
                                                             {
                                                                 GlobalContent.GetSound("Error").Play(int.Parse(SaveData.saveValues["SoundEffectVolume"], System.Globalization.CultureInfo.InvariantCulture) / 100f, 0f, 0f);
                                                                 return true;
                                                             }
                                                             PluginHandler.plugins[settingsIndex].settings[keyFromIndex] = switchState ? "1" : "0";
-                                                            if(oldValue != PluginHandler.plugins[settingsIndex].settings[keyFromIndex].ToString())
+                                                            if(oldValue != (PluginHandler.plugins[settingsIndex].settings[keyFromIndex].ToString() ?? ""))
                                                             {
                                                                 PluginHandler.SavePluginSettings();
                                                             }
@@ -771,10 +775,10 @@ namespace NonsensicalVideoGenerator
                                                     break;
                                                 case SettingType.TextInput:
                                                 default:
-                                                    te = new TextEntry(s.Key, PluginHandler.plugins[i].settingTooltips[s.Key], PluginHandler.plugins[i].settings[s.Key].ToString(), new Vector2(139, 60+19*sindex), 50, 25, ty, (int i, string keyFromIndex) => {
+                                                    te = new TextEntry(s.Key, PluginHandler.plugins[i].settingTooltips[s.Key], PluginHandler.plugins[i].settings[s.Key].ToString() ?? "", new Vector2(139, 60+19*sindex), 50, 25, ty, (int i, string keyFromIndex) => {
                                                         if(i == 0)
                                                         {
-                                                            string oldValue = PluginHandler.plugins[settingsIndex].settings[keyFromIndex].ToString();
+                                                            string oldValue = PluginHandler.plugins[settingsIndex].settings[keyFromIndex].ToString() ?? "";
                                                             if(!controller.interactables.ContainsKey(keyFromIndex))
                                                             {
                                                                 GlobalContent.GetSound("Error").Play(int.Parse(SaveData.saveValues["SoundEffectVolume"], System.Globalization.CultureInfo.InvariantCulture) / 100f, 0f, 0f);
@@ -849,7 +853,9 @@ namespace NonsensicalVideoGenerator
                 bool switchState = (i & 256) != 0;
                 if((i & 2) != 0)
                 {
-                    (controllerPluginCreation.interactables["PluginMinimal"] as Switch).SwitchState = false;
+                    Switch? buttonSwitch = controllerPluginCreation.interactables["PluginMinimal"] as Switch;
+                    if(buttonSwitch != null)
+                        buttonSwitch.SwitchState = false;
                     if(switchState)
                         templateType = 2;
                     else
@@ -861,7 +867,9 @@ namespace NonsensicalVideoGenerator
                 bool switchState = (i & 256) != 0;
                 if((i & 2) != 0)
                 {
-                    (controllerPluginCreation.interactables["PluginTheme"] as Switch).SwitchState = false;
+                    Switch? buttonSwitch = controllerPluginCreation.interactables["PluginTheme"] as Switch;
+                    if(buttonSwitch != null)
+                        buttonSwitch.SwitchState = false;
                     if(switchState)
                         templateType = 1;
                     else

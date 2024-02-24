@@ -14,9 +14,9 @@ namespace NonsensicalVideoGenerator
     }
     public static class DiscordRPC
     {
-        public static DiscordRpcClient client;
+        private static DiscordRpcClient? client;
         public static DateTime timestamp;
-        public static string curstate;
+        private static string? curstate;
         public static Tab prevtab;
         public static Tab curtab;
         public static Tab ToTab(string name)

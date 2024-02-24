@@ -57,7 +57,7 @@ namespace NonsensicalVideoGenerator
         
         public BackgroundWorker? killWorker { get; set; }
         public int timeout = 0;
-        public string tempOutput = Path.Combine(Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location), "library", "video", "renders", "temp.mp4");
+        public string tempOutput = Path.Combine(Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location) ?? ".", "library", "video", "renders", "temp.mp4");
         public void KillChildProcesses()
         {
             // Find all child processes of the current process and kill them.
@@ -282,7 +282,7 @@ namespace NonsensicalVideoGenerator
                                         };
                                         Process? ffprobeProcess = new Process();
                                         ffprobeProcess.StartInfo = ffprobe;
-                                        string isVideo = null;
+                                        string isVideo = "";
                                         ffprobeProcess.OutputDataReceived += (sender, e) =>
                                         {
                                             isVideo += e.Data;
@@ -290,7 +290,7 @@ namespace NonsensicalVideoGenerator
                                         ffprobeProcess.Start();
                                         ffprobeProcess.BeginOutputReadLine();
                                         ffprobeProcess.WaitForExit();
-                                        if (isVideo != null && isVideo != "" && isVideo != "N/A")
+                                        if (isVideo != "" && isVideo != "N/A")
                                         {
                                             foundOutput = true;
                                         }
@@ -603,7 +603,7 @@ namespace NonsensicalVideoGenerator
                                     };
                                     Process? ffprobeProcess = new Process();
                                     ffprobeProcess.StartInfo = ffprobe;
-                                    string isVideo = null;
+                                    string isVideo = "";
                                     ffprobeProcess.OutputDataReceived += (sender, e) =>
                                     {
                                         isVideo += e.Data;
@@ -611,7 +611,7 @@ namespace NonsensicalVideoGenerator
                                     ffprobeProcess.Start();
                                     ffprobeProcess.BeginOutputReadLine();
                                     ffprobeProcess.WaitForExit();
-                                    if (isVideo != null && isVideo != "" && isVideo != "N/A")
+                                    if (isVideo != "" && isVideo != "N/A")
                                     {
                                         foundOutput = true;
                                     }
@@ -771,7 +771,7 @@ namespace NonsensicalVideoGenerator
                 }
                 forceConcatenate = false;
                 timeout = int.Parse(SaveData.saveValues["TimeOut"], System.Globalization.CultureInfo.InvariantCulture);
-                tempOutput = Path.Combine(Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location), "library", "video", "renders", Global.videoTitle + ".mp4");
+                tempOutput = Path.Combine(Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location) ?? ".", "library", "video", "renders", Global.videoTitle + ".mp4");
                 timeoutWorker.RunWorkerAsync();
                 vidThreadWorker.RunWorkerAsync();
                 ConsoleOutput.WriteLine("Generation started.", Color.Green);
@@ -853,7 +853,7 @@ namespace NonsensicalVideoGenerator
                 startInfo.UseShellExecute = false;
                 startInfo.RedirectStandardOutput = true;
                 startInfo.RedirectStandardError = true;
-                startInfo.WorkingDirectory = Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location);
+                startInfo.WorkingDirectory = Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location) ?? ".";
                 startInfo.CreateNoWindow = true;
                 process.StartInfo = startInfo;
                 string s = "";
@@ -908,7 +908,7 @@ namespace NonsensicalVideoGenerator
                         + " \"" + output + "\"";
                 startInfo.UseShellExecute = false;
                 startInfo.RedirectStandardError = true;
-                startInfo.WorkingDirectory = Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location);
+                startInfo.WorkingDirectory = Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location) ?? ".";
                 startInfo.CreateNoWindow = true;
                 process.StartInfo = startInfo;
                 process.ErrorDataReceived += (sender, e) =>
@@ -951,7 +951,7 @@ namespace NonsensicalVideoGenerator
                 startInfo.UseShellExecute = false;
                 startInfo.RedirectStandardOutput = true;
                 startInfo.RedirectStandardError = true;
-                startInfo.WorkingDirectory = Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location);
+                startInfo.WorkingDirectory = Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location) ?? ".";
                 startInfo.CreateNoWindow = true;
                 process.StartInfo = startInfo;
                 string s = "";
@@ -1115,7 +1115,7 @@ namespace NonsensicalVideoGenerator
                                 + " \"" + Path.Combine(temporaryDirectory, "concat" + i2 + ".mp4") + "\"";
                         startInfo2.UseShellExecute = false;
                         startInfo2.RedirectStandardError = true;
-                        startInfo2.WorkingDirectory = Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location);
+                        startInfo2.WorkingDirectory = Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location) ?? ".";
                         startInfo2.CreateNoWindow = true;
                         process2.StartInfo = startInfo2;
                         process2.ErrorDataReceived += (sender, e) =>
@@ -1146,7 +1146,7 @@ namespace NonsensicalVideoGenerator
                     };
                     Process? ffprobeProcess = new Process();
                     ffprobeProcess.StartInfo = ffprobe;
-                    string isVideo = null;
+                    string isVideo = "";
                     ffprobeProcess.OutputDataReceived += (sender, e) =>
                     {
                         isVideo += e.Data;
@@ -1154,7 +1154,7 @@ namespace NonsensicalVideoGenerator
                     ffprobeProcess.Start();
                     ffprobeProcess.BeginOutputReadLine();
                     ffprobeProcess.WaitForExit();
-                    if(isVideo != null && isVideo != "" && isVideo != "N/A")
+                    if(isVideo != "" && isVideo != "N/A")
                     {
                         clips2.Add(new Clip("concat" + i + ".mp4"));
                     }
@@ -1221,7 +1221,7 @@ namespace NonsensicalVideoGenerator
             startInfo.Arguments = concat + " \"" + Path.Combine(temporaryDirectory, "iteration" + iteration + ".mp4") + "\"";
             startInfo.UseShellExecute = false;
             startInfo.RedirectStandardError = true;
-            startInfo.WorkingDirectory = Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location);
+            startInfo.WorkingDirectory = Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location) ?? ".";
             startInfo.CreateNoWindow = true;
             process.StartInfo = startInfo;
             process.ErrorDataReceived += (sender, e) =>
@@ -1282,7 +1282,7 @@ namespace NonsensicalVideoGenerator
                 startInfo2.Arguments = concat2 + " \"" + output + "\"";
                 startInfo2.UseShellExecute = false;
                 startInfo2.RedirectStandardError = true;
-                startInfo2.WorkingDirectory = Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location);
+                startInfo2.WorkingDirectory = Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location) ?? ".";
                 startInfo2.CreateNoWindow = true;
                 process2.StartInfo = startInfo2;
                 process2.ErrorDataReceived += (sender, e) =>
@@ -1322,7 +1322,7 @@ namespace NonsensicalVideoGenerator
                         + "\" -filter_complex \"[1:v]colorkey=0x00FF00:0.3:0.2,scale=" + SaveData.saveValues["VideoWidth"] + "x" + SaveData.saveValues["VideoHeight"] + ",setsar=1:1,fps=fps=30[outv];[0:v][outv]overlay=shortest=1[finalv];[0:a][1:a]amix=inputs=2:duration=shortest[outa]\" -map \"[finalv]\" -map \"[outa]\" -c:v libx264 -crf 18 -preset veryfast -y \"" + overlayed_video + "\"";
                 startInfo.UseShellExecute = false;
                 startInfo.RedirectStandardError = true;
-                startInfo.WorkingDirectory = Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location);
+                startInfo.WorkingDirectory = Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location) ?? ".";
                 startInfo.CreateNoWindow = true;
                 process.StartInfo = startInfo;
                 process.ErrorDataReceived += (sender, e) =>
