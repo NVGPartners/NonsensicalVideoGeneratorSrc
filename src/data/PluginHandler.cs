@@ -1472,7 +1472,7 @@ namespace NonsensicalVideoGenerator
                 }
                 Global.justCompletedRender = true; // demand a refresh
                 LoadPluginSettings();
-                Global.generator.progressText = $"{plugins.Count} effects loaded.";
+                Global.generator.progressText = $"{plugins.Count} addons loaded.";
                 Global.canRender = true;
                 ThemeManager.LoadThemes();
                 LibraryData.SequentialName();
