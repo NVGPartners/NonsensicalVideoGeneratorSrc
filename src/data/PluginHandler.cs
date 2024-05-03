@@ -1277,26 +1277,29 @@ namespace NonsensicalVideoGenerator
                         {
                             File.Delete(file);
                         }
-                        // Copy files from workshop folder to plugin folder.
-                        foreach (string file in Directory.GetFiles(folder))
+                        if(Directory.Exists(folder) == true)
                         {
-                            string dest = Path.Combine(itemPath, Path.GetFileName(file));
-                            // File hash check.
-                            if(File.Exists(dest))
+                            // Copy files from workshop folder to plugin folder.
+                            foreach (string file in Directory.GetFiles(folder))
                             {
-                                if (File.ReadAllBytes(file).SequenceEqual(File.ReadAllBytes(dest)))
+                                string dest = Path.Combine(itemPath, Path.GetFileName(file));
+                                // File hash check.
+                                if(File.Exists(dest))
                                 {
-                                    continue;
+                                    if (File.ReadAllBytes(file).SequenceEqual(File.ReadAllBytes(dest)))
+                                    {
+                                        continue;
+                                    }
                                 }
+                                if(File.Exists(dest))
+                                {
+                                    File.Delete(dest);
+                                }
+                                File.Copy(file, dest);
+                                ConsoleOutput.WriteLine($"Installed ID {Path.GetFileName(file)} from workshop.", Color.RoyalBlue);
                             }
-                            if(File.Exists(dest))
-                            {
-                                File.Delete(dest);
-                            }
-                            File.Copy(file, dest);
-                            ConsoleOutput.WriteLine($"Installed ID {Path.GetFileName(file)} from workshop.", Color.RoyalBlue);
+                            DirectoryCopy(folder, itemPath);
                         }
-                        DirectoryCopy(folder, itemPath);
                     }
                 }
                 pluginWorker = new();

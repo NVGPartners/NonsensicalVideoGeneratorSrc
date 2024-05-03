@@ -20,7 +20,7 @@ namespace NonsensicalVideoGenerator
         /// The title of the screen. This is displayed on the header bar.
         /// </summary>
         public string title { get; } = "Photosensitive Warning";
-        public int layer { get; } = 99;
+        public int layer { get; } = 98;
         public ScreenType screenType { get; set; } = ScreenType.Drawn;
         public int currentPlacement { get; set; } = -1;
         private int overlayOpacity = 255;

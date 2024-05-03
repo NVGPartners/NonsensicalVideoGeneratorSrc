@@ -46,7 +46,7 @@ end
 function PostCommand(commandindex, outputresult, errorresult, options, pluginSettings, functions)
     if commandindex == 1 then
         -- ffprobe get length of soundEffect
-        functions.runFFprobe("-v error -show_entries format=duration -of default=noprint_wrappers=1:nokey=1 " .. soundEffect)
+        functions.runFFprobe("-v error -show_entries format=duration -of default=noprint_wrappers=1:nokey=1 \"" .. soundEffect .. "\"")
     elseif commandindex == 2 then
         local length = tonumber(outputresult)
         if muteOriginalAudio then
