@@ -13,6 +13,7 @@ using System.Net;
 using System.Diagnostics;
 using System.Linq;
 using Steamworks;
+using System.Globalization;
 
 namespace NonsensicalVideoGenerator
 {
@@ -30,6 +31,10 @@ namespace NonsensicalVideoGenerator
         /// Audio files.
         /// </summary>
         Audio,
+        /// <summary>
+        /// Images (experimental).
+        /// </summary>
+        Image,
     }
     public enum LibraryFileType
     {
@@ -69,6 +74,10 @@ namespace NonsensicalVideoGenerator
         /// Rendered videos.
         /// </summary>
         Render,
+        /// <summary>
+        /// No images, placeholder.
+        /// </summary>
+        NoImages,
         /// <summary>
         /// Custom library type.
         /// </summary>
@@ -114,6 +123,7 @@ namespace NonsensicalVideoGenerator
         public static LibraryType All { get; } = new LibraryType(LibraryRootType.All, LibraryFileType.All, true);
         public static LibraryType Video { get; } = new LibraryType(LibraryRootType.Video, LibraryFileType.All, true);
         public static LibraryType Audio { get; } = new LibraryType(LibraryRootType.Audio, LibraryFileType.All, true);
+        public static LibraryType Image { get; } = new LibraryType(LibraryRootType.Image, LibraryFileType.All, true);
         public static LibraryType SFX { get; } = new LibraryType(LibraryRootType.Audio, LibraryFileType.SFX, "Random sound effects.");
         public static LibraryType Music { get; } = new LibraryType(LibraryRootType.Audio, LibraryFileType.Music, "Random dance music.");
         public static LibraryType Render { get; } = new LibraryType(LibraryRootType.Video, LibraryFileType.Render, "Generated videos.");
@@ -122,11 +132,13 @@ namespace NonsensicalVideoGenerator
         public static LibraryType Intro { get; } = new LibraryType(LibraryRootType.Video, LibraryFileType.Intro, "Played at the start of the video.");
         public static LibraryType Outro { get; } = new LibraryType(LibraryRootType.Video, LibraryFileType.Outro, "Played at the end of the video.");
         public static LibraryType Overlay { get; } = new LibraryType(LibraryRootType.Video, LibraryFileType.Overlay, "Requires pure green chroma key.");
+        public static LibraryType NoImages { get; } = new LibraryType(LibraryRootType.Image, LibraryFileType.NoImages, "No image libraries available.");
         public static List<LibraryType> AllTypes { get; } = new List<LibraryType>()
         {
             All,
             Video,
             Audio,
+            Image,
             SFX,
             Music,
             Material,
@@ -134,7 +146,8 @@ namespace NonsensicalVideoGenerator
             Intro,
             Outro,
             Overlay,
-            Render
+            Render,
+            NoImages
         };
     }
     public class LibraryFile
@@ -160,6 +173,7 @@ namespace NonsensicalVideoGenerator
             { DefaultLibraryTypes.All, @"" },
             { DefaultLibraryTypes.Video, @"video" },
             { DefaultLibraryTypes.Audio, @"audio" },
+            { DefaultLibraryTypes.Image, @"image" },
             { DefaultLibraryTypes.SFX, @"audio\sfx" },
             { DefaultLibraryTypes.Music, @"audio\music" },
             { DefaultLibraryTypes.Material, @"video\materials" },
@@ -167,13 +181,15 @@ namespace NonsensicalVideoGenerator
             { DefaultLibraryTypes.Intro, @"video\intros" },
             { DefaultLibraryTypes.Outro, @"video\outros" },
             { DefaultLibraryTypes.Overlay, @"video\overlays" },
-            { DefaultLibraryTypes.Render, @"video\renders" }
+            { DefaultLibraryTypes.Render, @"video\renders" },
+            { DefaultLibraryTypes.NoImages, @"image\noimages" },
         };
         public static Dictionary<LibraryType, string[]> libraryFileTypes { get; } = new Dictionary<LibraryType, string[]>()
         {
             { DefaultLibraryTypes.All, new string[] { ".mp4", ".webm", ".mov", ".avi", ".mkv", ".wmv", ".wav", ".mp3", ".ogg", ".m4a", ".flac" } },
             { DefaultLibraryTypes.Video, new string[] { ".mp4", ".webm", ".mov", ".avi", ".mkv", ".wmv" } },
             { DefaultLibraryTypes.Audio, new string[] { ".wav", ".mp3", ".ogg", ".m4a", ".flac" } },
+            { DefaultLibraryTypes.Image, new string[] { ".png", ".jpg", ".jpeg", ".bmp" } },
             { DefaultLibraryTypes.SFX, new string[] { ".wav", ".mp3", ".ogg", ".m4a", ".flac" } },
             { DefaultLibraryTypes.Music, new string[] { ".wav", ".mp3", ".ogg", ".m4a", ".flac" } },
             { DefaultLibraryTypes.Material, new string[] { ".mp4", ".webm", ".mov", ".avi", ".mkv", ".wmv" } },
@@ -181,13 +197,15 @@ namespace NonsensicalVideoGenerator
             { DefaultLibraryTypes.Intro, new string[] { ".mp4", ".webm", ".mov", ".avi", ".mkv", ".wmv" } },
             { DefaultLibraryTypes.Outro, new string[] { ".mp4", ".webm", ".mov", ".avi", ".mkv", ".wmv" } },
             { DefaultLibraryTypes.Overlay, new string[] { ".mp4", ".webm", ".mov", ".avi", ".mkv", ".wmv" } },
-            { DefaultLibraryTypes.Render, new string[] { ".mp4", ".webm", ".mov", ".avi", ".mkv", ".wmv" } }
+            { DefaultLibraryTypes.Render, new string[] { ".mp4", ".webm", ".mov", ".avi", ".mkv", ".wmv" } },
+            { DefaultLibraryTypes.NoImages, new string[] { ".png", ".jpg", ".jpeg", ".bmp" } },
         };
         public static Dictionary<LibraryType, string> libraryNames { get; } = new Dictionary<LibraryType, string>()
         {
             { DefaultLibraryTypes.All, "All" },
             { DefaultLibraryTypes.Video, "Video" },
             { DefaultLibraryTypes.Audio, "Audio" },
+            { DefaultLibraryTypes.Image, "Image" },
             { DefaultLibraryTypes.SFX, "Sound FX" },
             { DefaultLibraryTypes.Music, "Music" },
             { DefaultLibraryTypes.Material, "Materials" },
@@ -196,6 +214,7 @@ namespace NonsensicalVideoGenerator
             { DefaultLibraryTypes.Outro, "Outros" },
             { DefaultLibraryTypes.Overlay, "Overlays" },
             { DefaultLibraryTypes.Render, "Renders" },
+            { DefaultLibraryTypes.NoImages, "No Images" },
         };
         private static void LoadRecursive(string path, LibraryType type)
         {
@@ -304,7 +323,7 @@ namespace NonsensicalVideoGenerator
                 string achievement = "ACHIEVEMENT_LIBRARY_IMPORT";
                 ConsoleOutput.WriteLine("Awarding achievement: "+achievement, Color.LightBlue);
                 SteamUserStats.SetAchievement(achievement);
-                SaveData.saveValues["TotalMediaImported"] = (int.Parse(SaveData.saveValues["TotalMediaImported"], System.Globalization.CultureInfo.InvariantCulture) + 1).ToString(System.Globalization.CultureInfo.InvariantCulture);
+                SaveData.saveValues["TotalMediaImported"] = (int.Parse(SaveData.saveValues["TotalMediaImported"], CultureInfo.InvariantCulture) + 1).ToString(CultureInfo.InvariantCulture);
                 SaveData.Save();
             }
             SequentialName();
@@ -325,7 +344,7 @@ namespace NonsensicalVideoGenerator
                 if (name.StartsWith("Render"))
                 {
                     int num = 0;
-                    if (int.TryParse(name.Substring(6), out num))
+                    if (int.TryParse(name.Substring(6), NumberStyles.Integer, CultureInfo.InvariantCulture, out num))
                         max = Math.Max(max, num);
                 }
             }
@@ -408,7 +427,7 @@ namespace NonsensicalVideoGenerator
             {
                 if (x.Type == type && x.Path != null && File.Exists(x.Path) && x.Enabled)
                 {
-                    int max = int.Parse(SaveData.saveValues["MaxUniqueClips"], System.Globalization.CultureInfo.InvariantCulture);
+                    int max = int.Parse(SaveData.saveValues["MaxUniqueClips"], CultureInfo.InvariantCulture);
                     // Check if it's already been called.
                     if (max > 0 && calledMedia.Contains(x))
                     {
@@ -433,7 +452,7 @@ namespace NonsensicalVideoGenerator
             if(path != null)
             {
                 // Add to called media
-                if(int.Parse(SaveData.saveValues["MaxUniqueClips"], System.Globalization.CultureInfo.InvariantCulture) > 0)
+                if(int.Parse(SaveData.saveValues["MaxUniqueClips"], CultureInfo.InvariantCulture) > 0)
                 {
                     calledMedia.Add(files[index]);
                 }
@@ -628,6 +647,12 @@ namespace NonsensicalVideoGenerator
                         ConsoleOutput.WriteLine("Failed to download clip: URL is unknown.", Color.Red);
                         continue;
                     }
+                    // Can't download YouTube URLs if an image is being downloaded.
+                    if (key == DefaultLibraryTypes.Image)
+                    {
+                        ConsoleOutput.WriteLine("Failed to download clip: Images cannot be downloaded from YouTube.", Color.Red);
+                        continue;
+                    }
                     // It's a YouTube url.
                     youtubes.Add(true);
                 }
@@ -672,7 +697,7 @@ namespace NonsensicalVideoGenerator
                     string achievement = "ACHIEVEMENT_LIBRARY_IMPORT";
                     ConsoleOutput.WriteLine("Awarding achievement: "+achievement, Color.LightBlue);
                     SteamUserStats.SetAchievement(achievement);
-                    SaveData.saveValues["TotalMediaImported"] = (int.Parse(SaveData.saveValues["TotalMediaImported"], System.Globalization.CultureInfo.InvariantCulture) + 1).ToString();
+                    SaveData.saveValues["TotalMediaImported"] = (int.Parse(SaveData.saveValues["TotalMediaImported"], CultureInfo.InvariantCulture) + 1).ToString(CultureInfo.InvariantCulture);
                     SaveData.Save();
                 }
                 return true;

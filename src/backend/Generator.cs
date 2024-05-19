@@ -186,9 +186,9 @@ namespace NonsensicalVideoGenerator
                                 SteamUserStats.SetAchievement(achievement);
                             }
                         }
-                        SaveData.saveValues["TotalVideosRendered"] = (int.Parse(SaveData.saveValues["TotalVideosRendered"], System.Globalization.CultureInfo.InvariantCulture) + 1).ToString(System.Globalization.CultureInfo.InvariantCulture);
+                        SaveData.saveValues["TotalVideosRendered"] = (int.Parse(SaveData.saveValues["TotalVideosRendered"], CultureInfo.InvariantCulture) + 1).ToString(CultureInfo.InvariantCulture);
                         SaveData.Save();
-                        GlobalContent.GetSound("RenderComplete").Play(int.Parse(SaveData.saveValues["SoundEffectVolume"], System.Globalization.CultureInfo.InvariantCulture) / 100f, 0f, 0f);
+                        GlobalContent.GetSound("RenderComplete").Play(int.Parse(SaveData.saveValues["SoundEffectVolume"], CultureInfo.InvariantCulture) / 100f, 0f, 0f);
                         /*
                         // Open the video in the default video player if the user has that option enabled.
                         if (bool.Parse(SaveData.saveValues["PlayAutomatically"]))
@@ -251,14 +251,14 @@ namespace NonsensicalVideoGenerator
                     if(numberOfPlugins > 0)
                     {
                         // Roll for effect
-                        if(RandomInt(0, 100) < (thisClip.rolledForTransition ? int.Parse(SaveData.saveValues["TransitionEffectChance"], System.Globalization.CultureInfo.InvariantCulture) : int.Parse(SaveData.saveValues["EffectChance"], System.Globalization.CultureInfo.InvariantCulture)))
+                        if(RandomInt(0, 100) < (thisClip.rolledForTransition ? int.Parse(SaveData.saveValues["TransitionEffectChance"], CultureInfo.InvariantCulture) : int.Parse(SaveData.saveValues["EffectChance"], CultureInfo.InvariantCulture)))
                         {
                             progressText = (thisClip.rolledForTransition ? "Boiling" : "Baking") + " effects... (" + (i + 1) + "/" + maxClips + ")";
                             // We rolled for an effect, let's pick one.
                             PluginReturnValue effect = PluginHandler.PickRandom(globalRandom, Path.Combine(temporaryDirectory, thisClip.name));
                             if(effect.success)
                             {
-                                if(int.Parse(SaveData.saveValues["EffectChance"], System.Globalization.CultureInfo.InvariantCulture) >= 100)
+                                if(int.Parse(SaveData.saveValues["EffectChance"], CultureInfo.InvariantCulture) >= 100)
                                 {
                                     Global.usedAllEffectChance = true;
                                 }
@@ -343,7 +343,7 @@ namespace NonsensicalVideoGenerator
             progressText = "Parsing library...";
             LibraryData.Load();
 
-            int maxClips = int.Parse(SaveData.saveValues["MaxClipCount"], System.Globalization.CultureInfo.InvariantCulture);
+            int maxClips = int.Parse(SaveData.saveValues["MaxClipCount"], CultureInfo.InvariantCulture);
 
             // Check to ensure that the source pool is not empty.
             if(LibraryData.GetFileCount(DefaultLibraryTypes.Material) == 0 && maxClips > 0)
@@ -367,10 +367,10 @@ namespace NonsensicalVideoGenerator
                 seed += (int)c;
             }
             */
-            ConsoleOutput.WriteLine("Seed: " + seed.ToString(System.Globalization.CultureInfo.InvariantCulture), Color.Gray);
+            ConsoleOutput.WriteLine("Seed: " + seed.ToString(CultureInfo.InvariantCulture), Color.Gray);
             globalRandom = new Random(seed);
             
-            ConsoleOutput.WriteLine("Max clips: " + maxClips.ToString(System.Globalization.CultureInfo.InvariantCulture), Color.Gray);
+            ConsoleOutput.WriteLine("Max clips: " + maxClips.ToString(CultureInfo.InvariantCulture), Color.Gray);
 
             // Clean up previous temporary files.
             progressText = "Cleaning up...";
@@ -393,11 +393,11 @@ namespace NonsensicalVideoGenerator
                     {
                         Clip thisClip = new Clip(
                             i + ".mp4",
-                            RandomInt(0, 100) < int.Parse(SaveData.saveValues["OverlayChance"], System.Globalization.CultureInfo.InvariantCulture),
-                            RandomInt(0, 100) < int.Parse(SaveData.saveValues["TransitionChance"], System.Globalization.CultureInfo.InvariantCulture),
+                            RandomInt(0, 100) < int.Parse(SaveData.saveValues["OverlayChance"], CultureInfo.InvariantCulture),
+                            RandomInt(0, 100) < int.Parse(SaveData.saveValues["TransitionChance"], CultureInfo.InvariantCulture),
                             false
                         );
-                        timeout = int.Parse(SaveData.saveValues["TimeOut"], System.Globalization.CultureInfo.InvariantCulture);
+                        timeout = int.Parse(SaveData.saveValues["TimeOut"], CultureInfo.InvariantCulture);
                         if (vidThreadWorker?.CancellationPending == true)
                             return;
                         ConsoleOutput.WriteLine("Starting clip " + (i + 1) + "/" + maxClips + "...", Color.Gray);
@@ -411,7 +411,7 @@ namespace NonsensicalVideoGenerator
                                 thisClip.intro = true;
                                 maxClips++;
                                 ConsoleOutput.WriteLine("Intro clip enabled, adding 1 to max clips. New max clips is " + maxClips + ".", Color.Gray);
-                                progress = Convert.ToInt32(i / maxClips, System.Globalization.CultureInfo.InvariantCulture);
+                                progress = Convert.ToInt32(i / maxClips, CultureInfo.InvariantCulture);
                                 progressText = "Introducing ourselves... (" + (i + 1) + "/" + maxClips + ")";
                                 FFprobe_EncodeVideo(introPath, Path.Combine(temporaryDirectory, thisClip.name));
                             }
@@ -421,7 +421,7 @@ namespace NonsensicalVideoGenerator
                         if(!thisClip.intro)
                         {
                             string overlayPath = "";
-                            progress = Convert.ToInt32(i / maxClips, System.Globalization.CultureInfo.InvariantCulture);
+                            progress = Convert.ToInt32(i / maxClips, CultureInfo.InvariantCulture);
                             ConsoleOutput.WriteLine("Clipping... (" + (i + 1) + "/" + maxClips + ")", Color.Gray);
                             progressText = "Clipping... (" + (i + 1) + "/" + maxClips + ")";
                             string sourceToPick = LibraryData.PickRandom(DefaultLibraryTypes.Material, globalRandom);
@@ -435,14 +435,14 @@ namespace NonsensicalVideoGenerator
                             }
                             else
                             {
-                                source = float.Parse(FFprobe_Length(sourceToPick), System.Globalization.CultureInfo.InvariantCulture);
+                                source = float.Parse(FFprobe_Length(sourceToPick), CultureInfo.InvariantCulture);
                             }
                             ConsoleOutput.WriteLine("Length: " + source, Color.Gray);
-                            string output = source.ToString(System.Globalization.CultureInfo.InvariantCulture);
-                            //ConsoleOutput.WriteLine(FFprobe_Length(sourceToPick) + " -> " + output + " -> " + float.Parse(output, System.Globalization.CultureInfo.InvariantCulture));
-                            float outputDuration = float.Parse(output, System.Globalization.CultureInfo.InvariantCulture);
-                            float startOfClip = RandomFloat(0f, outputDuration - float.Parse(SaveData.saveValues["MinStreamDuration"], System.Globalization.CultureInfo.InvariantCulture));
-                            float endOfClip = startOfClip + RandomFloat(float.Parse(SaveData.saveValues["MinStreamDuration"], System.Globalization.CultureInfo.InvariantCulture), float.Parse(SaveData.saveValues["MaxStreamDuration"], System.Globalization.CultureInfo.InvariantCulture));
+                            string output = source.ToString(CultureInfo.InvariantCulture);
+                            //ConsoleOutput.WriteLine(FFprobe_Length(sourceToPick) + " -> " + output + " -> " + float.Parse(output, CultureInfo.InvariantCulture));
+                            float outputDuration = float.Parse(output, CultureInfo.InvariantCulture);
+                            float startOfClip = RandomFloat(0f, outputDuration - float.Parse(SaveData.saveValues["MinStreamDuration"], CultureInfo.InvariantCulture));
+                            float endOfClip = startOfClip + RandomFloat(float.Parse(SaveData.saveValues["MinStreamDuration"], CultureInfo.InvariantCulture), float.Parse(SaveData.saveValues["MaxStreamDuration"], CultureInfo.InvariantCulture));
                             // Ensure that the start is not less than 0 and the end is not greater than the source length.
                             if (startOfClip < 0)
                                 startOfClip = 0;
@@ -484,7 +484,7 @@ namespace NonsensicalVideoGenerator
                                 if(thisClip.rolledForOverlay && bool.Parse(SaveData.saveValues["PlayOverlayInFull"]))
                                 {
                                     // Snip video to overlay length at startOfClip (override endOfClip)
-                                    float overlayDuration = float.Parse(FFprobe_Length(overlayPath), System.Globalization.CultureInfo.InvariantCulture);
+                                    float overlayDuration = float.Parse(FFprobe_Length(overlayPath), CultureInfo.InvariantCulture);
                                     endOfClip = startOfClip + overlayDuration;
                                     FFprobe_ClipVideo(sourceToPick, startOfClip, endOfClip, Path.Combine(temporaryDirectory, thisClip.name));
                                 }
@@ -492,7 +492,7 @@ namespace NonsensicalVideoGenerator
                                 {
                                     FFprobe_ClipVideo(sourceToPick, startOfClip, endOfClip, Path.Combine(temporaryDirectory, thisClip.name));
                                 }
-                                SaveData.saveValues["TotalClipsTrimmed"] = (int.Parse(SaveData.saveValues["TotalClipsTrimmed"], System.Globalization.CultureInfo.InvariantCulture) + 1).ToString(System.Globalization.CultureInfo.InvariantCulture);
+                                SaveData.saveValues["TotalClipsTrimmed"] = (int.Parse(SaveData.saveValues["TotalClipsTrimmed"], CultureInfo.InvariantCulture) + 1).ToString(CultureInfo.InvariantCulture);
                                 SaveData.Save();
                                 ConsoleOutput.WriteLine("Snipped video.", Color.Gray);
                             }
@@ -509,9 +509,9 @@ namespace NonsensicalVideoGenerator
                                     if(!bool.Parse(SaveData.saveValues["PlayOverlayInFull"]))
                                     {
                                         // Now we'll snip the overlay with another random duration.
-                                        float overlayDuration = float.Parse(FFprobe_Length(overlayPath), System.Globalization.CultureInfo.InvariantCulture);
-                                        float startOfOverlay = RandomFloat(0f, overlayDuration - float.Parse(SaveData.saveValues["MinStreamDuration"], System.Globalization.CultureInfo.InvariantCulture));
-                                        float endOfOverlay = startOfOverlay + RandomFloat(float.Parse(SaveData.saveValues["MinStreamDuration"], System.Globalization.CultureInfo.InvariantCulture), float.Parse(SaveData.saveValues["MaxStreamDuration"], System.Globalization.CultureInfo.InvariantCulture));
+                                        float overlayDuration = float.Parse(FFprobe_Length(overlayPath), CultureInfo.InvariantCulture);
+                                        float startOfOverlay = RandomFloat(0f, overlayDuration - float.Parse(SaveData.saveValues["MinStreamDuration"], CultureInfo.InvariantCulture));
+                                        float endOfOverlay = startOfOverlay + RandomFloat(float.Parse(SaveData.saveValues["MinStreamDuration"], CultureInfo.InvariantCulture), float.Parse(SaveData.saveValues["MaxStreamDuration"], CultureInfo.InvariantCulture));
                                         // Make sure the start is not less than 0 and the end is not greater than the overlay length.
                                         if (startOfOverlay < 0)
                                             startOfOverlay = 0;
@@ -770,7 +770,7 @@ namespace NonsensicalVideoGenerator
                     timeoutWorker.WorkerSupportsCancellation = true;
                 }
                 forceConcatenate = false;
-                timeout = int.Parse(SaveData.saveValues["TimeOut"], System.Globalization.CultureInfo.InvariantCulture);
+                timeout = int.Parse(SaveData.saveValues["TimeOut"], CultureInfo.InvariantCulture);
                 tempOutput = Path.Combine(Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location) ?? ".", "library", "video", "renders", Global.videoTitle + ".mp4");
                 timeoutWorker.RunWorkerAsync();
                 vidThreadWorker.RunWorkerAsync();
@@ -842,9 +842,9 @@ namespace NonsensicalVideoGenerator
         {
             try
             {
-                System.Diagnostics.Process process = new System.Diagnostics.Process();
-                System.Diagnostics.ProcessStartInfo startInfo = new System.Diagnostics.ProcessStartInfo();
-                startInfo.WindowStyle = System.Diagnostics.ProcessWindowStyle.Hidden;
+                Process process = new Process();
+                ProcessStartInfo startInfo = new ProcessStartInfo();
+                startInfo.WindowStyle = ProcessWindowStyle.Hidden;
                 startInfo.FileName = Global.useSystemFFprobe ? "ffprobe" : @".\ffprobe.exe";
                 startInfo.Arguments = "-i \"" + file
                         + "\" -show_entries format=duration"
@@ -893,9 +893,9 @@ namespace NonsensicalVideoGenerator
         {
             try
             {
-                System.Diagnostics.Process process = new System.Diagnostics.Process();
-                System.Diagnostics.ProcessStartInfo startInfo = new System.Diagnostics.ProcessStartInfo();
-                startInfo.WindowStyle = System.Diagnostics.ProcessWindowStyle.Hidden;
+                Process process = new Process();
+                ProcessStartInfo startInfo = new ProcessStartInfo();
+                startInfo.WindowStyle = ProcessWindowStyle.Hidden;
                 startInfo.FileName = Global.useSystemFFmpeg ? "ffmpeg" : @".\ffmpeg.exe";
                 startInfo.Arguments = "-i \"" + video
                         + "\" -ss " + startTime
@@ -940,9 +940,9 @@ namespace NonsensicalVideoGenerator
         {
             try
             {
-                System.Diagnostics.Process process = new System.Diagnostics.Process();
-                System.Diagnostics.ProcessStartInfo startInfo = new System.Diagnostics.ProcessStartInfo();
-                startInfo.WindowStyle = System.Diagnostics.ProcessWindowStyle.Hidden;
+                Process process = new Process();
+                ProcessStartInfo startInfo = new ProcessStartInfo();
+                startInfo.WindowStyle = ProcessWindowStyle.Hidden;
                 startInfo.FileName = Global.useSystemFFprobe ? "ffprobe" : @".\ffprobe.exe";
                 startInfo.Arguments = "-i \"" + video
                         + "\" -show_streams"
@@ -998,9 +998,9 @@ namespace NonsensicalVideoGenerator
                     string length = FFprobe_Length(video);
                     appendNoAudio = "-f lavfi -i anullsrc=channel_layout=mono:sample_rate=44100 -t " + length + " ";
                 }
-                System.Diagnostics.Process process = new System.Diagnostics.Process();
-                System.Diagnostics.ProcessStartInfo startInfo = new System.Diagnostics.ProcessStartInfo();
-                startInfo.WindowStyle = System.Diagnostics.ProcessWindowStyle.Hidden;
+                Process process = new Process();
+                ProcessStartInfo startInfo = new ProcessStartInfo();
+                startInfo.WindowStyle = ProcessWindowStyle.Hidden;
                 startInfo.FileName = Global.useSystemFFmpeg ? "ffmpeg" : @".\ffmpeg.exe";
                 startInfo.Arguments = "-i \"" + video + "\" " + appendNoAudio
                         + " -c:v libx264"
@@ -1100,9 +1100,9 @@ namespace NonsensicalVideoGenerator
                             string length = FFprobe_Length(Path.Combine(temporaryDirectory, thisClip.name));
                             appendNoAudio = "-f lavfi -i anullsrc=channel_layout=mono:sample_rate=44100 -t " + length + " ";
                         }
-                        System.Diagnostics.Process process2 = new System.Diagnostics.Process();
-                        System.Diagnostics.ProcessStartInfo startInfo2 = new System.Diagnostics.ProcessStartInfo();
-                        startInfo2.WindowStyle = System.Diagnostics.ProcessWindowStyle.Hidden;
+                        Process process2 = new Process();
+                        ProcessStartInfo startInfo2 = new ProcessStartInfo();
+                        startInfo2.WindowStyle = ProcessWindowStyle.Hidden;
                         startInfo2.FileName = Global.useSystemFFmpeg ? "ffmpeg" : @".\ffmpeg.exe";
                         startInfo2.Arguments = "-i \"" + Path.Combine(temporaryDirectory, thisClip.name) + "\" " + appendNoAudio
                                 + " -c:v libx264"
@@ -1214,9 +1214,9 @@ namespace NonsensicalVideoGenerator
                     + " -ar 32000 -shortest -avoid_negative_ts make_zero -fflags +genpts"
                     + " -y";
             // Run ffmpeg to concatenate them
-            System.Diagnostics.Process process = new System.Diagnostics.Process();
-            System.Diagnostics.ProcessStartInfo startInfo = new System.Diagnostics.ProcessStartInfo();
-            startInfo.WindowStyle = System.Diagnostics.ProcessWindowStyle.Hidden;
+            Process process = new Process();
+            ProcessStartInfo startInfo = new ProcessStartInfo();
+            startInfo.WindowStyle = ProcessWindowStyle.Hidden;
             startInfo.FileName = Global.useSystemFFmpeg ? "ffmpeg" : @".\ffmpeg.exe";
             startInfo.Arguments = concat + " \"" + Path.Combine(temporaryDirectory, "iteration" + iteration + ".mp4") + "\"";
             startInfo.UseShellExecute = false;
@@ -1275,9 +1275,9 @@ namespace NonsensicalVideoGenerator
                         + " -ar 32000 -shortest -avoid_negative_ts make_zero -fflags +genpts"
                         + " -y";
                 // Run ffmpeg to concatenate them
-                System.Diagnostics.Process process2 = new System.Diagnostics.Process();
-                System.Diagnostics.ProcessStartInfo startInfo2 = new System.Diagnostics.ProcessStartInfo();
-                startInfo2.WindowStyle = System.Diagnostics.ProcessWindowStyle.Hidden;
+                Process process2 = new Process();
+                ProcessStartInfo startInfo2 = new ProcessStartInfo();
+                startInfo2.WindowStyle = ProcessWindowStyle.Hidden;
                 startInfo2.FileName = Global.useSystemFFmpeg ? "ffmpeg" : @".\ffmpeg.exe";
                 startInfo2.Arguments = concat2 + " \"" + output + "\"";
                 startInfo2.UseShellExecute = false;
@@ -1312,10 +1312,10 @@ namespace NonsensicalVideoGenerator
         {
             try
             {
-                System.Diagnostics.Process process = new System.Diagnostics.Process();
-                System.Diagnostics.ProcessStartInfo startInfo = new System.Diagnostics.ProcessStartInfo();
+                Process process = new Process();
+                ProcessStartInfo startInfo = new ProcessStartInfo();
                 string overlayed_video = video.Replace(".mp4", "_chromakey.mp4");
-                startInfo.WindowStyle = System.Diagnostics.ProcessWindowStyle.Hidden;
+                startInfo.WindowStyle = ProcessWindowStyle.Hidden;
                 startInfo.FileName = Global.useSystemFFmpeg ? "ffmpeg" : @".\ffmpeg.exe";
                 startInfo.Arguments = "-i \"" + video
                         + "\" -i \"" + overlay
@@ -1360,6 +1360,44 @@ namespace NonsensicalVideoGenerator
                 {
                     ConsoleOutput.WriteLine("Temporary directory could not be deleted.", Color.Red);
                 }
+            }
+        }
+        public static void GenerateTempAudioWaveformImage(string audio, string output)
+        {
+            int texScale = int.Parse(SaveData.saveValues["VideoPlaybackScale"], CultureInfo.InvariantCulture);
+            int texWidth = 29 * texScale;
+            int texHeight = 23 * texScale;
+            try
+            {
+                Process process = new Process();
+                ProcessStartInfo startInfo = new ProcessStartInfo
+                {
+                    WindowStyle = ProcessWindowStyle.Hidden,
+                    FileName = Global.useSystemFFmpeg ? "ffmpeg" : @".\ffmpeg.exe",
+                    Arguments = "-i \"" + audio
+                        + "\" -filter_complex \""
+                        + "aformat=channel_layouts=mono,showwavespic=s=" + texWidth + "x" + texHeight + ":colors=white[wave];"
+                        + " -frames:v 1"
+                        + " -y"
+                        + " \"" + output + "\"",
+                    UseShellExecute = false,
+                    RedirectStandardError = true,
+                    WorkingDirectory = Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location) ?? ".",
+                    CreateNoWindow = true
+                };
+                process.StartInfo = startInfo;
+                process.ErrorDataReceived += (sender, e) =>
+                {
+                    if (e.Data != null)
+                        ConsoleOutput.WriteLine(e.Data, Color.Transparent);
+                };
+                process.Start();
+                process.BeginErrorReadLine();
+                process.WaitForExit();
+            }
+            catch
+            {
+                // Do nothing
             }
         }
     }

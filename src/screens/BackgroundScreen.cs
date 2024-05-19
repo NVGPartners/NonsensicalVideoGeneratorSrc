@@ -19,7 +19,7 @@ namespace NonsensicalVideoGenerator
         /// The title of the screen. This is displayed on the header bar.
         /// </summary>
         public string title { get; } = "Background";
-        public int layer { get; } = 0;
+        public int layer { get; set; } = 0;
         public int currentPlacement { get; set; } = -1;
         public ScreenType screenType { get; set; } = ScreenType.Hidden;
         private static int totalCount = 1024;
@@ -87,11 +87,11 @@ namespace NonsensicalVideoGenerator
                     }
                 }
                 // (DEBUG) Draw scroll position.
-                //spriteBatch.DrawString(GlobalContent.GetFont("MunroSmall"), $"{scrollX}, {scrollY}", new Vector2(GlobalGraphics.Scale(16), GlobalGraphics.Scale(16)), Color.White);
+                //spriteBatch.DrawString(L.FontSmall(), $"{scrollX}, {scrollY}", new Vector2(GlobalGraphics.Scale(16), GlobalGraphics.Scale(16)), Color.White);
                 // (DEBUG) Draw count of circles.
-                //spriteBatch.DrawString(GlobalContent.GetFont("MunroSmall"), $"{circles.Count}", new Vector2(GlobalGraphics.Scale(16), GlobalGraphics.Scale(32)), Color.White);
+                //spriteBatch.DrawString(L.FontSmall(), $"{circles.Count}", new Vector2(GlobalGraphics.Scale(16), GlobalGraphics.Scale(32)), Color.White);
                 // (DEBUG) Draw mouse click state.
-                // spriteBatch.DrawString(GlobalContent.GetFont("MunroSmall"), $"{mouseReleased}", new Vector2(GlobalGraphics.Scale(16), GlobalGraphics.Scale(48)), Color.White);
+                // spriteBatch.DrawString(L.FontSmall(), $"{mouseReleased}", new Vector2(GlobalGraphics.Scale(16), GlobalGraphics.Scale(48)), Color.White);
             }
         }
         public void LoadContent(ContentManager contentManager, GraphicsDevice graphicsDevice)

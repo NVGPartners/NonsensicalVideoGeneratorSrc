@@ -39,7 +39,7 @@ namespace NonsensicalVideoGenerator
             if (handleInput)
             {
                 if(isButton)
-                    Accessibility.CompatAccessibility(rectangle, "Masked Button: Unknown");
+                    Accessibility.CompatAccessibility(rectangle, L.T(0, "Accessibility:InteractableMaskedButton"));
                 if (MouseInput.LastMouseState.LeftButton == ButtonState.Released && MouseInput.MouseState.LeftButton == ButtonState.Pressed)
                 {
                     if (rectangle.Contains(MouseInput.MouseState.Position))

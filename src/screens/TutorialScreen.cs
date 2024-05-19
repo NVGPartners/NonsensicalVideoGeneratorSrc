@@ -25,8 +25,8 @@ namespace NonsensicalVideoGenerator
         /// <summary>
         /// The title of the screen. This is displayed on the header bar.
         /// </summary>
-        public string title { get; } = "Initial Setup";
-        public int layer { get; } = 9;
+        public string title { get; } = "Tutorial";
+        public int layer { get; set; } = 9;
         public ScreenType screenType { get; set; } = ScreenType.Hidden;
         public int currentPlacement { get; set; } = -1;
         private bool hiding = false;
@@ -83,13 +83,13 @@ namespace NonsensicalVideoGenerator
                     // consents is a flag enum with 1 bit for each consent (3 bits)
                     if(UserConsent.consentForm != null)
                     {
-                        tutorialText[3][i] = tutorialText[3][i].Replace("%PLUGIN%", UserConsent.consentForm.name ?? "Unknown");
+                        tutorialText[3][i] = tutorialText[3][i].Replace("%PLUGIN%", UserConsent.consentForm.name ?? L.T(0, "Addons:UnknownName"));
                         // first bit
-                        tutorialText[3][i] = tutorialText[3][i].Replace("%PERM1%", UserConsent.consentForm.consents.HasFlag(Consents.DownloadFiles) ? "The ability to download these files:" : "");
+                        tutorialText[3][i] = tutorialText[3][i].Replace("%PERM1%", UserConsent.consentForm.consents.HasFlag(Consents.DownloadFiles) ? L.T(0, "Addons:ConsentDownloadFiles") : "");
                         // second bit
-                        tutorialText[3][i] = tutorialText[3][i].Replace("%PERM2%", UserConsent.consentForm.consents.HasFlag(Consents.ExecutePrograms) ? "The ability to execute these programs:" : "");
+                        tutorialText[3][i] = tutorialText[3][i].Replace("%PERM2%", UserConsent.consentForm.consents.HasFlag(Consents.ExecutePrograms) ? L.T(0, "Addons:ConsentExecutePrograms") : "");
                         // third bit
-                        tutorialText[3][i] = tutorialText[3][i].Replace("%PERM3%", UserConsent.consentForm.consents.HasFlag(Consents.AddToLibrary) ? "The ability to add these files to the library:" : "");
+                        tutorialText[3][i] = tutorialText[3][i].Replace("%PERM3%", UserConsent.consentForm.consents.HasFlag(Consents.AddToLibrary) ? L.T(0, "Addons:ConsentAddToLibrary") : "");
 
                         // append to list right here for each param in consent form for flags
                         if(isPerm1Text)
@@ -261,7 +261,7 @@ namespace NonsensicalVideoGenerator
         {
             new List<string>()
             { // PAGE 1
-                "Welcome to Nonsensical Video Generator!",
+                "Welcome to " + Global.productName + "!",
                 "",
                 "This initial setup will help you get started.",
                 "On the next page, we will check these prerequisites.",
@@ -305,7 +305,7 @@ namespace NonsensicalVideoGenerator
                 "Don't hesitate to ask for help on the GitHub issue tracker!",
                 "Be sure to join the Discord server community from the menu!",
                 "",
-                "Enjoy using Nonsensical Video Generator!",
+                "Enjoy using " + Global.productName + "!",
                 "",
                 "If there are still issues, the continue button will be disabled.",
                 "In that case, broken addons would have been detected.",
@@ -344,14 +344,18 @@ namespace NonsensicalVideoGenerator
             spriteBatch.Draw(tutorialWindow, new Rectangle(GlobalGraphics.Scale(8+960), GlobalGraphics.Scale(36), GlobalGraphics.Scale(tutorialWindow.Width), GlobalGraphics.Scale(tutorialWindow.Height)), Color.White);
             controller.Draw(gameTime, spriteBatch);
             // Draw the center title bar text
-            Vector2 titleSize1 = GlobalContent.GetFont("MunroSmall").MeasureString(title + ": Page 1/3");
-            spriteBatch.DrawString(GlobalContent.GetFont("MunroSmall"), title + ": Page 1/3", new Vector2(GlobalGraphics.scaledWidth / 2 - titleSize1.X / 2, (6 * GlobalGraphics.scale) - GlobalGraphics.Scale(1-32)), Color.White);
-            Vector2 titleSize2 = GlobalContent.GetFont("MunroSmall").MeasureString(title + ": Page 2/3");
-            spriteBatch.DrawString(GlobalContent.GetFont("MunroSmall"), title + ": Page 2/3", new Vector2(GlobalGraphics.scaledWidth / 2 - titleSize2.X / 2 + GlobalGraphics.Scale(320), (6 * GlobalGraphics.scale) - GlobalGraphics.Scale(1-32)), Color.White);
-            Vector2 titleSize3 = GlobalContent.GetFont("MunroSmall").MeasureString(title + ": Page 3/3");
-            spriteBatch.DrawString(GlobalContent.GetFont("MunroSmall"), title + ": Page 3/3", new Vector2(GlobalGraphics.scaledWidth / 2 - titleSize3.X / 2 + GlobalGraphics.Scale(640), (6 * GlobalGraphics.scale) - GlobalGraphics.Scale(1-32)), Color.White);
-            Vector2 titleSize4 = GlobalContent.GetFont("MunroSmall").MeasureString("User Consent Form");
-            spriteBatch.DrawString(GlobalContent.GetFont("MunroSmall"), "User Consent Form", new Vector2(GlobalGraphics.scaledWidth / 2 - titleSize4.X / 2 + GlobalGraphics.Scale(960), (6 * GlobalGraphics.scale) - GlobalGraphics.Scale(1-32)), Color.White);
+            string title1 = L.T(0, "Tutorial:Title", "1", "3");
+            string title2 = L.T(0, "Tutorial:Title", "2", "3");
+            string title3 = L.T(0, "Tutorial:Title", "3", "3");
+            string title4 = L.T(0, "Tutorial:UserConsentFormTitle");
+            Vector2 titleSize1 = L.FontSmall().MeasureString(title1);
+            spriteBatch.DrawString(L.FontSmall(), title1, new Vector2(GlobalGraphics.scaledWidth / 2 - titleSize1.X / 2, (6 * GlobalGraphics.scale) - GlobalGraphics.Scale(1-32)), Color.White);
+            Vector2 titleSize2 = L.FontSmall().MeasureString(title2);
+            spriteBatch.DrawString(L.FontSmall(), title2, new Vector2(GlobalGraphics.scaledWidth / 2 - titleSize2.X / 2 + GlobalGraphics.Scale(320), (6 * GlobalGraphics.scale) - GlobalGraphics.Scale(1-32)), Color.White);
+            Vector2 titleSize3 = L.FontSmall().MeasureString(title3);
+            spriteBatch.DrawString(L.FontSmall(), title3, new Vector2(GlobalGraphics.scaledWidth / 2 - titleSize3.X / 2 + GlobalGraphics.Scale(640), (6 * GlobalGraphics.scale) - GlobalGraphics.Scale(1-32)), Color.White);
+            Vector2 titleSize4 = L.FontSmall().MeasureString(title4);
+            spriteBatch.DrawString(L.FontSmall(), title4, new Vector2(GlobalGraphics.scaledWidth / 2 - titleSize4.X / 2 + GlobalGraphics.Scale(960), (6 * GlobalGraphics.scale) - GlobalGraphics.Scale(1-32)), Color.White);
             // Draw tutorial text
             for(int i = 0; i < tutorialText.Length; i++)
             {
@@ -363,9 +367,9 @@ namespace NonsensicalVideoGenerator
                     dummyText = dummyText.Replace("%FFPROBE%", "Checking...");
                     dummyText = dummyText.Replace("%IMAGEMAGICK%", "Checking...");
                     dummyText = dummyText.Replace("%YTDLP%", "Checking...");
-                    Vector2 textSize = GlobalContent.GetFont("MunroSmall").MeasureString(dummyText);
-                    spriteBatch.DrawString(GlobalContent.GetFont("MunroSmall"), dummyText, new Vector2(GlobalGraphics.Scale(8+16+1+320*i), GlobalGraphics.Scale(60+offsetText+1)), Color.Black);
-                    spriteBatch.DrawString(GlobalContent.GetFont("MunroSmall"), dummyText, new Vector2(GlobalGraphics.Scale(8+16+320*i), GlobalGraphics.Scale(60+offsetText)), Color.White);
+                    Vector2 textSize = L.FontSmall().MeasureString(dummyText);
+                    spriteBatch.DrawString(L.FontSmall(), dummyText, new Vector2(GlobalGraphics.Scale(8+16+1+320*i), GlobalGraphics.Scale(60+offsetText+1)), Color.Black);
+                    spriteBatch.DrawString(L.FontSmall(), dummyText, new Vector2(GlobalGraphics.Scale(8+16+320*i), GlobalGraphics.Scale(60+offsetText)), Color.White);
                     // Draw red overlay if prerequisite is not met
                     if(GlobalGraphics.scale == 2)
                     {
@@ -387,7 +391,7 @@ namespace NonsensicalVideoGenerator
                                     offset = 43;
                                     break;
                             }
-                            spriteBatch.DrawString(GlobalContent.GetFont("MunroSmall"), "Not found", new Vector2(GlobalGraphics.Scale(offset+8+16+320*i), GlobalGraphics.Scale(60+offsetText)), Color.OrangeRed);
+                            spriteBatch.DrawString(L.FontSmall(), "Not found", new Vector2(GlobalGraphics.Scale(offset+8+16+320*i), GlobalGraphics.Scale(60+offsetText)), Color.OrangeRed);
                         }
                         if(tutorialText[i][j].Contains("Downloading..."))
                         {
@@ -401,7 +405,7 @@ namespace NonsensicalVideoGenerator
                                     offset = 47;
                                     break;
                             }
-                            spriteBatch.DrawString(GlobalContent.GetFont("MunroSmall"), "Downloading...", new Vector2(GlobalGraphics.Scale(offset+8+16+320*i), GlobalGraphics.Scale(60+offsetText)), Color.BlueViolet);
+                            spriteBatch.DrawString(L.FontSmall(), "Downloading...", new Vector2(GlobalGraphics.Scale(offset+8+16+320*i), GlobalGraphics.Scale(60+offsetText)), Color.BlueViolet);
                         }
                         if(tutorialText[i][j].Contains("Extracting..."))
                         {
@@ -415,7 +419,7 @@ namespace NonsensicalVideoGenerator
                                     offset = 47;
                                     break;
                             }
-                            spriteBatch.DrawString(GlobalContent.GetFont("MunroSmall"), "Extracting...", new Vector2(GlobalGraphics.Scale(offset+8+16+320*i), GlobalGraphics.Scale(60+offsetText)), Color.BlueViolet);
+                            spriteBatch.DrawString(L.FontSmall(), "Extracting...", new Vector2(GlobalGraphics.Scale(offset+8+16+320*i), GlobalGraphics.Scale(60+offsetText)), Color.BlueViolet);
                         }
                         if(tutorialText[i][j].Contains("Using system PATH"))
                         {
@@ -435,7 +439,7 @@ namespace NonsensicalVideoGenerator
                                     offset = 43;
                                     break;
                             }
-                            spriteBatch.DrawString(GlobalContent.GetFont("MunroSmall"), "Using system PATH", new Vector2(GlobalGraphics.Scale(offset+8+16+320*i), GlobalGraphics.Scale(60+offsetText)), Color.SeaGreen);
+                            spriteBatch.DrawString(L.FontSmall(), "Using system PATH", new Vector2(GlobalGraphics.Scale(offset+8+16+320*i), GlobalGraphics.Scale(60+offsetText)), Color.SeaGreen);
                         }
                         // Draw green overlay if prerequisite is met
                         if(tutorialText[i][j].Contains("Installed"))
@@ -456,13 +460,13 @@ namespace NonsensicalVideoGenerator
                                     offset = 43;
                                     break;
                             }
-                            spriteBatch.DrawString(GlobalContent.GetFont("MunroSmall"), "Installed", new Vector2(GlobalGraphics.Scale(offset+8+16+320*i), GlobalGraphics.Scale(60+offsetText)), Color.LimeGreen);
+                            spriteBatch.DrawString(L.FontSmall(), "Installed", new Vector2(GlobalGraphics.Scale(offset+8+16+320*i), GlobalGraphics.Scale(60+offsetText)), Color.LimeGreen);
                         }
                         // Draw red overlay if update check failed
                         if(tutorialText[i][j].Contains("Failed"))
                         {
                             int offset = 68;
-                            spriteBatch.DrawString(GlobalContent.GetFont("MunroSmall"), "Failed", new Vector2(GlobalGraphics.Scale(offset+8+16+320*i), GlobalGraphics.Scale(60+offsetText)), Color.OrangeRed);
+                            spriteBatch.DrawString(L.FontSmall(), "Failed", new Vector2(GlobalGraphics.Scale(offset+8+16+320*i), GlobalGraphics.Scale(60+offsetText)), Color.OrangeRed);
                         }
                         // Draw yellow overlay if checking
                         if(dummyText.Contains("Checking..."))
@@ -483,7 +487,7 @@ namespace NonsensicalVideoGenerator
                                     offset = 43;
                                     break;
                             }
-                            spriteBatch.DrawString(GlobalContent.GetFont("MunroSmall"), "Checking...", new Vector2(GlobalGraphics.Scale(offset+8+16+320*i), GlobalGraphics.Scale(60+offsetText)), Color.Yellow);
+                            spriteBatch.DrawString(L.FontSmall(), "Checking...", new Vector2(GlobalGraphics.Scale(offset+8+16+320*i), GlobalGraphics.Scale(60+offsetText)), Color.Yellow);
                         }
                     }
                     offsetText += 8;
@@ -724,8 +728,8 @@ namespace NonsensicalVideoGenerator
                                 }
                                 hiding = true;
                                 FramePlayer.canPlayBgMusic = true;
-                                ScreenManager.PushNavigation("Main Menu");
-                                ScreenManager.GetScreen<MenuScreen>("Main Menu")?.Show();
+                                ScreenManager.PushNavigation("Menu");
+                                ScreenManager.GetScreen<MenuScreen>("Menu")?.Show();
                                 if(FramePlayer.audio != null)
                                 {
                                     ScreenManager.PushNavigation("Video");
@@ -778,8 +782,8 @@ namespace NonsensicalVideoGenerator
                             }
                             hiding = true;
                             FramePlayer.canPlayBgMusic = true;
-                            ScreenManager.PushNavigation("Main Menu");
-                            ScreenManager.GetScreen<MenuScreen>("Main Menu")?.Show();
+                            ScreenManager.PushNavigation("Menu");
+                            ScreenManager.GetScreen<MenuScreen>("Menu")?.Show();
                             if(FramePlayer.audio != null)
                             {
                                 ScreenManager.PushNavigation("Video");

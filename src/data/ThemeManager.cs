@@ -25,22 +25,25 @@ namespace NonsensicalVideoGenerator
         public string prefix;
         public bool mgcb;
         public int songCount;
+        public int misclickCount;
         public Dictionary<string, Color> colorTable;
-        public Theme(string name, string description, string prefix, int songCount, bool mgcb = false)
+        public Theme(string name, string description, string prefix, int songCount, int misclickCount, bool mgcb = false)
         {
             this.name = name;
             this.description = description;
             this.prefix = prefix;
             this.songCount = songCount;
+            this.misclickCount = misclickCount;
             this.mgcb = mgcb;
             this.colorTable = new Dictionary<string, Color>();
         }
-        public Theme(string name, string description, string prefix, int songCount, Dictionary<string, Color> colorTable, bool mgcb = false)
+        public Theme(string name, string description, string prefix, int songCount, int misclickCount, Dictionary<string, Color> colorTable, bool mgcb = false)
         {
             this.name = name;
             this.description = description;
             this.prefix = prefix;
             this.songCount = songCount;
+            this.misclickCount = misclickCount;
             this.colorTable = colorTable;
             this.mgcb = mgcb;
         }
@@ -58,7 +61,7 @@ namespace NonsensicalVideoGenerator
     }
     public static class DefaultThemes
     {
-        public static Theme Nonsensical = new Theme("Nonsensical", "The default theme.", "", 5, new Dictionary<string, Color>() {
+        public static Theme Nonsensical = new Theme("Nonsensical", "The default theme.", "", 7, 4, new Dictionary<string, Color>() {
             {"ClearColor", new Color(0, 0, 0, 255)},
             {"ShadowActionButtonInteractable", new Color(0, 0, 0, 255)},
             {"ShadowButtonInteractable", new Color(0, 0, 0, 255)},
@@ -112,6 +115,7 @@ namespace NonsensicalVideoGenerator
                 string themeName = theme.GetDisplayName();
                 string themeDescription = "";
                 int songCount = DefaultThemes.Nonsensical.songCount;
+                int misclickCount = DefaultThemes.Nonsensical.misclickCount;
                 if(theme.settings.Count > 0)
                 {
                     List<string> extsettings = new();
@@ -144,6 +148,7 @@ namespace NonsensicalVideoGenerator
                     continue;
                 }
                 // Count layerpath/music/theme*.ogg (indexed from 1 to 9)
+                songCount = 0;
                 if(Directory.Exists(layerPath + "music/"))
                 {
                     for(int i = 1; i < 10; i++)
@@ -154,7 +159,22 @@ namespace NonsensicalVideoGenerator
                         }
                     }
                 }
-                Theme thisTheme = new Theme(themeName, themeDescription, layerPath, songCount)
+                if (songCount == 0)
+                {
+                    songCount = DefaultThemes.Nonsensical.songCount;
+                }
+                // Count layerpath/graphics/misclick/*.png (indexed from 1 to 9)
+                if(Directory.Exists(layerPath + "graphics/misclick/"))
+                {
+                    for(int i = 1; i < 10; i++)
+                    {
+                        if(File.Exists(layerPath + $"graphics/misclick/{i}.png"))
+                        {
+                            misclickCount = i;
+                        }
+                    }
+                }
+                Theme thisTheme = new Theme(themeName, themeDescription, layerPath, songCount, misclickCount)
                 {
                     colorTable = theme.themeColors
                 };
@@ -209,6 +229,11 @@ namespace NonsensicalVideoGenerator
                     fullPath += ".wav";
                     break;
                 case "Song":
+                    if(activeTheme.mgcb)
+                    {
+                        fullPath += ".ogg";
+                        break;
+                    }
                     fullPath += ".wma";
                     break;
             }

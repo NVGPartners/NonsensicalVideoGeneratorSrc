@@ -28,10 +28,10 @@ namespace NonsensicalVideoGenerator
             Position = defaultPosition;
             Callback = defaultCallback;
         }
-        public virtual bool Update(GameTime gameTime, bool handleInput)
+        public virtual bool Update(GameTime gameTime, bool handleInput, string internalName)
         {
             // Calculate bounds
-            textSize = (GlobalContent.GetFont("Munro").MeasureString(Name) / GlobalGraphics.scale) - new Vector2(GlobalGraphics.Scale(1), 0);
+            textSize = (L.FontLarge().MeasureString(Name) / GlobalGraphics.scale) - new Vector2(GlobalGraphics.Scale(1), 0);
             textPosition = new(Position.X - textSize.X / 2, Position.Y - textSize.Y / 2);
             bounds = new((int)textPosition.X-4, (int)textPosition.Y-4, (int)textSize.X+8, 15);
             Rectangle scaledBounds = new((int)(bounds.X * GlobalGraphics.scale), (int)(bounds.Y * GlobalGraphics.scale), (int)(bounds.Width * GlobalGraphics.scale), (int)(bounds.Height * GlobalGraphics.scale));
@@ -39,7 +39,7 @@ namespace NonsensicalVideoGenerator
             {
                 int mouseButton = 0;
                 // Check if the mouse is hovering over the button.
-                Accessibility.CompatAccessibility(scaledBounds, "Button: " + Name + " (" + Tooltip + ")");
+                Accessibility.CompatAccessibility(scaledBounds, L.T(0, "Accessibility:InteractableButton", L.T(0, "Interactable:"+internalName+"Title"), L.T(0, "Interactable:"+internalName+"Tooltip")));
                 if (scaledBounds.Contains(MouseInput.MouseState.Position))
                 {
                     // Check if the mouse is clicking on the button.
@@ -71,7 +71,7 @@ namespace NonsensicalVideoGenerator
             }
             return false;
         }
-        public virtual void Draw(GameTime gameTime, SpriteBatch spriteBatch)
+        public virtual void Draw(GameTime gameTime, SpriteBatch spriteBatch, string internalName)
         {
             // Draw the sides
             Texture2D side = GlobalContent.GetTexture("InteractiveButtonSide");
@@ -85,27 +85,15 @@ namespace NonsensicalVideoGenerator
             spriteBatch.Draw(side, new Rectangle(GlobalGraphics.Scale(bounds.X + bounds.Width - 1 + side.Width/2), GlobalGraphics.Scale(bounds.Y - 1 + side.Height/2), GlobalGraphics.Scale(side.Width), GlobalGraphics.Scale(side.Height)), null, Color.White, MathHelper.ToRadians(180), new Vector2(side.Width/2, side.Height/2), SpriteEffects.None, 0);
             spriteBatch.Draw(inner, new Rectangle(GlobalGraphics.Scale(bounds.X+3), GlobalGraphics.Scale(bounds.Y), GlobalGraphics.Scale(bounds.Width-3), GlobalGraphics.Scale(inner.Height)), Color.White);
             // Text & shadow
-            spriteBatch.DrawString(GlobalContent.GetFont("Munro"), Name, new Vector2(GlobalGraphics.Scale(textPosition.X + 1), GlobalGraphics.Scale(textPosition.Y - 3 + 1)), Color.Black);
-            spriteBatch.DrawString(GlobalContent.GetFont("Munro"), Name, new Vector2(GlobalGraphics.Scale(textPosition.X), GlobalGraphics.Scale(textPosition.Y-3)), Color.White);
+            spriteBatch.DrawString(L.FontLarge(), L.T(0, "Interactable:"+internalName+"Title"), new Vector2(GlobalGraphics.Scale(textPosition.X + 1), GlobalGraphics.Scale(textPosition.Y - 3 + 1)), Color.Black);
+            spriteBatch.DrawString(L.FontLarge(), L.T(0, "Interactable:"+internalName+"Title"), new Vector2(GlobalGraphics.Scale(textPosition.X), GlobalGraphics.Scale(textPosition.Y-3)), Color.White);
             // If hovering, draw tooltip
             if (State >= 1 && Tooltip != "")
             {
-                // Get text size
-                Vector2 tooltipSize = GlobalContent.GetFont("MunroSmall").MeasureString(Tooltip);
-                // Position is relative to mouse position but tries to avoid going off screen
-                Vector2 position = new(MouseInput.MouseState.Position.X + 10, MouseInput.MouseState.Position.Y + 10);
-                // Make sure it doesn't go off the right side of the screen
-                if (position.X + tooltipSize.X + GlobalGraphics.Scale(6) > GlobalGraphics.scaledWidth)
-                    position.X = GlobalGraphics.scaledWidth - tooltipSize.X - GlobalGraphics.Scale(6);
-                // Make sure it doesn't go off the bottom of the screen
-                if (position.Y + tooltipSize.Y + GlobalGraphics.Scale(2) > GlobalGraphics.scaledHeight)
-                    position.Y = GlobalGraphics.scaledHeight - tooltipSize.Y - GlobalGraphics.Scale(2); 
-                spriteBatch.Draw(GlobalContent.GetTexture("Pixel"), new Rectangle((int)position.X, (int)position.Y, (int)tooltipSize.X + GlobalGraphics.Scale(2), (int)tooltipSize.Y - GlobalGraphics.Scale(2)), ThemeManager.GetColor("ShadowButtonInteractable"));
-                // White text
-                spriteBatch.DrawString(GlobalContent.GetFont("MunroSmall"), Tooltip, new Vector2(position.X + GlobalGraphics.Scale(2), position.Y - GlobalGraphics.Scale(2)), Color.White);
+                Global.tooltip = L.T(0, "Interactable:"+internalName+"Tooltip");
             }
         }
-        public virtual void LoadContent(ContentManager contentManager, GraphicsDevice graphicsDevice)
+        public virtual void LoadContent(ContentManager contentManager, GraphicsDevice graphicsDevice, string internalName)
         {
         }
     }

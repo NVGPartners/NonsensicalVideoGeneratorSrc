@@ -58,7 +58,12 @@ namespace NonsensicalVideoGenerator
             {"VideoPlaybackScale", "2"},
             {"ActiveTheme", ""},
             {"TimeOut", "30"},
-            {"EnableTimeOut", "true"}
+            {"EnableTimeOut", "true"},
+            {"SkipPhotosensitiveWarningScreen", "false"},
+            {"PluginListFilterFlags", "0"},
+            {"LastVersion", ""},
+            {"UseLegacyHeader", "false"},
+            {"Locale", "en_us"}
         };
         public static string saveFileName = "Options.json";
         public static bool Save()

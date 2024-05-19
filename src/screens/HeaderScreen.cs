@@ -40,7 +40,7 @@ namespace NonsensicalVideoGenerator
         /// The title of the screen. This is displayed on the header bar.
         /// </summary>
         public string title { get; } = "Header";
-        public int layer { get; } = 4;
+        public int layer { get; set; } = 4;
         public ScreenType screenType { get; set; } = ScreenType.Hidden;
         public int currentPlacement { get; set; } = -1;
         private bool hiding = false;
@@ -118,22 +118,14 @@ namespace NonsensicalVideoGenerator
             spriteBatch.End();
             // Use offset
             spriteBatch.Begin(SpriteSortMode.Deferred, BlendState.AlphaBlend, SamplerState.PointClamp, null, null, null, Matrix.CreateTranslation(offset.X, offset.Y, 0));
+            
             // Logo.
-            SpriteFont font = GlobalContent.GetFont("MunroSmall");
-
-            /*
-            Texture2D logobg = GlobalContent.GetTexture("LogoBG");
-            spriteBatch.Draw(logobg, new Rectangle(GlobalGraphics.Scale(0), GlobalGraphics.Scale(7), GlobalGraphics.Scale(logobg.Width), GlobalGraphics.Scale(logobg.Height)), Color.White);
-            spriteBatch.DrawString(font, "v" + Global.productVersion, new Vector2(GlobalGraphics.Scale(7+1), GlobalGraphics.Scale(8+1)), Color.Black);
-            spriteBatch.DrawString(font, "v" + Global.productVersion, new Vector2(GlobalGraphics.Scale(7), GlobalGraphics.Scale(8)), Color.White);
-            spriteBatch.DrawString(font, "Steam Version", new Vector2(GlobalGraphics.Scale(7+1), GlobalGraphics.Scale(18+1)), Color.Black);
-            spriteBatch.DrawString(font, "Steam Version", new Vector2(GlobalGraphics.Scale(7), GlobalGraphics.Scale(18)), Color.White);
-            */
-
-            Texture2D logomask = GlobalContent.GetTexture("LogoMask");
+            SpriteFont font = L.FontSmall();
             Texture2D logo = GlobalContent.GetTexture("Logo");
+            Texture2D logomask = GlobalContent.GetTexture("LogoMask");
             Texture2D iconmask = GlobalContent.GetTexture("IconMask");
             Texture2D icon = GlobalContent.GetTexture("Icon");
+            Texture2D debug = GlobalContent.GetTexture("Debug");
             for(int i = clickHeaderList.Count - 1; i >= 0; i--)
             {
                 Rectangle clickOffset = clickHeaderList[i].clickOffset;
@@ -142,11 +134,26 @@ namespace NonsensicalVideoGenerator
                 spriteBatch.Draw(logomask, new Rectangle(GlobalGraphics.Scale(clickOffset.X), GlobalGraphics.Scale(clickOffset.Y + (int)jump), GlobalGraphics.Scale(clickOffset.Width), GlobalGraphics.Scale(clickOffset.Height)), clickColor);
                 spriteBatch.Draw(iconmask, new Rectangle(GlobalGraphics.Scale(clickOffset2.X), GlobalGraphics.Scale(clickOffset2.Y + (int)jump), GlobalGraphics.Scale(clickOffset2.Width), GlobalGraphics.Scale(clickOffset2.Height)), clickColor);
             }
+
             spriteBatch.Draw(logo, new Rectangle(GlobalGraphics.Scale(10 + 21 + 1), GlobalGraphics.Scale(10 + 1 + (int)jump), GlobalGraphics.Scale(logo.Width), GlobalGraphics.Scale(logo.Height)), Color.Black);
             spriteBatch.Draw(logo, new Rectangle(GlobalGraphics.Scale(10 + 21), GlobalGraphics.Scale(10 + (int)jump), GlobalGraphics.Scale(logo.Width), GlobalGraphics.Scale(logo.Height)), Color.White);
             spriteBatch.Draw(icon, new Rectangle(GlobalGraphics.Scale(10 + 1), GlobalGraphics.Scale(11 + 1 + (int)jump), GlobalGraphics.Scale(icon.Width), GlobalGraphics.Scale(icon.Height)), Color.Black);
             spriteBatch.Draw(icon, new Rectangle(GlobalGraphics.Scale(10), GlobalGraphics.Scale(11 + (int)jump), GlobalGraphics.Scale(icon.Width), GlobalGraphics.Scale(icon.Height)), Color.White);
-
+            
+            if(Debug.GetDebugMode())
+            {
+                if(Pagination.SelectedPage == Pagination.TopPageCount)
+                {
+                    spriteBatch.Draw(GlobalContent.GetTexture("Pixel"), new Rectangle(GlobalGraphics.Scale(10 + 21 + 51 + 1), GlobalGraphics.Scale(10 + 6 - 1 + 1), GlobalGraphics.Scale(debug.Width + 2), GlobalGraphics.Scale(debug.Height + 2)), Color.Black);
+                    spriteBatch.Draw(GlobalContent.GetTexture("Pixel"), new Rectangle(GlobalGraphics.Scale(10 + 21 + 51), GlobalGraphics.Scale(10 + 6 - 1), GlobalGraphics.Scale(debug.Width + 2), GlobalGraphics.Scale(debug.Height + 2)), Color.Red);
+                }
+                else
+                {
+                    spriteBatch.Draw(debug, new Rectangle(GlobalGraphics.Scale(10 + 21 + 1 + 52), GlobalGraphics.Scale(10 + 6 + 1), GlobalGraphics.Scale(debug.Width), GlobalGraphics.Scale(debug.Height)), Color.Black);
+                }
+                spriteBatch.Draw(debug, new Rectangle(GlobalGraphics.Scale(10 + 21 + 52), GlobalGraphics.Scale(10 + 6), GlobalGraphics.Scale(debug.Width), GlobalGraphics.Scale(debug.Height)), Color.White);
+            }
+            
             // Draw rendering progress
             if(Global.generator.progressText != "")
             {
@@ -245,11 +252,12 @@ namespace NonsensicalVideoGenerator
                 if(MouseInput.MouseState.LeftButton == ButtonState.Pressed && MouseInput.LastMouseState.LeftButton == ButtonState.Released)
                 {
                     Texture2D logo = GlobalContent.GetTexture("Logo");
+                    Texture2D icon = GlobalContent.GetTexture("Icon");
+                    Texture2D debug = GlobalContent.GetTexture("Debug");
                     if(MouseInput.MouseState.X >= GlobalGraphics.Scale(10) && MouseInput.MouseState.X <= GlobalGraphics.Scale(10) + GlobalGraphics.Scale(logo.Width) + GlobalGraphics.Scale(21) && MouseInput.MouseState.Y >= GlobalGraphics.Scale(10) && MouseInput.MouseState.Y <= GlobalGraphics.Scale(10) + GlobalGraphics.Scale(logo.Height))
                     {
                         if(!bool.Parse(SaveData.saveValues["DisableMotion"]))
                         {
-                            Texture2D icon = GlobalContent.GetTexture("Icon");
                             Color clickColor = new Color(255, 255, 255, 255);
                             Rectangle clickOffset = new Rectangle(10 + 21, 10, logo.Width, logo.Height);
                             Rectangle clickOffset2 = new Rectangle(10, 11, icon.Width, icon.Height);
@@ -283,6 +291,28 @@ namespace NonsensicalVideoGenerator
                         }
                         return true;
                     }
+                    else if(MouseInput.MouseState.X >= GlobalGraphics.Scale(10 + 21 + 52) && MouseInput.MouseState.X <= GlobalGraphics.Scale(10 + 21 + 52) + GlobalGraphics.Scale(debug.Width) && MouseInput.MouseState.Y >= GlobalGraphics.Scale(10 + 6) && MouseInput.MouseState.Y <= GlobalGraphics.Scale(10 + 6) + GlobalGraphics.Scale(debug.Height))
+                    {
+                        if(Debug.GetDebugMode())
+                        {
+                            if(Pagination.SelectedPage != Pagination.TopPageCount)
+                            {
+                                GlobalContent.GetSound("Select").Play(int.Parse(SaveData.saveValues["SoundEffectVolume"], System.Globalization.CultureInfo.InvariantCulture) / 100f, 0f, 0f);
+                                Pagination.SetPage(Pagination.TopPageCount);
+                                ScreenManager.PushNavigation("Content");
+                                ScreenManager.GetScreen<ContentScreen>("Content")?.Show();
+                                ScreenManager.GetScreen<ContentScreen>("Content").offset = new Vector2(0, 0);
+                                ScreenManager.GetScreen<ContentScreen>("Content").layer = 999;
+                            }
+                            else
+                            {
+                                GlobalContent.GetSound("Back").Play(int.Parse(SaveData.saveValues["SoundEffectVolume"], System.Globalization.CultureInfo.InvariantCulture) / 100f, 0f, 0f);
+                                Pagination.SetPage(0);
+                                ScreenManager.GetScreen<ContentScreen>("Content").layer = 3;
+                            }
+                            return true;
+                        }
+                    }
                 }
             }
             return false;
@@ -295,6 +325,7 @@ namespace NonsensicalVideoGenerator
             GlobalContent.AddTexture("Icon", ThemeManager.LoadLayeredContent<Texture2D>("graphics/icon"));
             GlobalContent.AddTexture("IconMask", ThemeManager.LoadLayeredContent<Texture2D>("graphics/iconmask"));
             GlobalContent.AddTexture("LogoBG", ThemeManager.LoadLayeredContent<Texture2D>("graphics/bannerbg"));
+            GlobalContent.AddTexture("Debug", ThemeManager.LoadLayeredContent<Texture2D>("graphics/debug"));
         }
     }
 #endif

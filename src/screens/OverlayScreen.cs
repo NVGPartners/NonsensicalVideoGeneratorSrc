@@ -1,5 +1,6 @@
 #if MONOGAME
 using System;
+using System.Linq;
 using System.Reflection;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Content;
@@ -18,10 +19,11 @@ namespace NonsensicalVideoGenerator
         /// The title of the screen. This is displayed on the header bar.
         /// </summary>
         public string title { get; } = "Border";
-        public int layer { get; } = 100;
+        public int layer { get; set; } = 100;
         public ScreenType screenType { get; set; } = ScreenType.Drawn;
         public int currentPlacement { get; set; } = -1;
         private float exitOpacity = 0f;
+        private bool tooltipVisible = false;
         public Color bgColor = new Color(128, 128, 128);
         public void Show()
         {
@@ -35,6 +37,25 @@ namespace NonsensicalVideoGenerator
         }
         public void Draw(GameTime gameTime, SpriteBatch spriteBatch)
         {
+            // Draw tooltip.
+            if(Global.tooltip != "" && Global.canRender && tooltipVisible)
+            {
+                string tooltip = Global.tooltip;
+                // Remove non-ascii characters (except newlines)
+                tooltip = new string(tooltip.ToCharArray().Where(c => c == '\n' || c < 128).ToArray());
+                Vector2 tooltipSize = L.FontSmall().MeasureString(tooltip);
+                // Position is relative to mouse position but tries to avoid going off screen
+                Vector2 position = new(MouseInput.MouseState.Position.X + 16, MouseInput.MouseState.Position.Y + 16);
+                // Make sure it doesn't go off the right side of the screen
+                if (position.X + tooltipSize.X + GlobalGraphics.Scale(6) > GlobalGraphics.scaledWidth)
+                    position.X = GlobalGraphics.scaledWidth - tooltipSize.X - GlobalGraphics.Scale(6);
+                // Make sure it doesn't go off the bottom of the screen
+                if (position.Y + tooltipSize.Y + GlobalGraphics.Scale(2) > GlobalGraphics.scaledHeight)
+                    position.Y = GlobalGraphics.scaledHeight - tooltipSize.Y - GlobalGraphics.Scale(2); 
+                spriteBatch.Draw(GlobalContent.GetTexture("Pixel"), new Rectangle((int)position.X, (int)position.Y, (int)tooltipSize.X + GlobalGraphics.Scale(2), (int)tooltipSize.Y - GlobalGraphics.Scale(2)), ThemeManager.GetColor("BackgroundTooltip"));
+                // White text
+                spriteBatch.DrawString(L.FontSmall(), tooltip, new Vector2(position.X + GlobalGraphics.Scale(2), position.Y - GlobalGraphics.Scale(2)), Color.White);
+            }
             // Draw mask.
             Global.mask.Draw(gameTime, spriteBatch);
             spriteBatch.Draw(GlobalContent.GetTexture("Pixel"), new Rectangle(0, 0, GlobalGraphics.scaledWidth, GlobalGraphics.scaledHeight), new Color(0, 0, 0, exitOpacity));
@@ -46,6 +67,7 @@ namespace NonsensicalVideoGenerator
         }
         public bool Update(GameTime gameTime, bool handleInput)
         {
+            tooltipVisible = handleInput;
             // Update the mask.
             if(Global.mask.Update(gameTime, handleInput))
                 return true;

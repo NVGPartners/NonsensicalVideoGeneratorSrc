@@ -29,7 +29,7 @@ namespace NonsensicalVideoGenerator
                 // Update all interactables.
                 foreach (KeyValuePair<string, IInteractable> interactable in interactables)
                 {
-                    if(interactable.Value.Update(gameTime, handleInput))
+                    if(interactable.Value.Update(gameTime, handleInput, interactable.Key))
                         returnValue = true;
                 }
             }
@@ -41,7 +41,7 @@ namespace NonsensicalVideoGenerator
             // Draw all interactables.
             foreach (KeyValuePair<string, IInteractable> interactable in interactables)
             {
-                interactable.Value.Draw(gameTime, spriteBatch);
+                interactable.Value.Draw(gameTime, spriteBatch, interactable.Key);
             }
         }
         public void LoadContent(ContentManager contentManager, GraphicsDevice graphicsDevice)
@@ -49,7 +49,7 @@ namespace NonsensicalVideoGenerator
             // Load content for all interactables.
             foreach (KeyValuePair<string, IInteractable> interactable in interactables)
             {
-                interactable.Value.LoadContent(contentManager, graphicsDevice);
+                interactable.Value.LoadContent(contentManager, graphicsDevice, interactable.Key);
             }
         }
         // Clear managed interactables.

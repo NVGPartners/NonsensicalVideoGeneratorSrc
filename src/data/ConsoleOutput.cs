@@ -157,7 +157,9 @@ namespace NonsensicalVideoGenerator
                     string[] colorValues = colorString.Split(',');
                     if(colorValues.Length == 3)
                     {
-                        if (int.TryParse(colorValues[0], out int r) && int.TryParse(colorValues[1], out int g) && int.TryParse(colorValues[2], out int b))
+                        if (int.TryParse(colorValues[0], System.Globalization.NumberStyles.Integer, System.Globalization.CultureInfo.InvariantCulture, out int r)
+                        && int.TryParse(colorValues[1], System.Globalization.NumberStyles.Integer, System.Globalization.CultureInfo.InvariantCulture, out int g)
+                        && int.TryParse(colorValues[2], System.Globalization.NumberStyles.Integer, System.Globalization.CultureInfo.InvariantCulture, out int b))
                         {
 #if MONOGAME
                             c = new Color(r, g, b);

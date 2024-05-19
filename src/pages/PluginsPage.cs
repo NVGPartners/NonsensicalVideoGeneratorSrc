@@ -2,6 +2,7 @@
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
+using System.Globalization;
 using System.IO;
 using System.Linq;
 using Microsoft.Xna.Framework;
@@ -44,7 +45,7 @@ namespace NonsensicalVideoGenerator
             Texture2D scrollHandle = GlobalContent.GetTexture("ScrollHandle");
             Texture2D interactiveSwitchOn = GlobalContent.GetTexture("InteractiveSwitchOn");
             Texture2D interactiveSwitchOff = GlobalContent.GetTexture("InteractiveSwitchOff");
-            SpriteFont munroSmall = GlobalContent.GetFont("MunroSmall");
+            SpriteFont munroSmall = L.FontSmall();
             Texture2D pixel = GlobalContent.GetTexture("Pixel");
             if(!editingSettings)
             {
@@ -67,11 +68,13 @@ namespace NonsensicalVideoGenerator
                     spriteBatch.Begin(SpriteSortMode.Deferred, BlendState.AlphaBlend, SamplerState.PointClamp, null, rasterizerState, null, Matrix.CreateTranslation(GlobalGraphics.Scale(cntscr.offset.X / GlobalGraphics.scale), GlobalGraphics.Scale((cntscr.offset.Y / GlobalGraphics.scale) + -scrollOffset), 0));
                 }
                 int plcount = PluginHandler.GetPluginCount() + 1;
+                int offsetpl = 0;
                 for(int i = 0; i < plcount; i++)
                 {
+                    bool filtered = false;
                     // Alternate colors so it's easier to see
                     Color curColor = ThemeManager.GetColor("PluginEntryGenericPluginsPage");
-                    if(i % 2 != 0)
+                    if((i -  offsetpl) % 2 != 0)
                         curColor = ThemeManager.GetColor("PluginEntryGenericAltPluginsPage");
                     if(i < plcount-1)
                     {
@@ -81,42 +84,126 @@ namespace NonsensicalVideoGenerator
                             case AddonType.Effect: // blue 
                                 //curColor = new Color(192, 192, 255);
                                 curColor = ThemeManager.GetColor("PluginEntryEffectPluginsPage");
-                                if(i % 2 != 0)
+                                if((i -  offsetpl) % 2 != 0)
                                     curColor = ThemeManager.GetColor("PluginEntryEffectAltPluginsPage");
+                                if(!PluginHandler.pluginListFilter.HasFlag(PluginListFilter.Effects))
+                                    filtered = true;
                                 break;
                             case AddonType.PostRenderEffect: // green
                                 //curColor = new Color(192, 255, 192);
                                 curColor = ThemeManager.GetColor("PluginEntryPostRenderEffectPluginsPage");
-                                if(i % 2 != 0)
+                                if((i -  offsetpl) % 2 != 0)
                                     curColor = ThemeManager.GetColor("PluginEntryPostRenderEffectAltPluginsPage");
+                                if(!PluginHandler.pluginListFilter.HasFlag(PluginListFilter.PostRenderEffects))
+                                    filtered = true;
                                 break;
                             case AddonType.Theme: // red
                                 //curColor = new Color(255, 192, 192);
                                 curColor = ThemeManager.GetColor("PluginEntryThemePluginsPage");
-                                if(i % 2 != 0)
+                                if((i -  offsetpl) % 2 != 0)
                                     curColor = ThemeManager.GetColor("PluginEntryThemeAltPluginsPage");
+                                if(!PluginHandler.pluginListFilter.HasFlag(PluginListFilter.Themes))
+                                    filtered = true;
                                 break;
                         }
-                        spriteBatch.Draw(pluginEntry, new Rectangle(GlobalGraphics.Scale(136), GlobalGraphics.Scale(57 + i * pluginEntry.Height + i), pluginEntry.Width * GlobalGraphics.scale, pluginEntry.Height * GlobalGraphics.scale), curColor);
-                        spriteBatch.DrawString(munroSmall, PluginHandler.plugins[i].GetDisplayName(), new Vector2(GlobalGraphics.Scale(141+1), GlobalGraphics.Scale(58+1 + i * pluginEntry.Height + i)), Color.Black);
-                        spriteBatch.DrawString(munroSmall, PluginHandler.plugins[i].GetDisplayName(), new Vector2(GlobalGraphics.Scale(141), GlobalGraphics.Scale(58 + i * pluginEntry.Height + i)), Color.White);
+
+                        // Filtered out
+                        if(filtered)
+                        {
+                            offsetpl++;
+                            continue;
+                        }
+
+                        // Draw the plugin entry
+                        spriteBatch.Draw(pluginEntry, new Rectangle(GlobalGraphics.Scale(136), GlobalGraphics.Scale(57 + (i-offsetpl) * pluginEntry.Height + (i-offsetpl)), pluginEntry.Width * GlobalGraphics.scale, pluginEntry.Height * GlobalGraphics.scale), curColor);
+                                
+                        // Set up the plugin name
+                        string nam = PluginHandler.plugins[i].GetDisplayName();
+                        if(nam == "")
+                            nam = "My";
+                        if(nam.Contains(".lua"))
+                            nam = nam.Replace(".lua", "");
+
+                        // Capitalize first letter
+                        nam = nam.First().ToString().ToUpper() + nam.Substring(1);
+
+                        // Remove type from name if it already has it
+                        if(PluginHandler.plugins[i].GetAddonType() == AddonType.Effect)
+                        {
+                            if(nam.ToLower().EndsWith(" effect"))
+                                nam = nam.Substring(0, nam.Length - 7);
+                        }
+                        else if(PluginHandler.plugins[i].GetAddonType() == AddonType.PostRenderEffect)
+                        {
+                            if(nam.ToLower().EndsWith(" post-render effect") || nam.ToLower().EndsWith(" post render effect"))
+                                nam = nam.Substring(0, nam.Length - 17);
+                            if(nam.ToLower().EndsWith(" postrender effect"))
+                                nam = nam.Substring(0, nam.Length - 15);
+                            if(nam.ToLower().EndsWith(" post"))
+                                nam = nam.Substring(0, nam.Length - 5);
+                            if(nam.ToLower().EndsWith(" pr-effect") || nam.ToLower().EndsWith(" pr effect"))
+                                nam = nam.Substring(0, nam.Length - 10);
+                            if(nam.ToLower().EndsWith(" preffect"))
+                                nam = nam.Substring(0, nam.Length - 8);
+                        }
+                        else if(PluginHandler.plugins[i].GetAddonType() == AddonType.Theme)
+                        {
+                            if(nam.ToLower().EndsWith(" theme"))
+                                nam = nam.Substring(0, nam.Length - 6);
+                            if(nam.ToLower().EndsWith(" bg"))
+                                nam = nam.Substring(0, nam.Length - 3);
+                            if(nam.ToLower().EndsWith(" background"))
+                                nam = nam.Substring(0, nam.Length - 10);
+                        }
+
+                        // Add type to name
+                        switch(PluginHandler.plugins[i].GetAddonType())
+                        {
+                            case AddonType.Effect:
+                                if(nam.Length + 7 <= 26)
+                                    nam += " Effect";
+                                break;
+                            case AddonType.PostRenderEffect:
+                                if(nam.Length + 19 <= 26)
+                                    nam += " Post-Render Effect";
+                                // special case: abbreviate because this type is kinda long 
+                                else if(nam.Length + 10 <= 26)
+                                    nam += " PR-Effect";
+                                break;
+                            case AddonType.Theme:
+                                if(nam.Length + 6 <= 26)
+                                    nam += " Theme";
+                                break;
+                        }
+
+                        // Fit name to width
+                        int maxPixels = 110 - GlobalGraphics.GetSmallStringWidth("...");
+                        int namWidth = GlobalGraphics.GetSmallStringWidth(nam);
+                        while(namWidth > maxPixels)
+                        {
+                            nam = nam.Substring(0, nam.Length - 1);
+                            namWidth = GlobalGraphics.GetSmallStringWidth(nam);
+                        }
+
+                        spriteBatch.DrawString(munroSmall, nam, new Vector2(GlobalGraphics.Scale(141+1), GlobalGraphics.Scale(58+1 + (i-offsetpl) * pluginEntry.Height + (i-offsetpl))), Color.Black);
+                        spriteBatch.DrawString(munroSmall, nam, new Vector2(GlobalGraphics.Scale(141), GlobalGraphics.Scale(58 + (i-offsetpl) * pluginEntry.Height + (i-offsetpl))), Color.White);
                         if(Global.canRender)
                         {
-                            spriteBatch.Draw(PluginHandler.plugins[i].enabled ? interactiveSwitchOn : interactiveSwitchOff, new Rectangle(GlobalGraphics.Scale(271), GlobalGraphics.Scale(60 + i * pluginEntry.Height + i), interactiveSwitchOn.Width * GlobalGraphics.scale, interactiveSwitchOn.Height * GlobalGraphics.scale), Color.White);
+                            spriteBatch.Draw(PluginHandler.plugins[i].enabled ? interactiveSwitchOn : interactiveSwitchOff, new Rectangle(GlobalGraphics.Scale(271), GlobalGraphics.Scale(60 + (i-offsetpl) * pluginEntry.Height + (i-offsetpl)), interactiveSwitchOn.Width * GlobalGraphics.scale, interactiveSwitchOn.Height * GlobalGraphics.scale), Color.White);
                         }
                         else
                         {
-                            spriteBatch.DrawString(munroSmall, "...", new Vector2(GlobalGraphics.Scale(277+1), GlobalGraphics.Scale(58 + 1 + i * pluginEntry.Height + i)), Color.Black);
-                            spriteBatch.DrawString(munroSmall, "...", new Vector2(GlobalGraphics.Scale(277), GlobalGraphics.Scale(58 + i * pluginEntry.Height + i)), Color.White);
+                            spriteBatch.DrawString(munroSmall, "...", new Vector2(GlobalGraphics.Scale(277+1), GlobalGraphics.Scale(58 + 1 + (i-offsetpl) * pluginEntry.Height + (i-offsetpl))), Color.Black);
+                            spriteBatch.DrawString(munroSmall, "...", new Vector2(GlobalGraphics.Scale(277), GlobalGraphics.Scale(58 + (i-offsetpl) * pluginEntry.Height + (i-offsetpl))), Color.White);
                         }
                     }
                     else
                     {
                         // Alternate colors so it's easier to see
-                        spriteBatch.Draw(pluginEntryBlank, new Rectangle(GlobalGraphics.Scale(136), GlobalGraphics.Scale(57 + i * pluginEntry.Height + i), pluginEntry.Width * GlobalGraphics.scale, pluginEntry.Height * GlobalGraphics.scale), curColor);
+                        spriteBatch.Draw(pluginEntryBlank, new Rectangle(GlobalGraphics.Scale(136), GlobalGraphics.Scale(57 + (i-offsetpl) * pluginEntry.Height + (i-offsetpl)), pluginEntry.Width * GlobalGraphics.scale, pluginEntry.Height * GlobalGraphics.scale), curColor);
                         // create plugin
-                        spriteBatch.DrawString(munroSmall, "Addon Management", new Vector2(GlobalGraphics.Scale(141+1), GlobalGraphics.Scale(58+1 + i * pluginEntry.Height + i)), Color.Black);
-                        spriteBatch.DrawString(munroSmall, "Addon Management", new Vector2(GlobalGraphics.Scale(141), GlobalGraphics.Scale(58 + i * pluginEntry.Height + i)), Color.White);
+                        spriteBatch.DrawString(munroSmall, "Addon Management", new Vector2(GlobalGraphics.Scale(141+1), GlobalGraphics.Scale(58+1 + (i-offsetpl) * pluginEntry.Height + (i-offsetpl))), Color.Black);
+                        spriteBatch.DrawString(munroSmall, "Addon Management", new Vector2(GlobalGraphics.Scale(141), GlobalGraphics.Scale(58 + (i-offsetpl) * pluginEntry.Height + (i-offsetpl))), Color.White);
                     }
                 }
                 // End offset
@@ -144,31 +231,48 @@ namespace NonsensicalVideoGenerator
             }
             if (internalTooltip != "")
             {
-                // Get text size
-                Vector2 tooltipSize = GlobalContent.GetFont("MunroSmall").MeasureString(internalTooltip);
-                // Position is relative to mouse position but tries to avoid going off screen
-                Vector2 position = new(MouseInput.MouseState.Position.X + 10, MouseInput.MouseState.Position.Y + 10);
-                // Make sure it doesn't go off the right side of the screen
-                if (position.X + tooltipSize.X + GlobalGraphics.Scale(6) > GlobalGraphics.scaledWidth)
-                    position.X = GlobalGraphics.scaledWidth - tooltipSize.X - GlobalGraphics.Scale(6);
-                // Make sure it doesn't go off the bottom of the screen
-                if (position.Y + tooltipSize.Y + GlobalGraphics.Scale(2) > GlobalGraphics.scaledHeight)
-                    position.Y = GlobalGraphics.scaledHeight - tooltipSize.Y - GlobalGraphics.Scale(2); 
-                spriteBatch.Draw(GlobalContent.GetTexture("Pixel"), new Rectangle((int)position.X, (int)position.Y, (int)tooltipSize.X + GlobalGraphics.Scale(2), (int)tooltipSize.Y - GlobalGraphics.Scale(2)), ThemeManager.GetColor("BackgroundTooltip"));
-                // White text
-                spriteBatch.DrawString(GlobalContent.GetFont("MunroSmall"), internalTooltip, new Vector2(position.X + GlobalGraphics.Scale(2), position.Y - GlobalGraphics.Scale(2)), Color.White);
+                Global.tooltip = internalTooltip;
             }
         }
         public bool Update(GameTime gameTime, bool handleInput)
         {
             int plcount = PluginHandler.GetPluginCount() + 1;
-            int tempMaxScrollOffset = plcount;
+            int offsetpl = 0;
+            for(int i = 0; i < plcount; i++)
+            {
+                bool filtered = false;
+                if(i < plcount-1)
+                {
+                    switch(PluginHandler.plugins[i].GetAddonType())
+                    {
+                        case AddonType.Effect:
+                            if(!PluginHandler.pluginListFilter.HasFlag(PluginListFilter.Effects))
+                                filtered = true;
+                            break;
+                        case AddonType.PostRenderEffect:
+                            if(!PluginHandler.pluginListFilter.HasFlag(PluginListFilter.PostRenderEffects))
+                                filtered = true;
+                            break;
+                        case AddonType.Theme:
+                            if(!PluginHandler.pluginListFilter.HasFlag(PluginListFilter.Themes))
+                                filtered = true;
+                            break;
+                    }
+                    if(filtered)
+                    {
+                        offsetpl++;
+                        continue;
+                    }
+                }
+            }
+            int tempMaxScrollOffset = plcount - offsetpl;
             tempMaxScrollOffset -= 11;
             if(tempMaxScrollOffset <= 0)
             {
                 tempMaxScrollOffset = 0;
             }
             maxScrollOffset = tempMaxScrollOffset * 16;
+            offsetpl = 0;
             if(handleInput)
             {
                 internalTooltip = "";
@@ -178,8 +282,29 @@ namespace NonsensicalVideoGenerator
                     {
                         if(i < plcount-1)
                         {
+                            bool filtered = false;
+                            switch(PluginHandler.plugins[i].GetAddonType())
+                            {
+                                case AddonType.Effect:
+                                    if(!PluginHandler.pluginListFilter.HasFlag(PluginListFilter.Effects))
+                                        filtered = true;
+                                    break;
+                                case AddonType.PostRenderEffect:
+                                    if(!PluginHandler.pluginListFilter.HasFlag(PluginListFilter.PostRenderEffects))
+                                        filtered = true;
+                                    break;
+                                case AddonType.Theme:
+                                    if(!PluginHandler.pluginListFilter.HasFlag(PluginListFilter.Themes))
+                                        filtered = true;
+                                    break;
+                            }
+                            if(filtered)
+                            {
+                                offsetpl++;
+                                continue;
+                            }
                             if (MouseInput.MouseState.X >= GlobalGraphics.Scale(269) && MouseInput.MouseState.X < GlobalGraphics.Scale(290)
-                                && MouseInput.MouseState.Y >= GlobalGraphics.Scale(59 + (i * 16) - scrollOffset) && MouseInput.MouseState.Y < GlobalGraphics.Scale(70 + (i * 16) - scrollOffset))
+                                && MouseInput.MouseState.Y >= GlobalGraphics.Scale(59 + ((i-offsetpl) * 16) - scrollOffset) && MouseInput.MouseState.Y < GlobalGraphics.Scale(70 + ((i-offsetpl) * 16) - scrollOffset))
                             {
                                 internalTooltip = Global.canRender ?"Click to toggle addon." : "Loading...";
                             }
@@ -189,7 +314,7 @@ namespace NonsensicalVideoGenerator
                                 inRange = 267; // No settings button
                             }
                             if (MouseInput.MouseState.X >= GlobalGraphics.Scale(138) && MouseInput.MouseState.X < GlobalGraphics.Scale(inRange)
-                                && MouseInput.MouseState.Y >= GlobalGraphics.Scale(59 + (i * 16) - scrollOffset) && MouseInput.MouseState.Y < GlobalGraphics.Scale(70 + (i * 16) - scrollOffset))
+                                && MouseInput.MouseState.Y >= GlobalGraphics.Scale(59 + ((i-offsetpl) * 16) - scrollOffset) && MouseInput.MouseState.Y < GlobalGraphics.Scale(70 + ((i-offsetpl) * 16) - scrollOffset))
                             {
                                 // Is this a workshop plugin?
                                 // If so, tooltip should be "Open workshop page."
@@ -206,7 +331,7 @@ namespace NonsensicalVideoGenerator
                             if(Global.canRender)
                             {
                                 if (MouseInput.MouseState.X >= GlobalGraphics.Scale(256) && MouseInput.MouseState.X < GlobalGraphics.Scale(267)
-                                    && MouseInput.MouseState.Y >= GlobalGraphics.Scale(59 + (i * 16) - scrollOffset) && MouseInput.MouseState.Y < GlobalGraphics.Scale(70 + (i * 16) - scrollOffset))
+                                    && MouseInput.MouseState.Y >= GlobalGraphics.Scale(59 + ((i-offsetpl) * 16) - scrollOffset) && MouseInput.MouseState.Y < GlobalGraphics.Scale(70 + ((i-offsetpl) * 16) - scrollOffset))
                                 {
                                     internalTooltip = "Edit settings.";
                                 }
@@ -216,7 +341,7 @@ namespace NonsensicalVideoGenerator
                         {
                             // create plugin
                             if (MouseInput.MouseState.X >= GlobalGraphics.Scale(138) && MouseInput.MouseState.X < GlobalGraphics.Scale(290)
-                                && MouseInput.MouseState.Y >= GlobalGraphics.Scale(59 + (i * 16) - scrollOffset) && MouseInput.MouseState.Y < GlobalGraphics.Scale(70 + (i * 16) - scrollOffset))
+                                && MouseInput.MouseState.Y >= GlobalGraphics.Scale(59 + ((i-offsetpl) * 16) - scrollOffset) && MouseInput.MouseState.Y < GlobalGraphics.Scale(70 + ((i-offsetpl) * 16) - scrollOffset))
                             {
                                 internalTooltip = "Create or reload addons.";
                             }
@@ -359,41 +484,85 @@ namespace NonsensicalVideoGenerator
                     // Accessibility
                     Accessibility.CompatAccessibility(new Rectangle(GlobalGraphics.Scale(294), GlobalGraphics.Scale(57), GlobalGraphics.Scale(11), GlobalGraphics.Scale(11)), "Scroll Up");
                     Accessibility.CompatAccessibility(new Rectangle(GlobalGraphics.Scale(294), GlobalGraphics.Scale(224), GlobalGraphics.Scale(11), GlobalGraphics.Scale(11)), "Scroll Down");
+                    offsetpl = 0;
                     for (int i = 0; i < plcount; i++)
                     {
                         if(i < plcount-1)
                         {
+                            bool filtered = false;
+                            switch(PluginHandler.plugins[i].GetAddonType())
+                            {
+                                case AddonType.Effect:
+                                    if(!PluginHandler.pluginListFilter.HasFlag(PluginListFilter.Effects))
+                                        filtered = true;
+                                    break;
+                                case AddonType.PostRenderEffect:
+                                    if(!PluginHandler.pluginListFilter.HasFlag(PluginListFilter.PostRenderEffects))
+                                        filtered = true;
+                                    break;
+                                case AddonType.Theme:
+                                    if(!PluginHandler.pluginListFilter.HasFlag(PluginListFilter.Themes))
+                                        filtered = true;
+                                    break;
+                            }
+                            if(filtered)
+                            {
+                                offsetpl++;
+                                continue;
+                            }
                             int inRange = 254;
                             if(!Global.canRender)
                             {
                                 inRange = 267; // No settings button
                             }
                             // Toggle Button
-                            Accessibility.CompatAccessibility(new Rectangle(GlobalGraphics.Scale(269), GlobalGraphics.Scale(59 + (i * 16) - scrollOffset), GlobalGraphics.Scale(21), GlobalGraphics.Scale((70 + (i * 16) - scrollOffset) - (59 + (i * 16) - scrollOffset))), (PluginHandler.plugins[i].enabled ? "Disable " : "Enable ") + "\"" + PluginHandler.plugins[i].GetDisplayName() + "\"");
+                            Accessibility.CompatAccessibility(new Rectangle(GlobalGraphics.Scale(269), GlobalGraphics.Scale(59 + ((i-offsetpl) * 16) - scrollOffset), GlobalGraphics.Scale(21), GlobalGraphics.Scale((70 + ((i-offsetpl) * 16) - scrollOffset) - (59 + ((i-offsetpl) * 16) - scrollOffset))), (PluginHandler.plugins[i].enabled ? "Disable " : "Enable ") + "\"" + PluginHandler.plugins[i].GetDisplayName() + "\"");
                             if(Global.canRender)
                             {
                                 // Settings Button
-                                Accessibility.CompatAccessibility(new Rectangle(GlobalGraphics.Scale(256), GlobalGraphics.Scale(59 + (i * 16) - scrollOffset), GlobalGraphics.Scale(11), GlobalGraphics.Scale((70 + (i * 16) - scrollOffset) - (59 + (i * 16) - scrollOffset))), "Settings for \"" + PluginHandler.plugins[i].GetDisplayName() + "\"");
+                                Accessibility.CompatAccessibility(new Rectangle(GlobalGraphics.Scale(256), GlobalGraphics.Scale(59 + ((i-offsetpl) * 16) - scrollOffset), GlobalGraphics.Scale(11), GlobalGraphics.Scale((70 + ((i-offsetpl) * 16) - scrollOffset) - (59 + ((i-offsetpl) * 16) - scrollOffset))), L.T(0, "Accessibility:AddonsSettings", PluginHandler.plugins[i].GetDisplayName()));
                             }
                             // Main Button
-                            Accessibility.CompatAccessibility(new Rectangle(GlobalGraphics.Scale(138), GlobalGraphics.Scale(59 + (i * 16) - scrollOffset), GlobalGraphics.Scale(inRange-138), GlobalGraphics.Scale((70 + (i * 16) - scrollOffset) - (59 + (i * 16) - scrollOffset))), "Open container for \"" + PluginHandler.plugins[i].GetDisplayName() + "\"");
+                            Accessibility.CompatAccessibility(new Rectangle(GlobalGraphics.Scale(138), GlobalGraphics.Scale(59 + ((i-offsetpl) * 16) - scrollOffset), GlobalGraphics.Scale(inRange-138), GlobalGraphics.Scale((70 + ((i-offsetpl) * 16) - scrollOffset) - (59 + ((i-offsetpl) * 16) - scrollOffset))), L.T(0, "Accessibility:AddonsOpenContainer", PluginHandler.plugins[i].GetDisplayName()));
                         }
                         else
                         {
                             // create plugin
-                            Accessibility.CompatAccessibility(new Rectangle(GlobalGraphics.Scale(138), GlobalGraphics.Scale(59 + (i * 16) - scrollOffset), GlobalGraphics.Scale(152), GlobalGraphics.Scale((70 + (i * 16) - scrollOffset) - (59 + (i * 16) - scrollOffset))), "Addon Management (Create or reload addons.)");
+                            Accessibility.CompatAccessibility(new Rectangle(GlobalGraphics.Scale(138), GlobalGraphics.Scale(59 + ((i-offsetpl) * 16) - scrollOffset), GlobalGraphics.Scale(152), GlobalGraphics.Scale((70 + ((i-offsetpl) * 16) - scrollOffset) - (59 + ((i-offsetpl) * 16) - scrollOffset))), L.T(0, "Accessibility:AddonsManagement"));
                         }
                     }
                     if(MouseInput.MouseState.LeftButton == ButtonState.Pressed && MouseInput.LastMouseState.LeftButton == ButtonState.Released)
                     {
+                        offsetpl = 0;
                         // Plugin entries
                         for (int i = 0; i < plcount; i++)
                         {
                             if(i < plcount-1)
                             {
+                                bool filtered = false;
+                                switch(PluginHandler.plugins[i].GetAddonType())
+                                {
+                                    case AddonType.Effect:
+                                        if(!PluginHandler.pluginListFilter.HasFlag(PluginListFilter.Effects))
+                                            filtered = true;
+                                        break;
+                                    case AddonType.PostRenderEffect:
+                                        if(!PluginHandler.pluginListFilter.HasFlag(PluginListFilter.PostRenderEffects))
+                                            filtered = true;
+                                        break;
+                                    case AddonType.Theme:
+                                        if(!PluginHandler.pluginListFilter.HasFlag(PluginListFilter.Themes))
+                                            filtered = true;
+                                        break;
+                                }
+                                if(filtered)
+                                {
+                                    offsetpl++;
+                                    continue;
+                                }
                                 // Toggle button
                                 if (MouseInput.MouseState.X >= GlobalGraphics.Scale(269) && MouseInput.MouseState.X < GlobalGraphics.Scale(290)
-                                    && MouseInput.MouseState.Y >= GlobalGraphics.Scale(59 + (i * 16) - scrollOffset) && MouseInput.MouseState.Y < GlobalGraphics.Scale(70 + (i * 16) - scrollOffset))
+                                    && MouseInput.MouseState.Y >= GlobalGraphics.Scale(59 + ((i-offsetpl) * 16) - scrollOffset) && MouseInput.MouseState.Y < GlobalGraphics.Scale(70 + ((i-offsetpl) * 16) - scrollOffset))
                                 {
                                     if(Global.canRender)
                                     {
@@ -443,7 +612,7 @@ namespace NonsensicalVideoGenerator
                                     inRange = 267; // No settings button
                                 }
                                 if (MouseInput.MouseState.X >= GlobalGraphics.Scale(138) && MouseInput.MouseState.X < GlobalGraphics.Scale(inRange)
-                                    && MouseInput.MouseState.Y >= GlobalGraphics.Scale(59 + (i * 16) - scrollOffset) && MouseInput.MouseState.Y < GlobalGraphics.Scale(70 + (i * 16) - scrollOffset))
+                                    && MouseInput.MouseState.Y >= GlobalGraphics.Scale(59 + ((i-offsetpl) * 16) - scrollOffset) && MouseInput.MouseState.Y < GlobalGraphics.Scale(70 + ((i-offsetpl) * 16) - scrollOffset))
                                 {
                                     GlobalContent.GetSound("Option").Play(int.Parse(SaveData.saveValues["SoundEffectVolume"], System.Globalization.CultureInfo.InvariantCulture) / 100f, 0f, 0f);
                                     // Open directory and select file
@@ -486,7 +655,7 @@ namespace NonsensicalVideoGenerator
                                 if(Global.canRender)
                                 {
                                     if (MouseInput.MouseState.X >= GlobalGraphics.Scale(256) && MouseInput.MouseState.X < GlobalGraphics.Scale(267)
-                                        && MouseInput.MouseState.Y >= GlobalGraphics.Scale(59 + (i * 16) - scrollOffset) && MouseInput.MouseState.Y < GlobalGraphics.Scale(70 + (i * 16) - scrollOffset))
+                                        && MouseInput.MouseState.Y >= GlobalGraphics.Scale(59 + ((i-offsetpl) * 16) - scrollOffset) && MouseInput.MouseState.Y < GlobalGraphics.Scale(70 + ((i-offsetpl) * 16) - scrollOffset))
                                     {
                                         GlobalContent.GetSound("Select").Play(int.Parse(SaveData.saveValues["SoundEffectVolume"], System.Globalization.CultureInfo.InvariantCulture) / 100f, 0f, 0f);
                                         // Open settings
@@ -677,6 +846,14 @@ namespace NonsensicalVideoGenerator
                                                                         fileDialog.FileName = "workshop.jpg";
                                                                         if(fileDialog.ShowDialog() == System.Windows.Forms.DialogResult.OK)
                                                                         {
+                                                                            // file must be under 1mb, otherwise complain
+                                                                            if(new FileInfo(fileDialog.FileName).Length > 1048576)
+                                                                            {
+                                                                                GlobalContent.GetSound("Error").Play(int.Parse(SaveData.saveValues["SoundEffectVolume"], System.Globalization.CultureInfo.InvariantCulture) / 100f, 0f, 0f);
+                                                                                ConsoleOutput.WriteLine("Selected Workshop Icon is too large. Must be under 1mb.", Color.Red);
+                                                                                Global.generator.progressText = "Size Too Big (>1 MB)";
+                                                                                return true;
+                                                                            }
                                                                             Name = "Addons";
                                                                             editingSettings = false;
                                                                             controller.Clear();
@@ -688,7 +865,7 @@ namespace NonsensicalVideoGenerator
                                                                 }
                                                                 return false;
                                                             }));
-                                                            controller.Add("Back", new Button("Back", "Go back to effect addon list.", new Vector2(119+167, 60+10+19*8), (int i, string n) => {
+                                                            controller.Add("Back", new Button("Back", "Go back to addon list.", new Vector2(119+167, 60+10+19*8), (int i, string n) => {
                                                                 switch(i)
                                                                 {
                                                                     case 2: // left click
@@ -811,7 +988,7 @@ namespace NonsensicalVideoGenerator
                             {
                                 // create plugin
                                 if (MouseInput.MouseState.X >= GlobalGraphics.Scale(138) && MouseInput.MouseState.X < GlobalGraphics.Scale(290)
-                                    && MouseInput.MouseState.Y >= GlobalGraphics.Scale(59 + (i * 16) - scrollOffset) && MouseInput.MouseState.Y < GlobalGraphics.Scale(70 + (i * 16) - scrollOffset))
+                                    && MouseInput.MouseState.Y >= GlobalGraphics.Scale(59 + ((i-offsetpl) * 16) - scrollOffset) && MouseInput.MouseState.Y < GlobalGraphics.Scale(70 + ((i-offsetpl) * 16) - scrollOffset))
                                 {
                                     if (MouseInput.MouseState.LeftButton == ButtonState.Pressed && MouseInput.LastMouseState.LeftButton == ButtonState.Released)
                                     {
@@ -849,7 +1026,7 @@ namespace NonsensicalVideoGenerator
             GlobalContent.AddTexture("PluginEntryBlank", ThemeManager.LoadLayeredContent<Texture2D>("graphics/pluginentryblank"));
             GlobalContent.AddTexture("PluginEntry", ThemeManager.LoadLayeredContent<Texture2D>("graphics/pluginentry"));
             GlobalContent.AddTexture("ScrollHandle", ThemeManager.LoadLayeredContent<Texture2D>("graphics/scrollhandle"));
-            controllerPluginCreation.Add("PluginTheme", new Switch("Theme Template", "Create a theme for NVG.", new Vector2(139, 60+19*3), (int i, string n) => {
+            controllerPluginCreation.Add("PluginTheme", new Switch("Theme Template", "Create a theme for " + Global.productNameShort + ".", new Vector2(139, 60+19*3), (int i, string n) => {
                 bool switchState = (i & 256) != 0;
                 if((i & 2) != 0)
                 {
@@ -884,6 +1061,18 @@ namespace NonsensicalVideoGenerator
             }));
             controllerPluginCreation.Add("PluginPrettyName", new TextEntry("Addon Name", "The human-readable name of the addon.", customPluginName, new Vector2(139, 60), 50, 25, 5, (int i, string n) => {
                 customPluginName = controllerPluginCreation.interactables["PluginPrettyName"].Tooltip;
+                return false;
+            }));
+            controllerPluginCreation.Add("Filter", new Button("Filter: "+PluginHandler.GetPluginListFilter(), "Change the filter type in the addon list.", new Vector2(119+100, 60+10+19*6), (int i, string n) => {
+                switch(i)
+                {
+                    case 2: // left click
+                        GlobalContent.GetSound("Select").Play(int.Parse(SaveData.saveValues["SoundEffectVolume"], System.Globalization.CultureInfo.InvariantCulture) / 100f, 0f, 0f);
+                        PluginHandler.CyclePluginListFilter();
+                        scrollOffset = 0;
+                        controllerPluginCreation.interactables["Filter"].Name = "Filter: "+PluginHandler.GetPluginListFilter();
+                        return true;
+                }
                 return false;
             }));
             controllerPluginCreation.Add("Back", new Button("Back", "Go back.", new Vector2(119+36, 60+10+19*8), (int i, string n) => {

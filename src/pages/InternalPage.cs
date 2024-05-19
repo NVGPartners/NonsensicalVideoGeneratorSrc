@@ -6,12 +6,12 @@ using Microsoft.Xna.Framework.Graphics;
 namespace NonsensicalVideoGenerator
 {
     /// <summary>
-    /// News page.
+    /// Debug page.
     /// </summary>
-    public class ExitPage : IPage
+    public class InternalPage : IPage
     {
-        public string Name { get; set; } = "Blog";
-        public string Tooltip { get; } = "Check out what's new!";
+        public string Name { get; set; } = "Debug";
+        public string Tooltip { get; } = "";
         private readonly InteractableController controller = new();
         public bool Update(GameTime gameTime, bool handleInput)
         {
@@ -24,6 +24,14 @@ namespace NonsensicalVideoGenerator
         {
             // Interactable
             controller.Draw(gameTime, spriteBatch);
+            if(Debug.GetDebugMode())
+            {
+                DrawButton(spriteBatch, 20, 50, "Debug Mode: Enabled");
+            }
+        }
+        public void DrawButton(SpriteBatch spriteBatch, int x, int y, string text)
+        {
+            GlobalGraphics.DrawButton(spriteBatch, GlobalGraphics.Scale(x), GlobalGraphics.Scale(y), Color.Transparent, text, Color.White, Color.Gray);
         }
         public void LoadContent(ContentManager contentManager, GraphicsDevice graphicsDevice)
         {

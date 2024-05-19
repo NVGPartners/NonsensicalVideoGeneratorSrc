@@ -18,8 +18,8 @@ namespace NonsensicalVideoGenerator
         /// <summary>
         /// The title of the screen. This is displayed on the header bar.
         /// </summary>
-        public string title { get; } = "Main Menu";
-        public int layer { get; } = 8;
+        public string title { get; } = "Menu";
+        public int layer { get; set; } = 8;
         public ScreenType screenType { get; set; } = ScreenType.Hidden;
         public int currentPlacement { get; set; } = -1;
         private bool hiding = false;
@@ -106,37 +106,24 @@ namespace NonsensicalVideoGenerator
             int whichOption = currentPage == 0 ? 1 : (currentPage == Pagination.GetTopPageCount() - 1 ? 2 : 0); // 0: middle, 1: top, 2: bottom
             spriteBatch.Draw(whichOption == 1 ? menuselected2 : (whichOption == 2 ? menuselected3 : menuselected), new Rectangle(GlobalGraphics.Scale(4), GlobalGraphics.Scale(134 + (pageOffset * currentPage)), GlobalGraphics.Scale(menuselected.Width), GlobalGraphics.Scale(menuselected.Height)), Color.White);
             // Draw option text
-            string name;
+            string name = "";
             for (int i = 0; i < Pagination.GetTopPageCount(); i++)
             {
-                name = Pagination.GetPage(i).Name;
+                name = L.T(0, Pagination.GetPage(i).Name+":Title");
                 if(i == 2)
-                    name = "Addons";
-                spriteBatch.DrawString(GlobalContent.GetFont("Munro"), name, new Vector2(GlobalGraphics.Scale(7+1), GlobalGraphics.Scale(136 + (pageOffset * i)+1)), Color.Black);
-                spriteBatch.DrawString(GlobalContent.GetFont("Munro"), name, new Vector2(GlobalGraphics.Scale(7), GlobalGraphics.Scale(136 + (pageOffset * i))), Color.White);
+                    name = L.T(0, "Addons:Title");
+                spriteBatch.DrawString(L.FontLarge(), name, new Vector2(GlobalGraphics.Scale(7+1), GlobalGraphics.Scale(136 + (pageOffset * i)+1)), Color.Black);
+                spriteBatch.DrawString(L.FontLarge(), name, new Vector2(GlobalGraphics.Scale(7), GlobalGraphics.Scale(136 + (pageOffset * i))), Color.White);
             }
             Texture2D menuwindow = GlobalContent.GetTexture("MenuWindow");
             spriteBatch.Draw(menuwindow, new Rectangle(GlobalGraphics.Scale(0), GlobalGraphics.Scale(132), GlobalGraphics.Scale(menuwindow.Width), GlobalGraphics.Scale(menuwindow.Height)), Color.White);
             // Draw window title
-            Vector2 titleSize = GlobalContent.GetFont("MunroSmall").MeasureString(title);
-            spriteBatch.DrawString(GlobalContent.GetFont("MunroSmall"), title, new Vector2(GlobalGraphics.Scale(52), GlobalGraphics.Scale(203)), Color.White, MathHelper.ToRadians(90), new Vector2(titleSize.X, titleSize.Y), 1, SpriteEffects.None, 0);
+            Vector2 titleSize = L.FontSmall().MeasureString(title);
+            spriteBatch.DrawString(L.FontSmall(), title, new Vector2(GlobalGraphics.Scale(52), GlobalGraphics.Scale(203)), Color.White, MathHelper.ToRadians(90), new Vector2(titleSize.X, titleSize.Y), 1, SpriteEffects.None, 0);
             // If hovering, draw tooltip
-            if (hovering && !Global.exiting)
+            if (hovering && !Global.exiting && name != "")
             {
-                string tooltip = Pagination.GetPage(hoveringPage).Tooltip;
-                // Get text size
-                Vector2 tooltipSize = GlobalContent.GetFont("MunroSmall").MeasureString(tooltip);
-                // Position is relative to mouse position but tries to avoid going off screen
-                Vector2 position = new(MouseInput.MouseState.Position.X + 10, MouseInput.MouseState.Position.Y + 10);
-                // Make sure it doesn't go off the right side of the screen
-                if (position.X + tooltipSize.X + GlobalGraphics.Scale(6) > GlobalGraphics.scaledWidth)
-                    position.X = GlobalGraphics.scaledWidth - tooltipSize.X - GlobalGraphics.Scale(6);
-                // Make sure it doesn't go off the bottom of the screen
-                if (position.Y + tooltipSize.Y + GlobalGraphics.Scale(2) > GlobalGraphics.scaledHeight)
-                    position.Y = GlobalGraphics.scaledHeight - tooltipSize.Y - GlobalGraphics.Scale(2); 
-                spriteBatch.Draw(GlobalContent.GetTexture("Pixel"), new Rectangle((int)position.X, (int)position.Y, (int)tooltipSize.X + GlobalGraphics.Scale(2), (int)tooltipSize.Y - GlobalGraphics.Scale(2)), ThemeManager.GetColor("BackgroundTooltip"));
-                // White text
-                spriteBatch.DrawString(GlobalContent.GetFont("MunroSmall"), tooltip, new Vector2(position.X + GlobalGraphics.Scale(2), position.Y - GlobalGraphics.Scale(2)), Color.White);
+                Global.tooltip = L.T(0, Pagination.GetPage(hoveringPage).Name+":Tooltip");
             }
             // End offset spritebatch
             spriteBatch.End();
@@ -169,8 +156,10 @@ namespace NonsensicalVideoGenerator
             {
                 // Accessibility
                 // -2 because the exit and game buttons are not included
-                for(int i = 0; i < Pagination.GetTopPageCount()-2; i++)
+                for(int i = 0; i < Pagination.GetTopPageCount(); i++)
                 {
+                    if(i == Pagination.GetTopPageCount()-2)
+                        continue; // Skip Game
                     string name = Pagination.GetPage(i).Name;
                     if(i == 2)
                         name = "Addons";
@@ -201,17 +190,17 @@ namespace NonsensicalVideoGenerator
                                 if(segment == 2)
                                     name = "Addons";
                                 DiscordRPC.curtab = DiscordRPC.ToTab(name);
-                                if(segment == Pagination.GetPageCount() - 2)
+                                if(segment == Pagination.GetPageCount() - 3)
                                 {
-                                    ScreenManager.PushNavigation("Pastime Game");
-                                    ScreenManager.GetScreen<PastimeGameScreen>("Pastime Game")?.Show();
+                                    ScreenManager.PushNavigation("Game");
+                                    ScreenManager.GetScreen<PastimeGameScreen>("Game")?.Show();
                                     ScreenManager.GetScreen<ContentScreen>("Content")?.Hide();
                                 }
                                 else
                                 {
-                                    if(Pagination.DrawnPage == Pagination.GetPageCount() - 2)
+                                    if(Pagination.DrawnPage == Pagination.GetPageCount() - 3)
                                     {
-                                        ScreenManager.GetScreen<PastimeGameScreen>("Pastime Game")?.Hide();
+                                        ScreenManager.GetScreen<PastimeGameScreen>("Game")?.Hide();
                                         ScreenManager.PushNavigation("Content");
                                         ScreenManager.GetScreen<ContentScreen>("Content")?.Show();
                                     }

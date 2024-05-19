@@ -63,7 +63,7 @@ namespace NonsensicalVideoGenerator
                 spriteBatch.Draw(GlobalContent.GetTexture("Pixel"), new Rectangle(GlobalGraphics.Scale(135), GlobalGraphics.Scale(58), GlobalGraphics.Scale(1), GlobalGraphics.Scale(178)), ThemeManager.GetColor("OverlayContentScreen"));
                 spriteBatch.Draw(GlobalContent.GetTexture("Pixel"), new Rectangle(GlobalGraphics.Scale(305-1), GlobalGraphics.Scale(58), GlobalGraphics.Scale(1), GlobalGraphics.Scale(178)), ThemeManager.GetColor("OverlayContentScreen"));
                 // Draw text to indicate that rendering is in progress
-                SpriteFont font = GlobalContent.GetFont("Munro");
+                SpriteFont font = L.FontLarge();
                 string text = "Rendering is in progress.";
                 Vector2 textSize = font.MeasureString(text);
                 spriteBatch.DrawString(font, "Rendering is in progress.", new Vector2(GlobalGraphics.Scale(1) + GlobalGraphics.Scale(135) + (GlobalGraphics.Scale(306) - GlobalGraphics.Scale(135) - textSize.X) / 2, GlobalGraphics.Scale(1) + GlobalGraphics.Scale(58) + (GlobalGraphics.Scale(236) - GlobalGraphics.Scale(58) - textSize.Y) / 2), Color.Black);
@@ -120,13 +120,13 @@ namespace NonsensicalVideoGenerator
                                     ConsoleOutput.ResetScroll();
                                     GlobalContent.GetSound("Select").Play(int.Parse(SaveData.saveValues["SoundEffectVolume"], System.Globalization.CultureInfo.InvariantCulture) / 100f, 0f, 0f);
                                     if(Accessibility.showDisambiguation)
-                                        Accessibility.TTS("Console shown.");
+                                        Accessibility.TTS(L.T(0, "Accessibility:ConsoleShown"));
                                 }
                                 else
                                 {
                                     GlobalContent.GetSound("Back").Play(int.Parse(SaveData.saveValues["SoundEffectVolume"], System.Globalization.CultureInfo.InvariantCulture) / 100f, 0f, 0f);
                                     if(Accessibility.showDisambiguation)
-                                        Accessibility.TTS("Console hidden.");
+                                        Accessibility.TTS(L.T(0, "Accessibility:ConsoleHidden"));
                                 }
                             }
                             else
@@ -134,7 +134,7 @@ namespace NonsensicalVideoGenerator
                                 ConsoleOutput.WriteLine("Console not found!!!");
                                 GlobalContent.GetSound("Error").Play(int.Parse(SaveData.saveValues["SoundEffectVolume"], System.Globalization.CultureInfo.InvariantCulture) / 100f, 0f, 0f);
                                 if(Accessibility.showDisambiguation)
-                                    Accessibility.TTS("Console not found.");
+                                    Accessibility.TTS(L.T(0, "Accessibility:ConsoleNotFound"));
                             }
                         }
                         return true;

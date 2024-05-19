@@ -211,7 +211,7 @@ namespace NonsensicalVideoGenerator
                         GetScreen<ContentScreen>("Content")?.Hide();
                         GetScreen<HeaderScreen>("Header")?.Hide();
                         GetScreen<VideoScreen>("Video")?.Hide();
-                        GetScreen<MenuScreen>("Main Menu")?.Hide();
+                        GetScreen<MenuScreen>("Menu")?.Hide();
                         GetScreen<SocialScreen>("Socials")?.Hide();
                     }
                     else
@@ -219,12 +219,12 @@ namespace NonsensicalVideoGenerator
                         PushNavigation("Content");
                         PushNavigation("Header");
                         PushNavigation("Video");
-                        PushNavigation("Main Menu");
+                        PushNavigation("Menu");
                         PushNavigation("Socials");
                         GetScreen<ContentScreen>("Content")?.Show();
                         GetScreen<HeaderScreen>("Header")?.Show();
                         GetScreen<VideoScreen>("Video")?.Show();
-                        GetScreen<MenuScreen>("Main Menu")?.Show();
+                        GetScreen<MenuScreen>("Menu")?.Show();
                         GetScreen<SocialScreen>("Socials")?.Show();
                     }
                 }

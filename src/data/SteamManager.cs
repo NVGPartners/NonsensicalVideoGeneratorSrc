@@ -13,9 +13,9 @@ namespace NonsensicalVideoGenerator
             try
             {
                 if (!Packsize.Test())
-                    Console.WriteLine("[Steamworks.NET] Packsize Test returned false, the wrong version of Steamworks.NET is being run in this platform.");
+                    ConsoleOutput.WriteLine("[Steamworks.NET] Packsize Test returned false, the wrong version of Steamworks.NET is being run in this platform.");
                 if (!DllCheck.Test())
-                    Console.WriteLine("[Steamworks.NET] DllCheck Test returned false, One or more of the Steamworks binaries seems to be the wrong version.");
+                    ConsoleOutput.WriteLine("[Steamworks.NET] DllCheck Test returned false, One or more of the Steamworks binaries seems to be the wrong version.");
                 try
                 {
                     // If Steam is not running or the game wasn't started through Steam, SteamAPI_RestartAppIfNecessary starts the
@@ -39,8 +39,8 @@ namespace NonsensicalVideoGenerator
                 catch (System.DllNotFoundException e)
                 {
                     // We catch this exception here, as it will be the first occurrence of it.
-                    Console.WriteLine("[Steamworks.NET] Could not load [lib]steam_api.dll/so/dylib. It's likely not in the correct location. Refer to the README for more details.");
-                    Console.WriteLine(e.ToString());
+                    ConsoleOutput.WriteLine("[Steamworks.NET] Could not load [lib]steam_api.dll/so/dylib. It's likely not in the correct location. Refer to the README for more details.");
+                    ConsoleOutput.WriteLine(e.ToString());
                     return;
                 }
 
@@ -56,13 +56,13 @@ namespace NonsensicalVideoGenerator
                 initialized = SteamAPI.Init();
                 if (!initialized)
                 {
-                    Console.WriteLine("[Steamworks.NET] SteamAPI_Init() failed. Refer to Valve's documentation or the comment above this line for more information.");
+                    ConsoleOutput.WriteLine("[Steamworks.NET] SteamAPI_Init() failed. Refer to Valve's documentation or the comment above this line for more information.");
                     return;
                 }
             }
             catch (Exception e)
             {
-                Console.WriteLine("[Steamworks.NET] Could not initialize SteamAPI: " + e.ToString());
+                ConsoleOutput.WriteLine("[Steamworks.NET] Could not initialize SteamAPI: " + e.ToString());
                 return;
             }
         }
@@ -72,14 +72,17 @@ namespace NonsensicalVideoGenerator
         // Thus it is not recommended to perform any Steamworks work in other OnDestroy functions as the order of execution can not be garenteed upon Shutdown. Prefer OnDisable().
         public static void Shutdown()
         {
+            if(!initialized)
+                return;
             try
             {
                 SteamAPI.Shutdown();
             }
             catch (System.Exception e)
             {
-                Console.WriteLine("[Steamworks.NET] Could not shutdown SteamAPI: " + e.ToString());
+                ConsoleOutput.WriteLine("[Steamworks.NET] Could not shutdown SteamAPI: " + e.ToString());
             }
+            initialized = false;
         }
 
         public static void Update()

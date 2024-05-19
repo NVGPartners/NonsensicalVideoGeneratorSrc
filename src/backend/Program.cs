@@ -20,6 +20,19 @@ namespace NonsensicalVideoGenerator
             }
             if(Global.parameters.Count > 0)
                 ConsoleOutput.WriteLine("Using command line parameters: " + String.Join(" ", Global.parameters.ToArray()));
+#if DEBUG
+            Debug.SetDebugMode(true);
+#endif
+            string? locale = null;
+            if(Global.parameters.Contains("-lang"))
+            {
+                int index = Global.parameters.IndexOf("-lang");
+                if(index + 1 < Global.parameters.Count)
+                {
+                    locale = Global.parameters[index + 1];
+                }
+            }
+            L.LoadLocale(locale);
 #if MONOGAME
             using (var game = new UserInterface())
                 game.Run();

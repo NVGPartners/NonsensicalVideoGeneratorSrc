@@ -15,7 +15,7 @@ namespace NonsensicalVideoGenerator
     public class ConsoleScreen : IScreen
     {
         public string title { get; } = "Console";
-        public int layer { get; } = 100;
+        public int layer { get; set; } = 99;
         public ScreenType screenType { get; set; } = ScreenType.Hidden;
         public int currentPlacement { get; set; } = -1;
         private bool hiding = true;
@@ -120,9 +120,9 @@ namespace NonsensicalVideoGenerator
                 if(Accessibility.showDisambiguation)
                 {
                     if(!toggled)
-                        Accessibility.TTS("Console hidden.");
+                        Accessibility.TTS(L.T(0, "Accessibility:ConsoleHidden"));
                     else
-                        Accessibility.TTS("Console shown.");
+                        Accessibility.TTS(L.T(0, "Accessibility:ConsoleShown"));
                 }
                 if(!toggled)
                     GlobalContent.GetSound("Back").Play(int.Parse(SaveData.saveValues["SoundEffectVolume"], System.Globalization.CultureInfo.InvariantCulture) / 100f, 0f, 0f);
@@ -177,8 +177,8 @@ namespace NonsensicalVideoGenerator
             spriteBatch.Draw(pixel, new Rectangle(0, 0, GlobalGraphics.scaledWidth, GlobalGraphics.scaledHeight), ThemeManager.GetColor("BackgroundConsoleScreen"));
             // Draw the center title bar text.`
             string newTitle = title + " - Toggle with F5";
-            Vector2 titleSize = GlobalContent.GetFont("MunroSmall").MeasureString(newTitle);
-            spriteBatch.DrawString(GlobalContent.GetFont("MunroSmall"), newTitle, new Vector2(GlobalGraphics.scaledWidth / 2 - titleSize.X / 2, (6 * GlobalGraphics.scale) - GlobalGraphics.Scale(1)), Color.White);
+            Vector2 titleSize = L.FontSmall().MeasureString(newTitle);
+            spriteBatch.DrawString(L.FontSmall(), newTitle, new Vector2(GlobalGraphics.scaledWidth / 2 - titleSize.X / 2, (6 * GlobalGraphics.scale) - GlobalGraphics.Scale(1)), Color.White);
             // Draw lines.
             int lineHeight = 8 * GlobalGraphics.scale;
             int lineSpacing = 2 * GlobalGraphics.scale;
@@ -187,15 +187,18 @@ namespace NonsensicalVideoGenerator
             {
                 foreach (ColoredString line in ConsoleOutput.GetOutput())
                 {
-                    Vector2 lineSize = GlobalContent.GetFont("MunroSmall").MeasureString(line.Text);
-                    spriteBatch.DrawString(GlobalContent.GetFont("MunroSmall"), line.Text, new Vector2(GlobalGraphics.Scale(8), lineY), line.Color);
+                    Vector2 lineSize = L.FontSmall().MeasureString(line.Text);
+                    spriteBatch.DrawString(L.FontSmall(), line.Text, new Vector2(GlobalGraphics.Scale(8), lineY), line.Color);
                     lineY += lineHeight;
                 }
             }
             catch {}
             // Draw assembly version.
             string version = "- v" + Global.productVersion + " - View full output in console.txt -" + (ConsoleOutput.proxyOutput.Count > ConsoleOutput.maxLines ? (" Line " + (ConsoleOutput.scrollAmount > -1 ? (ConsoleOutput.scrollAmount + 1).ToString(System.Globalization.CultureInfo.InvariantCulture) : (ConsoleOutput.proxyOutput.Count - ConsoleOutput.maxLines + 1).ToString(System.Globalization.CultureInfo.InvariantCulture)) + "/" + ConsoleOutput.proxyOutput.Count.ToString(System.Globalization.CultureInfo.InvariantCulture) + " -") : "");
-            spriteBatch.DrawString(GlobalContent.GetFont("MunroSmall"), version, new Vector2(GlobalGraphics.Scale(8), lineY), Color.White);
+#if DEBUG
+            version += " DEBUG -";
+#endif
+            spriteBatch.DrawString(L.FontSmall(), version, new Vector2(GlobalGraphics.Scale(8), lineY), Color.White);
             // End offset spritebatch
             spriteBatch.End();
             // Remake spritebatch

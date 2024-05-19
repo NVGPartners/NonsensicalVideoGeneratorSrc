@@ -1,6 +1,7 @@
 #if MONOGAME
 using System;
 using System.Collections.Generic;
+using System.Globalization;
 using System.Text.RegularExpressions;
 using System.Windows;
 using Microsoft.Xna.Framework;
@@ -39,7 +40,7 @@ namespace NonsensicalVideoGenerator
             this.maxChars = maxChars;
             this.mode = mode;
         }
-        public bool Update(GameTime gameTime, bool handleInput)
+        public bool Update(GameTime gameTime, bool handleInput, string internalName)
         {
             if(!registered)
             {
@@ -50,7 +51,7 @@ namespace NonsensicalVideoGenerator
             scaledBounds = new((int)(bounds.X * GlobalGraphics.scale), (int)(bounds.Y * GlobalGraphics.scale), (int)(bounds.Width * GlobalGraphics.scale), (int)(bounds.Height * GlobalGraphics.scale));
             if (handleInput)
             {
-                Accessibility.CompatAccessibility(scaledBounds, "Text Input: " + Name + " (" + hiddenToolTip + ") set to \"" + Tooltip + "\"");
+                Accessibility.CompatAccessibility(scaledBounds, L.T(0, "Accessibility:InteractableTextInput", Name, hiddenToolTip, Tooltip));
                 // Capture keyboard input
                 oldKeyboardState = newKeyboardState;
                 newKeyboardState = Keyboard.GetState();
@@ -65,13 +66,13 @@ namespace NonsensicalVideoGenerator
                             // Check to make sure there's actually some text
                             if (Tooltip == "")
                             {
-                                GlobalContent.GetSound("Error").Play(int.Parse(SaveData.saveValues["SoundEffectVolume"], System.Globalization.CultureInfo.InvariantCulture) / 100f, 0f, 0f);
+                                GlobalContent.GetSound("Error").Play(int.Parse(SaveData.saveValues["SoundEffectVolume"], CultureInfo.InvariantCulture) / 100f, 0f, 0f);
                                 return true;
                             }
                             Callback(State, Name);
                             Global.editing = "";
                             //Accessibility.allowAccessibility = true;
-                            GlobalContent.GetSound("Option").Play(int.Parse(SaveData.saveValues["SoundEffectVolume"], System.Globalization.CultureInfo.InvariantCulture) / 100f, 0f, 0f);
+                            GlobalContent.GetSound("Option").Play(int.Parse(SaveData.saveValues["SoundEffectVolume"], CultureInfo.InvariantCulture) / 100f, 0f, 0f);
                             Global.mask.Disable();
                         }
                         else if(Global.editing == "")
@@ -79,24 +80,24 @@ namespace NonsensicalVideoGenerator
                             // Check to make sure there's actually some text
                             if (Tooltip == "")
                             {
-                                GlobalContent.GetSound("Error").Play(int.Parse(SaveData.saveValues["SoundEffectVolume"], System.Globalization.CultureInfo.InvariantCulture) / 100f, 0f, 0f);
+                                GlobalContent.GetSound("Error").Play(int.Parse(SaveData.saveValues["SoundEffectVolume"], CultureInfo.InvariantCulture) / 100f, 0f, 0f);
                                 return true;
                             }
                             Callback(State, Name);
                             Global.editing = Name + "Input";
                             //Accessibility.allowAccessibility = false;
-                            GlobalContent.GetSound("Option").Play(int.Parse(SaveData.saveValues["SoundEffectVolume"], System.Globalization.CultureInfo.InvariantCulture) / 100f, 0f, 0f);
+                            GlobalContent.GetSound("Option").Play(int.Parse(SaveData.saveValues["SoundEffectVolume"], CultureInfo.InvariantCulture) / 100f, 0f, 0f);
                             Global.mask.AddUnmaskedObject("TextEntry", new SimpleObject(scaledBounds, Color.Transparent, GlobalContent.GetTexture("Pixel"), () => {
                                 // Check to make sure there's actually some text
                                 if (Tooltip == "")
                                 {
-                                    GlobalContent.GetSound("Error").Play(int.Parse(SaveData.saveValues["SoundEffectVolume"], System.Globalization.CultureInfo.InvariantCulture) / 100f, 0f, 0f);
+                                    GlobalContent.GetSound("Error").Play(int.Parse(SaveData.saveValues["SoundEffectVolume"], CultureInfo.InvariantCulture) / 100f, 0f, 0f);
                                     return true;
                                 }
                                 Callback(State, Name);
                                 Global.editing = "";
                                 //Accessibility.allowAccessibility = true;
-                                GlobalContent.GetSound("Option").Play(int.Parse(SaveData.saveValues["SoundEffectVolume"], System.Globalization.CultureInfo.InvariantCulture) / 100f, 0f, 0f);
+                                GlobalContent.GetSound("Option").Play(int.Parse(SaveData.saveValues["SoundEffectVolume"], CultureInfo.InvariantCulture) / 100f, 0f, 0f);
                                 Global.mask.Disable();
                                 return true;
                             }, true));
@@ -108,18 +109,18 @@ namespace NonsensicalVideoGenerator
                             if (Global.editing != "")
                             {
                                 //Global.editing = "";
-                                GlobalContent.GetSound("Error").Play(int.Parse(SaveData.saveValues["SoundEffectVolume"], System.Globalization.CultureInfo.InvariantCulture) / 100f, 0f, 0f);
+                                GlobalContent.GetSound("Error").Play(int.Parse(SaveData.saveValues["SoundEffectVolume"], CultureInfo.InvariantCulture) / 100f, 0f, 0f);
                             }
                             else
                             {
                                 // Check to make sure there's actually some text
                                 if (Tooltip == "")
                                 {
-                                    GlobalContent.GetSound("Error").Play(int.Parse(SaveData.saveValues["SoundEffectVolume"], System.Globalization.CultureInfo.InvariantCulture) / 100f, 0f, 0f);
+                                    GlobalContent.GetSound("Error").Play(int.Parse(SaveData.saveValues["SoundEffectVolume"], CultureInfo.InvariantCulture) / 100f, 0f, 0f);
                                     return true;
                                 }
                                 Callback(State, Name);
-                                GlobalContent.GetSound("Back").Play(int.Parse(SaveData.saveValues["SoundEffectVolume"], System.Globalization.CultureInfo.InvariantCulture) / 100f, 0f, 0f);
+                                GlobalContent.GetSound("Back").Play(int.Parse(SaveData.saveValues["SoundEffectVolume"], CultureInfo.InvariantCulture) / 100f, 0f, 0f);
                                 Global.mask.Disable();
                             }
                         }
@@ -135,13 +136,13 @@ namespace NonsensicalVideoGenerator
                         // Check to make sure there's actually some text
                         if (Tooltip == "")
                         {
-                            GlobalContent.GetSound("Error").Play(int.Parse(SaveData.saveValues["SoundEffectVolume"], System.Globalization.CultureInfo.InvariantCulture) / 100f, 0f, 0f);
+                            GlobalContent.GetSound("Error").Play(int.Parse(SaveData.saveValues["SoundEffectVolume"], CultureInfo.InvariantCulture) / 100f, 0f, 0f);
                             return true;
                         }
                         Callback(0, Name);
                         Global.editing = "";
                         Accessibility.allowAccessibility = true;
-                        GlobalContent.GetSound("Option").Play(int.Parse(SaveData.saveValues["SoundEffectVolume"], System.Globalization.CultureInfo.InvariantCulture) / 100f, 0f, 0f);
+                        GlobalContent.GetSound("Option").Play(int.Parse(SaveData.saveValues["SoundEffectVolume"], CultureInfo.InvariantCulture) / 100f, 0f, 0f);
                     }
                     else
                     {
@@ -153,12 +154,12 @@ namespace NonsensicalVideoGenerator
                                 switch(mode)
                                 {
                                     case 1: // numbers only (inc 1)
-                                        int.TryParse(Tooltip, out int num);
+                                        int.TryParse(Tooltip, NumberStyles.Integer, CultureInfo.InvariantCulture, out int num);
                                         num += 1;
-                                        Tooltip = num.ToString();
+                                        Tooltip = num.ToString(CultureInfo.InvariantCulture);
                                         break;
                                     case 2: // decimals (inc 0.01)
-                                        float.TryParse(Tooltip, out float dec);
+                                        float.TryParse(Tooltip, NumberStyles.Float, CultureInfo.InvariantCulture, out float dec);
                                         dec += 0.01f;
                                         Tooltip = dec.ToString("0.00");
                                         // Remove 0s at end
@@ -174,12 +175,12 @@ namespace NonsensicalVideoGenerator
                                 switch (mode)
                                 {
                                     case 1: // numbers only (dec 1)
-                                        int.TryParse(Tooltip, out int num);
+                                        int.TryParse(Tooltip, NumberStyles.Integer, CultureInfo.InvariantCulture, out int num);
                                         num -= 1;
-                                        Tooltip = num.ToString();
+                                        Tooltip = num.ToString(CultureInfo.InvariantCulture);
                                         break;
                                     case 2: // decimals (dec 0.01)
-                                        float.TryParse(Tooltip, out float dec);
+                                        float.TryParse(Tooltip, NumberStyles.Float, CultureInfo.InvariantCulture, out float dec);
                                         dec -= 0.01f;
                                         // round to 2 decimal places in string
                                         Tooltip = dec.ToString("0.00");
@@ -198,7 +199,7 @@ namespace NonsensicalVideoGenerator
             }
             return false;
         }
-        public void Draw(GameTime gameTime, SpriteBatch spriteBatch)
+        public void Draw(GameTime gameTime, SpriteBatch spriteBatch, string internalName)
         {
             // Draw the sides
             Texture2D side = GlobalContent.GetTexture("InteractiveTextEntrySide");
@@ -214,8 +215,8 @@ namespace NonsensicalVideoGenerator
             // Inner text
             try
             {
-                spriteBatch.DrawString(GlobalContent.GetFont("Munro"), Tooltip, new Vector2(GlobalGraphics.Scale(bounds.X + 4 + 1), GlobalGraphics.Scale(bounds.Y + 1 + 1)), Color.Black);
-                spriteBatch.DrawString(GlobalContent.GetFont("Munro"), Tooltip, new Vector2(GlobalGraphics.Scale(bounds.X + 4), GlobalGraphics.Scale(bounds.Y + 1)), Color.White);
+                spriteBatch.DrawString(L.FontLarge(), Tooltip, new Vector2(GlobalGraphics.Scale(bounds.X + 4 + 1), GlobalGraphics.Scale(bounds.Y + 1 + 1)), Color.Black);
+                spriteBatch.DrawString(L.FontLarge(), Tooltip, new Vector2(GlobalGraphics.Scale(bounds.X + 4), GlobalGraphics.Scale(bounds.Y + 1)), Color.White);
             }
             catch (ArgumentException)
             {
@@ -225,37 +226,25 @@ namespace NonsensicalVideoGenerator
             // Draw cursor every 500ms
             if ((Global.editing == Name + "Input") && gameTime.TotalGameTime.TotalMilliseconds % 500 < 250)
             {
-                int cursorX = (int)GlobalContent.GetFont("Munro").MeasureString(Tooltip).X;
+                int cursorX = (int)L.FontLarge().MeasureString(Tooltip).X;
                 // could have just used a line here
-                spriteBatch.DrawString(GlobalContent.GetFont("Munro"), ":", new Vector2(cursorX + GlobalGraphics.Scale(bounds.X + 4 + 1), GlobalGraphics.Scale(bounds.Y + 1 + 1)), Color.Black);
-                spriteBatch.DrawString(GlobalContent.GetFont("Munro"), ":", new Vector2(cursorX + GlobalGraphics.Scale(bounds.X + 4 + 1), GlobalGraphics.Scale(bounds.Y + 1)), Color.Black);
-                spriteBatch.DrawString(GlobalContent.GetFont("Munro"), ":", new Vector2(cursorX + GlobalGraphics.Scale(bounds.X + 4 + 1), GlobalGraphics.Scale(bounds.Y)), Color.Black);
-                spriteBatch.DrawString(GlobalContent.GetFont("Munro"), ":", new Vector2(cursorX + GlobalGraphics.Scale(bounds.X + 4), GlobalGraphics.Scale(bounds.Y + 1)), Color.White);
-                spriteBatch.DrawString(GlobalContent.GetFont("Munro"), ":", new Vector2(cursorX + GlobalGraphics.Scale(bounds.X + 4), GlobalGraphics.Scale(bounds.Y)), Color.White);
-                spriteBatch.DrawString(GlobalContent.GetFont("Munro"), ":", new Vector2(cursorX + GlobalGraphics.Scale(bounds.X + 4), GlobalGraphics.Scale(bounds.Y - 1)), Color.White);
+                spriteBatch.DrawString(L.FontLarge(), ":", new Vector2(cursorX + GlobalGraphics.Scale(bounds.X + 4 + 1), GlobalGraphics.Scale(bounds.Y + 1 + 1)), Color.Black);
+                spriteBatch.DrawString(L.FontLarge(), ":", new Vector2(cursorX + GlobalGraphics.Scale(bounds.X + 4 + 1), GlobalGraphics.Scale(bounds.Y + 1)), Color.Black);
+                spriteBatch.DrawString(L.FontLarge(), ":", new Vector2(cursorX + GlobalGraphics.Scale(bounds.X + 4 + 1), GlobalGraphics.Scale(bounds.Y)), Color.Black);
+                spriteBatch.DrawString(L.FontLarge(), ":", new Vector2(cursorX + GlobalGraphics.Scale(bounds.X + 4), GlobalGraphics.Scale(bounds.Y + 1)), Color.White);
+                spriteBatch.DrawString(L.FontLarge(), ":", new Vector2(cursorX + GlobalGraphics.Scale(bounds.X + 4), GlobalGraphics.Scale(bounds.Y)), Color.White);
+                spriteBatch.DrawString(L.FontLarge(), ":", new Vector2(cursorX + GlobalGraphics.Scale(bounds.X + 4), GlobalGraphics.Scale(bounds.Y - 1)), Color.White);
             }
             // Label
-            spriteBatch.DrawString(GlobalContent.GetFont("Munro"), Name, new Vector2(GlobalGraphics.Scale(bounds.X + bounds.Width + 7 + 1), GlobalGraphics.Scale(bounds.Y + 2 + 1)), Color.Black);
-            spriteBatch.DrawString(GlobalContent.GetFont("Munro"), Name, new Vector2(GlobalGraphics.Scale(bounds.X + bounds.Width + 7), GlobalGraphics.Scale(bounds.Y + 2)), Color.White);
+            spriteBatch.DrawString(L.FontLarge(), L.T(0, "Interactable:"+internalName+"Title"), new Vector2(GlobalGraphics.Scale(bounds.X + bounds.Width + 7 + 1), GlobalGraphics.Scale(bounds.Y + 2 + 1)), Color.Black);
+            spriteBatch.DrawString(L.FontLarge(), L.T(0, "Interactable:"+internalName+"Title"), new Vector2(GlobalGraphics.Scale(bounds.X + bounds.Width + 7), GlobalGraphics.Scale(bounds.Y + 2)), Color.White);
             // Tooltip
-            if (scaledBounds.Contains(MouseInput.MouseState.Position) && Tooltip != "")
+            if (scaledBounds.Contains(MouseInput.MouseState.Position) && hiddenToolTip != "")
             {
-                // Get text size
-                Vector2 tooltipSize = GlobalContent.GetFont("MunroSmall").MeasureString(hiddenToolTip);
-                // Position is relative to mouse position but tries to avoid going off screen
-                Vector2 position = new(MouseInput.MouseState.Position.X + 10, MouseInput.MouseState.Position.Y + 10);
-                // Make sure it doesn't go off the right side of the screen
-                if (position.X + tooltipSize.X + GlobalGraphics.Scale(6) > GlobalGraphics.scaledWidth)
-                    position.X = GlobalGraphics.scaledWidth - tooltipSize.X - GlobalGraphics.Scale(6);
-                // Make sure it doesn't go off the bottom of the screen
-                if (position.Y + tooltipSize.Y + GlobalGraphics.Scale(2) > GlobalGraphics.scaledHeight)
-                    position.Y = GlobalGraphics.scaledHeight - tooltipSize.Y - GlobalGraphics.Scale(2); 
-                spriteBatch.Draw(GlobalContent.GetTexture("Pixel"), new Rectangle((int)position.X, (int)position.Y, (int)tooltipSize.X + GlobalGraphics.Scale(2), (int)tooltipSize.Y - GlobalGraphics.Scale(2)), ThemeManager.GetColor("ShadowTextInputInteractable"));
-                // White text
-                spriteBatch.DrawString(GlobalContent.GetFont("MunroSmall"), hiddenToolTip, new Vector2(position.X + GlobalGraphics.Scale(2), position.Y - GlobalGraphics.Scale(2)), Color.White);
+                Global.tooltip = L.T(0, "Interactable:"+internalName+"Tooltip");
             }
         }
-        public void LoadContent(ContentManager contentManager, GraphicsDevice graphicsDevice)
+        public void LoadContent(ContentManager contentManager, GraphicsDevice graphicsDevice, string internalName)
         {
         }
         public TextEntry Register()
@@ -313,13 +302,13 @@ namespace NonsensicalVideoGenerator
                                 // no newlines
                                 if (c == '\n')
                                 {
-                                    GlobalContent.GetSound("Error").Play(int.Parse(SaveData.saveValues["SoundEffectVolume"], System.Globalization.CultureInfo.InvariantCulture) / 100f, 0f, 0f);
+                                    GlobalContent.GetSound("Error").Play(int.Parse(SaveData.saveValues["SoundEffectVolume"], CultureInfo.InvariantCulture) / 100f, 0f, 0f);
                                     return;
                                 }
                                 // validate
                                 if (!ValidateInput(c))
                                 {
-                                    GlobalContent.GetSound("Error").Play(int.Parse(SaveData.saveValues["SoundEffectVolume"], System.Globalization.CultureInfo.InvariantCulture) / 100f, 0f, 0f);
+                                    GlobalContent.GetSound("Error").Play(int.Parse(SaveData.saveValues["SoundEffectVolume"], CultureInfo.InvariantCulture) / 100f, 0f, 0f);
                                     return;
                                 }
                             }
@@ -327,7 +316,7 @@ namespace NonsensicalVideoGenerator
                         }
                         else
                         {
-                            GlobalContent.GetSound("Error").Play(int.Parse(SaveData.saveValues["SoundEffectVolume"], System.Globalization.CultureInfo.InvariantCulture) / 100f, 0f, 0f);
+                            GlobalContent.GetSound("Error").Play(int.Parse(SaveData.saveValues["SoundEffectVolume"], CultureInfo.InvariantCulture) / 100f, 0f, 0f);
                         }
                     }
                     // \u0003 is copy
@@ -363,7 +352,7 @@ namespace NonsensicalVideoGenerator
                 }
                 else
                 {
-                    GlobalContent.GetSound("Error").Play(int.Parse(SaveData.saveValues["SoundEffectVolume"], System.Globalization.CultureInfo.InvariantCulture) / 100f, 0f, 0f);
+                    GlobalContent.GetSound("Error").Play(int.Parse(SaveData.saveValues["SoundEffectVolume"], CultureInfo.InvariantCulture) / 100f, 0f, 0f);
                 }
             }
         }

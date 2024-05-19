@@ -14,7 +14,7 @@ namespace NonsensicalVideoGenerator
         /// The title of the screen. This is used on the header bar if it is being displayed on the foreground.
         /// </summary>
         public string title { get; }
-        public int layer { get; }
+        public int layer { get; set; }
         public ScreenType screenType { get; set; }
         public int currentPlacement { get; set; }
         public void Show();

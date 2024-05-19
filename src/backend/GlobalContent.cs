@@ -86,6 +86,8 @@ namespace NonsensicalVideoGenerator
             AddFont("Munro", ThemeManager.LoadLayeredContent<SpriteFont>("fonts/munro-x"+scale));
             AddFont("MunroNarrow", ThemeManager.LoadLayeredContent<SpriteFont>("fonts/munro-narrow-x"+scale));
             AddFont("MunroSmall", ThemeManager.LoadLayeredContent<SpriteFont>("fonts/munro-small-x"+scale));
+            // Fallback (multi-language support) system font.
+            //AddFont("Arial", UserInterface.instance.Content.Load<SpriteFont>("Arial"));
             // Load default songs.
             for(int i = 1; i < ThemeManager.GetSongCount()+1; i++)
             {
@@ -180,7 +182,6 @@ namespace NonsensicalVideoGenerator
             {
                 sounds[key].Dispose();
             }
-#if MONOGAME
             foreach(string key in textures.Keys)
             {
                 textures[key].Dispose();
@@ -189,9 +190,7 @@ namespace NonsensicalVideoGenerator
             {
                 songs[key].Dispose();
             }
-#endif
         }
-#if MONOGAME
         public static bool AddTexture(string name, Texture2D texture)
         {
             if (textures.ContainsKey(name))
@@ -217,7 +216,6 @@ namespace NonsensicalVideoGenerator
             }
             return true;
         }
-#endif
         public static bool AddSound(string name, SoundEffect sound)
         {
             if (sounds.ContainsKey(name))
@@ -231,11 +229,6 @@ namespace NonsensicalVideoGenerator
             }
             return true;
         }
-        public static SoundEffect GetSound(string name)
-        {
-            return sounds[name];
-        }
-#if MONOGAME
         public static bool AddSong(string name, Song song)
         {
             if (songs.ContainsKey(name))
@@ -249,26 +242,46 @@ namespace NonsensicalVideoGenerator
             }
             return true;
         }
-        public static int GetSongCount()
+        
+        public static SoundEffect GetSound(string name)
         {
-            return songs.Count;
+            return sounds[name];
+        }
+        public static int GetSoundCount()
+        {
+            return sounds.Count;
         }
         public static Texture2D GetTexture(string name)
         {
             return textures[name];
         }
+        public static int GetTextureCount()
+        {
+            return textures.Count;
+        }
         public static SpriteFont GetFont(string name)
         {
             return fonts[name];
+        }
+        public static int GetFontCount()
+        {
+            return fonts.Count;
+        }
+        public static bool CheckFont(string name)
+        {
+            return fonts.ContainsKey(name);
         }
         public static Song GetSong(string name)
         {
             return songs[name];
         }
+        public static int GetSongCount()
+        {
+            return songs.Count;
+        }
         public static Song GetSongByIndex(int index)
         {
             return songs.Values.ElementAt(index);
         }
-#endif
     }
 }

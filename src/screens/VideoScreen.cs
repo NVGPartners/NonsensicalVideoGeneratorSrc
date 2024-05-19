@@ -15,7 +15,7 @@ namespace NonsensicalVideoGenerator
     public class VideoScreen : IScreen
     {
         public string title { get; } = "Video";
-        public int layer { get; } = 2;
+        public int layer { get; set; } = 2;
         public ScreenType screenType { get; set; } = ScreenType.Hidden;
         public int currentPlacement { get; set; } = -1;
         private bool hiding = false;
@@ -270,9 +270,9 @@ namespace NonsensicalVideoGenerator
             }
             // Video Window
             spriteBatch.Draw(vidwindow, new Rectangle(GlobalGraphics.Scale(0), GlobalGraphics.Scale(36), GlobalGraphics.Scale(vidwindow.Width), GlobalGraphics.Scale(vidwindow.Height)), Color.White);
-            SpriteFont munro = GlobalContent.GetFont("MunroSmall");
+            SpriteFont munro = L.FontSmall();
             // Draw window title on left side (90 degrees)
-            string altTitle = "Video Player";
+            string altTitle = L.T(0, "Video");
             Vector2 titleSize = munro.MeasureString(altTitle);
             spriteBatch.DrawString(munro, altTitle, new Vector2(GlobalGraphics.Scale(111), GlobalGraphics.Scale(110)), Color.White, MathHelper.ToRadians(90), new Vector2(titleSize.X, titleSize.Y), 1, SpriteEffects.None, 0);
             // End offset spritebatch

@@ -14,40 +14,25 @@ namespace NonsensicalVideoGenerator
     {
         public Vector2 circleClick = new Vector2(0, 0);
         public int circleSize = 1;
-        public int circleSaturation = 100;
         public int circleValue = 100;
         public int circleAlpha = 255;
+        public int rotation = 0;
+        public int textureIndex = 1;
         public MisclickCircle(Vector2 circleClick)
         {
             this.circleClick = circleClick;
+            // pick a random texture
+            textureIndex = Global.generator.RandomInt(1, ThemeManager.activeTheme.misclickCount+1);
+            rotation = Global.generator.RandomInt(0, 360);
         }
         public void Update()
         {
             if(circleClick.X != 0 && circleClick.Y != 0)
             {
-                /*
-                if(circleSaturation <= 25 && circleValue <= 25)
-                {
-                    // By setting the circle size to 0, the circle will be removed from the screen.
-                    circleClick = new Vector2(0, 0);
-                    circleSize = 0;
-                }
-                else
-                {
-                    if(circleSaturation > 25)
-                        circleSaturation -= 1;
-                    if(circleValue > 25)
-                        circleValue -= 1;
-                    circleSize += GlobalGraphics.Scale(1);
-                }
-                */
+                rotation += 2;
                 circleAlpha -= 16;
-                //if(circleSaturation > 25)
-                    //circleSaturation -= 1;
-                //if(circleValue > 25)
-                    //circleValue -= 1;
                 circleValue -= 6;
-                circleSize += GlobalGraphics.Scale(4);
+                circleSize += GlobalGraphics.Scale(2);
                 if(circleAlpha <= 0)
                 {
                     // By setting the circle size to 0, the circle will be removed from the screen.
@@ -66,7 +51,7 @@ namespace NonsensicalVideoGenerator
         /// The title of the screen. This is displayed on the header bar.
         /// </summary>
         public string title { get; } = "Misclick";
-        public int layer { get; } = 99;
+        public int layer { get; set; } = 98;
         public int currentPlacement { get; set; } = -1;
         public ScreenType screenType { get; set; } = ScreenType.Drawn;
         private float hueColor = 0;
@@ -149,15 +134,21 @@ namespace NonsensicalVideoGenerator
                 // Draw circles indicating misclicks.
                 foreach(MisclickCircle circle in circles)
                 {
-                    Color circleColor = Color.Black;
-                    HSVToRGB((int)hueColor, circle.circleSaturation, circle.circleValue, out circleColor);
-                    circleColor = new Color(circleColor.R, circleColor.G, circleColor.B, circle.circleAlpha);
-                    GlobalGraphics.DrawCircle(spriteBatch, circle.circleClick, circle.circleSize, circleColor);
+                    HSVToRGB((int)hueColor, 100, circle.circleValue, out Color circleColor);
+                    circleColor = new Color(circleColor, circle.circleAlpha);
+                    //GlobalGraphics.DrawCircle(spriteBatch, circle.circleClick, circle.circleSize, circleColor);
+                    Texture2D circleTexture = GlobalContent.GetTexture("MisclickCircle"+circle.textureIndex);
+                    Rectangle circlePos = new Rectangle((int)circle.circleClick.X, (int)circle.circleClick.Y, circle.circleSize, circle.circleSize);
+                    spriteBatch.Draw(circleTexture, circlePos, null, circleColor, MathHelper.ToRadians(circle.rotation), new Vector2(circleTexture.Width/2, circleTexture.Height/2), SpriteEffects.None, 0);
                 }
             }
         }
         public void LoadContent(ContentManager contentManager, GraphicsDevice graphicsDevice)
         {
+            for(int i = 1; i <= ThemeManager.activeTheme.misclickCount; i++)
+            {
+                GlobalContent.AddTexture("MisclickCircle"+i, ThemeManager.LoadLayeredContent<Texture2D>("graphics/misclick/"+i));
+            }
         }
     }
 }

@@ -32,7 +32,7 @@ namespace NonsensicalVideoGenerator
         private MusicState _musicState = MusicState.Paused;
         private int _musicActive = 0;
         private int music;
-        private bool alreadyPlayedFirstSong = true;
+        private bool alreadyPlayedFirstSong = false;
         public UserInterface()
         {
             ConsoleOutput.WriteLine("Creating new UserInterface instance...", Color.Transparent);
@@ -85,7 +85,7 @@ namespace NonsensicalVideoGenerator
             ConsoleOutput.WriteLine("Form does not support drag and drop.", Color.Transparent);
 #endif
             // Set window title.
-            Window.Title = "Nonsensical Video Generator";
+            Window.Title = Global.productName + " (v" + Global.productVersion + (Debug.GetDebugMode() ? " DEBUG)" : ")");
             // Disable anti-aliasing.
             _graphics.PreferMultiSampling = false;
             GraphicsDevice.SamplerStates[0] = SamplerState.PointClamp;
@@ -99,6 +99,9 @@ namespace NonsensicalVideoGenerator
             ScreenManager.LoadScreens();
             ConsoleOutput.WriteLine("Initialization complete.", Color.Transparent);
             LibraryData.SequentialName();
+            Window.AllowAltF4 = false;
+            Form _GameForm = (Form)Form.FromHandle(Window.Handle);
+            _GameForm.Closing += ClosingForm;
             base.Initialize();
         }
         protected override void LoadContent()
@@ -123,12 +126,12 @@ namespace NonsensicalVideoGenerator
             if(!alreadyPlayedFirstSong)
             {
                 alreadyPlayedFirstSong = true;
-                music = 5; // halloween
-                _musicState = MusicState.Playing;
-                MediaPlayer.Play(GlobalContent.GetSongByIndex(music));
-                return;
+                music = Global.generator.globalRandom.Next(0, GlobalContent.GetSongCount());
             }
-            music = Global.generator.globalRandom.Next(0, GlobalContent.GetSongCount());
+            else
+            {
+                music++;
+            }
             // Make sure music is in range.
             if(music < 0 || music >= GlobalContent.GetSongCount())
             {
@@ -244,6 +247,7 @@ namespace NonsensicalVideoGenerator
         protected override void Draw(GameTime gameTime)
         {
             GraphicsDevice.Clear(ThemeManager.GetColor("ClearColor")); // Black background.
+            Global.tooltip = "";
             if(_spriteBatch != null)
             {
                 _spriteBatch.Begin(SpriteSortMode.Deferred,
@@ -255,12 +259,36 @@ namespace NonsensicalVideoGenerator
             }
             base.Draw(gameTime);
         }
+        private void ClosingForm(object? sender, System.ComponentModel.CancelEventArgs e)
+        {
+            if(!Global.exiting)
+            {
+                e.Cancel = true;
+                Global.exiting = true;
+                // Exit page is always the last
+                Global.exitOpacityIncrease = 0.0075f;
+                Global.fakeExit = false;
+                GlobalContent.GetSound("Quit").Play(int.Parse(SaveData.saveValues["SoundEffectVolume"], System.Globalization.CultureInfo.InvariantCulture) / 100f, 0f, 0f);
+                //ScreenManager.GetScreen<MenuScreen>("Menu")?.Hide();
+                //if(FramePlayer.audio != null)
+                //    ScreenManager.GetScreen<VideoScreen>("Video")?.Hide();
+                //ScreenManager.GetScreen<ContentScreen>("Content")?.Hide();
+                //ScreenManager.GetScreen<HeaderScreen>("Header")?.Hide();
+                //ScreenManager.GetScreen<SocialScreen>("Socials")?.Hide();
+                if(SteamManager.initialized)
+                    SteamManager.Shutdown();
+                DiscordRPC.Shutdown();
+            }
+        }
         protected override void OnExiting(object sender, EventArgs args)
         {
             base.OnExiting(sender, args);
-            if(SteamManager.initialized)
-                SteamManager.Shutdown();
-            DiscordRPC.Shutdown();
+            if(!Global.exiting)
+            {
+                if(SteamManager.initialized)
+                    SteamManager.Shutdown();
+                DiscordRPC.Shutdown();
+            }
         }
     }
 }

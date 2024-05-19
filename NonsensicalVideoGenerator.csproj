@@ -3,9 +3,9 @@
     <AssemblyName>NonsensicalVideoGenerator</AssemblyName>
     <AssemblyProduct>NonsensicalVideoGenerator</AssemblyProduct>
     <AssemblyTitle>Nonsensical Video Generator</AssemblyTitle>
-    <FileVersion>1.0.0.25</FileVersion>
-    <AssemblyVersion>1.0.0.25</AssemblyVersion>
-    <Version>1.0.0.25</Version>
+    <FileVersion>1.0.1.0</FileVersion>
+    <AssemblyVersion>1.0.1.0</AssemblyVersion>
+    <Version>1.0.1.0</Version>
     <AssemblyCopyright>Copyright © KiwifruitDev 2024</AssemblyCopyright>
     <AssemblyTrademark>Newtonsoft.Json licensed under MIT; MonoGame licensed under Ms-PL; MoonSharp licensed under BSD-3-Clause; Steamworks.NET licensed under MIT; Munro licensed under SIL OFL</AssemblyTrademark>
     <Authors>KiwifruitDev</Authors>
@@ -57,6 +57,7 @@
     <WorkshopPlugins Include="$(ProjectDir)baseplugins\user\**\*.*" />
     <BaseTemplates Include="$(ProjectDir)basetemplates\**\*.*" />
     <BaseHTML Include="$(ProjectDir)basehtml\**\*.*" />
+    <BaseLocales Include="$(ProjectDir)baselocales\**\*.*" />
  	</ItemGroup>
 	<Target Name="CopyPlugins" AfterTargets="Build">
 		<MakeDir Directories="$(ProjectDir)bin\x64\Release\net6.0-windows\plugins" />
@@ -69,10 +70,14 @@
     <MakeDir Directories="$(ProjectDir)bin\x64\Debug\net6.0-windows\library\video" />
     <MakeDir Directories="$(ProjectDir)bin\x64\Release\net6.0-windows\templates" />
     <MakeDir Directories="$(ProjectDir)bin\x64\Debug\net6.0-windows\templates" />
+    <MakeDir Directories="$(ProjectDir)bin\x64\Release\net6.0-windows\locales" />
+    <MakeDir Directories="$(ProjectDir)bin\x64\Debug\net6.0-windows\locales" />
 		<Copy SourceFiles="@(BasePlugins)" DestinationFiles="$(ProjectDir)bin\x64\Release\net6.0-windows\plugins\user\stock\%(Filename)%(Extension)" />
 		<Copy SourceFiles="@(WorkshopPlugins)" DestinationFiles="$(ProjectDir)bin\x64\Debug\net6.0-windows\plugins\user\%(RecursiveDir)%(Filename)%(Extension)" />
     <Copy SourceFiles="@(BaseTemplates)" DestinationFiles="$(ProjectDir)bin\x64\Release\net6.0-windows\templates\%(RecursiveDir)%(Filename)%(Extension)" />
     <Copy SourceFiles="@(BaseTemplates)" DestinationFiles="$(ProjectDir)bin\x64\Debug\net6.0-windows\templates\%(RecursiveDir)%(Filename)%(Extension)" />
+    <Copy SourceFiles="@(BaseLocales)" DestinationFiles="$(ProjectDir)bin\x64\Release\net6.0-windows\locales\%(RecursiveDir)%(Filename)%(Extension)" />
+    <Copy SourceFiles="@(BaseLocales)" DestinationFiles="$(ProjectDir)bin\x64\Debug\net6.0-windows\locales\%(RecursiveDir)%(Filename)%(Extension)" />
     <!-- .\packages\Steamworks.NET\steam_api64.dll -->
     <Copy SourceFiles=".\packages\Steamworks.NET\steam_api64.dll" DestinationFiles="$(ProjectDir)bin\x64\Release\net6.0-windows\steam_api64.dll" />
     <Copy SourceFiles=".\packages\Steamworks.NET\steam_api64.dll" DestinationFiles="$(ProjectDir)bin\x64\Debug\net6.0-windows\steam_api64.dll" />

@@ -165,8 +165,8 @@ namespace NonsensicalVideoGenerator
         }
         public static string[] help = new string[]
         {
-            "Press F1 to toggle keyboard navigation. Press F2 to toggle text to speech.",
-            "Press enter to select an option. Use arrow keys or tab to navigate.",
+            "Accessibility:Help1",
+            "Accessibility:Help2",
             ""
         };
         public static void PostDraw(GameTime gameTime, SpriteBatch spriteBatch)
@@ -270,19 +270,18 @@ namespace NonsensicalVideoGenerator
                 // Draw black overlay.
                 Texture2D pixel = GlobalContent.GetTexture("Pixel");
                 spriteBatch.Draw(pixel, new Rectangle(GlobalGraphics.Scale(4), GlobalGraphics.Scale(4), GlobalGraphics.scaledWidth - GlobalGraphics.Scale(8), GlobalGraphics.scaledHeight - GlobalGraphics.Scale(8)), Color.Black * 0.5f);
-                SpriteFont munroSmall = GlobalContent.GetFont("MunroSmall");
+                SpriteFont munroSmall = L.FontSmall();
                 for(int i = 0; i < help.Length; i++)
                 {
                     if(help[i] == "")
                         continue;
                     // Draw help text at the top of the screen.
                     spriteBatch.Draw(pixel, new Rectangle(GlobalGraphics.Scale(4), GlobalGraphics.Scale(4+9*i), GlobalGraphics.scaledWidth - GlobalGraphics.Scale(8), GlobalGraphics.Scale(1) + GlobalGraphics.Scale(9)), Color.Black);
-                    Vector2 size = munroSmall.MeasureString(help[i]);
                     // Center horizontally
                     Vector2 position = new(GlobalGraphics.Scale(6), GlobalGraphics.Scale(2 + i * 9));
                     // Draw opaque background
                     //spriteBatch.Draw(pixel, new Rectangle((int)position.X - GlobalGraphics.Scale(2), (int)position.Y + GlobalGraphics.Scale(4) - GlobalGraphics.Scale(2), (int)size.X + GlobalGraphics.Scale(2), (int)size.Y - GlobalGraphics.Scale(5) + GlobalGraphics.Scale(2)), Color.Black);
-                    spriteBatch.DrawString(munroSmall, help[i], position, Color.White);
+                    spriteBatch.DrawString(munroSmall, L.T(0, help[i]), position, Color.White);
                 }
                 for(int i = 0; i < disambiguationOptions.Count; i++)
                 {
@@ -294,7 +293,7 @@ namespace NonsensicalVideoGenerator
                         {
                             if (i+offset<9)
                             {
-                                key = "[ ]"; //(i+offset+1).ToString();
+                                key = L.T(0, "Accessibility:Cursor"); //(i+offset+1).ToString();
                             }
                             else
                             {
@@ -304,7 +303,7 @@ namespace NonsensicalVideoGenerator
                     }
                     Vector2 offsetv = new();
                     TutorialScreen? tutorialScreen = null;
-                    tutorialScreen = ScreenManager.GetScreen<TutorialScreen>("Initial Setup");
+                    tutorialScreen = ScreenManager.GetScreen<TutorialScreen>("Tutorial");
                     if(tutorialScreen != null && tutorialScreen.screenType == ScreenType.Drawn)
                     {
                         offsetv = tutorialScreen.offset;
@@ -338,7 +337,7 @@ namespace NonsensicalVideoGenerator
                             showDisambiguation = false;
                             holdItForMe = true;
                             GlobalContent.GetSound("CompatSelect").Play(int.Parse(SaveData.saveValues["SoundEffectVolume"], System.Globalization.CultureInfo.InvariantCulture) / 100f, 0f, 0f);
-                            TTS("Selected " + disambiguationOptions[i].tts);
+                            TTS(L.T(0, "Accessibility:Selected", disambiguationOptions[i].tts));
                             return;
                         }
                     }

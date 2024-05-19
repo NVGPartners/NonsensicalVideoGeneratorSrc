@@ -21,8 +21,9 @@
                 "${workspaceFolder}\\NonsensicalVideoGenerator.csproj",
                 "/property:GenerateFullPaths=true",
                 "/consoleloggerparameters:NoSummary",
+                "/p:Configuration=Debug",
                 "/p:Platform=x64",
-                "/p:DefineConstants=WINDOWSDX MONOGAME",
+                "/p:DefineConstants=WINDOWSDX MONOGAME DEBUG KIWIFRUITDEV",
             ],
             "problemMatcher": "$msCompile"
         },
@@ -35,8 +36,9 @@
                 "${workspaceFolder}\\NonsensicalVideoGenerator.csproj",
                 "/property:GenerateFullPaths=true",
                 "/consoleloggerparameters:NoSummary",
+                "/p:Configuration=Debug",
                 "/p:Platform=x64",
-                "/p:DefineConstants=DESKTOPG MONOGAME",
+                "/p:DefineConstants=DESKTOPGL MONOGAME DEBUG KIWIFRUITDEV",
             ],
             "problemMatcher": "$msCompile"
         },
@@ -51,7 +53,7 @@
                 "/consoleloggerparameters:NoSummary",
                 "/p:Configuration=Release",
                 "/p:Platform=x64",
-                "/p:DefineConstants=WINDOWSDX MONOGAME",
+                "/p:DefineConstants=WINDOWSDX MONOGAME RELEASE KIWIFRUITDEV",
             ],
             "problemMatcher": "$msCompile"
         },
@@ -66,7 +68,7 @@
                 "/consoleloggerparameters:NoSummary",
                 "/p:Configuration=Release",
                 "/p:Platform=x64",
-                "/p:DefineConstants=DESKTOPGL MONOGAME",
+                "/p:DefineConstants=DESKTOPGL MONOGAME RELEASE KIWIFRUITDEV",
             ],
             "problemMatcher": "$msCompile"
         },

@@ -7,13 +7,14 @@ using Steamworks;
 namespace NonsensicalVideoGenerator
 {
     /// <summary>
-    /// This class stores useful global variables and functions.
     /// </summary>
+    /// This class stores useful global variables and functions.
     public static class Global
     {
-        public static Assembly assembly = System.Reflection.Assembly.GetExecutingAssembly();
+        public static Assembly assembly = Assembly.GetExecutingAssembly();
         public static FileVersionInfo fileVersionInfo = FileVersionInfo.GetVersionInfo(assembly.Location);
-        public static string? productName = fileVersionInfo.ProductName;
+        public static string? productName = fileVersionInfo.FileDescription;
+        public static string productNameShort = "NVG";
         public static string? productVersion = fileVersionInfo.ProductVersion;
 #if MONOGAME
         public static Mask mask = new();
@@ -44,5 +45,8 @@ namespace NonsensicalVideoGenerator
         public static bool highScore50 = false;
         public static Generator generator = new Generator();
         public static List<string> parameters = new List<string>();
+        public static string tooltip = "";
+        public static bool imageLibraryAvailable = false;
+        public static bool imageLibraryAvailableInternal = true;
     }
 }

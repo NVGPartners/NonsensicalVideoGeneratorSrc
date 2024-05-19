@@ -8,6 +8,7 @@ using Microsoft.Xna.Framework.Content;
 using Microsoft.Xna.Framework.Graphics;
 using Microsoft.Xna.Framework.Input;
 using Steamworks;
+using System.Globalization;
 
 namespace NonsensicalVideoGenerator
 {
@@ -19,8 +20,8 @@ namespace NonsensicalVideoGenerator
         /// <summary>
         /// The title of the screen. This is displayed on the header bar.
         /// </summary>
-        public string title { get; } = "Photosensitive Warning";
-        public int layer { get; } = 98;
+        public string title { get; } = "Intro";
+        public int layer { get; set; } = 97;
         public ScreenType screenType { get; set; } = ScreenType.Drawn;
         public int currentPlacement { get; set; } = -1;
         private int overlayOpacity = 255;
@@ -31,6 +32,7 @@ namespace NonsensicalVideoGenerator
         private double timeText = 0;
         private bool askAccessibility = false;
         private bool dontAskAgain = false;
+        private bool skipped = false;
         private static KeyboardState oldKeyboardState;
         private static KeyboardState newKeyboardState;
         // shamelessly copied from tutorial screen
@@ -38,24 +40,24 @@ namespace NonsensicalVideoGenerator
         private readonly InteractableController controller = new();
         private void ErrorOut()
         {
-            if(ScreenManager.GetScreen<TutorialScreen>("Initial Setup")?.screenType == ScreenType.Hidden)
+            if(ScreenManager.GetScreen<TutorialScreen>("Tutorial")?.screenType == ScreenType.Hidden)
             {
                 FramePlayer.canPlayBgMusic = false;
-                ScreenManager.PushNavigation("Initial Setup");
-                ScreenManager.GetScreen<TutorialScreen>("Initial Setup")?.Show();
+                ScreenManager.PushNavigation("Tutorial");
+                ScreenManager.GetScreen<TutorialScreen>("Tutorial")?.Show();
                 ScreenManager.GetScreen<ContentScreen>("Content")?.Hide();
-                ScreenManager.GetScreen<MenuScreen>("Main Menu")?.Hide();
+                ScreenManager.GetScreen<MenuScreen>("Menu")?.Hide();
                 if(FramePlayer.audio != null)
                     ScreenManager.GetScreen<VideoScreen>("Video")?.Hide();
                 ScreenManager.GetScreen<BackgroundScreen>("Background")?.Hide();
                 ScreenManager.GetScreen<SocialScreen>("Socials")?.Hide();
-                GlobalContent.GetSound("Prompt").Play(int.Parse(SaveData.saveValues["SoundEffectVolume"], System.Globalization.CultureInfo.InvariantCulture) / 100f, 0f, 0f);
+                GlobalContent.GetSound("Prompt").Play(int.Parse(SaveData.saveValues["SoundEffectVolume"], CultureInfo.InvariantCulture) / 100f, 0f, 0f);
             }
         }
         private void UpdateCheckThread(object? sender, DoWorkEventArgs e)
         {
             UpdateManager.GetDependencyStatus();
-            if(!UpdateManager.ffmpegInstalled || !UpdateManager.ffprobeInstalled)
+            if(!UpdateManager.ffmpegInstalled || !UpdateManager.ffprobeInstalled || Global.parameters.Contains("-forceinstall"))
             {
                 ErrorOut();
             }
@@ -108,88 +110,19 @@ namespace NonsensicalVideoGenerator
         private List<string> tipoftheday = new List<string>()
         {
             " ",
-            "Tip of the Day:",
-            "placeholder1",
-            "placeholder2",
+            "Intro:TipHeader",
             " ",
-            "Total Stats:",
-            "0 videos rendered",
-            "0 media imports",
-            "0 clips trimmed",
             " ",
-            "Click anywhere to continue.",
+            " ",
+            "Intro:StatsHeader",
+            " ",
+            " ",
+            " ",
+            " ",
+            "Intro:Continue",
             " "
         };
-        private List<string[]> tips = new List<string[]>()
-        {
-#if WINDOWSDX
-            new string[]
-            {
-                "You can drag and drop media into",
-                "the library to import them."
-            },
-            new string[]
-            {
-                "You can download several URLs at a time by",
-                "pasting a list of URLs from the clipboard."
-            },
-#endif
-            new string[]
-            {
-                "Check out the GitHub wiki to learn how",
-                "to use the program and create addons."
-            },
-            new string[]
-            {
-                "Press F5 to toggle the debug console.",
-                "This can be used to view errors."
-            },
-            new string[]
-            {
-                "Hold shift while scrolling in the console",
-                "to scroll faster. Also, try PG UP and PG DN."
-            },
-            new string[]
-            {
-                "You can right click on media in the library",
-                "to view them in the file explorer."
-            },
-            new string[]
-            {
-                "You can right click the video player to",
-                "start playing in an external player."
-            },
-            new string[]
-            {
-                "You can press F1 to access keyboard",
-                "navigation, which uses the arrow keys."
-            },
-            new string[]
-            {
-                "You can press F2 to toggle text to speech",
-                "while keyboard navigation is enabled."
-            },
-            new string[]
-            {
-                "You can press space to pause or re-play",
-                "the video in the video player."
-            },
-            new string[]
-            {
-                "The screen scale multiplier can be",
-                "set to change the program resolution."
-            },
-            new string[]
-            {
-                "You can hold shift while deleting media from",
-                "the library to instantly delete them."
-            },
-            new string[]
-            {
-                "Clicking on the Nonsensical Video Generator",
-                "logo will re-seed the random number generator."
-            },
-        };
+        private int tips = 12;
         public void Show()
         {
         }
@@ -202,7 +135,7 @@ namespace NonsensicalVideoGenerator
         }
         public void Draw(GameTime gameTime, SpriteBatch spriteBatch)
         {
-            SpriteFont fontMunro = GlobalContent.GetFont("Munro");
+            SpriteFont fontMunro = L.FontLarge();
             if(!fadingIn)
             {
                 // Draw black background.
@@ -271,6 +204,24 @@ namespace NonsensicalVideoGenerator
             }
             if(handleInput)
             {
+                if(!skipped && SaveData.saveValues["SkipPhotosensitiveWarningScreen"] == "true")
+                {
+                    accepted = true;
+                    skipped = true;
+                    askAccessibility = false;
+                    overlayOpacity = 255;
+                    if(askAccessibility)
+                    {
+                        SaveData.saveValues["FirstBoot"] = "false";
+                        SaveData.Save();
+                        askAccessibility = false;
+                        dontAskAgain = false;
+                    }
+                    else
+                    {
+                        ConsoleOutput.WriteLine("User acknowledged photosensitive warning.", Color.LightGreen);
+                    }
+                }
                 if(!askAccessibility && !accepted)
                 {
                     // Interactable
@@ -301,7 +252,7 @@ namespace NonsensicalVideoGenerator
                                 ConsoleOutput.WriteLine("User acknowledged photosensitive warning.", Color.LightGreen);
                             }
                             accepted = true;
-                            GlobalContent.GetSound("Select").Play(int.Parse(SaveData.saveValues["SoundEffectVolume"], System.Globalization.CultureInfo.InvariantCulture) / 100f, 0f, 0f);
+                            GlobalContent.GetSound("Select").Play(int.Parse(SaveData.saveValues["SoundEffectVolume"], CultureInfo.InvariantCulture) / 100f, 0f, 0f);
                         }
                     }
                 }
@@ -334,12 +285,12 @@ namespace NonsensicalVideoGenerator
                             updateWorker = new BackgroundWorker();
                             updateWorker.DoWork += UpdateCheckThread;
                             updateWorker.RunWorkerAsync();
-                            ScreenManager.PushNavigation("Main Menu");
+                            ScreenManager.PushNavigation("Menu");
                             ScreenManager.PushNavigation("Content");
                             ScreenManager.PushNavigation("Background");
                             ScreenManager.PushNavigation("Socials");
                             ScreenManager.GetScreen<ContentScreen>("Content")?.Show();
-                            ScreenManager.GetScreen<MenuScreen>("Main Menu")?.Show();
+                            ScreenManager.GetScreen<MenuScreen>("Menu")?.Show();
                             if(FramePlayer.audio != null)
                             {
                                 ScreenManager.PushNavigation("Video");
@@ -351,7 +302,8 @@ namespace NonsensicalVideoGenerator
                             Global.ready = true;
                             Global.readyTime = gameTime.TotalGameTime.TotalMilliseconds;
                             // Play startup sound.
-                            GlobalContent.GetSound("Start").Play(int.Parse(SaveData.saveValues["SoundEffectVolume"], System.Globalization.CultureInfo.InvariantCulture) / 100f, 0f, 0f);
+                            if(SaveData.saveValues["ActiveTheme"] == "")
+                                GlobalContent.GetSound("Start").Play(int.Parse(SaveData.saveValues["SoundEffectVolume"], CultureInfo.InvariantCulture) / 100f, 0f, 0f);
                             fadingIn = true;
                         }
                         accepted = false;
@@ -378,15 +330,22 @@ namespace NonsensicalVideoGenerator
                     // tip of the day
                     warningText = new List<string>(tipoftheday);
                     // Get random tip.
-                    string[] tip = tips[Global.generator.globalRandom.Next(tips.Count)];
-                    warningText[2] = tip[0];
-                    warningText[3] = tip[1];
+                    int tip = Global.generator.RandomInt(0, tips);
+                    warningText[2] = "Intro:Tip" + tip.ToString(CultureInfo.InvariantCulture) + "_0";
+                    warningText[3] = "Intro:Tip" + tip.ToString(CultureInfo.InvariantCulture) + "_1";
+                    // Translate current text
+                    for (int i = 0; i < warningText.Count; i++)
+                    {
+                        if(warningText[i] == " ")
+                            continue;
+                        warningText[i] = L.T(0, warningText[i]);
+                    }
                     // get stats
                     int[] stats = new int[3]
                     {
-                        int.Parse(SaveData.saveValues["TotalVideosRendered"], System.Globalization.CultureInfo.InvariantCulture),
-                        int.Parse(SaveData.saveValues["TotalMediaImported"], System.Globalization.CultureInfo.InvariantCulture),
-                        int.Parse(SaveData.saveValues["TotalClipsTrimmed"], System.Globalization.CultureInfo.InvariantCulture)
+                        int.Parse(SaveData.saveValues["TotalVideosRendered"], CultureInfo.InvariantCulture),
+                        int.Parse(SaveData.saveValues["TotalMediaImported"], CultureInfo.InvariantCulture),
+                        int.Parse(SaveData.saveValues["TotalClipsTrimmed"], CultureInfo.InvariantCulture)
                     };
                     bool[] plural = new bool[3]
                     {
@@ -394,9 +353,9 @@ namespace NonsensicalVideoGenerator
                         stats[1] != 1,
                         stats[2] != 1
                     };
-                    warningText[6] = $"{stats[0]} video{(plural[0] ? "s" : "")} rendered";
-                    warningText[7] = $"{stats[1]} media import{(plural[1] ? "s" : "")}";
-                    warningText[8] = $"{stats[2]} clip{(plural[2] ? "s" : "")} trimmed";
+                    warningText[6] = plural[0] ? L.T(0, "Intro:StatsVideosRenderedNonPlural", stats[0].ToString(CultureInfo.InvariantCulture)) : L.T(0, "Intro:StatsVideosRendered", stats[0].ToString(CultureInfo.InvariantCulture));
+                    warningText[7] = plural[1] ? L.T(0, "Intro:StatsMediaImportsNonPlural", stats[1].ToString(CultureInfo.InvariantCulture)) : L.T(0, "Intro:StatsMediaImports", stats[1].ToString(CultureInfo.InvariantCulture));
+                    warningText[8] = plural[2] ? L.T(0, "Intro:StatsClipsTrimmedNonPlural", stats[2].ToString(CultureInfo.InvariantCulture)) : L.T(0, "Intro:StatsClipsTrimmed", stats[2].ToString(CultureInfo.InvariantCulture));
                 }
             }
             else

@@ -21,7 +21,7 @@ namespace NonsensicalVideoGenerator
         /// The title of the screen. This is displayed on the header bar.
         /// </summary>
         public string title { get; } = "Socials";
-        public int layer { get; } = 5;
+        public int layer { get; set; } = 5;
         public ScreenType screenType { get; set; } = ScreenType.Hidden;
         public int currentPlacement { get; set; } = -1;
         private bool hiding = false;
@@ -182,7 +182,7 @@ namespace NonsensicalVideoGenerator
             Texture2D socialscreen = GlobalContent.GetTexture("SocialScreen");
             spriteBatch.Draw(socialscreen, new Rectangle(GlobalGraphics.Scale(69), GlobalGraphics.Scale(203), GlobalGraphics.Scale(socialscreen.Width), GlobalGraphics.Scale(socialscreen.Height)), Color.White);
             // Draw text
-            SpriteFont munroSmall = GlobalContent.GetFont("MunroSmall");
+            SpriteFont munroSmall = L.FontSmall();
             spriteBatch.DrawString(munroSmall, title, new Vector2(GlobalGraphics.Scale(83), GlobalGraphics.Scale(204)), Color.White);
             // End offset spritebatch
             spriteBatch.End();
@@ -193,19 +193,7 @@ namespace NonsensicalVideoGenerator
                 null, null, null, null);
             if(tooltip != "")
             {
-                // Get text size
-                Vector2 tooltipSize = GlobalContent.GetFont("MunroSmall").MeasureString(tooltip);
-                // Position is relative to mouse position but tries to avoid going off screen
-                Vector2 position = new(MouseInput.MouseState.Position.X + 10, MouseInput.MouseState.Position.Y + 10);
-                // Make sure it doesn't go off the right side of the screen
-                if (position.X + tooltipSize.X + GlobalGraphics.Scale(6) > GlobalGraphics.scaledWidth)
-                    position.X = GlobalGraphics.scaledWidth - tooltipSize.X - GlobalGraphics.Scale(6);
-                // Make sure it doesn't go off the bottom of the screen
-                if (position.Y + tooltipSize.Y + GlobalGraphics.Scale(2) > GlobalGraphics.scaledHeight)
-                    position.Y = GlobalGraphics.scaledHeight - tooltipSize.Y - GlobalGraphics.Scale(2); 
-                spriteBatch.Draw(GlobalContent.GetTexture("Pixel"), new Rectangle((int)position.X, (int)position.Y, (int)tooltipSize.X + GlobalGraphics.Scale(2), (int)tooltipSize.Y - GlobalGraphics.Scale(2)), ThemeManager.GetColor("BackgroundTooltip"));
-                // White text
-                spriteBatch.DrawString(GlobalContent.GetFont("MunroSmall"), tooltip, new Vector2(position.X + GlobalGraphics.Scale(2), position.Y - GlobalGraphics.Scale(2)), Color.White);
+                Global.tooltip = tooltip;
             }
         }
         public void LoadContent(ContentManager contentManager, GraphicsDevice graphicsDevice)

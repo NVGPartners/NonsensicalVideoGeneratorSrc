@@ -375,7 +375,7 @@ namespace NonsensicalVideoGenerator
                     {
                         audio.Play();
                         Global.generator.progressText = "Playing media...";
-                        FramePlayer.canPlayBgMusic = false;
+                        canPlayBgMusic = false;
                         audioPlaying = true;
                     }
                     else
@@ -383,7 +383,7 @@ namespace NonsensicalVideoGenerator
                         audio.Stop();
                         currentAudioTime = 0;
                         audioPlaying = false;
-                        FramePlayer.canPlayBgMusic = true;
+                        canPlayBgMusic = true;
                         Global.generator.progressText = "Stopped playback.";
                     }
                 }

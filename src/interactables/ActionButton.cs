@@ -18,7 +18,7 @@ namespace NonsensicalVideoGenerator
         {
             Icon = icon;
         }
-        public override bool Update(GameTime gameTime, bool handleInput)
+        public override bool Update(GameTime gameTime, bool handleInput, string internalName)
         {
             if (handleInput)
             {
@@ -27,7 +27,7 @@ namespace NonsensicalVideoGenerator
                 Rectangle scaledBounds = new((int)(Position.X * GlobalGraphics.scale), (int)(Position.Y * GlobalGraphics.scale), (int)(actionButton.Width * GlobalGraphics.scale), (int)(actionButton.Height * GlobalGraphics.scale));
                 int mouseButton = 0;
                 // Check if the mouse is hovering over the button.
-                Accessibility.CompatAccessibility(scaledBounds, "Action Button: " + Tooltip);
+                Accessibility.CompatAccessibility(scaledBounds, L.T(0, "Accessibility:InteractableActionButton", Tooltip));
                 if (scaledBounds.Contains(MouseInput.MouseState.Position))
                 {
                     // Check if the mouse is clicking on the button.
@@ -59,7 +59,7 @@ namespace NonsensicalVideoGenerator
             }
             return false;
         }
-        public override void Draw(GameTime gameTime, SpriteBatch spriteBatch)
+        public override void Draw(GameTime gameTime, SpriteBatch spriteBatch, string internalName)
         {
             // Draw the button
             Texture2D actionButton = GlobalContent.GetTexture("ActionButton");
@@ -72,22 +72,10 @@ namespace NonsensicalVideoGenerator
             // If hovering, draw tooltip
             if (State >= 1 && Tooltip != "")
             {
-                // Get text size
-                Vector2 tooltipSize = GlobalContent.GetFont("MunroSmall").MeasureString(Tooltip);
-                // Position is relative to mouse position but tries to avoid going off screen
-                Vector2 position = new(MouseInput.MouseState.Position.X + 10, MouseInput.MouseState.Position.Y + 10);
-                // Make sure it doesn't go off the right side of the screen
-                if (position.X + tooltipSize.X + GlobalGraphics.Scale(6) > GlobalGraphics.scaledWidth)
-                    position.X = GlobalGraphics.scaledWidth - tooltipSize.X - GlobalGraphics.Scale(6);
-                // Make sure it doesn't go off the bottom of the screen
-                if (position.Y + tooltipSize.Y + GlobalGraphics.Scale(2) > GlobalGraphics.scaledHeight)
-                    position.Y = GlobalGraphics.scaledHeight - tooltipSize.Y - GlobalGraphics.Scale(2); 
-                spriteBatch.Draw(GlobalContent.GetTexture("Pixel"), new Rectangle((int)position.X, (int)position.Y, (int)tooltipSize.X + GlobalGraphics.Scale(2), (int)tooltipSize.Y - GlobalGraphics.Scale(2)), ThemeManager.GetColor("ShadowActionButtonInteractable"));
-                // White text
-                spriteBatch.DrawString(GlobalContent.GetFont("MunroSmall"), Tooltip, new Vector2(position.X + GlobalGraphics.Scale(2), position.Y - GlobalGraphics.Scale(2)), Color.White);
+                Global.tooltip = L.T(0, "Interactable:"+internalName+"Tooltip");
             }
         }
-        public override void LoadContent(ContentManager contentManager, GraphicsDevice graphicsDevice)
+        public override void LoadContent(ContentManager contentManager, GraphicsDevice graphicsDevice, string internalName)
         {
         }
     }

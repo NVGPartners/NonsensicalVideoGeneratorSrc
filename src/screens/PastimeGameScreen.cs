@@ -1,6 +1,7 @@
 #if MONOGAME
 using System;
 using System.Collections.Generic;
+using System.Globalization;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Audio;
 using Microsoft.Xna.Framework.Content;
@@ -139,8 +140,8 @@ namespace NonsensicalVideoGenerator
         /// <summary>
         /// The title of the screen. This is displayed on the header bar.
         /// </summary>
-        public string title { get; } = "Pastime Game";
-        public int layer { get; } = 1;
+        public string title { get; } = "Game";
+        public int layer { get; set; } = 1;
         public ScreenType screenType { get; set; } = ScreenType.Hidden;
         public int currentPlacement { get; set; } = -1;
         private bool hiding = false;
@@ -307,7 +308,7 @@ namespace NonsensicalVideoGenerator
             }
             if(handleInput)
             {
-                Accessibility.CompatAccessibility(new Rectangle(GlobalGraphics.Scale(player.spacing), (int)GlobalGraphics.Scale(player.spacingPlacementY) + GlobalGraphics.Scale(player.height/2), GlobalGraphics.Scale(player.width), GlobalGraphics.Scale(player.height/2)), "Player; Press Shift+Space to exit");
+                Accessibility.CompatAccessibility(new Rectangle(GlobalGraphics.Scale(player.spacing), (int)GlobalGraphics.Scale(player.spacingPlacementY) + GlobalGraphics.Scale(player.height/2), GlobalGraphics.Scale(player.width), GlobalGraphics.Scale(player.height/2)), L.T(0, "Accessibility:GamePlayer"));
             }
             /*
             if (handleInput && MouseInput.MouseState.RightButton == ButtonState.Pressed && MouseInput.LastMouseState.RightButton == ButtonState.Released)
@@ -366,7 +367,7 @@ namespace NonsensicalVideoGenerator
                             {
                                 GlobalContent.GetSound("Prompt").Play(int.Parse(SaveData.saveValues["SoundEffectVolume"], System.Globalization.CultureInfo.InvariantCulture) / 100f, 0f, 0f);
                                 highScore = player.points;
-                                SaveData.saveValues["GameHighScore"] = highScore.ToString();
+                                SaveData.saveValues["GameHighScore"] = highScore.ToString(CultureInfo.InvariantCulture);
                                 SaveData.Save();
                                 // get random high score tease
                                 int rand = Global.generator.globalRandom.Next(0, highScoreTeases.Count);
@@ -502,13 +503,13 @@ namespace NonsensicalVideoGenerator
             // Draw player
             player.Draw(gameTime, spriteBatch);
             // Draw points
-            SpriteFont font = GlobalContent.GetFont("MunroSmall");
-            Vector2 textSize = font.MeasureString(player.points.ToString());
+            SpriteFont font = L.FontSmall();
+            Vector2 textSize = font.MeasureString(player.points.ToString(CultureInfo.InvariantCulture));
             // Center horizontally
             if (!player.waiting)
             {
-                spriteBatch.DrawString(font, player.points.ToString(), new Vector2(GlobalGraphics.Scale(160) - (textSize.X / 2) + GlobalGraphics.Scale(1), GlobalGraphics.Scale(240) - textSize.Y - GlobalGraphics.Scale(8) + GlobalGraphics.Scale(1)), Color.Black);
-                spriteBatch.DrawString(font, player.points.ToString(), new Vector2(GlobalGraphics.Scale(160) - (textSize.X / 2), GlobalGraphics.Scale(240) - textSize.Y - GlobalGraphics.Scale(8)), Color.White);
+                spriteBatch.DrawString(font, player.points.ToString(CultureInfo.InvariantCulture), new Vector2(GlobalGraphics.Scale(160) - (textSize.X / 2) + GlobalGraphics.Scale(1), GlobalGraphics.Scale(240) - textSize.Y - GlobalGraphics.Scale(8) + GlobalGraphics.Scale(1)), Color.Black);
+                spriteBatch.DrawString(font, player.points.ToString(CultureInfo.InvariantCulture), new Vector2(GlobalGraphics.Scale(160) - (textSize.X / 2), GlobalGraphics.Scale(240) - textSize.Y - GlobalGraphics.Scale(8)), Color.White);
                 // Draw score text
                 string scoreText = "Score";
                 if(player.points == highScore)
@@ -528,10 +529,10 @@ namespace NonsensicalVideoGenerator
                 spriteBatch.DrawString(font, "High Score", new Vector2(GlobalGraphics.Scale(160) - (textSize.X / 2) + GlobalGraphics.Scale(1), GlobalGraphics.Scale(240) - textSize.Y - GlobalGraphics.Scale(16) + GlobalGraphics.Scale(1)), Color.Black);
                 spriteBatch.DrawString(font, "High Score", new Vector2(GlobalGraphics.Scale(160) - (textSize.X / 2), GlobalGraphics.Scale(240) - textSize.Y - GlobalGraphics.Scale(16)), Color.White);
                 // Draw high score
-                textSize = font.MeasureString(highScore.ToString());
+                textSize = font.MeasureString(highScore.ToString(CultureInfo.InvariantCulture));
                 // Center horizontally
-                spriteBatch.DrawString(font, highScore.ToString(), new Vector2(GlobalGraphics.Scale(160) - (textSize.X / 2) + GlobalGraphics.Scale(1), GlobalGraphics.Scale(240) - textSize.Y - GlobalGraphics.Scale(8) + GlobalGraphics.Scale(1)), Color.Black);
-                spriteBatch.DrawString(font, highScore.ToString(), new Vector2(GlobalGraphics.Scale(160) - (textSize.X / 2), GlobalGraphics.Scale(240) - textSize.Y - GlobalGraphics.Scale(8)), Color.White);
+                spriteBatch.DrawString(font, highScore.ToString(CultureInfo.InvariantCulture), new Vector2(GlobalGraphics.Scale(160) - (textSize.X / 2) + GlobalGraphics.Scale(1), GlobalGraphics.Scale(240) - textSize.Y - GlobalGraphics.Scale(8) + GlobalGraphics.Scale(1)), Color.Black);
+                spriteBatch.DrawString(font, highScore.ToString(CultureInfo.InvariantCulture), new Vector2(GlobalGraphics.Scale(160) - (textSize.X / 2), GlobalGraphics.Scale(240) - textSize.Y - GlobalGraphics.Scale(8)), Color.White);
             }
             textSize = font.MeasureString(creditRoll[currentCredit]);
             spriteBatch.DrawString(font, creditRoll[currentCredit], new Vector2(GlobalGraphics.Scale(320) - textSize.X - GlobalGraphics.Scale(8), GlobalGraphics.Scale(9)), Color.Black);
