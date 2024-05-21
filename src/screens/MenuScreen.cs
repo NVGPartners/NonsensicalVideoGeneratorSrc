@@ -105,25 +105,26 @@ namespace NonsensicalVideoGenerator
             int currentPage = Pagination.GetParentPage();
             int whichOption = currentPage == 0 ? 1 : (currentPage == Pagination.GetTopPageCount() - 1 ? 2 : 0); // 0: middle, 1: top, 2: bottom
             spriteBatch.Draw(whichOption == 1 ? menuselected2 : (whichOption == 2 ? menuselected3 : menuselected), new Rectangle(GlobalGraphics.Scale(4), GlobalGraphics.Scale(134 + (pageOffset * currentPage)), GlobalGraphics.Scale(menuselected.Width), GlobalGraphics.Scale(menuselected.Height)), Color.White);
+            Texture2D menuwindow = GlobalContent.GetTexture("MenuWindow");
+            spriteBatch.Draw(menuwindow, new Rectangle(GlobalGraphics.Scale(0), GlobalGraphics.Scale(132), GlobalGraphics.Scale(menuwindow.Width), GlobalGraphics.Scale(menuwindow.Height)), Color.White);
+            // Draw window title
+            string localizedTitle = L.T(0, title+":Title");
+            Vector2 titleSize = L.FontSmall().MeasureString(localizedTitle);
+            spriteBatch.DrawString(L.FontSmall(), localizedTitle, new Vector2(GlobalGraphics.Scale(52), GlobalGraphics.Scale(203)), Color.White, MathHelper.ToRadians(90), new Vector2(titleSize.X, titleSize.Y), 1, SpriteEffects.None, 0);
             // Draw option text
             string name = "";
             for (int i = 0; i < Pagination.GetTopPageCount(); i++)
             {
-                name = L.T(0, Pagination.GetPage(i).Name+":Title");
+                name = L.T(0, Pagination.GetPage(i).Name.Replace("Page","")+":Title");
                 if(i == 2)
                     name = L.T(0, "Addons:Title");
                 spriteBatch.DrawString(L.FontLarge(), name, new Vector2(GlobalGraphics.Scale(7+1), GlobalGraphics.Scale(136 + (pageOffset * i)+1)), Color.Black);
                 spriteBatch.DrawString(L.FontLarge(), name, new Vector2(GlobalGraphics.Scale(7), GlobalGraphics.Scale(136 + (pageOffset * i))), Color.White);
             }
-            Texture2D menuwindow = GlobalContent.GetTexture("MenuWindow");
-            spriteBatch.Draw(menuwindow, new Rectangle(GlobalGraphics.Scale(0), GlobalGraphics.Scale(132), GlobalGraphics.Scale(menuwindow.Width), GlobalGraphics.Scale(menuwindow.Height)), Color.White);
-            // Draw window title
-            Vector2 titleSize = L.FontSmall().MeasureString(title);
-            spriteBatch.DrawString(L.FontSmall(), title, new Vector2(GlobalGraphics.Scale(52), GlobalGraphics.Scale(203)), Color.White, MathHelper.ToRadians(90), new Vector2(titleSize.X, titleSize.Y), 1, SpriteEffects.None, 0);
             // If hovering, draw tooltip
             if (hovering && !Global.exiting && name != "")
             {
-                Global.tooltip = L.T(0, Pagination.GetPage(hoveringPage).Name+":Tooltip");
+                Global.tooltip = L.T(0, Pagination.GetPage(hoveringPage).Name.Replace("Page","")+":Tooltip");
             }
             // End offset spritebatch
             spriteBatch.End();
@@ -162,7 +163,7 @@ namespace NonsensicalVideoGenerator
                         continue; // Skip Game
                     string name = Pagination.GetPage(i).Name;
                     if(i == 2)
-                        name = "Addons";
+                        name = L.T(0, "Addons:Title");
                     Accessibility.CompatAccessibility(new Rectangle(GlobalGraphics.Scale(4), GlobalGraphics.Scale(i * 16 + 134), GlobalGraphics.Scale(45), GlobalGraphics.Scale(16)), name + " (" + Pagination.GetPage(i).Tooltip + ")");
                 }
                 // Bounds of each segment
@@ -188,7 +189,7 @@ namespace NonsensicalVideoGenerator
                             {
                                 string name = Pagination.GetPage(segment).Name;
                                 if(segment == 2)
-                                    name = "Addons";
+                                    name = L.T(0, "Addons:Title");
                                 DiscordRPC.curtab = DiscordRPC.ToTab(name);
                                 if(segment == Pagination.GetPageCount() - 3)
                                 {

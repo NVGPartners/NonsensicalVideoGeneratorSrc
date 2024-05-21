@@ -86,6 +86,7 @@ namespace NonsensicalVideoGenerator
             AddFont("Munro", ThemeManager.LoadLayeredContent<SpriteFont>("fonts/munro-x"+scale));
             AddFont("MunroNarrow", ThemeManager.LoadLayeredContent<SpriteFont>("fonts/munro-narrow-x"+scale));
             AddFont("MunroSmall", ThemeManager.LoadLayeredContent<SpriteFont>("fonts/munro-small-x"+scale));
+            AddFont("LanaPixel", ThemeManager.LoadLayeredContent<SpriteFont>("fonts/lanapixel-x"+scale));
             // Fallback (multi-language support) system font.
             //AddFont("Arial", UserInterface.instance.Content.Load<SpriteFont>("Arial"));
             // Load default songs.

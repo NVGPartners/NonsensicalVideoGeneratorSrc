@@ -85,12 +85,20 @@ namespace NonsensicalVideoGenerator
             spriteBatch.Draw(side, new Rectangle(GlobalGraphics.Scale(bounds.X + bounds.Width - 1 + side.Width/2), GlobalGraphics.Scale(bounds.Y - 1 + side.Height/2), GlobalGraphics.Scale(side.Width), GlobalGraphics.Scale(side.Height)), null, Color.White, MathHelper.ToRadians(180), new Vector2(side.Width/2, side.Height/2), SpriteEffects.None, 0);
             spriteBatch.Draw(inner, new Rectangle(GlobalGraphics.Scale(bounds.X+3), GlobalGraphics.Scale(bounds.Y), GlobalGraphics.Scale(bounds.Width-3), GlobalGraphics.Scale(inner.Height)), Color.White);
             // Text & shadow
-            spriteBatch.DrawString(L.FontLarge(), L.T(0, "Interactable:"+internalName+"Title"), new Vector2(GlobalGraphics.Scale(textPosition.X + 1), GlobalGraphics.Scale(textPosition.Y - 3 + 1)), Color.Black);
-            spriteBatch.DrawString(L.FontLarge(), L.T(0, "Interactable:"+internalName+"Title"), new Vector2(GlobalGraphics.Scale(textPosition.X), GlobalGraphics.Scale(textPosition.Y-3)), Color.White);
+            string localizedTitle;
+            if(internalName.StartsWith("NoLocalization:"))
+                localizedTitle = Name;
+            else
+                localizedTitle = L.T(0, "Interactable:"+internalName+"Title");
+            spriteBatch.DrawString(L.FontLarge(), localizedTitle, new Vector2(GlobalGraphics.Scale(textPosition.X + 1), GlobalGraphics.Scale(textPosition.Y - 3 + 1)), Color.Black);
+            spriteBatch.DrawString(L.FontLarge(), localizedTitle, new Vector2(GlobalGraphics.Scale(textPosition.X), GlobalGraphics.Scale(textPosition.Y-3)), Color.White);
             // If hovering, draw tooltip
             if (State >= 1 && Tooltip != "")
             {
-                Global.tooltip = L.T(0, "Interactable:"+internalName+"Tooltip");
+                if(internalName.StartsWith("NoLocalization:"))
+                    Global.tooltip = Tooltip;
+                else
+                    Global.tooltip = L.T(0, "Interactable:"+internalName+"Tooltip");
             }
         }
         public virtual void LoadContent(ContentManager contentManager, GraphicsDevice graphicsDevice, string internalName)

@@ -1,0 +1,25 @@
+"InstallScript"
+{
+	"Run Process"
+	{
+		"windowsdesktop-runtime-6.0.19-win-x64"
+		{
+			"HasRunKey"		"HKEY_LOCAL_MACHINE\\Software\\Valve\\Steam\\Apps\\2516360"
+			"process 1"		"%INSTALLDIR%\\redist\\windowsdesktop-runtime-6.0.19-win-x64.exe"
+			"command 1"		"/install /quiet /norestart"
+			"NoCleanUp"		"1"
+			"Requirement_OS"
+			{
+				"Is64BitWindows"		"1"
+			}
+		}
+	}
+	"Firewall"
+	{
+		"Nonsensical Video Generator"		"%INSTALLDIR%\\NonsensicalVideoGenerator.exe"
+	}
+}
+"kvsignatures"
+{
+	"InstallScript"		"11d508eea6d8e4d8415593eac6577266deb645fe8b1a87aafd7f055fff75bed4b93e33962104d5517447820ece35a2ab695d9e9a4899a00a3a40f3a14859473dbf2ff871bafc88368e93092c6deb2f2f2e65f3ccd36afa5a52e172455ae4528fae28ec1412502f08a6a698c510d0e1b8367abb5f4268d57b82610d21cc8d397b"
+}

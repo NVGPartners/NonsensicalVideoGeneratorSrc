@@ -1,19 +1,22 @@
-function Query()
+function Query(localeName, localizationTokens)
+    local localizedOption1 = localizationTokens["Addons:StockSpeedOption1"] or "Speed"
+    local localizedOption2 = localizationTokens["Addons:StockSpeedOption1"] or "Speeds up or down the clip."
+    local localizedOption3 = localizationTokens["Addons:StockSpeedOption2"] or "Out of 100, chance for which type to apply."
     return {
         ["settings"] = {
             {
                 ["name"] = "Display Name",
-                ["value"] = "Speed",
+                ["value"] = localizedOption1,
                 ["type"] = "label",
             },
             {
                 ["name"] = "Description",
-                ["value"] = "Speeds up or down the clip.",
+                ["value"] = localizedOption2,
                 ["type"] = "label",
             },
             {
                 ["name"] = "Chance Roll",
-                ["tooltip"] = "Out of 100, chance for which type to apply.",
+                ["tooltip"] = localizedOption3,
                 ["value"] = "50",
                 ["type"] = "int",
             },

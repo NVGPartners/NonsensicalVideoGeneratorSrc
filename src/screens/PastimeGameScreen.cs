@@ -2,6 +2,8 @@
 using System;
 using System.Collections.Generic;
 using System.Globalization;
+using System.IO;
+using System.Reflection;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Audio;
 using Microsoft.Xna.Framework.Content;
@@ -10,6 +12,7 @@ using Microsoft.Xna.Framework.Input;
 using Microsoft.Xna.Framework.Media;
 using MonoGame.Extended.Tweening;
 using Steamworks;
+using Newtonsoft.Json;
 
 namespace NonsensicalVideoGenerator
 {
@@ -91,28 +94,39 @@ namespace NonsensicalVideoGenerator
                 if (handleInput && MouseInput.LastMouseState.LeftButton == ButtonState.Released && MouseInput.MouseState.LeftButton == ButtonState.Pressed)
                 {
                     waiting = false;
-                    velocity = -jump;
-                    GlobalContent.GetSound("Option").Play(int.Parse(SaveData.saveValues["SoundEffectVolume"], System.Globalization.CultureInfo.InvariantCulture) / 100f, 0f, 0f);
+                    if(!Debug.gameCheat)
+                        velocity = -jump;
+                    GlobalContent.GetSound("Option").Play(int.Parse(SaveData.saveValues["SoundEffectVolume"], CultureInfo.InvariantCulture) / 100f, 0f, 0f);
                     return true;
                 }
             }
             else
             {
                 distance += (int)(gameTime.ElapsedGameTime.TotalSeconds * 100);
-                velocity += gravity;
-                spacingPlacementY += velocity;
-                if(spacingPlacementY < -height)
+                if(Debug.gameCheat)
                 {
-                    spacingPlacementY = -height;
-                    velocity = 0;
+                    // Use mouse cursor to control the bird
+                    spacingPlacementY = MouseInput.MouseState.Y / GlobalGraphics.scale;
+                    spacing = MouseInput.MouseState.X / GlobalGraphics.scale;
                 }
-                if(!dead && handleInput)
+                else
                 {
-                    if (MouseInput.LastMouseState.LeftButton == ButtonState.Released && MouseInput.MouseState.LeftButton == ButtonState.Pressed)
+                    spacing =  (320 / 2) - (5/2) - 1;
+                    velocity += gravity;
+                    spacingPlacementY += velocity;
+                    if(spacingPlacementY < -height)
                     {
-                        velocity = -jump;
-                        GlobalContent.GetSound("Hover").Play(int.Parse(SaveData.saveValues["SoundEffectVolume"], System.Globalization.CultureInfo.InvariantCulture) / 100f, 0f, 0f);
-                        return true;
+                        spacingPlacementY = -height;
+                        velocity = 0;
+                    }
+                    if(!dead && handleInput)
+                    {
+                        if (MouseInput.LastMouseState.LeftButton == ButtonState.Released && MouseInput.MouseState.LeftButton == ButtonState.Pressed)
+                        {
+                            velocity = -jump;
+                            GlobalContent.GetSound("Hover").Play(int.Parse(SaveData.saveValues["SoundEffectVolume"], CultureInfo.InvariantCulture) / 100f, 0f, 0f);
+                            return true;
+                        }
                     }
                 }
             }
@@ -156,69 +170,10 @@ namespace NonsensicalVideoGenerator
             new PastimeGameObstacle(0),
             new PastimeGameObstacle((320/2) - (PastimeGameObstacle.width/4)),
         };
-        private readonly List<string> highScoreTeases = new()
-        {
-            "Wowza!",
-            "You're getting good at this!",
-            "You're a pro!",
-            "You're a god!",
-            "How did you do that?",
-            "Good job!",
-            "Nice!",
-            "What a score!",
-            "You're a legend!",
-            "Great work!",
-        };
-        private int currentCredit = 0;
-        private readonly List<string> creditRoll = new()
-        {
-            "Score points to view credits!",
-            "Lead Developer:",
-            "kiwifruitdev",
-            "Sound Designers:",
-            "gmm2003",
-            "bobbyiguess",
-            "Moderators:",
-            "0zne",
-            "brettbagel",
-            "spiral2839",
-            "nuppington",
-            "treycen",
-            "Special Thanks:",
-            "vinesauce",
-            "meleekirby",
-            "supositware",
-            "devanwolf",
-            "deemacias",
-            "Superstars:",
-            "thigo",
-            "eddsworldfan69420",
-            "fireafyanimations",
-            "goggleskun",
-            "1greg7",
-            "gungholizard",
-            "nobodyhasabandonedme",
-            "jankespro12",
-            "kraggerthemenace",
-            "lindinhodebonito",
-            "marcioleo123",
-            "revilleaj",
-            "rowster64",
-            "thebritishytper",
-            "thet00nedl00n",
-            "madclown55",
-            "waterdeervt",
-            "OSS Licenses:",
-            "MonoGame (Ms-PL)",
-            "Newtonsoft.Json (MIT License)",
-            "Steamworks.NET (MIT License)",
-            "MoonSharp (BSD-3-Clause License)",
-            "DiscordRichPresence (MIT License)",
-            "yt-dlp (Unlicense)",
-            "Font Licenses:",
-            "Munro (SIL Open Font License)",
-            "End of credits",
-        };
+        private string currentCreditKey = "";
+        private int currentCreditIndex = -1;
+        private string creditsFile = "credits.json";
+        private Dictionary<string, List<string>> credits = new();
         private PastimeGamePlayer player = new();
         public void Show()
         {
@@ -313,7 +268,7 @@ namespace NonsensicalVideoGenerator
             /*
             if (handleInput && MouseInput.MouseState.RightButton == ButtonState.Pressed && MouseInput.LastMouseState.RightButton == ButtonState.Released)
             {
-                GlobalContent.GetSound("Back").Play(int.Parse(SaveData.saveValues["SoundEffectVolume"], System.Globalization.CultureInfo.InvariantCulture) / 100f, 0f, 0f);
+                GlobalContent.GetSound("Back").Play(int.Parse(SaveData.saveValues["SoundEffectVolume"], CultureInfo.InvariantCulture) / 100f, 0f, 0f);
                 Hide();
                 ScreenManager.PushNavigation("Video");
                 ScreenManager.GetScreen<VideoScreen>("Video")?.Show();
@@ -338,7 +293,7 @@ namespace NonsensicalVideoGenerator
                     // If player is in an obstacle, die
                     if(obstacle.CheckCollision(new Rectangle(GlobalGraphics.Scale(player.spacing), GlobalGraphics.Scale((int)player.spacingPlacementY), GlobalGraphics.Scale(player.width), GlobalGraphics.Scale(player.height))))
                     {
-                        GlobalContent.GetSound("Error").Play(int.Parse(SaveData.saveValues["SoundEffectVolume"], System.Globalization.CultureInfo.InvariantCulture) / 100f, 0f, 0f);
+                        GlobalContent.GetSound("Error").Play(int.Parse(SaveData.saveValues["SoundEffectVolume"], CultureInfo.InvariantCulture) / 100f, 0f, 0f);
                         player.dead = true;
                         // timer in 0.05 seconds
                         timer = (float)gameTime.TotalGameTime.TotalMilliseconds + 50f;
@@ -356,35 +311,67 @@ namespace NonsensicalVideoGenerator
                         if(!obstacle.isDead && !obstacle.point)
                         {
                             obstacle.point = true;
-                            GlobalContent.GetSound("AddSource").Play(int.Parse(SaveData.saveValues["SoundEffectVolume"], System.Globalization.CultureInfo.InvariantCulture) / 100f, 0f, 0f);
-                            player.points++;
-                            currentCredit++;
-                            if(currentCredit > creditRoll.Count-1)
+                            GlobalContent.GetSound("AddSource").Play(int.Parse(SaveData.saveValues["SoundEffectVolume"], CultureInfo.InvariantCulture) / 100f, 0f, 0f);
+                            if(player.points < 2147483647)
+                                player.points++;
+                            if(player.points == 2147483647)
+                                GlobalContent.GetSound("RenderComplete").Play(int.Parse(SaveData.saveValues["SoundEffectVolume"], CultureInfo.InvariantCulture) / 100f, 0f, 0f);
+                            // Increment currentCreditIndex
+                            // If out of range of the key, increment currentCreditKey and set currentCreditIndex to -1
+                            if(credits.Count > 0)
                             {
-                                currentCredit = 1;
+                                if(currentCreditIndex == -1)
+                                {
+                                    currentCreditIndex = 0;
+                                }
+                                else
+                                {
+                                    currentCreditIndex++;
+                                }
+                                if(currentCreditIndex >= credits[currentCreditKey].Count)
+                                {
+                                    currentCreditIndex = -1;
+                                    foreach (string key in credits.Keys)
+                                    {
+                                        if(key == currentCreditKey)
+                                        {
+                                            currentCreditKey = "";
+                                        }
+                                        else if(currentCreditKey == "")
+                                        {
+                                            currentCreditKey = key;
+                                            break;
+                                        }
+                                    }
+                                    // Loop back to the beginning
+                                    if(currentCreditKey == "")
+                                    {
+                                        foreach (string key in credits.Keys)
+                                        {
+                                            currentCreditKey = key;
+                                            break;
+                                        }
+                                    }
+                                }
                             }
                             if(player.points >= highScore)
                             {
-                                GlobalContent.GetSound("Prompt").Play(int.Parse(SaveData.saveValues["SoundEffectVolume"], System.Globalization.CultureInfo.InvariantCulture) / 100f, 0f, 0f);
+                                GlobalContent.GetSound("Prompt").Play(int.Parse(SaveData.saveValues["SoundEffectVolume"], CultureInfo.InvariantCulture) / 100f, 0f, 0f);
                                 highScore = player.points;
                                 SaveData.saveValues["GameHighScore"] = highScore.ToString(CultureInfo.InvariantCulture);
                                 SaveData.Save();
-                                // get random high score tease
-                                int rand = Global.generator.globalRandom.Next(0, highScoreTeases.Count);
-                                ConsoleOutput.WriteLine(highScoreTeases[rand] + " New high score: " + highScore, Color.Cyan);
                             }
                             if(player.points == 50 && !Global.highScore50)
                             {
                                 Global.highScore50 = true;
                                 string achievement = "ACHIEVEMENT_HIGH_SCORE";
-                                ConsoleOutput.WriteLine("Awarding achievement: "+achievement, Color.LightBlue);
-                                SteamUserStats.SetAchievement(achievement);
+                                Achievements.Award(achievement);
                             }
                         }
                     }
                     if(phase == 0 && player.spacingPlacementY > 240-player.height)
                     {
-                        GlobalContent.GetSound("Error").Play(int.Parse(SaveData.saveValues["SoundEffectVolume"], System.Globalization.CultureInfo.InvariantCulture) / 100f, 0f, 0f);
+                        GlobalContent.GetSound("Error").Play(int.Parse(SaveData.saveValues["SoundEffectVolume"], CultureInfo.InvariantCulture) / 100f, 0f, 0f);
                         player.dead = true;
                         // timer in 0.05 seconds
                         timer = (float)gameTime.TotalGameTime.TotalMilliseconds + 50f;
@@ -504,39 +491,54 @@ namespace NonsensicalVideoGenerator
             player.Draw(gameTime, spriteBatch);
             // Draw points
             SpriteFont font = L.FontSmall();
-            Vector2 textSize = font.MeasureString(player.points.ToString(CultureInfo.InvariantCulture));
+            string points = player.points.ToString(CultureInfo.InvariantCulture);
+            if (player.points == 2147483647)
+                points = "";
+            Vector2 textSize = font.MeasureString(points);
             // Center horizontally
-            if (!player.waiting)
+            if (!player.waiting && player.points < 2147483647)
             {
-                spriteBatch.DrawString(font, player.points.ToString(CultureInfo.InvariantCulture), new Vector2(GlobalGraphics.Scale(160) - (textSize.X / 2) + GlobalGraphics.Scale(1), GlobalGraphics.Scale(240) - textSize.Y - GlobalGraphics.Scale(8) + GlobalGraphics.Scale(1)), Color.Black);
-                spriteBatch.DrawString(font, player.points.ToString(CultureInfo.InvariantCulture), new Vector2(GlobalGraphics.Scale(160) - (textSize.X / 2), GlobalGraphics.Scale(240) - textSize.Y - GlobalGraphics.Scale(8)), Color.White);
+                spriteBatch.DrawString(font, points, new Vector2(GlobalGraphics.Scale(160) - (textSize.X / 2) + GlobalGraphics.Scale(1), GlobalGraphics.Scale(240) - textSize.Y - GlobalGraphics.Scale(8) + GlobalGraphics.Scale(1)), Color.Black);
+                spriteBatch.DrawString(font, points, new Vector2(GlobalGraphics.Scale(160) - (textSize.X / 2), GlobalGraphics.Scale(240) - textSize.Y - GlobalGraphics.Scale(8)), Color.White);
                 // Draw score text
-                string scoreText = "Score";
+                string scoreText = L.T(0, "Game:Score");
                 if(player.points == highScore)
                 {
-                    scoreText = "High Score";
+                    scoreText = L.T(0, "Game:HighScore");
                 }
                 textSize = font.MeasureString(scoreText);
                 // Center horizontally
                 spriteBatch.DrawString(font, scoreText, new Vector2(GlobalGraphics.Scale(160) - (textSize.X / 2) + GlobalGraphics.Scale(1), GlobalGraphics.Scale(240) - textSize.Y - GlobalGraphics.Scale(16) + GlobalGraphics.Scale(1)), Color.Black);
                 spriteBatch.DrawString(font, scoreText, new Vector2(GlobalGraphics.Scale(160) - (textSize.X / 2), GlobalGraphics.Scale(240) - textSize.Y - GlobalGraphics.Scale(16)), Color.White);
             }
-            else
+            else if(highScore < 2147483647)
             {
                 // Draw high score text
-                textSize = font.MeasureString("High Score");
+                textSize = font.MeasureString(L.T(0, "Game:HighScore"));
                 // Center horizontally
-                spriteBatch.DrawString(font, "High Score", new Vector2(GlobalGraphics.Scale(160) - (textSize.X / 2) + GlobalGraphics.Scale(1), GlobalGraphics.Scale(240) - textSize.Y - GlobalGraphics.Scale(16) + GlobalGraphics.Scale(1)), Color.Black);
-                spriteBatch.DrawString(font, "High Score", new Vector2(GlobalGraphics.Scale(160) - (textSize.X / 2), GlobalGraphics.Scale(240) - textSize.Y - GlobalGraphics.Scale(16)), Color.White);
+                spriteBatch.DrawString(font, L.T(0, "Game:HighScore"), new Vector2(GlobalGraphics.Scale(160) - (textSize.X / 2) + GlobalGraphics.Scale(1), GlobalGraphics.Scale(240) - textSize.Y - GlobalGraphics.Scale(16) + GlobalGraphics.Scale(1)), Color.Black);
+                spriteBatch.DrawString(font, L.T(0, "Game:HighScore"), new Vector2(GlobalGraphics.Scale(160) - (textSize.X / 2), GlobalGraphics.Scale(240) - textSize.Y - GlobalGraphics.Scale(16)), Color.White);
                 // Draw high score
                 textSize = font.MeasureString(highScore.ToString(CultureInfo.InvariantCulture));
                 // Center horizontally
                 spriteBatch.DrawString(font, highScore.ToString(CultureInfo.InvariantCulture), new Vector2(GlobalGraphics.Scale(160) - (textSize.X / 2) + GlobalGraphics.Scale(1), GlobalGraphics.Scale(240) - textSize.Y - GlobalGraphics.Scale(8) + GlobalGraphics.Scale(1)), Color.Black);
                 spriteBatch.DrawString(font, highScore.ToString(CultureInfo.InvariantCulture), new Vector2(GlobalGraphics.Scale(160) - (textSize.X / 2), GlobalGraphics.Scale(240) - textSize.Y - GlobalGraphics.Scale(8)), Color.White);
             }
-            textSize = font.MeasureString(creditRoll[currentCredit]);
-            spriteBatch.DrawString(font, creditRoll[currentCredit], new Vector2(GlobalGraphics.Scale(320) - textSize.X - GlobalGraphics.Scale(8), GlobalGraphics.Scale(9)), Color.Black);
-            spriteBatch.DrawString(font, creditRoll[currentCredit], new Vector2(GlobalGraphics.Scale(320) - textSize.X - GlobalGraphics.Scale(9), GlobalGraphics.Scale(8)), Color.White);
+            string credit = "";
+            if(credits.Count > 0 && currentCreditKey != "" && credits.ContainsKey(currentCreditKey))
+            {
+                if(currentCreditIndex == -1 || currentCreditIndex >= credits[currentCreditKey].Count)
+                {
+                    credit = L.T(0, "Game:Credits"+currentCreditKey);
+                }
+                else
+                {
+                    credit = credits[currentCreditKey][currentCreditIndex];
+                }
+            }
+            textSize = font.MeasureString(credit);
+            spriteBatch.DrawString(font, credit, new Vector2(GlobalGraphics.Scale(320) - textSize.X - GlobalGraphics.Scale(8), GlobalGraphics.Scale(9)), Color.Black);
+            spriteBatch.DrawString(font, credit, new Vector2(GlobalGraphics.Scale(320) - textSize.X - GlobalGraphics.Scale(9), GlobalGraphics.Scale(8)), Color.White);
             // Draw render progress on right side (pastime)
             /*
             if(Global.generator.progressText != "")
@@ -566,7 +568,32 @@ namespace NonsensicalVideoGenerator
                 obstacle.LoadContent(contentManager, graphicsDevice);
             }
             // Set high score
-            highScore = int.Parse(SaveData.saveValues["GameHighScore"], System.Globalization.CultureInfo.InvariantCulture);
+            highScore = int.Parse(SaveData.saveValues["GameHighScore"], CultureInfo.InvariantCulture);
+            // Load credits from credits.json
+            credits.Clear();
+            string creditPath = Path.Combine(Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location) ?? ".", creditsFile);
+            if (File.Exists(creditPath))
+            {
+                Dictionary<string, List<string>>? newCredits = JsonConvert.DeserializeObject<Dictionary<string, List<string>>>(File.ReadAllText(creditPath));
+                // Add start and end credits
+                if (newCredits != null)
+                {
+                    credits.Add("Start", new List<string>());
+                    foreach (string key in newCredits.Keys)
+                    {
+                        credits.Add(key, newCredits[key]);
+                    }
+                    credits.Add("End", new List<string>());
+                    // Get first key
+                    foreach (string key in credits.Keys)
+                    {
+                        currentCreditKey = key;
+                        break;
+                    }
+                }
+            }
+            if (credits == null)
+                ConsoleOutput.WriteLine("Could not find credits file: " + creditsFile, Color.Red);
         }
     }
 }

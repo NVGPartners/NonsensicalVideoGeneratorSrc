@@ -24,6 +24,7 @@ namespace NonsensicalVideoGenerator
         public static int currentFrame = 0;
 #if MONOGAME
         public static List<Texture2D> frames = new();
+        public static Texture2D? audioFrame;
 #else
         public static List<Image> frames = new();
 #endif
@@ -74,8 +75,8 @@ namespace NonsensicalVideoGenerator
                 if(worker.CancellationPending || !processing)
                     return;
                 int scale =  int.Parse(SaveData.saveValues["VideoPlaybackScale"], System.Globalization.CultureInfo.InvariantCulture);
-                int w = 104 * scale;
-                int h = 82 * scale;
+                int w = 100 * scale;
+                int h = 78 * scale;
                 ProcessStartInfo startInfo = new()
                 {
                     FileName = "ffmpeg",
@@ -104,6 +105,7 @@ namespace NonsensicalVideoGenerator
                 if(worker.CancellationPending || !processing)
                     return;
                 // Load frames
+                audioFrame = null;
                 frames.Clear();
                 if(worker.CancellationPending || !processing)
                     return;
@@ -143,7 +145,7 @@ namespace NonsensicalVideoGenerator
                 ConsoleOutput.WriteLine(e.Message);
                 Stop();
                 GlobalContent.GetSound("Error").Play(int.Parse(SaveData.saveValues["SoundEffectVolume"], System.Globalization.CultureInfo.InvariantCulture) / 100f, 0f, 0f);
-                Global.generator.progressText = "Failed to play media.";
+                Global.generator.progressText = L.T(0, "Video:StatusFailPlay");
             }
             processing = false;
         }
@@ -258,7 +260,7 @@ namespace NonsensicalVideoGenerator
 #if MONOGAME
                     ScreenManager.GetScreen<VideoScreen>("Video")?.Hide();
 #endif
-                    Global.generator.progressText = "Stopped playback.";
+                    Global.generator.progressText = L.T(0, "Video:StatusStop");
                 }
             }
             catch(Exception e)
@@ -353,9 +355,21 @@ namespace NonsensicalVideoGenerator
                 process.WaitForExit();
 #endif
                 canPlayBgMusic = false;
+                Process waveProcess = Generator.GenerateTempAudioWaveformImage(currentPath, ".\\temp\\extracted\\audio.bmp", 100, 78);
+                // Defer until the process is finished
+                while(!waveProcess.HasExited)
+                {
+                    System.Threading.Thread.Sleep(100);
+                }
+                audioFrame = null;
+                FileStream audioFrameFile = File.OpenRead(".\\temp\\extracted\\audio.bmp");
+                audioFrame = Texture2D.FromStream(UserInterface.instance.GraphicsDevice, audioFrameFile);
+                audioFrameFile.Close();
                 audio.Play();
+                ScreenManager.PushNavigation("Video");
+                ScreenManager.GetScreen<VideoScreen>("Video")?.Show();
                 audioPlaying = true;
-                Global.generator.progressText = "Playing media...";
+                Global.generator.progressText = L.T(0, "Video:StatusPlay");
             }
             catch(Exception e)
             {
@@ -374,7 +388,7 @@ namespace NonsensicalVideoGenerator
                     if(!audioPlaying && frames.Count == 0)
                     {
                         audio.Play();
-                        Global.generator.progressText = "Playing media...";
+                        Global.generator.progressText = L.T(0, "Video:StatusPlay");
                         canPlayBgMusic = false;
                         audioPlaying = true;
                     }
@@ -384,7 +398,7 @@ namespace NonsensicalVideoGenerator
                         currentAudioTime = 0;
                         audioPlaying = false;
                         canPlayBgMusic = true;
-                        Global.generator.progressText = "Stopped playback.";
+                        Global.generator.progressText = L.T(0, "Video:StatusStop");
                     }
                 }
                 playing = false;
@@ -449,7 +463,7 @@ namespace NonsensicalVideoGenerator
                             ConsoleOutput.WriteLine($"Failed to play media.");
                             ConsoleOutput.WriteLine(e.Message);
                             GlobalContent.GetSound("Error").Play(int.Parse(SaveData.saveValues["SoundEffectVolume"], System.Globalization.CultureInfo.InvariantCulture) / 100f, 0f, 0f);
-                            Global.generator.progressText = "Failed to play media.";
+                            Global.generator.progressText = L.T(0, "Video:StatusFailPlay");
                         }
                     }
                 }
@@ -457,7 +471,7 @@ namespace NonsensicalVideoGenerator
             else
             {
                 GlobalContent.GetSound("Error").Play(int.Parse(SaveData.saveValues["SoundEffectVolume"], System.Globalization.CultureInfo.InvariantCulture) / 100f, 0f, 0f);
-                Global.generator.progressText = "Failed to stop playback.";
+                Global.generator.progressText = L.T(0, "Video:StatusFailStop");
             }
         }
 #if MONOGAME
@@ -475,13 +489,16 @@ namespace NonsensicalVideoGenerator
 #endif
                 if(currentAudioTime > audioLength)
                 {
-                    Stop();
+                    audio.Stop();
+                    currentAudioTime = 0;
                     audioPlaying = false;
+                    canPlayBgMusic = true;
+                    Global.generator.progressText = L.T(0, "Video:StatusStop");
                 }
             }
             if(frames.Count > 0 && !playing && audio != null && !processing)
             {
-                Global.generator.progressText = "Playing media...";
+                Global.generator.progressText = L.T(0, "Video:StatusPlay");
 #if MONOGAME
                 timeStarted = gameTime.TotalGameTime.TotalSeconds;
 #else

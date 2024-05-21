@@ -1,25 +1,29 @@
-function Query()
+function Query(localeName, localizationTokens)
+    local localizedOption1 = localizationTokens["Addons:StockRaveOption1"] or "Rave"
+    local localizedOption2 = localizationTokens["Addons:StockRaveOption2"] or "Random frame order with color cycle."
+    local localizedOption3 = localizationTokens["Addons:StockRaveOption3"] or "The minimum amount of time to seek music."
+    local localizedOption4 = localizationTokens["Addons:StockRaveOption4"] or "The maximum amount of time to seek music."
     return {
         ["settings"] = {
             {
                 ["name"] = "Display Name",
-                ["value"] = "Rave",
+                ["value"] = localizedOption1,
                 ["type"] = "label",
             },
             {
                 ["name"] = "Description",
-                ["value"] = "Random frame order with color cycle.",
+                ["value"] = localizedOption2,
                 ["type"] = "label",
             },
             {
                 ["name"] = "Music Seek Start",
-                ["tooltip"] = "The minimum amount of time to seek music.",
+                ["tooltip"] = localizedOption3,
                 ["value"] = "1",
                 ["type"] = "float",
             },
             {
                 ["name"] = "Music Seek End",
-                ["tooltip"] = "The maximum amount of time to seek music.",
+                ["tooltip"] = localizedOption4,
                 ["value"] = "5",
                 ["type"] = "float",
             },

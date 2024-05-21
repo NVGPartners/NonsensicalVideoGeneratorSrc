@@ -1,19 +1,22 @@
-function Query()
+function Query(localeName, localizationTokens)
+    local localizedOption1 = localizationTokens["Addons:StockReverseOption1"] or "Reverse"
+    local localizedOption2 = localizationTokens["Addons:StockReverseOption2"] or "Reverses or forward-reverses a clip."
+    local localizedOption3 = localizationTokens["Addons:StockReverseOption3"] or "Out of 100, chance for which type to apply."
     return {
         ["settings"] = {
             {
                 ["name"] = "Display Name",
-                ["value"] = "Reverse",
+                ["value"] = localizedOption1,
                 ["type"] = "label",
             },
             {
                 ["name"] = "Description",
-                ["value"] = "Reverses or forward-reverses a clip.",
+                ["value"] = localizedOption2,
                 ["type"] = "label",
             },
             {
                 ["name"] = "Chance Roll",
-                ["tooltip"] = "Out of 100, chance for which type to apply.",
+                ["tooltip"] = localizedOption3,
                 ["value"] = "50",
                 ["type"] = "int",
             },

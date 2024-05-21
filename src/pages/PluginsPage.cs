@@ -18,7 +18,7 @@ namespace NonsensicalVideoGenerator
     /// </summary>
     public class PluginsPage : IPage
     {
-        public string Name { get; set; } = "Addons";
+        public string Name { get; set; } = "PageAddons";
         public string Tooltip { get; } = "Add, remove, or modify Workshop addons.";
         private int scrollOffset = 0;
         private int maxScrollOffset = 0;
@@ -161,18 +161,18 @@ namespace NonsensicalVideoGenerator
                         {
                             case AddonType.Effect:
                                 if(nam.Length + 7 <= 26)
-                                    nam += " Effect";
+                                    nam = L.T(0, "Addons:TypePrefixEffect", nam);
                                 break;
                             case AddonType.PostRenderEffect:
                                 if(nam.Length + 19 <= 26)
-                                    nam += " Post-Render Effect";
+                                    nam = L.T(0, "Addons:TypePrefixPostRenderEffect", nam);
                                 // special case: abbreviate because this type is kinda long 
                                 else if(nam.Length + 10 <= 26)
-                                    nam += " PR-Effect";
+                                    nam = L.T(0, "Addons:TypePrefixPostRenderEffectAlt", nam);
                                 break;
                             case AddonType.Theme:
                                 if(nam.Length + 6 <= 26)
-                                    nam += " Theme";
+                                    nam = L.T(0, "Addons:TypePrefixTheme", nam);
                                 break;
                         }
 
@@ -202,8 +202,8 @@ namespace NonsensicalVideoGenerator
                         // Alternate colors so it's easier to see
                         spriteBatch.Draw(pluginEntryBlank, new Rectangle(GlobalGraphics.Scale(136), GlobalGraphics.Scale(57 + (i-offsetpl) * pluginEntry.Height + (i-offsetpl)), pluginEntry.Width * GlobalGraphics.scale, pluginEntry.Height * GlobalGraphics.scale), curColor);
                         // create plugin
-                        spriteBatch.DrawString(munroSmall, "Addon Management", new Vector2(GlobalGraphics.Scale(141+1), GlobalGraphics.Scale(58+1 + (i-offsetpl) * pluginEntry.Height + (i-offsetpl))), Color.Black);
-                        spriteBatch.DrawString(munroSmall, "Addon Management", new Vector2(GlobalGraphics.Scale(141), GlobalGraphics.Scale(58 + (i-offsetpl) * pluginEntry.Height + (i-offsetpl))), Color.White);
+                        spriteBatch.DrawString(munroSmall, L.T(0, "Addons:AddonManagementButton"), new Vector2(GlobalGraphics.Scale(141+1), GlobalGraphics.Scale(58+1 + (i-offsetpl) * pluginEntry.Height + (i-offsetpl))), Color.Black);
+                        spriteBatch.DrawString(munroSmall, L.T(0, "Addons:AddonManagementButton"), new Vector2(GlobalGraphics.Scale(141), GlobalGraphics.Scale(58 + (i-offsetpl) * pluginEntry.Height + (i-offsetpl))), Color.White);
                     }
                 }
                 // End offset
@@ -240,6 +240,8 @@ namespace NonsensicalVideoGenerator
             int offsetpl = 0;
             for(int i = 0; i < plcount; i++)
             {
+                if(PluginHandler.plugins.Count < plcount)
+                    break; // ???
                 bool filtered = false;
                 if(i < plcount-1)
                 {
@@ -854,7 +856,7 @@ namespace NonsensicalVideoGenerator
                                                                                 Global.generator.progressText = "Size Too Big (>1 MB)";
                                                                                 return true;
                                                                             }
-                                                                            Name = "Addons";
+                                                                            Name = L.T(0, "Addons:Title");
                                                                             editingSettings = false;
                                                                             controller.Clear();
                                                                             Global.generator.progressText = "Uploading...";
@@ -871,7 +873,7 @@ namespace NonsensicalVideoGenerator
                                                                     case 2: // left click
                                                                         GlobalContent.GetSound("Back").Play(int.Parse(SaveData.saveValues["SoundEffectVolume"], System.Globalization.CultureInfo.InvariantCulture) / 100f, 0f, 0f);
                                                                         controller.Clear();
-                                                                        Name = "Addons";
+                                                                        Name = L.T(0, "Addons:Title");
                                                                         editingSettings = false;
                                                                         return true;
                                                                 }
@@ -889,7 +891,7 @@ namespace NonsensicalVideoGenerator
                                                 case 2: // left click
                                                     GlobalContent.GetSound("Back").Play(int.Parse(SaveData.saveValues["SoundEffectVolume"], System.Globalization.CultureInfo.InvariantCulture) / 100f, 0f, 0f);
                                                     controller.Clear();
-                                                    Name = "Addons";
+                                                    Name = L.T(0, "Addons:Title");
                                                     editingSettings = false;
                                                     return true;
                                             }
@@ -977,7 +979,7 @@ namespace NonsensicalVideoGenerator
                                         for(int i2 = tes.Count-1; i2 >= 0; i2--)
                                         {
                                             // Get name
-                                            string name = tes[i2].Name;
+                                            string name = "NoLocalization:"+tes[i2].Name;
                                             controller.Add(name, tes[i2]);
                                         }
                                         return true;

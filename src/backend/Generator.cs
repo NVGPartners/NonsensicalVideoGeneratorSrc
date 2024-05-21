@@ -182,8 +182,7 @@ namespace NonsensicalVideoGenerator
                             }
                             foreach(string achievement in achievements)
                             {
-                                ConsoleOutput.WriteLine("Awarding achievement: "+achievement, Color.LightBlue);
-                                SteamUserStats.SetAchievement(achievement);
+                                Achievements.Award(achievement);
                             }
                         }
                         SaveData.saveValues["TotalVideosRendered"] = (int.Parse(SaveData.saveValues["TotalVideosRendered"], CultureInfo.InvariantCulture) + 1).ToString(CultureInfo.InvariantCulture);
@@ -1362,21 +1361,21 @@ namespace NonsensicalVideoGenerator
                 }
             }
         }
-        public static void GenerateTempAudioWaveformImage(string audio, string output)
+        public static Process GenerateTempAudioWaveformImage(string audio, string output, int width = 29, int height = 23)
         {
             int texScale = int.Parse(SaveData.saveValues["VideoPlaybackScale"], CultureInfo.InvariantCulture);
-            int texWidth = 29 * texScale;
-            int texHeight = 23 * texScale;
+            int texWidth = width * texScale;
+            int texHeight = height * texScale;
+            Process process = new Process();
             try
             {
-                Process process = new Process();
                 ProcessStartInfo startInfo = new ProcessStartInfo
                 {
                     WindowStyle = ProcessWindowStyle.Hidden,
                     FileName = Global.useSystemFFmpeg ? "ffmpeg" : @".\ffmpeg.exe",
-                    Arguments = "-i \"" + audio
-                        + "\" -filter_complex \""
-                        + "aformat=channel_layouts=mono,showwavespic=s=" + texWidth + "x" + texHeight + ":colors=white[wave];"
+                    Arguments = "-i \"" + audio + "\""
+                        + " -filter_complex"
+                        + " \"aformat=channel_layouts=mono,showwavespic=s=" + texWidth + "x" + texHeight + ":colors=white;\""
                         + " -frames:v 1"
                         + " -y"
                         + " \"" + output + "\"",
@@ -1399,6 +1398,7 @@ namespace NonsensicalVideoGenerator
             {
                 // Do nothing
             }
+            return process;
         }
     }
 }

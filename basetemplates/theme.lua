@@ -57,6 +57,8 @@ function ThemeMetadata(pluginSettings)
             ["ObstaclePastimeGameScreen"] = {0, 0, 0, 255},
             ["BackgroundScreen"] = {64, 64, 64, 255},
             ["TileBackgroundScreen"] = {102, 102, 102, 255},
+            ["VideoPlayerProgressBar"] = {255, 0, 0, 255},
+            ["VideoPlayerProgressBarBackground"] = {0, 0, 0, 0},
         }
     }
 end

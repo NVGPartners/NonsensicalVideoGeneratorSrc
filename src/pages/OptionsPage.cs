@@ -13,7 +13,7 @@ namespace NonsensicalVideoGenerator
     /// </summary>
     public class OptionsPage : IPage
     {
-        public string Name { get; set; } = "Options";
+        public string Name { get; set; } = "PageOptions";
         public string Tooltip { get; } = "Change application settings.";
         private readonly InteractableController controller = new();
         public bool Update(GameTime gameTime, bool handleInput)
@@ -52,6 +52,8 @@ namespace NonsensicalVideoGenerator
                 if(int.Parse(controller.interactables["VideoPlaybackScale"].Tooltip, CultureInfo.InvariantCulture) > 4)
                     controller.interactables["VideoPlaybackScale"].Tooltip = "4";
                 SaveData.saveValues["VideoPlaybackScale"] = controller.interactables["VideoPlaybackScale"].Tooltip;
+                if(oldValue != int.Parse(SaveData.saveValues["VideoPlaybackScale"], CultureInfo.InvariantCulture))
+                    SaveData.Save();
                 return false;
             }));
             controller.Add("MuteMusicWhileTabbedOut", new Switch("Mute Music While Inactive", "Don't play music while " + Global.productNameShort + " is in the background.", new Vector2(139, 60+19*6), (int i, string n) => {

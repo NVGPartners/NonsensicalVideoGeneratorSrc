@@ -1,6 +1,7 @@
 #if MONOGAME
 using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Linq;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Content;
@@ -172,6 +173,8 @@ namespace NonsensicalVideoGenerator
         }
         public static void Update(GameTime gameTime)
         {
+            if(Debug.frame)
+                Debug.paused = false;
             lastKeyboardState = keyboardState;
             keyboardState = Keyboard.GetState();
             // Handle mouse input, so that screens don't have to do that.
@@ -188,22 +191,39 @@ namespace NonsensicalVideoGenerator
             }
             bool handleInput = Accessibility.showDisambiguation || (UserInterface.instance != null && UserInterface.instance.IsActive && MouseInput.MouseState.X >= 0 && MouseInput.MouseState.X <= GlobalGraphics.scaledWidth &&
                 MouseInput.MouseState.Y >= 0 && MouseInput.MouseState.Y <= GlobalGraphics.scaledHeight && !Global.dragDrop);
-            if(Accessibility.PreUpdate(gameTime))
-                handleInput = false;
+            if(!Debug.paused)
+            {
+                if(Accessibility.PreUpdate(gameTime))
+                    handleInput = false;
+            }
             // Update the drawn screens in layer order and reversed.
             List<IScreen> orderedScreens = drawnScreens.OrderBy(s => s.layer).ToList();
             orderedScreens.Reverse();
-            for(int i = 0; i < orderedScreens.Count; i++)
+            if(!Debug.paused)
             {
-                if(orderedScreens[i].Update(gameTime, orderedScreens[i].screenType == ScreenType.Drawn && handleInput))
+                for(int i = 0; i < orderedScreens.Count; i++)
                 {
-                    handleInput = false;
+                    if(orderedScreens[i].Update(gameTime, orderedScreens[i].screenType == ScreenType.Drawn && handleInput))
+                    {
+                        handleInput = false;
+                    }
                 }
             }
-            // Ctrl+F5 will toggle all UI elements
-            if(keyboardState.IsKeyDown(Keys.LeftControl) && keyboardState.IsKeyDown(Keys.F5) && lastKeyboardState.IsKeyUp(Keys.F5))
+            // Toggle debug mode
+            // F20 or CTRL+F3 will toggle debug mode
+            if((keyboardState.IsKeyDown(Keys.F20)
+                || (keyboardState.IsKeyDown(Keys.LeftControl) && keyboardState.IsKeyDown(Keys.F3)))
+                && lastKeyboardState.IsKeyUp(Keys.F20)
+                && (lastKeyboardState.IsKeyUp(Keys.LeftControl)
+                || lastKeyboardState.IsKeyUp(Keys.F3)))
             {
-                if(bool.Parse(SaveData.saveValues["HiddenVerbose"]))
+                Debug.SetDebugMode(!Debug.GetDebugMode());
+            }
+            // DEBUG
+            if(Debug.GetDebugMode())
+            {
+                // F4 will toggle hiding everything
+                if(keyboardState.IsKeyDown(Keys.F4) && lastKeyboardState.IsKeyUp(Keys.F4))
                 {
                     hideEverything = !hideEverything;
                     if(hideEverything)
@@ -228,8 +248,34 @@ namespace NonsensicalVideoGenerator
                         GetScreen<SocialScreen>("Socials")?.Show();
                     }
                 }
+                // F6 will pause
+                if(keyboardState.IsKeyDown(Keys.F6) && lastKeyboardState.IsKeyUp(Keys.F6))
+                {
+                    Debug.paused = !Debug.paused;
+                }
+                // F7 will advance a frame
+                if(keyboardState.IsKeyDown(Keys.F7) && lastKeyboardState.IsKeyUp(Keys.F7))
+                {
+                    Debug.frame = true;
+                }
+                // F8 will call update 2x
+                if(keyboardState.IsKeyDown(Keys.F8) && !Debug.debugSpeedDebounce)
+                {
+                    Debug.debugSpeedDebounce = true;
+                    for(int i = 0; i < Debug.debugSpeedBoost-1; i++)
+                    {
+                        Update(gameTime);
+                    }
+                    Debug.debugSpeedDebounce = false;
+                }
             }
-            Accessibility.PostUpdate(gameTime);
+            if(!Debug.paused)
+                Accessibility.PostUpdate(gameTime);
+            if(!Debug.paused && Debug.frame)
+            {
+                Debug.frame = false;
+                Debug.paused = true;
+            }
         }
         public static void Draw(GameTime gameTime, SpriteBatch spriteBatch)
         {

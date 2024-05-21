@@ -84,7 +84,7 @@ namespace NonsensicalVideoGenerator
                     case CommandType.FFprobe:
                         return Global.useSystemFFprobe ? "ffprobe" : Path.Combine(Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location) ?? ".", "ffprobe.exe");
                     case CommandType.Magick:
-                        return "magick"; // only system PATH is supported
+                        return Global.useSystemMagick ? "magick" : Path.Combine(Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location) ?? ".", "magick.exe");
                     case CommandType.YtDlp:
                         return Global.useSystemYtDlp ? "yt-dlp" : Path.Combine(Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location) ?? ".", "yt-dlp.exe");
                     default:
@@ -487,7 +487,12 @@ namespace NonsensicalVideoGenerator
         // Magick installed for lua
         public static bool MagickInstalled()
         {
-            return UpdateManager.DoesCommandExist("magick");
+            return Global.useSystemMagick || File.Exists(Path.Combine(Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location) ?? ".", "magick.exe"));
+        }
+        // Frei0r installed for lua
+        public static bool Frei0rInstalled()
+        {
+            return Global.useSystemFrei0r || Directory.Exists(Path.Combine(Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location) ?? ".", "frei0r-1"));
         }
         // GetRandomLibraryFile for lua
         public static string GetRandomLibraryFile(string rootType = "video", string subType = "materials")
@@ -743,6 +748,7 @@ namespace NonsensicalVideoGenerator
                             functions["ffmpegInstalled"] = (Func<bool>)FFmpegInstalled;
                             functions["ffprobeInstalled"] = (Func<bool>)FFprobeInstalled;
                             functions["magickInstalled"] = (Func<bool>)MagickInstalled;
+                            functions["frei0rInstalled"] = (Func<bool>)Frei0rInstalled;
                             functions["libraryHasFile"] = (Func<string, string, string, bool>)LibraryHasFile;
                             // Requires permission
                             functions["addToLibrary"] = (Action<string, string, string>)AddToLibrary;
@@ -821,15 +827,25 @@ namespace NonsensicalVideoGenerator
                         if(workshopId != "" && rootPath.Contains("user"))
                         {
                             string achievement = "ACHIEVEMENT_LUA_ERROR";
-                            ConsoleOutput.WriteLine("Awarding achievement: "+achievement, Color.LightBlue);
-                            SteamUserStats.SetAchievement(achievement);
+                            Achievements.Award(achievement);
                         }
                         throw e;
                     }
                     // Call plugin with query argument.
                     if(luaScript.Globals["Query"] != null)
                     {
-                        DynValue luaQuery = luaScript.Call(luaScript.Globals["Query"]);
+                        // Argument 1: Current locale (L.locale.name)
+                        // Argument 2: Table of localization tokens (L.locale.localizationTokens)
+                        string currentLocale = L.locale.name;
+                        Table localizationTokens = new(luaScript);
+                        foreach (Dictionary<string, string> version in L.locale.localizationTokens)
+                        {
+                            foreach (KeyValuePair<string, string> pair in version)
+                            {
+                                localizationTokens[pair.Key] = pair.Value;
+                            }
+                        }
+                        DynValue luaQuery = luaScript.Call(luaScript.Globals["Query"], currentLocale, localizationTokens);
                         if (luaQuery.Type != DataType.Table)
                         {
                             ConsoleOutput.WriteLine($"Addon {Path.GetFileName(path)} returned invalid query.", Color.Red);
@@ -1377,44 +1393,52 @@ namespace NonsensicalVideoGenerator
         {
             if(subscribedItems != null)
             {
-                foreach (PublishedFileId_t item in subscribedItems)
+                try
                 {
-                    string itemPath = Path.Combine(pluginPath, "workshop", item.m_PublishedFileId.ToString());
-                    SteamUGC.GetItemInstallInfo(item, out ulong size, out string folder, 1024, out uint timestamp);
-                    if (Directory.Exists(itemPath) == false)
+                    foreach (PublishedFileId_t item in subscribedItems)
                     {
-                        Directory.CreateDirectory(itemPath);
-                    }
-                    // Delete files currently in plugin folder.
-                    foreach (string file in Directory.GetFiles(itemPath))
-                    {
-                        File.Delete(file);
-                    }
-                    if(Directory.Exists(folder) == true)
-                    {
-                        // Copy files from workshop folder to plugin folder.
-                        foreach (string file in Directory.GetFiles(folder))
+                        string itemPath = Path.Combine(pluginPath, "workshop", item.m_PublishedFileId.ToString());
+                        SteamUGC.GetItemInstallInfo(item, out ulong size, out string folder, 1024, out uint timestamp);
+                        if (Directory.Exists(itemPath) == false)
                         {
-                            string dest = Path.Combine(itemPath, Path.GetFileName(file));
-                            // File hash check.
-                            if(File.Exists(dest))
-                            {
-                                if (File.ReadAllBytes(file).SequenceEqual(File.ReadAllBytes(dest)))
-                                {
-                                    continue;
-                                }
-                            }
-                            if(File.Exists(dest))
-                            {
-                                File.Delete(dest);
-                            }
-                            File.Copy(file, dest);
-                            ConsoleOutput.WriteLine($"Installed ID {Path.GetFileName(file)} from workshop.", Color.RoyalBlue);
+                            Directory.CreateDirectory(itemPath);
                         }
-                        DirectoryCopy(folder, itemPath);
+                        // Delete files currently in plugin folder.
+                        foreach (string file in Directory.GetFiles(itemPath))
+                        {
+                            File.Delete(file);
+                        }
+                        if(Directory.Exists(folder) == true)
+                        {
+                            // Copy files from workshop folder to plugin folder.
+                            foreach (string file in Directory.GetFiles(folder))
+                            {
+                                string dest = Path.Combine(itemPath, Path.GetFileName(file));
+                                // File hash check.
+                                if(File.Exists(dest))
+                                {
+                                    if (File.ReadAllBytes(file).SequenceEqual(File.ReadAllBytes(dest)))
+                                    {
+                                        continue;
+                                    }
+                                }
+                                if(File.Exists(dest))
+                                {
+                                    File.Delete(dest);
+                                }
+                                File.Copy(file, dest);
+                                ConsoleOutput.WriteLine($"Installed ID {Path.GetFileName(file)} from workshop.", Color.RoyalBlue);
+                            }
+                            DirectoryCopy(folder, itemPath);
+                        }
                     }
+                    Global.pluginsLoaded = LoadPlugins();
                 }
-                Global.pluginsLoaded = LoadPlugins();
+                catch (Exception ex)
+                {
+                    ConsoleOutput.WriteLine("Error installing workshop items.", Color.Red);
+                    ConsoleOutput.WriteLine(ex.Message, Color.Red);
+                }
             }
         }
         public static List<Callback<DownloadItemResult_t>> downloadItemResult = new();
@@ -1882,13 +1906,13 @@ namespace NonsensicalVideoGenerator
                 switch(publishPlugin.GetAddonType())
                 {
                     case AddonType.Effect:
-                        nam += " Effect";
+                        nam = L.T(0, "Addons:TypePrefixEffect", nam);
                         break;
                     case AddonType.PostRenderEffect:
-                        nam += " Post-Render Effect";
+                        nam = L.T(0, "Addons:TypePrefixPostRenderEffect", nam);
                         break;
                     case AddonType.Theme:
-                        nam += " Theme";
+                        nam = L.T(0, "Addons:TypePrefixTheme", nam);
                         break;
                 }
                 cont = SteamUGC.SetItemTitle(handle, nam);

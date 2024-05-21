@@ -34,7 +34,9 @@ namespace NonsensicalVideoGenerator
         public static List<string> dragDropFiles = new();
         public static bool useSystemFFmpeg = false;
         public static bool useSystemFFprobe = false;
+        public static bool useSystemMagick = false;
         public static bool useSystemYtDlp = false;
+        public static bool useSystemFrei0r = false;
         public static string editing = "";
         public static AppId_t appId = new(2516360);
         public static string videoTitle = "Render1";
@@ -48,5 +50,6 @@ namespace NonsensicalVideoGenerator
         public static string tooltip = "";
         public static bool imageLibraryAvailable = false;
         public static bool imageLibraryAvailableInternal = true;
+        public static int randomSeed = 0;
     }
 }

@@ -41,6 +41,12 @@ namespace NonsensicalVideoGenerator
             IsMouseVisible = true;
             instance = this;
         }
+        public void Resize(int width, int height)
+        {
+            _graphics.PreferredBackBufferWidth = width;
+            _graphics.PreferredBackBufferHeight = height;
+            _graphics.ApplyChanges();
+        }
         // Drag and drop support.
         private void DragEnter(object? sender, DragEventArgs e)
         {
@@ -73,6 +79,7 @@ namespace NonsensicalVideoGenerator
             {
                 ConsoleOutput.WriteLine("SteamManager failed to initialize: " + ex.Message, Color.Red);
             }
+            Kiwano.Check();
             // File drag and drop support.
 #if WINDOWSDX
             Form gameForm = (Form)Form.FromHandle(Window.Handle);
@@ -85,16 +92,17 @@ namespace NonsensicalVideoGenerator
             ConsoleOutput.WriteLine("Form does not support drag and drop.", Color.Transparent);
 #endif
             // Set window title.
-            Window.Title = Global.productName + " (v" + Global.productVersion + (Debug.GetDebugMode() ? " DEBUG)" : ")");
+            Window.Title = Global.productName + " v" + Global.productVersion;
             // Disable anti-aliasing.
             _graphics.PreferMultiSampling = false;
             GraphicsDevice.SamplerStates[0] = SamplerState.PointClamp;
             // Set screen resolution.
             ConsoleOutput.WriteLine("Setting screen resolution...", Color.Transparent);
             int scale = int.Parse(SaveData.saveValues["ScreenScale"], System.Globalization.CultureInfo.InvariantCulture);
-            _graphics.PreferredBackBufferWidth = (int)(int.Parse(SaveData.saveValues["ScreenWidth"], System.Globalization.CultureInfo.InvariantCulture) * scale);
-            _graphics.PreferredBackBufferHeight = (int)(int.Parse(SaveData.saveValues["ScreenHeight"], System.Globalization.CultureInfo.InvariantCulture) * scale);
-            _graphics.ApplyChanges();
+            Resize(
+                int.Parse(SaveData.saveValues["ScreenWidth"], System.Globalization.CultureInfo.InvariantCulture) * scale,
+                int.Parse(SaveData.saveValues["ScreenHeight"], System.Globalization.CultureInfo.InvariantCulture) * scale
+            );
             ConsoleOutput.WriteLine("Screen resolution set.", Color.Transparent);
             ScreenManager.LoadScreens();
             ConsoleOutput.WriteLine("Initialization complete.", Color.Transparent);

@@ -50,6 +50,7 @@ with.
     character set. The characters are ordered according to the Unicode standard.
     See the documentation for more information.
     -->
+    <DefaultCharacter>?</DefaultCharacter>
     <CharacterRegions>
       <CharacterRegion>
         <Start>&#32;</Start>

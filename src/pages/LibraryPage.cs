@@ -24,7 +24,7 @@ namespace NonsensicalVideoGenerator
     /// </summary>
     public class LibraryPage : IPage
     {
-        public string Name { get; set; } = "Library";
+        public string Name { get; set; } = "PageLibrary";
         public string Tooltip { get; } = "View imported media and previous renders.";
         private readonly InteractableController controller = new();
         private readonly Dictionary<string, Rectangle> rects = new();
@@ -126,12 +126,12 @@ namespace NonsensicalVideoGenerator
             if(success)
             {
                 GlobalContent.GetSound("RenderComplete").Play(int.Parse(SaveData.saveValues["SoundEffectVolume"], System.Globalization.CultureInfo.InvariantCulture) / 100f, 0f, 0f);
-                Global.generator.progressText = "Downloaded clip.";
+                Global.generator.progressText = L.T(0, "Library:StatusDownloadedClip");
             }
             else
             {
                 GlobalContent.GetSound("Error").Play(int.Parse(SaveData.saveValues["SoundEffectVolume"], System.Globalization.CultureInfo.InvariantCulture) / 100f, 0f, 0f);
-                Global.generator.progressText = "Failed to download clip.";
+                Global.generator.progressText = L.T(0, "Library:StatusFailDownloadClip");
             }
         }
         public void Draw(GameTime gameTime, SpriteBatch spriteBatch)
@@ -223,8 +223,8 @@ namespace NonsensicalVideoGenerator
                         }
                         else if(deleteConfirmPos == position)
                         {
-                            spriteBatch.DrawString(munroSmall, "Delete?", new Vector2(deleteConfirmRect.X - GlobalGraphics.Scale(1-1), deleteConfirmRect.Y - GlobalGraphics.Scale(14-1)), Color.Black);
-                            spriteBatch.DrawString(munroSmall, "Delete?", new Vector2(deleteConfirmRect.X - GlobalGraphics.Scale(1), deleteConfirmRect.Y - GlobalGraphics.Scale(14)), Color.White);
+                            spriteBatch.DrawString(munroSmall, L.T(0, "Library:AskToDelete"), new Vector2(deleteConfirmRect.X - GlobalGraphics.Scale(1-1), deleteConfirmRect.Y - GlobalGraphics.Scale(14-1)), Color.Black);
+                            spriteBatch.DrawString(munroSmall, L.T(0, "Library:AskToDelete"), new Vector2(deleteConfirmRect.X - GlobalGraphics.Scale(1), deleteConfirmRect.Y - GlobalGraphics.Scale(14)), Color.White);
                             spriteBatch.Draw(deleteConfirm, deleteConfirmRect, Color.White);
                         }
                         else if(currentLibraryType != DefaultLibraryTypes.Render && currentLibraryType != DefaultLibraryTypes.NoImages)
@@ -296,47 +296,47 @@ namespace NonsensicalVideoGenerator
                 switch(currentRootType)
                 {
                     case LibraryRootType.Video:
-                        spriteBatch.DrawString(munroSmall, "Video", new Vector2(GlobalGraphics.Scale(139 + 1), GlobalGraphics.Scale(56 + 1)), Color.Black);
-                        spriteBatch.DrawString(munroSmall, "Video", new Vector2(GlobalGraphics.Scale(139), GlobalGraphics.Scale(56)), Color.White);
-                        spriteBatch.DrawString(munroSmall, "Audio", new Vector2(GlobalGraphics.Scale(170 + 1), GlobalGraphics.Scale(56 + 1)), Color.Black);
-                        spriteBatch.DrawString(munroSmall, "Audio", new Vector2(GlobalGraphics.Scale(170), GlobalGraphics.Scale(56)), Color.White);
+                        spriteBatch.DrawString(munroSmall, L.T(0, "Library:VideoTitle"), new Vector2(GlobalGraphics.Scale(139 + 1), GlobalGraphics.Scale(56 + 1)), Color.Black);
+                        spriteBatch.DrawString(munroSmall, L.T(0, "Library:VideoTitle"), new Vector2(GlobalGraphics.Scale(139), GlobalGraphics.Scale(56)), Color.White);
+                        spriteBatch.DrawString(munroSmall, L.T(0, "Library:AudioTitle"), new Vector2(GlobalGraphics.Scale(170 + 1), GlobalGraphics.Scale(56 + 1)), Color.Black);
+                        spriteBatch.DrawString(munroSmall, L.T(0, "Library:AudioTitle"), new Vector2(GlobalGraphics.Scale(170), GlobalGraphics.Scale(56)), Color.White);
                         break;
                     case LibraryRootType.Audio:
-                        spriteBatch.DrawString(munroSmall, "Audio", new Vector2(GlobalGraphics.Scale(139 + 1), GlobalGraphics.Scale(56 + 1)), Color.Black);
-                        spriteBatch.DrawString(munroSmall, "Audio", new Vector2(GlobalGraphics.Scale(139), GlobalGraphics.Scale(56)), Color.White);
-                        spriteBatch.DrawString(munroSmall, "Image", new Vector2(GlobalGraphics.Scale(170 + 1), GlobalGraphics.Scale(56 + 1)), Color.Black);
-                        spriteBatch.DrawString(munroSmall, "Image", new Vector2(GlobalGraphics.Scale(170), GlobalGraphics.Scale(56)), Color.White);
+                        spriteBatch.DrawString(munroSmall, L.T(0, "Library:AudioTitle"), new Vector2(GlobalGraphics.Scale(139 + 1), GlobalGraphics.Scale(56 + 1)), Color.Black);
+                        spriteBatch.DrawString(munroSmall, L.T(0, "Library:AudioTitle"), new Vector2(GlobalGraphics.Scale(139), GlobalGraphics.Scale(56)), Color.White);
+                        spriteBatch.DrawString(munroSmall, L.T(0, "Library:ImageTitle"), new Vector2(GlobalGraphics.Scale(170 + 1), GlobalGraphics.Scale(56 + 1)), Color.Black);
+                        spriteBatch.DrawString(munroSmall, L.T(0, "Library:ImageTitle"), new Vector2(GlobalGraphics.Scale(170), GlobalGraphics.Scale(56)), Color.White);
                         break;
                     case LibraryRootType.Image:
-                        spriteBatch.DrawString(munroSmall, "Image", new Vector2(GlobalGraphics.Scale(139 + 1), GlobalGraphics.Scale(56 + 1)), Color.Black);
-                        spriteBatch.DrawString(munroSmall, "Image", new Vector2(GlobalGraphics.Scale(139), GlobalGraphics.Scale(56)), Color.White);
-                        spriteBatch.DrawString(munroSmall, "Video", new Vector2(GlobalGraphics.Scale(170 + 1), GlobalGraphics.Scale(56 + 1)), Color.Black);
-                        spriteBatch.DrawString(munroSmall, "Video", new Vector2(GlobalGraphics.Scale(170), GlobalGraphics.Scale(56)), Color.White);
+                        spriteBatch.DrawString(munroSmall, L.T(0, "Library:ImageTitle"), new Vector2(GlobalGraphics.Scale(139 + 1), GlobalGraphics.Scale(56 + 1)), Color.Black);
+                        spriteBatch.DrawString(munroSmall, L.T(0, "Library:ImageTitle"), new Vector2(GlobalGraphics.Scale(139), GlobalGraphics.Scale(56)), Color.White);
+                        spriteBatch.DrawString(munroSmall, L.T(0, "Library:VideoTitle"), new Vector2(GlobalGraphics.Scale(170 + 1), GlobalGraphics.Scale(56 + 1)), Color.Black);
+                        spriteBatch.DrawString(munroSmall, L.T(0, "Library:VideoTitle"), new Vector2(GlobalGraphics.Scale(170), GlobalGraphics.Scale(56)), Color.White);
                         break;
                 }
             }
             else
             {
-                spriteBatch.DrawString(munroSmall, "Video", new Vector2(GlobalGraphics.Scale(139 + 1), GlobalGraphics.Scale(56 + 1)), Color.Black);
-                spriteBatch.DrawString(munroSmall, "Video", new Vector2(GlobalGraphics.Scale(139), GlobalGraphics.Scale(56)), Color.White);
-                spriteBatch.DrawString(munroSmall, "Audio", new Vector2(GlobalGraphics.Scale(170 + 1), GlobalGraphics.Scale(56 + 1)), Color.Black);
-                spriteBatch.DrawString(munroSmall, "Audio", new Vector2(GlobalGraphics.Scale(170), GlobalGraphics.Scale(56)), Color.White);
+                spriteBatch.DrawString(munroSmall, L.T(0, "Library:VideoTitle"), new Vector2(GlobalGraphics.Scale(139 + 1), GlobalGraphics.Scale(56 + 1)), Color.Black);
+                spriteBatch.DrawString(munroSmall, L.T(0, "Library:VideoTitle"), new Vector2(GlobalGraphics.Scale(139), GlobalGraphics.Scale(56)), Color.White);
+                spriteBatch.DrawString(munroSmall, L.T(0, "Library:AudioTitle"), new Vector2(GlobalGraphics.Scale(170 + 1), GlobalGraphics.Scale(56 + 1)), Color.Black);
+                spriteBatch.DrawString(munroSmall, L.T(0, "Library:AudioTitle"), new Vector2(GlobalGraphics.Scale(170), GlobalGraphics.Scale(56)), Color.White);
             }
-            spriteBatch.DrawString(munroSmall, "Back", new Vector2(GlobalGraphics.Scale(205 + 1), GlobalGraphics.Scale(223 + 1)), Color.Black);
-            spriteBatch.DrawString(munroSmall, "Back", new Vector2(GlobalGraphics.Scale(205), GlobalGraphics.Scale(223)), Color.White);
-            spriteBatch.DrawString(munroSmall, "Next", new Vector2(GlobalGraphics.Scale(281 + 1), GlobalGraphics.Scale(223 + 1)), Color.Black);
-            spriteBatch.DrawString(munroSmall, "Next", new Vector2(GlobalGraphics.Scale(281), GlobalGraphics.Scale(223)), Color.White);
+            spriteBatch.DrawString(munroSmall, L.T(0, "Library:BackButton"), new Vector2(GlobalGraphics.Scale(205 + 1), GlobalGraphics.Scale(223 + 1)), Color.Black);
+            spriteBatch.DrawString(munroSmall, L.T(0, "Library:BackButton"), new Vector2(GlobalGraphics.Scale(205), GlobalGraphics.Scale(223)), Color.White);
+            spriteBatch.DrawString(munroSmall, L.T(0, "Library:NextButton"), new Vector2(GlobalGraphics.Scale(281 + 1), GlobalGraphics.Scale(223 + 1)), Color.Black);
+            spriteBatch.DrawString(munroSmall, L.T(0, "Library:NextButton"), new Vector2(GlobalGraphics.Scale(281), GlobalGraphics.Scale(223)), Color.White);
             // Downloader
 #if WINDOWSDX
             if(currentLibraryType != DefaultLibraryTypes.Render && currentLibraryType != DefaultLibraryTypes.NoImages)
             {
-                string totalIndicator = "Click to download media";
+                string totalIndicator = L.T(0, "Library:DownloadMedia");
                 if((selectedFlags & 4) == 4)
-                    totalIndicator =    "Paste URLs to download";
+                    totalIndicator =    L.T(0, "Library:DownloadMediaPasteURLS");
                 if(downloading)
-                    totalIndicator =    "Downloading...";
+                    totalIndicator =    L.T(0, "Library:DownloadMediaDownloading");
                 Vector2 totalIndicatorSize = munroSmall.MeasureString(totalIndicator);
-                Vector2 totalPosition = new Vector2((rects["HeaderButton"].X + rects["HeaderButton"].Width / 2 - totalIndicatorSize.X / 2) + GlobalGraphics.Scale(1), GlobalGraphics.Scale(56));
+                Vector2 totalPosition = new Vector2(rects["HeaderButton"].X + rects["HeaderButton"].Width / 2 - totalIndicatorSize.X / 2 + GlobalGraphics.Scale(1), GlobalGraphics.Scale(56));
                 spriteBatch.DrawString(munroSmall, totalIndicator, totalPosition + new Vector2(GlobalGraphics.Scale(1), GlobalGraphics.Scale(1)), Color.Black);
                 spriteBatch.DrawString(munroSmall, totalIndicator, totalPosition, Color.White);
             }
@@ -349,7 +349,7 @@ namespace NonsensicalVideoGenerator
                 // If the last page is full of videos, add an extra page
                 if(libraryFileCache[currentLibraryType].Count % 12 == 0)
                     maxPages++;
-                string pageIndicator = (page + 1) + "/" + maxPages;
+                string pageIndicator = page + 1 + "/" + maxPages;
                 Vector2 pageIndicatorSize = munroSmall.MeasureString(pageIndicator);
                 int pivot = 252; 
                 spriteBatch.DrawString(munroSmall, pageIndicator, new Vector2(GlobalGraphics.Scale(pivot + 1) - pageIndicatorSize.X / 2, GlobalGraphics.Scale(223 + 1)), Color.Black);
@@ -454,8 +454,16 @@ namespace NonsensicalVideoGenerator
                                 case LibraryRootType.Audio:
                                 {
                                     // Generate audio waveform using ffmpeg
-                                    string tempBmp = Path.GetTempFileName();
-                                    Generator.GenerateTempAudioWaveformImage(libraryFile.Path, tempBmp);
+                                    string tempBmp = Path.Combine(Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location) ?? ".", "temp", "wave.bmp");
+                                    Process bmpProcess = Generator.GenerateTempAudioWaveformImage(libraryFile.Path, tempBmp);
+                                    // Defer until process is done
+                                    while (!bmpProcess.HasExited)
+                                    {
+                                        System.Threading.Thread.Sleep(100);
+                                        // Check to make sure we're still on the same page
+                                        if (currentPage != page)
+                                            return;
+                                    }
                                     // Check to make sure we're still on the same page
                                     if (currentPage != page)
                                         return;
@@ -471,6 +479,9 @@ namespace NonsensicalVideoGenerator
                                         for (int j = 0; j < texHeight; j++)
                                         {
                                             System.Drawing.Color color = bitmap.GetPixel(i, j);
+                                            // Black is translucent
+                                            if (color.R == 0 && color.G == 0 && color.B == 0)
+                                                color = System.Drawing.Color.FromArgb(192, 0, 0, 0);
                                             colorData[i + (j * texWidth)] = new Color(color.R, color.G, color.B, color.A);
                                         }
                                     }
@@ -482,6 +493,7 @@ namespace NonsensicalVideoGenerator
                                     if (loadVideosThread != null && loadVideosThread.CancellationPending)
                                         return;
                                     // Delete temp file
+                                    bitmap.Dispose();
                                     File.Delete(tempBmp);
                                     break;
                                 }
@@ -546,7 +558,7 @@ namespace NonsensicalVideoGenerator
                     selectedFlags &= ~4;
                     if(libraryFileCache.Keys.Contains(currentLibraryType))
                     {
-                        Global.generator.progressText = "Downloading...";
+                        Global.generator.progressText = L.T(0, "Library:Downloading");
                         downloading = true;
                         string clipboard = Clipboard.GetText();
                         // Remove invalid characters
@@ -556,7 +568,7 @@ namespace NonsensicalVideoGenerator
                         if (!LibraryData.DownloadClip(clipboard.Split('\n'), currentLibraryType))
                         {
                             downloading = false;
-                            Global.generator.progressText = "Failed to download media.";
+                            Global.generator.progressText = L.T(0, "Library:StatusFailDownloadMedia");
                             GlobalContent.GetSound("Error").Play(int.Parse(SaveData.saveValues["SoundEffectVolume"], System.Globalization.CultureInfo.InvariantCulture) / 100f, 0f, 0f);
                         }
                     }
@@ -730,11 +742,11 @@ namespace NonsensicalVideoGenerator
                     switch(tts)
                     {
                         case "HeaderButton":
-                            string totalIndicator = "Click to download media";
+                            string totalIndicator = L.T(0, "Library:DownloadMedia");
                             if((selectedFlags & 4) == 4)
-                                totalIndicator = "Paste URLs to download";
+                                totalIndicator = L.T(0, "Library:DownloadMediaPasteURLS");
                             if(downloading)
-                                totalIndicator = "Downloading...";
+                                totalIndicator = L.T(0, "Library:Downloading");
                             tts = totalIndicator;
                             break;
                     }
@@ -1065,7 +1077,7 @@ namespace NonsensicalVideoGenerator
                                                 ProcessStartInfo startInfo = new()
                                                 {
                                                     FileName = "explorer.exe",
-                                                    Arguments = "/select, \"" + (Path.GetFullPath(file.Path)) + "\""
+                                                    Arguments = "/select, \"" + Path.GetFullPath(file.Path) + "\""
                                                 };
                                                 Process.Start(startInfo);
                                             }
@@ -1327,7 +1339,17 @@ namespace NonsensicalVideoGenerator
                         {
                             if (type.Value == libraryTypes[currentRootType][index])
                             {
-                                tooltip = type.Key.Description;
+                                if(type.Key.CustomName == "")
+                                {
+                                    //tooltip = L.T(0, "Library:" + type.Key.ToString() + "Description");
+                                    // It is actually really hard to get the type itself here
+                                    // So just remove spaces for the library name and use that
+                                    tooltip = L.T(0, "Library:" + type.Value.Replace(" ", "") + "Description");
+                                }
+                                else
+                                {
+                                    tooltip = type.Key.Description;
+                                }
                                 break;
                             }
                         }
@@ -1356,11 +1378,7 @@ namespace NonsensicalVideoGenerator
                                 }
                                 else if(currentLibraryType != DefaultLibraryTypes.Render && currentLibraryType != DefaultLibraryTypes.NoImages)
                                 {
-#if WINDOWSDX
-                                    tooltip = "Add Media: Click or Drag and Drop";
-#elif DESKTOPGL
-                                    tooltip = "Add Media";
-#endif
+                                    tooltip = L.T(0, "Library:AddMedia");
                                 }
                             }
                         }

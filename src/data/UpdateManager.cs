@@ -4,6 +4,8 @@ using System.IO;
 using Newtonsoft.Json;
 using System.Net.Http;
 using System.Diagnostics;
+using System.Windows.Forms;
+
 #if MONOGAME
 using Microsoft.Xna.Framework;
 #else
@@ -23,13 +25,11 @@ namespace NonsensicalVideoGenerator
         public static bool ffprobeInstalled = false;
         public static bool imagemagickInstalled = false;
         public static bool ytDlpInstalled = false;
-        public static bool updateFailed = false;
-        public static bool updateAvailable = false;
-        public static bool checkedForUpdates = false;
+        public static bool frei0rInstalled = false;
         public static bool DoesCommandExist(string command)
         {
             // skip if needed and return false
-            if(Global.parameters.Contains("-nopath"))
+            if(Global.parameters.Contains("-nopath") || Global.parameters.Contains("-noenv"))
                 return false;
             string output = "";
             ProcessStartInfo startInfo = new()
@@ -51,16 +51,25 @@ namespace NonsensicalVideoGenerator
             bool exists = output != "" && !output.Contains("Could not find");
             return exists;
         }
+        public static bool DoesEnvironmentVariableExist(string variable)
+        {
+            // skip if needed and return false
+            if(Global.parameters.Contains("-noenv"))
+                return false;
+            string? value = Environment.GetEnvironmentVariable(variable);
+            return value != null;
+        }
         public static void GetDependencyStatus()
         {
             // Test for dependencies.
             ConsoleOutput.WriteLine("Checking for dependencies...", Color.Magenta);
-            bool[] status = new bool[3];
-            imagemagickInstalled = DoesCommandExist("magick");
+            bool[] status = new bool[5];
             // Check if .\ffmpeg.exe and .\ffprobe.exe exist.
             status[0] = File.Exists(@".\ffmpeg.exe");
             status[1] = File.Exists(@".\ffprobe.exe");
-            status[2] = File.Exists(@".\yt-dlp.exe");
+            status[2] = File.Exists(@".\magick.exe");
+            status[3] = File.Exists(@".\yt-dlp.exe");
+            status[4] = Directory.Exists(@".\frei0r-1");
             // If these don't exist, set Global.useSystemFFmpeg to true
             // so that the program will use the system ffmpeg and ffprobe.
             if (!status[0])
@@ -79,13 +88,29 @@ namespace NonsensicalVideoGenerator
             {
                 Global.useSystemFFprobe = false;
             }
-            if(!status[2])
+            if (!status[2])
+            {
+                Global.useSystemMagick = true;
+            }
+            else
+            {
+                Global.useSystemMagick = false;
+            }
+            if(!status[3])
             {
                 Global.useSystemYtDlp = true;
             }
             else
             {
                 Global.useSystemYtDlp = false;
+            }
+            if(!status[4])
+            {
+                Global.useSystemFrei0r = true;
+            }
+            else
+            {
+                Global.useSystemFrei0r = false;
             }
             if(!Global.useSystemFFmpeg)
             {
@@ -103,79 +128,30 @@ namespace NonsensicalVideoGenerator
             {
                 ffprobeInstalled = DoesCommandExist("ffprobe");
             }
+            if(!Global.useSystemMagick)
+            {
+                imagemagickInstalled = status[2];
+            }
+            else
+            {
+                imagemagickInstalled = DoesCommandExist("magick");
+            }
             if(!Global.useSystemYtDlp)
             {
-                ytDlpInstalled = status[2];
+                ytDlpInstalled = status[3];
             }
             else
             {
                 ytDlpInstalled = DoesCommandExist("yt-dlp");
             }
-        }
-        public static bool CheckForUpdates()
-        {
-            return false;
-            /*
-            try
+            if(!Global.useSystemFrei0r)
             {
-                updateFailed = false;
-                // Get latest release info.
-                HttpClient client = new();
-                client.DefaultRequestHeaders.Add("User-Agent", "NonsensicalVideoGenerator");
-                string json = client.GetStringAsync(queryUrl).Result;
-                // Parse JSON.
-                dynamic? data = JsonConvert.DeserializeObject(json);
-                string? latestVersion = data?.tag_name;
-                checkedForUpdates = true;
-                // Compare versions.
-                if (latestVersion != "v" + Global.productVersion)
-                {
-                    // Parse major, minor, and patch versions.
-                    string[]? currentVersion = Global.productVersion?.Split('.');
-                    string[]? latestVersionSplit = latestVersion?.Replace("v", "")?.Split('.');
-                    int[] currentVersionInt = new int[3];
-                    int[] latestVersionInt = new int[3];
-                    for (int i = 0; i < 3; i++)
-                    {
-                        currentVersionInt[i] = int.Parse(currentVersion?[i] ?? "0", System.Globalization.CultureInfo.InvariantCulture);
-                        latestVersionInt[i] = int.Parse(latestVersionSplit?[i] ?? "0", System.Globalization.CultureInfo.InvariantCulture);
-                    }
-                    // Compare versions.
-                    bool update = latestVersionInt[0] > currentVersionInt[0] ||
-                                  latestVersionInt[1] > currentVersionInt[1] ||
-                                  latestVersionInt[2] > currentVersionInt[2];
-                    if (!update)
-                    {
-                        ConsoleOutput.WriteLine("No updates available.", Color.Magenta);
-                        return false;
-                    }
-                    // Get download URL.
-                    string? assetUrl = data?.assets[0].browser_download_url;
-                    if (assetUrl != null)
-                    {
-                        updateUrl = assetUrl;
-                    }
-                    if(latestVersion != null)
-                    {
-                        updateTag = latestVersion;
-                    }
-                    ConsoleOutput.WriteLine("Update available: " + latestVersion, Color.Magenta);
-                    updateAvailable = true;
-                    return true;
-                }
-                else
-                {
-                    ConsoleOutput.WriteLine("No updates available.", Color.Magenta);
-                    return false;
-                }
+                frei0rInstalled = status[4];
             }
-            catch(Exception e)
+            else
             {
-                ConsoleOutput.WriteLine("Failed to check for updates: " + e.Message, Color.Red);
-                updateFailed = true;
-                return false;
+                frei0rInstalled = DoesEnvironmentVariableExist("FREI0R_PATH");
             }
-            */
         }
         public static void DownloadUpdate()
         {

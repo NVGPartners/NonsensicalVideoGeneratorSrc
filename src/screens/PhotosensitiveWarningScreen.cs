@@ -32,7 +32,6 @@ namespace NonsensicalVideoGenerator
         private double timeText = 0;
         private bool askAccessibility = false;
         private bool dontAskAgain = false;
-        private bool skipped = false;
         private static KeyboardState oldKeyboardState;
         private static KeyboardState newKeyboardState;
         // shamelessly copied from tutorial screen
@@ -56,6 +55,11 @@ namespace NonsensicalVideoGenerator
         }
         private void UpdateCheckThread(object? sender, DoWorkEventArgs e)
         {
+            // Defer until Global.ready is true.
+            while(!Global.ready)
+            {
+                System.Threading.Thread.Sleep(100);
+            }
             UpdateManager.GetDependencyStatus();
             if(!UpdateManager.ffmpegInstalled || !UpdateManager.ffprobeInstalled || Global.parameters.Contains("-forceinstall"))
             {
@@ -80,31 +84,31 @@ namespace NonsensicalVideoGenerator
         private List<string> warningText = new List<string>()
         {
             " ",
-            "Accessibility Help:",
-            "Press F1 to access accessible keyboard navigation.",
-            "Press F2 to toggle text to speech for keyboard navigation.",
-            " ",
-            "Disable Motion:",
-            " ",
-            "Mute Background Music:",
+            "Intro:AccessibilityHelp",
+            "Intro:AccessibilityF1",
+            "Intro:AccessibilityF2",
             " ",
             " ",
-            "Click anywhere to continue.",
+            " ",
+            " ",
+            " ",
+            " ",
+            "Intro:Continue",
             " "
         };
         private List<string> accesibilityText = new List<string>()
         {
             " ",
-            "WARNING:",
+            "Intro:PhotosensitiveWarning1",
             " ",
-            "A very small percentage of people may experience a seizure",
-            "when exposed to certain visual images, including flashing",
-            "lights or patterns that may appear in generated content.",
+            "Intro:PhotosensitiveWarning2",
+            "Intro:PhotosensitiveWarning3",
+            "Intro:PhotosensitiveWarning4",
             " ",
-            "If you are sensitive to flashing lights,",
-            "please do not use this software.",
+            "Intro:PhotosensitiveWarning5",
+            "Intro:PhotosensitiveWarning6",
             " ",
-            "Click anywhere to continue.",
+            "Intro:Continue",
             " "
         };
         private List<string> tipoftheday = new List<string>()
@@ -144,6 +148,8 @@ namespace NonsensicalVideoGenerator
                 for (int i = 0; i < warningText.Count; i++)
                 {
                     string text = warningText[i];
+                    if(text != " ")
+                        text = L.T(0, text);
                     Vector2 textSize = fontMunro.MeasureString(text);
                     spriteBatch.DrawString(fontMunro, text, new Vector2(GlobalGraphics.scaledWidth / 2 - textSize.X / 2, GlobalGraphics.Scale(24 + i * 16)), Color.White);
                 }
@@ -204,24 +210,6 @@ namespace NonsensicalVideoGenerator
             }
             if(handleInput)
             {
-                if(!skipped && SaveData.saveValues["SkipPhotosensitiveWarningScreen"] == "true")
-                {
-                    accepted = true;
-                    skipped = true;
-                    askAccessibility = false;
-                    overlayOpacity = 255;
-                    if(askAccessibility)
-                    {
-                        SaveData.saveValues["FirstBoot"] = "false";
-                        SaveData.Save();
-                        askAccessibility = false;
-                        dontAskAgain = false;
-                    }
-                    else
-                    {
-                        ConsoleOutput.WriteLine("User acknowledged photosensitive warning.", Color.LightGreen);
-                    }
-                }
                 if(!askAccessibility && !accepted)
                 {
                     // Interactable
@@ -314,11 +302,10 @@ namespace NonsensicalVideoGenerator
         }
         public void LoadContent(ContentManager contentManager, GraphicsDevice graphicsDevice)
         {
-            if(!bool.Parse(SaveData.saveValues["FirstBoot"]))
+            if(!bool.Parse(SaveData.saveValues["FirstBoot"]) && !Global.parameters.Contains("-intro"))
             {
-                if(SteamManager.initialized && SteamApps.GetLaunchQueryParam("accept") != "")
+                if(bool.Parse(SaveData.saveValues["SkipPhotosensitiveWarningScreen"]))
                 {
-                    UserConsent.Accept(SteamApps.GetLaunchQueryParam("accept"));
                     askAccessibility = false;
                     accepted = true;
                     overlayOpacity = 255;

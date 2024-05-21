@@ -38,11 +38,9 @@ namespace NonsensicalVideoGenerator
         public void Draw(GameTime gameTime, SpriteBatch spriteBatch)
         {
             // Draw tooltip.
-            if(Global.tooltip != "" && Global.canRender && tooltipVisible)
+            if(Global.tooltip != "" && tooltipVisible && Global.ready)
             {
                 string tooltip = Global.tooltip;
-                // Remove non-ascii characters (except newlines)
-                tooltip = new string(tooltip.ToCharArray().Where(c => c == '\n' || c < 128).ToArray());
                 Vector2 tooltipSize = L.FontSmall().MeasureString(tooltip);
                 // Position is relative to mouse position but tries to avoid going off screen
                 Vector2 position = new(MouseInput.MouseState.Position.X + 16, MouseInput.MouseState.Position.Y + 16);

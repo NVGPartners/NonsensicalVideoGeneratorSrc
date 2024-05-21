@@ -40,7 +40,7 @@ namespace NonsensicalVideoGenerator
             get => locales[localeIndex];
             set => localeIndex = locales.IndexOf(value);
         }
-        public static string invalid { get; set; } = "[??]";
+        public static string invalid { get; set; } = "[%1]";
         public static string defaultLocale { get; set; } = "en_us";
         public static string localeFolder { get; set; } = "locales";
         public static int maxVersion { get; set; } = 0;
@@ -71,7 +71,7 @@ namespace NonsensicalVideoGenerator
             // Fall back to invalid string if translation is missing.
             if (result == text)
             {
-                result = invalid + text + invalid;
+                result = invalid.Replace("%1", text);
             }
             // Replace placeholders globally.
             for (int i = 0; i < args.Length; i++)
@@ -119,6 +119,8 @@ namespace NonsensicalVideoGenerator
                 ConsoleOutput.WriteLine("Fatal error: Could not load default locale.", Color.Red);
                 return;
             }
+            SaveData.saveValues["Locale"] = name;
+            SaveData.Save();
             // Check if locale is already loaded.
             foreach (Locale l in locales)
             {
@@ -177,7 +179,7 @@ namespace NonsensicalVideoGenerator
                     }
                     locales.Add(new Locale(name, localizedName, localizationList, fontLarge, fontSmall));
                     locale = locales[^1];
-                    ConsoleOutput.WriteLine($"Loaded {tokenCount} localization tokens for locale {name}: {localizedName}", Color.Green);
+                    ConsoleOutput.WriteLine($"Loaded {tokenCount} tokens for {name}: {localizedName}", Color.Green);
                 }
                 catch (Exception e)
                 {

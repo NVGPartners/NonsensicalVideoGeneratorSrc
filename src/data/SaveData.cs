@@ -22,7 +22,6 @@ namespace NonsensicalVideoGenerator
             {"ScreenWidth", "320"},
             {"ScreenHeight", "240"},
             {"ScreenScale", "2"}, // 1 - 4 ONLY!
-            {"BackgroundSaturation", "0"},
             {"MinStreamDuration", "0.2"},
             {"MaxStreamDuration", "0.4"},
             {"MaxClipCount", "20"},
@@ -62,7 +61,6 @@ namespace NonsensicalVideoGenerator
             {"SkipPhotosensitiveWarningScreen", "false"},
             {"PluginListFilterFlags", "0"},
             {"LastVersion", ""},
-            {"UseLegacyHeader", "false"},
             {"Locale", "en_us"}
         };
         public static string saveFileName = "Options.json";

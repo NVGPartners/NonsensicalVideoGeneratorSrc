@@ -15,7 +15,7 @@ namespace NonsensicalVideoGenerator
     /// </summary>
     public class GeneratePage : IPage
     {
-        public string Name { get; set; } = "Generate";
+        public string Name { get; set; } = "PageGenerate";
         public string Tooltip { get; } = "Render a nonsensical video.";
         private readonly InteractableController actionController = new();
         private readonly InteractableController controller = new();
@@ -104,7 +104,7 @@ namespace NonsensicalVideoGenerator
             controllerRendering.Clear();
             controllerPage3.Clear();
             // Actions
-            actionController.Add("ActionConsole", new ActionButton("View console output.", new Vector2(113, 182), (int i, string n) => {
+            actionController.Add("ActionConsole", new ActionButton("View console output.", new Vector2(112, 176), (int i, string n) => {
                 switch(i)
                 {
                     case 2: // left click
@@ -141,7 +141,7 @@ namespace NonsensicalVideoGenerator
                 }
                 return false;
             }, ThemeManager.LoadLayeredContent<Texture2D>("graphics/actions/console")));
-            actionController.Add("ActionReset", new ActionButton("Reset to default parameters.", new Vector2(113, 167), (int i, string n) => {
+            actionController.Add("ActionReset", new ActionButton("Reset to default parameters.", new Vector2(112, 176-15), (int i, string n) => {
                 switch(i)
                 {
                     case 2: // left click
@@ -202,7 +202,7 @@ namespace NonsensicalVideoGenerator
                 }
                 return false;
             }, ThemeManager.LoadLayeredContent<Texture2D>("graphics/actions/reset")));
-            actionController.Add("ActionPlayLast", new ActionButton("Play last rendered video.", new Vector2(113, 152), (int i, string n) => {
+            actionController.Add("ActionPlayLast", new ActionButton("Play last rendered video.", new Vector2(112, 176-(15*2)), (int i, string n) => {
                 switch(i)
                 {
                     case 2: // left click
@@ -234,7 +234,7 @@ namespace NonsensicalVideoGenerator
                 }
                 return false;
             }, ThemeManager.LoadLayeredContent<Texture2D>("graphics/actions/playlast")));
-            actionController.Add("ActionRender", new ActionButton("Start generating a new video.", new Vector2(113, 137), (int i, string n) => {
+            actionController.Add("ActionRender", new ActionButton("Start generating a new video.", new Vector2(112, 176-(15*3)), (int i, string n) => {
                 switch(i)
                 {
                     case 2: // left click
@@ -278,8 +278,7 @@ namespace NonsensicalVideoGenerator
                                         }
                                         foreach(string achievement in achievements)
                                         {
-                                            ConsoleOutput.WriteLine("Awarding achievement: "+achievement, Color.LightBlue);
-                                            SteamUserStats.SetAchievement(achievement);
+                                            Achievements.Award(achievement);
                                         }
                                     }
                                 }
@@ -575,8 +574,7 @@ namespace NonsensicalVideoGenerator
                                         }
                                         foreach(string achievement in achievements)
                                         {
-                                            ConsoleOutput.WriteLine("Awarding achievement: "+achievement, Color.LightBlue);
-                                            SteamUserStats.SetAchievement(achievement);
+                                            Achievements.Award(achievement);
                                         }
                                     }
                                 }

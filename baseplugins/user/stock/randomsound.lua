@@ -1,19 +1,22 @@
-function Query()
+function Query(localeName, localizationTokens)
+    local localizedOption1 = localizationTokens["Addons:StockRandomSoundOption1"] or "Random Sound"
+    local localizedOption2 = localizationTokens["Addons:StockRandomSoundOption2"] or "Applies a random sound effect"
+    local localizedOption3 = localizationTokens["Addons:StockRandomSoundOption3"] or "Out of 100, chance to mute the original audio"
     return {
         ["settings"] = {
             {
                 ["name"] = "Display Name",
-                ["value"] = "Random Sound",
+                ["value"] = localizedOption1,
                 ["type"] = "label",
             },
             {
                 ["name"] = "Description",
-                ["value"] = "Applies a random sound effect",
+                ["value"] = localizedOption2,
                 ["type"] = "label",
             },
             {
                 ["name"] = "Mute Original Chance",
-                ["tooltip"] = "Out of 100, chance to mute the original audio",
+                ["tooltip"] = localizedOption3,
                 ["value"] = "50",
                 ["type"] = "int",
             },

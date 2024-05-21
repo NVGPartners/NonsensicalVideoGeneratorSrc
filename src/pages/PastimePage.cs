@@ -11,7 +11,7 @@ namespace NonsensicalVideoGenerator
     /// </summary>
     public class PastimePage : IPage
     {
-        public string Name { get; set; } = "Game";
+        public string Name { get; set; } = "PageGame";
         public string Tooltip { get; } = "Play a game while generating.";
         private readonly InteractableController controller = new();
         public bool active = false;

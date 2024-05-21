@@ -6,6 +6,7 @@ using Microsoft.Xna.Framework.Input;
 using Microsoft.Xna.Framework.Content;
 using Microsoft.Xna.Framework.Graphics;
 using MonoGame.Extended.Tweening;
+using System.Globalization;
 
 namespace NonsensicalVideoGenerator
 {
@@ -102,7 +103,7 @@ namespace NonsensicalVideoGenerator
             tween.Update((float)gameTime.ElapsedGameTime.TotalSeconds);
             int scrollWeight = newKeyboardState.IsKeyDown(Keys.LeftShift) || newKeyboardState.IsKeyDown(Keys.RightShift) ? 5 : 1;
             // Show/hide console when you press f5
-            bool returnValue = !showing && !hiding && (toggle ? true : handleInput);
+            bool returnValue = !showing && !hiding && (toggle ? true : handleInput) && offset.X == 0;
             if ((newKeyboardState.IsKeyDown(Keys.F5) && !oldKeyboardState.IsKeyDown(Keys.F5))
                 || newKeyboardState.IsKeyDown(Keys.OemTilde) && !oldKeyboardState.IsKeyDown(Keys.OemTilde)
                 || (MouseInput.MouseState.LeftButton == ButtonState.Pressed
@@ -125,9 +126,9 @@ namespace NonsensicalVideoGenerator
                         Accessibility.TTS(L.T(0, "Accessibility:ConsoleShown"));
                 }
                 if(!toggled)
-                    GlobalContent.GetSound("Back").Play(int.Parse(SaveData.saveValues["SoundEffectVolume"], System.Globalization.CultureInfo.InvariantCulture) / 100f, 0f, 0f);
+                    GlobalContent.GetSound("Back").Play(int.Parse(SaveData.saveValues["SoundEffectVolume"], CultureInfo.InvariantCulture) / 100f, 0f, 0f);
                 else
-                    GlobalContent.GetSound("Select").Play(int.Parse(SaveData.saveValues["SoundEffectVolume"], System.Globalization.CultureInfo.InvariantCulture) / 100f, 0f, 0f);
+                    GlobalContent.GetSound("Select").Play(int.Parse(SaveData.saveValues["SoundEffectVolume"], CultureInfo.InvariantCulture) / 100f, 0f, 0f);
             }
             // Scrolling will set ConsoleOutput.paused to true.
             if (MouseInput.MouseState.ScrollWheelValue != MouseInput.LastMouseState.ScrollWheelValue)
@@ -162,7 +163,7 @@ namespace NonsensicalVideoGenerator
                 ConsoleOutput.Scroll(-ConsoleOutput.maxLines * 120);
             }
             // (DEBUG) Fill the console with nonsense.
-            //ConsoleOutput.WriteLine(Math.Sin(gameTime.TotalGameTime.TotalSeconds).ToString(System.Globalization.CultureInfo.InvariantCulture));
+            //ConsoleOutput.WriteLine(Math.Sin(gameTime.TotalGameTime.TotalSeconds).ToString(CultureInfo.InvariantCulture));
             // Return true if the console is open.
             return returnValue;
         }
@@ -175,8 +176,8 @@ namespace NonsensicalVideoGenerator
             // Draw the background.
             Texture2D pixel = GlobalContent.GetTexture("Pixel");
             spriteBatch.Draw(pixel, new Rectangle(0, 0, GlobalGraphics.scaledWidth, GlobalGraphics.scaledHeight), ThemeManager.GetColor("BackgroundConsoleScreen"));
-            // Draw the center title bar text.`
-            string newTitle = title + " - Toggle with F5";
+            // Draw the center title bar text.
+            string newTitle = L.T(0, "Console:Title", offset.X == 0 ? L.T(0, "Console:TitleExtra") : "");
             Vector2 titleSize = L.FontSmall().MeasureString(newTitle);
             spriteBatch.DrawString(L.FontSmall(), newTitle, new Vector2(GlobalGraphics.scaledWidth / 2 - titleSize.X / 2, (6 * GlobalGraphics.scale) - GlobalGraphics.Scale(1)), Color.White);
             // Draw lines.
@@ -194,10 +195,7 @@ namespace NonsensicalVideoGenerator
             }
             catch {}
             // Draw assembly version.
-            string version = "- v" + Global.productVersion + " - View full output in console.txt -" + (ConsoleOutput.proxyOutput.Count > ConsoleOutput.maxLines ? (" Line " + (ConsoleOutput.scrollAmount > -1 ? (ConsoleOutput.scrollAmount + 1).ToString(System.Globalization.CultureInfo.InvariantCulture) : (ConsoleOutput.proxyOutput.Count - ConsoleOutput.maxLines + 1).ToString(System.Globalization.CultureInfo.InvariantCulture)) + "/" + ConsoleOutput.proxyOutput.Count.ToString(System.Globalization.CultureInfo.InvariantCulture) + " -") : "");
-#if DEBUG
-            version += " DEBUG -";
-#endif
+            string version = L.T(0, "Console:Footer", Global.productVersion, ConsoleOutput.scrollAmount > -1 ? (ConsoleOutput.scrollAmount + 1).ToString(CultureInfo.InvariantCulture) : (ConsoleOutput.proxyOutput.Count - ConsoleOutput.maxLines + 1).ToString(CultureInfo.InvariantCulture), ConsoleOutput.proxyOutput.Count.ToString(CultureInfo.InvariantCulture));
             spriteBatch.DrawString(L.FontSmall(), version, new Vector2(GlobalGraphics.Scale(8), lineY), Color.White);
             // End offset spritebatch
             spriteBatch.End();
@@ -209,8 +207,6 @@ namespace NonsensicalVideoGenerator
         }
         public void LoadContent(ContentManager contentManager, GraphicsDevice graphicsDevice)
         {
-            // Set offset to hidden position.
-            offset = new(0, GlobalGraphics.Scale(240));
         }
     }
 }

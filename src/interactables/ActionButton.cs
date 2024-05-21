@@ -72,7 +72,10 @@ namespace NonsensicalVideoGenerator
             // If hovering, draw tooltip
             if (State >= 1 && Tooltip != "")
             {
-                Global.tooltip = L.T(0, "Interactable:"+internalName+"Tooltip");
+                if(internalName.StartsWith("NoLocalization:"))
+                    Global.tooltip = Tooltip;
+                else
+                    Global.tooltip = L.T(0, "Interactable:"+internalName+"Tooltip");
             }
         }
         public override void LoadContent(ContentManager contentManager, GraphicsDevice graphicsDevice, string internalName)

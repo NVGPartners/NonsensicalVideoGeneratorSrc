@@ -114,15 +114,10 @@ namespace NonsensicalVideoGenerator
             tween.Update((float)gameTime.ElapsedGameTime.TotalSeconds);
             if(hiding || screenType == ScreenType.Hidden)
                 return false;
+            /*
             if(handleInput)
             {
                 tooltip = "";
-                /*
-                for(int i = 0; i < buttons.Count; i++)
-                {
-                    Accessibility.CompatAccessibility(new Rectangle(GlobalGraphics.Scale(buttons[i].X), GlobalGraphics.Scale(buttons[i].Y), GlobalGraphics.Scale(buttons[i].Width), GlobalGraphics.Scale(buttons[i].Height)));
-                }
-                */
                 if(MouseInput.MouseState.X >= GlobalGraphics.Scale(74) && MouseInput.MouseState.X <= GlobalGraphics.Scale(119) && MouseInput.MouseState.Y >= GlobalGraphics.Scale(221) && MouseInput.MouseState.Y <= GlobalGraphics.Scale(233))
                 {
                     for(int i = 0; i < buttons.Count; i++)
@@ -171,10 +166,12 @@ namespace NonsensicalVideoGenerator
                     }
                 }
             }
+            */
             return false;
         }
         public void Draw(GameTime gameTime, SpriteBatch spriteBatch)
         {
+            /*
             // End existing spritebatch
             spriteBatch.End();
             // Use offset
@@ -195,10 +192,11 @@ namespace NonsensicalVideoGenerator
             {
                 Global.tooltip = tooltip;
             }
+            */
         }
         public void LoadContent(ContentManager contentManager, GraphicsDevice graphicsDevice)
         {
-            GlobalContent.AddTexture("SocialScreen", ThemeManager.LoadLayeredContent<Texture2D>("graphics/socialscreen"));
+            //GlobalContent.AddTexture("SocialScreen", ThemeManager.LoadLayeredContent<Texture2D>("graphics/socialscreen"));
         }
     }
 }

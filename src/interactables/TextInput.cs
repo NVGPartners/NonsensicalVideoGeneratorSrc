@@ -236,12 +236,20 @@ namespace NonsensicalVideoGenerator
                 spriteBatch.DrawString(L.FontLarge(), ":", new Vector2(cursorX + GlobalGraphics.Scale(bounds.X + 4), GlobalGraphics.Scale(bounds.Y - 1)), Color.White);
             }
             // Label
-            spriteBatch.DrawString(L.FontLarge(), L.T(0, "Interactable:"+internalName+"Title"), new Vector2(GlobalGraphics.Scale(bounds.X + bounds.Width + 7 + 1), GlobalGraphics.Scale(bounds.Y + 2 + 1)), Color.Black);
-            spriteBatch.DrawString(L.FontLarge(), L.T(0, "Interactable:"+internalName+"Title"), new Vector2(GlobalGraphics.Scale(bounds.X + bounds.Width + 7), GlobalGraphics.Scale(bounds.Y + 2)), Color.White);
+            string localizedTitle;
+            if(internalName.StartsWith("NoLocalization:"))
+                localizedTitle = Name;
+            else
+                localizedTitle = L.T(0, "Interactable:"+internalName+"Title");
+            spriteBatch.DrawString(L.FontLarge(), localizedTitle, new Vector2(GlobalGraphics.Scale(bounds.X + bounds.Width + 7 + 1), GlobalGraphics.Scale(bounds.Y + 2 + 1)), Color.Black);
+            spriteBatch.DrawString(L.FontLarge(), localizedTitle, new Vector2(GlobalGraphics.Scale(bounds.X + bounds.Width + 7), GlobalGraphics.Scale(bounds.Y + 2)), Color.White);
             // Tooltip
             if (scaledBounds.Contains(MouseInput.MouseState.Position) && hiddenToolTip != "")
             {
-                Global.tooltip = L.T(0, "Interactable:"+internalName+"Tooltip");
+                if(internalName.StartsWith("NoLocalization:"))
+                    Global.tooltip = Tooltip;
+                else
+                    Global.tooltip = L.T(0, "Interactable:"+internalName+"Tooltip");
             }
         }
         public void LoadContent(ContentManager contentManager, GraphicsDevice graphicsDevice, string internalName)

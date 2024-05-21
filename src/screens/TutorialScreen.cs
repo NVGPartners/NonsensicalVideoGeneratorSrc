@@ -14,6 +14,10 @@ using Microsoft.Xna.Framework.Input;
 using Microsoft.Xna.Framework.Media;
 using MonoGame.Extended.Tweening;
 using System.Diagnostics;
+using System.Globalization;
+using SharpCompress.Archives.SevenZip;
+using SharpCompress.Archives;
+using SharpCompress.Common;
 
 namespace NonsensicalVideoGenerator
 {
@@ -33,6 +37,9 @@ namespace NonsensicalVideoGenerator
         private bool showing = false;
         private bool toggle = false;
         private bool check = false;
+        private bool extracting = false;
+        private bool downloading = false;
+        private string zip = "ffmpeg-6.1.1-essentials_build.7z";
         public Vector2 offset = new(0, 0);
         private readonly Tweener tween = new();
         private readonly InteractableController controller = new();
@@ -83,7 +90,7 @@ namespace NonsensicalVideoGenerator
                     // consents is a flag enum with 1 bit for each consent (3 bits)
                     if(UserConsent.consentForm != null)
                     {
-                        tutorialText[3][i] = tutorialText[3][i].Replace("%PLUGIN%", UserConsent.consentForm.name ?? L.T(0, "Addons:UnknownName"));
+                        tutorialText[3][i] = tutorialText[3][i].Replace("%1", UserConsent.consentForm.name ?? L.T(0, "Addons:UnknownName"));
                         // first bit
                         tutorialText[3][i] = tutorialText[3][i].Replace("%PERM1%", UserConsent.consentForm.consents.HasFlag(Consents.DownloadFiles) ? L.T(0, "Addons:ConsentDownloadFiles") : "");
                         // second bit
@@ -261,73 +268,73 @@ namespace NonsensicalVideoGenerator
         {
             new List<string>()
             { // PAGE 1
-                "Welcome to " + Global.productName + "!",
+                "Tutorial:Page1_0",
+                " ",
+                "Tutorial:Page1_1",
+                "Tutorial:Page1_2",
                 "",
-                "This initial setup will help you get started.",
-                "On the next page, we will check these prerequisites.",
-                "",
-                "These programs are required, but not included:",
-                " - ffmpeg",
-                " - ffprobe",
-                "",
-                "You will need to place them in the same folder as this software.",
-                "",
-                "(Advanced: Add a folder containing them to your PATH variable.)",
-                "",
-                "These programs are optional:",
-                " - magick (only uses PATH)",
-                " - yt-dlp (bundled)",
-                "",
-                "Click \"Next Page\" to continue."
+                "Tutorial:Page1_3",
+                "%FFMPEGNAME%",
+                "%FFPROBENAME%",
+                " ",
+                "Tutorial:Page1_4",
+                " ",
+                "Tutorial:Page1_5",
+                " ",
+                "Tutorial:Page1_6",
+                "%MAGICKNAME%",
+                "%FREI0RNAME%",
+                " ",
+                "Tutorial:Page1_7"
             },
             new List<string>()
             { // PAGE 2
-                "The status of each program is shown below.",
-                "",
-                "Required software:",
-                " - ffmpeg: %FFMPEG%",
-                " - ffprobe: %FFPROBE%",
-                "",
-                "Optional software:",
-                " - magick: %IMAGEMAGICK%",
-                " - yt-dlp: %YTDLP%",
-                "",
-                "Click \"Next Page\" to re-check the status of each program.",
-                "",
-                "Need help? Create an issue or post on the GitHub issue tracker.",
-                "",
-                "The \"Next Page\" button will be disabled if there are issues."
+                "Tutorial:Page2_0",
+                " ",
+                "Tutorial:Page2_1",
+                "%FFMPEGSTATUS%",
+                "%FFPROBESTATUS%",
+                " ",
+                "Tutorial:Page2_2",
+                "%MAGICKSTATUS%",
+                "%FREI0RSTATUS%",
+                " ",
+                "Tutorial:Page2_3",
+                " ",
+                "Tutorial:Page2_4",
+                " ",
+                "Tutorial:Page2_5"
             },
             new List<string>()
             { // PAGE 3
-                "All required software is installed!",
-                "",
-                "Don't hesitate to ask for help on the GitHub issue tracker!",
-                "Be sure to join the Discord server community from the menu!",
-                "",
-                "Enjoy using " + Global.productName + "!",
-                "",
-                "If there are still issues, the continue button will be disabled.",
-                "In that case, broken addons would have been detected.",
-                "Check console with F5 to see which addons are broken, if so.",
-                "",
-                "Click \"Continue\" to scan addons and continue if successful."
+                "Tutorial:Page3_0",
+                " ",
+                "Tutorial:Page3_1",
+                "Tutorial:Page3_2",
+                " ",
+                "Tutorial:Page3_3",
+                " ",
+                "Tutorial:Page3_4",
+                "Tutorial:Page3_5",
+                "Tutorial:Page3_6",
+                " ",
+                "Tutorial:Page3_7"
             },
             new List<string>()
             { // PLUGIN CONSENT FORM
-                "The effect %PLUGIN% requires additional permissions:",
-                "",
+                "Tutorial:PluginConsentForm_0",
+                " ",
                 "%PERM1%",
-                "",
+                " ",
                 "%PERM2%",
-                "",
+                " ",
                 "%PERM3%",
-                "",
-                "If you do not agree, unsubscribe from the effect by visiting its",
-                "workshop page from the button below.",
-                "",
-                "Click \"Continue\" to accept the permissions, or if unsubscribed,",
-                "decline the permissions."
+                " ",
+                "Tutorial:PluginConsentForm_1",
+                "Tutorial:PluginConsentForm_2",
+                " ",
+                "Tutorial:PluginConsentForm_3",
+                "Tutorial:PluginConsentForm_4"
             }
         };
         public void Draw(GameTime gameTime, SpriteBatch spriteBatch)
@@ -362,134 +369,18 @@ namespace NonsensicalVideoGenerator
                 int offsetText = 0;
                 for(int j = 0; j < tutorialText[i].Count; j++)
                 {
-                    string dummyText = tutorialText[i][j];
-                    dummyText = dummyText.Replace("%FFMPEG%", "Checking...");
-                    dummyText = dummyText.Replace("%FFPROBE%", "Checking...");
-                    dummyText = dummyText.Replace("%IMAGEMAGICK%", "Checking...");
-                    dummyText = dummyText.Replace("%YTDLP%", "Checking...");
-                    Vector2 textSize = L.FontSmall().MeasureString(dummyText);
-                    spriteBatch.DrawString(L.FontSmall(), dummyText, new Vector2(GlobalGraphics.Scale(8+16+1+320*i), GlobalGraphics.Scale(60+offsetText+1)), Color.Black);
-                    spriteBatch.DrawString(L.FontSmall(), dummyText, new Vector2(GlobalGraphics.Scale(8+16+320*i), GlobalGraphics.Scale(60+offsetText)), Color.White);
-                    // Draw red overlay if prerequisite is not met
-                    if(GlobalGraphics.scale == 2)
-                    {
-                        if(tutorialText[i][j].Contains("Not found"))
-                        {
-                            int offset = 0;
-                            switch(j)
-                            {
-                                case 3:
-                                    offset = 43;
-                                    break;
-                                case 4:
-                                    offset = 47;
-                                    break;
-                                case 7:
-                                    offset = 42;
-                                    break;
-                                case 8:
-                                    offset = 43;
-                                    break;
-                            }
-                            spriteBatch.DrawString(L.FontSmall(), "Not found", new Vector2(GlobalGraphics.Scale(offset+8+16+320*i), GlobalGraphics.Scale(60+offsetText)), Color.OrangeRed);
-                        }
-                        if(tutorialText[i][j].Contains("Downloading..."))
-                        {
-                            int offset = 0;
-                            switch(j)
-                            {
-                                case 3:
-                                    offset = 43;
-                                    break;
-                                case 4:
-                                    offset = 47;
-                                    break;
-                            }
-                            spriteBatch.DrawString(L.FontSmall(), "Downloading...", new Vector2(GlobalGraphics.Scale(offset+8+16+320*i), GlobalGraphics.Scale(60+offsetText)), Color.BlueViolet);
-                        }
-                        if(tutorialText[i][j].Contains("Extracting..."))
-                        {
-                            int offset = 0;
-                            switch(j)
-                            {
-                                case 3:
-                                    offset = 43;
-                                    break;
-                                case 4:
-                                    offset = 47;
-                                    break;
-                            }
-                            spriteBatch.DrawString(L.FontSmall(), "Extracting...", new Vector2(GlobalGraphics.Scale(offset+8+16+320*i), GlobalGraphics.Scale(60+offsetText)), Color.BlueViolet);
-                        }
-                        if(tutorialText[i][j].Contains("Using system PATH"))
-                        {
-                            int offset = 0;
-                            switch(j)
-                            {
-                                case 3:
-                                    offset = 43;
-                                    break;
-                                case 4:
-                                    offset = 47;
-                                    break;
-                                case 7:
-                                    offset = 42;
-                                    break;
-                                case 8:
-                                    offset = 43;
-                                    break;
-                            }
-                            spriteBatch.DrawString(L.FontSmall(), "Using system PATH", new Vector2(GlobalGraphics.Scale(offset+8+16+320*i), GlobalGraphics.Scale(60+offsetText)), Color.SeaGreen);
-                        }
-                        // Draw green overlay if prerequisite is met
-                        if(tutorialText[i][j].Contains("Installed"))
-                        {
-                            int offset = 0;
-                            switch(j)
-                            {
-                                case 3:
-                                    offset = 43;
-                                    break;
-                                case 4:
-                                    offset = 47;
-                                    break;
-                                case 7:
-                                    offset = 42;
-                                    break;
-                                case 8:
-                                    offset = 43;
-                                    break;
-                            }
-                            spriteBatch.DrawString(L.FontSmall(), "Installed", new Vector2(GlobalGraphics.Scale(offset+8+16+320*i), GlobalGraphics.Scale(60+offsetText)), Color.LimeGreen);
-                        }
-                        // Draw red overlay if update check failed
-                        if(tutorialText[i][j].Contains("Failed"))
-                        {
-                            int offset = 68;
-                            spriteBatch.DrawString(L.FontSmall(), "Failed", new Vector2(GlobalGraphics.Scale(offset+8+16+320*i), GlobalGraphics.Scale(60+offsetText)), Color.OrangeRed);
-                        }
-                        // Draw yellow overlay if checking
-                        if(dummyText.Contains("Checking..."))
-                        {
-                            int offset = 68;
-                            switch(j)
-                            {
-                                case 3:
-                                    offset = 43;
-                                    break;
-                                case 4:
-                                    offset = 47;
-                                    break;
-                                case 7:
-                                    offset = 42;
-                                    break;
-                                case 8:
-                                    offset = 43;
-                                    break;
-                            }
-                            spriteBatch.DrawString(L.FontSmall(), "Checking...", new Vector2(GlobalGraphics.Scale(offset+8+16+320*i), GlobalGraphics.Scale(60+offsetText)), Color.Yellow);
-                        }
-                    }
+                    string curText = tutorialText[i][j].Replace("%FFMPEGNAME%", L.T(0, "Tutorial:ProgramName", "ffmpeg"));
+                    curText = curText.Replace("%FFPROBENAME%", L.T(0, "Tutorial:ProgramName", "ffprobe"));
+                    curText = curText.Replace("%MAGICKNAME%", L.T(0, "Tutorial:ProgramName", "magick"));
+                    curText = curText.Replace("%FREI0RNAME%", L.T(0, "Tutorial:ProgramName", "frei0r plugins"));
+                    curText = curText.Replace("%FFMPEGSTATUS%", L.T(0, "Tutorial:ProgramStatus", "ffmpeg", L.T(0, "Tutorial:ProgramChecking")));
+                    curText = curText.Replace("%FFPROBESTATUS%", L.T(0, "Tutorial:ProgramStatus", "ffprobe", L.T(0, "Tutorial:ProgramChecking")));
+                    curText = curText.Replace("%MAGICKSTATUS%", L.T(0, "Tutorial:ProgramStatus", "magick", L.T(0, "Tutorial:ProgramChecking")));
+                    curText = curText.Replace("%FREI0RSTATUS%", L.T(0, "Tutorial:ProgramStatus", "frei0r plugins", L.T(0, "Tutorial:ProgramChecking")));
+                    if(curText.StartsWith("Tutorial:"))
+                        curText = L.T(0, curText);
+                    spriteBatch.DrawString(L.FontSmall(), curText, new Vector2(GlobalGraphics.Scale(8+16+1+320*i), GlobalGraphics.Scale(60+offsetText+1)), Color.Black);
+                    spriteBatch.DrawString(L.FontSmall(), curText, new Vector2(GlobalGraphics.Scale(8+16+320*i), GlobalGraphics.Scale(60+offsetText)), Color.White);
                     offsetText += 8;
                 }
             }
@@ -510,24 +401,28 @@ namespace NonsensicalVideoGenerator
             {
                 for (int j = 0; j < tutorialText[h].Count; j++)
                 {
-                    string ffmpeg = UpdateManager.ffmpegInstalled ? "Installed" : "Not found";
-                    string ffprobe = UpdateManager.ffprobeInstalled ? "Installed" : "Not found";
-                    string ytDlp = UpdateManager.ytDlpInstalled ? "Installed" : "Not found";
+                    string localizedInstalled = L.T(0, "Tutorial:ProgramInstalled");
+                    string localizedNotFound = L.T(0, "Tutorial:ProgramNotFound");
+                    string localizedUsingSystemPath = L.T(0, "Tutorial:ProgramUsingSystemPath");
+                    string ffmpeg = UpdateManager.ffmpegInstalled ? localizedInstalled : localizedNotFound;
+                    string ffprobe = UpdateManager.ffprobeInstalled ? localizedInstalled : localizedNotFound;
+                    string magick = UpdateManager.imagemagickInstalled ? localizedInstalled : localizedNotFound;
+                    string frei0r = UpdateManager.frei0rInstalled ? localizedInstalled : localizedNotFound;
                     if(Global.useSystemFFmpeg)
                     {
                         if(!UpdateManager.ffmpegInstalled)
-                            ffmpeg = "Not found";
+                            ffmpeg = localizedNotFound;
                         else
                         {
-                            ffmpeg = "Using system PATH";
+                            ffmpeg = localizedUsingSystemPath;
                         }
                     }
                     if(Global.useSystemFFprobe)
                     {
                         if(!UpdateManager.ffprobeInstalled)
-                            ffprobe = "Not found";
+                            ffprobe = localizedNotFound;
                         else
-                            ffprobe = "Using system PATH";
+                            ffprobe = localizedUsingSystemPath;
                     }
                     if(Global.useSystemFFmpeg && Global.useSystemFFprobe
                         && UpdateManager.ffmpegInstalled && UpdateManager.ffprobeInstalled)
@@ -535,17 +430,24 @@ namespace NonsensicalVideoGenerator
                         // Remove ffmpeg button
                         controller.Remove("ButtonFFmpeg");
                     }
-                    if(Global.useSystemYtDlp)
+                    if(Global.useSystemMagick)
                     {
-                        if(!UpdateManager.ytDlpInstalled)
-                            ytDlp = "Not found";
+                        if(!UpdateManager.imagemagickInstalled)
+                            magick = localizedNotFound;
                         else
-                            ytDlp = "Using system PATH";
+                            magick = localizedUsingSystemPath;
                     }
-                    tutorialText[h][j] = tutorialText[h][j].Replace("%FFMPEG%", ffmpeg);
-                    tutorialText[h][j] = tutorialText[h][j].Replace("%FFPROBE%", ffprobe);
-                    tutorialText[h][j] = tutorialText[h][j].Replace("%IMAGEMAGICK%", UpdateManager.imagemagickInstalled ? "Using system PATH" : "Not found");
-                    tutorialText[h][j] = tutorialText[h][j].Replace("%YTDLP%", ytDlp);
+                    if(Global.useSystemFrei0r)
+                    {
+                        if(!UpdateManager.frei0rInstalled)
+                            frei0r = localizedNotFound;
+                        else
+                            frei0r = localizedUsingSystemPath;
+                    }
+                    tutorialText[h][j] = tutorialText[h][j].Replace("%FFMPEGSTATUS%", L.T(0, "Tutorial:ProgramStatus", "ffmpeg", ffmpeg));
+                    tutorialText[h][j] = tutorialText[h][j].Replace("%FFPROBESTATUS%", L.T(0, "Tutorial:ProgramStatus", "ffprobe", ffprobe));
+                    tutorialText[h][j] = tutorialText[h][j].Replace("%MAGICKSTATUS%", L.T(0, "Tutorial:ProgramStatus", "magick", magick));
+                    tutorialText[h][j] = tutorialText[h][j].Replace("%FREI0RSTATUS%", L.T(0, "Tutorial:ProgramStatus", "frei0r plugins", frei0r));
                 }
             }
             check = false;
@@ -566,7 +468,7 @@ namespace NonsensicalVideoGenerator
                         if(!Global.generator.progressText.ToLower().Contains("extract")
                             && !Global.generator.progressText.ToLower().Contains("downloading"))
                         {
-                            GlobalContent.GetSound("Option").Play(int.Parse(SaveData.saveValues["SoundEffectVolume"], System.Globalization.CultureInfo.InvariantCulture) / 100f, 0f, 0f);
+                            GlobalContent.GetSound("Option").Play(int.Parse(SaveData.saveValues["SoundEffectVolume"], CultureInfo.InvariantCulture) / 100f, 0f, 0f);
                             if(!bool.Parse(SaveData.saveValues["DisableMotion"]))
                             {
                                 tween.TweenTo(this, t => t.offset, new Vector2(GlobalGraphics.Scale(0), 0), 0.5f)
@@ -579,12 +481,12 @@ namespace NonsensicalVideoGenerator
                         }
                         else
                         {
-                            GlobalContent.GetSound("Error").Play(int.Parse(SaveData.saveValues["SoundEffectVolume"], System.Globalization.CultureInfo.InvariantCulture) / 100f, 0f, 0f);
+                            GlobalContent.GetSound("Error").Play(int.Parse(SaveData.saveValues["SoundEffectVolume"], CultureInfo.InvariantCulture) / 100f, 0f, 0f);
                         }
                     }
                     else
                     {
-                        GlobalContent.GetSound("Error").Play(int.Parse(SaveData.saveValues["SoundEffectVolume"], System.Globalization.CultureInfo.InvariantCulture) / 100f, 0f, 0f);
+                        GlobalContent.GetSound("Error").Play(int.Parse(SaveData.saveValues["SoundEffectVolume"], CultureInfo.InvariantCulture) / 100f, 0f, 0f);
                     }
                     return true;
             }
@@ -601,7 +503,7 @@ namespace NonsensicalVideoGenerator
                         if(!Global.generator.progressText.ToLower().Contains("extract")
                             && !Global.generator.progressText.ToLower().Contains("downloading"))
                         {
-                            GlobalContent.GetSound("Option").Play(int.Parse(SaveData.saveValues["SoundEffectVolume"], System.Globalization.CultureInfo.InvariantCulture) / 100f, 0f, 0f);
+                            GlobalContent.GetSound("Option").Play(int.Parse(SaveData.saveValues["SoundEffectVolume"], CultureInfo.InvariantCulture) / 100f, 0f, 0f);
                             if(!bool.Parse(SaveData.saveValues["DisableMotion"]))
                             {
                                 tween.TweenTo(this, t => t.offset, new Vector2(GlobalGraphics.Scale(-320), 0), 0.5f)
@@ -615,7 +517,7 @@ namespace NonsensicalVideoGenerator
                     }
                     else
                     {
-                        GlobalContent.GetSound("Error").Play(int.Parse(SaveData.saveValues["SoundEffectVolume"], System.Globalization.CultureInfo.InvariantCulture) / 100f, 0f, 0f);
+                        GlobalContent.GetSound("Error").Play(int.Parse(SaveData.saveValues["SoundEffectVolume"], CultureInfo.InvariantCulture) / 100f, 0f, 0f);
                     }
                     return true;
             }
@@ -628,24 +530,24 @@ namespace NonsensicalVideoGenerator
                 case 2: // left click
                     if(!UserConsent.needsConsent)
                     {
-                        Global.generator.progressText = "Starting download...";
+                        Global.generator.progressText = L.T(0, "Tutorial:StatusStartDownload");
 
-                        GlobalContent.GetSound("Option").Play(int.Parse(SaveData.saveValues["SoundEffectVolume"], System.Globalization.CultureInfo.InvariantCulture) / 100f, 0f, 0f);
-                        tutorialText[1][3] = " - ffmpeg: Downloading...";
-                        tutorialText[1][4] = " - ffprobe: Downloading...";
+                        GlobalContent.GetSound("Option").Play(int.Parse(SaveData.saveValues["SoundEffectVolume"], CultureInfo.InvariantCulture) / 100f, 0f, 0f);
+                        tutorialText[1][3] = L.T(0, "Tutorial:ProgramStatus", "ffmpeg", L.T(0, "Tutorial:ProgramDownloading"));
+                        tutorialText[1][4] = L.T(0, "Tutorial:ProgramStatus", "ffprobe", L.T(0, "Tutorial:ProgramDownloading"));
                         controller.Remove("ButtonFFmpeg");
 
                         // Create temp folder
                         Directory.CreateDirectory(Path.Combine(Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location) ?? ".", "temp"));
 
                         // Download ffmpeg essential release from gyan.dev
-                        System.Uri url = new("https://www.gyan.dev/ffmpeg/builds/ffmpeg-release-essentials.zip");
-                        string path = Path.Combine(Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location) ?? ".", "temp", "ffmpeg-release-essentials.zip");
+                        Uri url = new("https://www.gyan.dev/ffmpeg/builds/packages/"+zip);
+                        string path = Path.Combine(Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location) ?? ".", "temp", zip);
 
                         // Delete file if it exists
-                        if(File.Exists(Path.Combine(Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location) ?? ".", "temp", "ffmpeg-release-essentials.zip")))
+                        if(File.Exists(Path.Combine(Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location) ?? ".", "temp", zip)))
                         {
-                            File.Delete(Path.Combine(Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location) ?? ".", "temp", "ffmpeg-release-essentials.zip"));
+                            File.Delete(Path.Combine(Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location) ?? ".", "temp", zip));
                         }
                         
                         // Download ffmpeg
@@ -654,14 +556,17 @@ namespace NonsensicalVideoGenerator
                             using (WebClient client = new WebClient())
                             {
                                 client.DownloadProgressChanged += (sender, e) => {
-                                    Global.generator.progressText = "Downloading... (" + e.ProgressPercentage + "%)";
-                                    tutorialText[1][3] = " - ffmpeg: Downloading... (" + e.ProgressPercentage + "%)";
-                                    tutorialText[1][4] = " - ffprobe: Downloading... (" + e.ProgressPercentage + "%)";
+                                    downloading = true;
+                                    Global.generator.progressText = L.T(0, "Tutorial:StatusDownload", e.ProgressPercentage.ToString(CultureInfo.InvariantCulture));
+                                    tutorialText[1][3] = L.T(0, "Tutorial:ProgramStatus", "ffmpeg", Global.generator.progressText);
+                                    tutorialText[1][4] = L.T(0, "Tutorial:ProgramStatus", "ffprobe", Global.generator.progressText);
                                 };
                                 client.DownloadFileCompleted += (sender, e) => {
-                                    Global.generator.progressText = "Extracting...";
-                                    tutorialText[1][3] = " - ffmpeg: Extracting...";
-                                    tutorialText[1][4] = " - ffprobe: Extracting...";
+                                    downloading = false;
+                                    extracting = true;
+                                    Global.generator.progressText = L.T(0, "Tutorial:ProgramExtracting");
+                                    tutorialText[1][3] = L.T(0, "Tutorial:ProgramStatus", "ffmpeg", Global.generator.progressText);
+                                    tutorialText[1][4] = L.T(0, "Tutorial:ProgramStatus", "ffprobe", Global.generator.progressText);
                                     ffmpegDownloadWorker = new BackgroundWorker();
                                     ffmpegDownloadWorker.DoWork += (object? sender, DoWorkEventArgs e) => {
                                         DownloadFFmpegThread();
@@ -673,7 +578,7 @@ namespace NonsensicalVideoGenerator
                         }
                         catch
                         {
-                            ConsoleOutput.WriteLine("Failed to download ffmpeg-release-essentials.zip", Color.Red);
+                            ConsoleOutput.WriteLine("Failed to download zip", Color.Red);
                             // Re-scan for ffmpeg
                             for(int h = 0; h < baseTutorialText.Length; h++)
                             {
@@ -683,18 +588,20 @@ namespace NonsensicalVideoGenerator
                                     tutorialText[h].Add(baseTutorialText[h][j]);
                                 }
                             }
+                            downloading = false;
+                            extracting = false;
                             check = true;
                             dependencyWorker = new BackgroundWorker();
                             dependencyWorker.DoWork += DependencyCheckThread;
                             dependencyWorker.RunWorkerAsync();
-                            Global.generator.progressText = "Failed to download.";
+                            Global.generator.progressText = L.T(0, "Tutorial:StatusFailDownload");
                             // Play sound effect
-                            GlobalContent.GetSound("Error").Play(int.Parse(SaveData.saveValues["SoundEffectVolume"], System.Globalization.CultureInfo.InvariantCulture) / 100f, 0f, 0f);
+                            GlobalContent.GetSound("Error").Play(int.Parse(SaveData.saveValues["SoundEffectVolume"], CultureInfo.InvariantCulture) / 100f, 0f, 0f);
                         }
                     }
                     else
                     {
-                        GlobalContent.GetSound("Error").Play(int.Parse(SaveData.saveValues["SoundEffectVolume"], System.Globalization.CultureInfo.InvariantCulture) / 100f, 0f, 0f);
+                        GlobalContent.GetSound("Error").Play(int.Parse(SaveData.saveValues["SoundEffectVolume"], CultureInfo.InvariantCulture) / 100f, 0f, 0f);
                     }
                     return true;
             }
@@ -707,15 +614,14 @@ namespace NonsensicalVideoGenerator
                 case 2: // left click
                     if(!UserConsent.needsConsent)
                     {
-                        if(!Global.generator.progressText.ToLower().Contains("extract")
-                            && !Global.generator.progressText.ToLower().Contains("downloading"))
+                        if(!extracting && !downloading)
                         {
-                            GlobalContent.GetSound("Option").Play(int.Parse(SaveData.saveValues["SoundEffectVolume"], System.Globalization.CultureInfo.InvariantCulture) / 100f, 0f, 0f);
+                            GlobalContent.GetSound("Option").Play(int.Parse(SaveData.saveValues["SoundEffectVolume"], CultureInfo.InvariantCulture) / 100f, 0f, 0f);
                             if(!check3)
                             {
                                 check3 = true;
                                 SaveData.Save();
-                                GlobalContent.GetSound("Back").Play(int.Parse(SaveData.saveValues["SoundEffectVolume"], System.Globalization.CultureInfo.InvariantCulture) / 100f, 0f, 0f);
+                                GlobalContent.GetSound("Back").Play(int.Parse(SaveData.saveValues["SoundEffectVolume"], CultureInfo.InvariantCulture) / 100f, 0f, 0f);
                                 toggle = false;
                                 if(!bool.Parse(SaveData.saveValues["DisableMotion"]))
                                 {
@@ -748,7 +654,7 @@ namespace NonsensicalVideoGenerator
                     }
                     else
                     {
-                        GlobalContent.GetSound("Error").Play(int.Parse(SaveData.saveValues["SoundEffectVolume"], System.Globalization.CultureInfo.InvariantCulture) / 100f, 0f, 0f);
+                        GlobalContent.GetSound("Error").Play(int.Parse(SaveData.saveValues["SoundEffectVolume"], CultureInfo.InvariantCulture) / 100f, 0f, 0f);
                     }
                     return true;
             }
@@ -761,13 +667,12 @@ namespace NonsensicalVideoGenerator
                 case 2: // left click
                     if(UserConsent.needsConsent)
                     {
-                        if(!Global.generator.progressText.ToLower().Contains("extract")
-                            && !Global.generator.progressText.ToLower().Contains("downloading"))
+                        if(!extracting && !downloading)
                         {
-                            GlobalContent.GetSound("Option").Play(int.Parse(SaveData.saveValues["SoundEffectVolume"], System.Globalization.CultureInfo.InvariantCulture) / 100f, 0f, 0f);
+                            GlobalContent.GetSound("Option").Play(int.Parse(SaveData.saveValues["SoundEffectVolume"], CultureInfo.InvariantCulture) / 100f, 0f, 0f);
                             if(UserConsent.consentForm != null)
                                 UserConsent.Accept(UserConsent.consentForm.pluginName);
-                            GlobalContent.GetSound("Back").Play(int.Parse(SaveData.saveValues["SoundEffectVolume"], System.Globalization.CultureInfo.InvariantCulture) / 100f, 0f, 0f);
+                            GlobalContent.GetSound("Back").Play(int.Parse(SaveData.saveValues["SoundEffectVolume"], CultureInfo.InvariantCulture) / 100f, 0f, 0f);
                             toggle = false;
                             if(UserConsent.consentForm != null)
                                 Global.generator.progressText = $"Addon {UserConsent.consentForm?.pluginName} accepted.";
@@ -802,7 +707,7 @@ namespace NonsensicalVideoGenerator
                     }
                     else
                     {
-                        GlobalContent.GetSound("Error").Play(int.Parse(SaveData.saveValues["SoundEffectVolume"], System.Globalization.CultureInfo.InvariantCulture) / 100f, 0f, 0f);
+                        GlobalContent.GetSound("Error").Play(int.Parse(SaveData.saveValues["SoundEffectVolume"], CultureInfo.InvariantCulture) / 100f, 0f, 0f);
                     }
                     break;
             }
@@ -815,8 +720,7 @@ namespace NonsensicalVideoGenerator
                 case 2: // left click
                     if(UserConsent.needsConsent)
                     {
-                        if(!Global.generator.progressText.ToLower().Contains("extract")
-                            && !Global.generator.progressText.ToLower().Contains("downloading"))
+                        if(!extracting && !downloading)
                         {
                             if(UserConsent.needsConsent)
                             {
@@ -825,7 +729,7 @@ namespace NonsensicalVideoGenerator
                                     && UserConsent.consentForm.workshopId != ""
                                     && UserConsent.consentForm.rootPath.Contains("workshop"))
                                 {
-                                    GlobalContent.GetSound("Option").Play(int.Parse(SaveData.saveValues["SoundEffectVolume"], System.Globalization.CultureInfo.InvariantCulture) / 100f, 0f, 0f);
+                                    GlobalContent.GetSound("Option").Play(int.Parse(SaveData.saveValues["SoundEffectVolume"], CultureInfo.InvariantCulture) / 100f, 0f, 0f);
                                     ProcessStartInfo startInfo = new ProcessStartInfo();
                                     startInfo.FileName = "https://steamcommunity.com/sharedfiles/filedetails/?id=" + UserConsent.consentForm.workshopId;
                                     startInfo.UseShellExecute = true;
@@ -833,7 +737,7 @@ namespace NonsensicalVideoGenerator
                                 }
                                 else
                                 {
-                                    GlobalContent.GetSound("Error").Play(int.Parse(SaveData.saveValues["SoundEffectVolume"], System.Globalization.CultureInfo.InvariantCulture) / 100f, 0f, 0f);
+                                    GlobalContent.GetSound("Error").Play(int.Parse(SaveData.saveValues["SoundEffectVolume"], CultureInfo.InvariantCulture) / 100f, 0f, 0f);
                                     //UserConsent.ShowConsentForm();
                                 }
                                 return true;
@@ -842,7 +746,7 @@ namespace NonsensicalVideoGenerator
                     }
                     else
                     {
-                        GlobalContent.GetSound("Error").Play(int.Parse(SaveData.saveValues["SoundEffectVolume"], System.Globalization.CultureInfo.InvariantCulture) / 100f, 0f, 0f);
+                        GlobalContent.GetSound("Error").Play(int.Parse(SaveData.saveValues["SoundEffectVolume"], CultureInfo.InvariantCulture) / 100f, 0f, 0f);
                     }
                     break;
             }
@@ -857,10 +761,9 @@ namespace NonsensicalVideoGenerator
                     if(!UserConsent.needsConsent)
                     {
                         // Get dependencies.
-                        if(!Global.generator.progressText.ToLower().Contains("extract")
-                            && !Global.generator.progressText.ToLower().Contains("downloading"))
+                        if(!extracting && !downloading)
                         {
-                            GlobalContent.GetSound("Option").Play(int.Parse(SaveData.saveValues["SoundEffectVolume"], System.Globalization.CultureInfo.InvariantCulture) / 100f, 0f, 0f);
+                            GlobalContent.GetSound("Option").Play(int.Parse(SaveData.saveValues["SoundEffectVolume"], CultureInfo.InvariantCulture) / 100f, 0f, 0f);
                             if(!check)
                             {
                                 for(int h = 0; h < baseTutorialText.Length; h++)
@@ -888,12 +791,12 @@ namespace NonsensicalVideoGenerator
                         }
                         else
                         {
-                            GlobalContent.GetSound("Error").Play(int.Parse(SaveData.saveValues["SoundEffectVolume"], System.Globalization.CultureInfo.InvariantCulture) / 100f, 0f, 0f);
+                            GlobalContent.GetSound("Error").Play(int.Parse(SaveData.saveValues["SoundEffectVolume"], CultureInfo.InvariantCulture) / 100f, 0f, 0f);
                         }
                     }
                     else
                     {
-                        GlobalContent.GetSound("Error").Play(int.Parse(SaveData.saveValues["SoundEffectVolume"], System.Globalization.CultureInfo.InvariantCulture) / 100f, 0f, 0f);
+                        GlobalContent.GetSound("Error").Play(int.Parse(SaveData.saveValues["SoundEffectVolume"], CultureInfo.InvariantCulture) / 100f, 0f, 0f);
                     }
                     return true;
             }
@@ -906,12 +809,11 @@ namespace NonsensicalVideoGenerator
                 case 2: // left click
                     if(!UserConsent.needsConsent)
                     {
-                        if(!Global.generator.progressText.ToLower().Contains("extract")
-                            && !Global.generator.progressText.ToLower().Contains("downloading"))
+                        if(!extracting && !downloading)
                         {
                             if(UpdateManager.ffmpegInstalled && UpdateManager.ffprobeInstalled)
                             {
-                                GlobalContent.GetSound("Option").Play(int.Parse(SaveData.saveValues["SoundEffectVolume"], System.Globalization.CultureInfo.InvariantCulture) / 100f, 0f, 0f);
+                                GlobalContent.GetSound("Option").Play(int.Parse(SaveData.saveValues["SoundEffectVolume"], CultureInfo.InvariantCulture) / 100f, 0f, 0f);
                                 if(!bool.Parse(SaveData.saveValues["DisableMotion"]))
                                 {
                                     tween.TweenTo(this, t => t.offset, new Vector2(GlobalGraphics.Scale(-640), 0), 0.5f)
@@ -939,17 +841,17 @@ namespace NonsensicalVideoGenerator
                                     dependencyWorker.DoWork += DependencyCheckThread;
                                     dependencyWorker.RunWorkerAsync();
                                 }
-                                GlobalContent.GetSound("Error").Play(int.Parse(SaveData.saveValues["SoundEffectVolume"], System.Globalization.CultureInfo.InvariantCulture) / 100f, 0f, 0f);
+                                GlobalContent.GetSound("Error").Play(int.Parse(SaveData.saveValues["SoundEffectVolume"], CultureInfo.InvariantCulture) / 100f, 0f, 0f);
                             }
                         }
                         else
                         {
-                            GlobalContent.GetSound("Error").Play(int.Parse(SaveData.saveValues["SoundEffectVolume"], System.Globalization.CultureInfo.InvariantCulture) / 100f, 0f, 0f);
+                            GlobalContent.GetSound("Error").Play(int.Parse(SaveData.saveValues["SoundEffectVolume"], CultureInfo.InvariantCulture) / 100f, 0f, 0f);
                         }
                     }
                     else
                     {
-                        GlobalContent.GetSound("Error").Play(int.Parse(SaveData.saveValues["SoundEffectVolume"], System.Globalization.CultureInfo.InvariantCulture) / 100f, 0f, 0f);
+                        GlobalContent.GetSound("Error").Play(int.Parse(SaveData.saveValues["SoundEffectVolume"], CultureInfo.InvariantCulture) / 100f, 0f, 0f);
                     }
                     return true;
             }
@@ -994,16 +896,27 @@ namespace NonsensicalVideoGenerator
         }
         public void DownloadFFmpegThread()
         {
-            string path = Path.Combine(Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location) ?? ".", "temp", "ffmpeg-release-essentials.zip");
+            string path = Path.Combine(Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location) ?? ".", "temp", zip);
 
             // Extract ffmpeg to temp folder
             try
             {
-                ZipFile.ExtractToDirectory(path, Path.Combine(Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location) ?? ".", "temp"), true);
+                //ZipFile.ExtractToDirectory(path, Path.Combine(Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location) ?? ".", "temp"), true);
+                using(SevenZipArchive archive = SevenZipArchive.Open(path))
+                {
+                    foreach(SevenZipArchiveEntry entry in archive.Entries)
+                    {
+                        entry.WriteToDirectory(Path.Combine(Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location) ?? ".", "temp"), new ExtractionOptions
+                        {
+                            ExtractFullPath = true,
+                            Overwrite = true
+                        });
+                    }
+                }
             }
             catch
             {
-                ConsoleOutput.WriteLine("Failed to extract ffmpeg-release-essentials.zip", Color.Red);
+                ConsoleOutput.WriteLine("Failed to extract zip", Color.Red);
             }
 
             string ffmpegPath = "";
@@ -1087,17 +1000,18 @@ namespace NonsensicalVideoGenerator
             dependencyWorker = new BackgroundWorker();
             dependencyWorker.DoWork += DependencyCheckThread;
             dependencyWorker.RunWorkerAsync();
-            
+            extracting = false;
+            downloading = false;
             // Play sound effect
             if(ffmpegExePath != "" && ffprobeExePath != "")
             {
-                Global.generator.progressText = "Download complete.";
-                GlobalContent.GetSound("RenderComplete").Play(int.Parse(SaveData.saveValues["SoundEffectVolume"], System.Globalization.CultureInfo.InvariantCulture) / 100f, 0f, 0f);
+                Global.generator.progressText = L.T(0, "Tutorial:StatusDownloadComplete");
+                GlobalContent.GetSound("RenderComplete").Play(int.Parse(SaveData.saveValues["SoundEffectVolume"], CultureInfo.InvariantCulture) / 100f, 0f, 0f);
             }
             else
             {
-                Global.generator.progressText = "Failed to download.";
-                GlobalContent.GetSound("Error").Play(int.Parse(SaveData.saveValues["SoundEffectVolume"], System.Globalization.CultureInfo.InvariantCulture) / 100f, 0f, 0f);
+                Global.generator.progressText = L.T(0, "Failed to download.");
+                GlobalContent.GetSound("Error").Play(int.Parse(SaveData.saveValues["SoundEffectVolume"], CultureInfo.InvariantCulture) / 100f, 0f, 0f);
             }
         }
     }

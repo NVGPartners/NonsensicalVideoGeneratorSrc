@@ -1,0 +1,55 @@
+{
+    "LeadDeveloper": [
+        "kiwifruitdev"
+    ],
+    "SoundDesigner": [
+        "gmm2003",
+        "bobbyiguess"
+    ],
+    "Moderator": [
+        "0zne",
+        "brettbagel",
+        "spiral2839",
+        "nuppington",
+        "treycen"
+    ],
+    "SpecialThanks": [
+        "vinesauce",
+        "meleekirby",
+        "supositware",
+        "devanwolf",
+        "deemacias"
+    ],
+    "Superstar": [
+        "thigo",
+        "eddsworldfan69420",
+        "fireafyanimations",
+        "goggleskun",
+        "1greg7",
+        "gungholizard",
+        "nobodyhasabandonedme",
+        "jankespro12",
+        "kraggerthemenace",
+        "lindinhodebonito",
+        "marcioleo123",
+        "revilleaj",
+        "rowster64",
+        "thebritishytper",
+        "thet00nedl00n",
+        "madclown55",
+        "waterdeervt"
+    ],
+    "SoftwareLicense": [
+        "MonoGame (Ms-PL)",
+        "Newtonsoft.Json (MIT License)",
+        "Steamworks.NET (MIT License)",
+        "DiscordRichPresence (MIT License)",
+        "SharpCompress (MIT License)",
+        "MoonSharp (BSD-3-Clause License)",
+        "yt-dlp (Unlicense)"
+    ],
+    "FontLicense": [
+        "Munro (SIL Open Font License)",
+        "LanaPixel (SIL Open Font License)"
+    ]
+}

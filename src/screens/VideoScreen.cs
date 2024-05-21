@@ -25,15 +25,6 @@ namespace NonsensicalVideoGenerator
         private readonly Tweener tween = new();
         public KeyboardState newKeyboardState;
         public KeyboardState oldKeyboardState;
-        List<string> lines = new()
-        {
-            " ",
-            " ",
-            "If you find any bugs,",
-            "please report them on",
-            "the GitHub issues page.",
-            "Thank you, and enjoy!"
-        };
         public void Show()
         {
             toggle = true;
@@ -131,7 +122,7 @@ namespace NonsensicalVideoGenerator
                         FramePlayer.currentAudioTime = 0;
                         FramePlayer.audioPlaying = false;
                         FramePlayer.canPlayBgMusic = true;
-                        Global.generator.progressText = "Stopped playback.";
+                        Global.generator.progressText = L.T(0, "Video:StatusStop");
                         GlobalContent.GetSound("Option").Play(int.Parse(SaveData.saveValues["SoundEffectVolume"], System.Globalization.CultureInfo.InvariantCulture) / 100f, 0f, 0f);
                     }
                     else
@@ -159,11 +150,21 @@ namespace NonsensicalVideoGenerator
                             }
                             if(FramePlayer.audio != null)
                             {
-                                FramePlayer.audio.Stop();
-                                FramePlayer.currentAudioTime = 0;
-                                FramePlayer.audioPlaying = false;
-                                FramePlayer.canPlayBgMusic = true;
-                                Global.generator.progressText = "Stopped playback.";
+                                if(FramePlayer.audioPlaying)
+                                {
+                                    FramePlayer.audio.Stop();
+                                    FramePlayer.currentAudioTime = 0;
+                                    FramePlayer.audioPlaying = false;
+                                    FramePlayer.canPlayBgMusic = true;
+                                    Global.generator.progressText = L.T(0, "Video:StatusStop");
+                                }
+                                else
+                                {
+                                    FramePlayer.audio.Play();
+                                    FramePlayer.audioPlaying = true;
+                                    FramePlayer.canPlayBgMusic = false;
+                                    Global.generator.progressText = L.T(0, "Video:StatusPlay");
+                                }
                                 GlobalContent.GetSound("Option").Play(int.Parse(SaveData.saveValues["SoundEffectVolume"], System.Globalization.CultureInfo.InvariantCulture) / 100f, 0f, 0f);
                             }
                             else
@@ -183,7 +184,7 @@ namespace NonsensicalVideoGenerator
                             FramePlayer.currentAudioTime = 0;
                             FramePlayer.audioPlaying = false;
                             FramePlayer.canPlayBgMusic = true;
-                            Global.generator.progressText = "Stopped playback.";
+                            Global.generator.progressText = L.T(0, "Video:StatusStop");
                             FramePlayer.canPlayBgMusic = true;
                         }
                         ProcessStartInfo startInfo = new()
@@ -212,67 +213,42 @@ namespace NonsensicalVideoGenerator
         public int flash = 0;
         public void Draw(GameTime gameTime, SpriteBatch spriteBatch)
         {
-            Texture2D vidoverlay = GlobalContent.GetTexture("VidOverlay");
             Texture2D pixel = GlobalContent.GetTexture("Pixel");
-            if(FramePlayer.playing && !FramePlayer.canPlayBgMusic)
-                spriteBatch.Draw(pixel, new Rectangle(GlobalGraphics.Scale(4), GlobalGraphics.Scale(4), GlobalGraphics.Scale(vidoverlay.Width), GlobalGraphics.Scale(vidoverlay.Height)), Color.Black * 0.5f);
             // End existing spritebatch
             spriteBatch.End();
             // Use offset
             spriteBatch.Begin(SpriteSortMode.Deferred, BlendState.AlphaBlend, SamplerState.PointClamp, null, null, null, Matrix.CreateTranslation(offset.X, offset.Y, 0));
-    
-            /*
-            Texture2D vidbutton = GlobalContent.GetTexture("VidButton");
-            spriteBatch.Draw(vidbutton, new Rectangle(GlobalGraphics.Scale(14), GlobalGraphics.Scale(104), GlobalGraphics.Scale(vidbutton.Width), GlobalGraphics.Scale(vidbutton.Height)), Color.White);
-            spriteBatch.Draw(vidbutton, new Rectangle(GlobalGraphics.Scale(47), GlobalGraphics.Scale(104), GlobalGraphics.Scale(vidbutton.Width), GlobalGraphics.Scale(vidbutton.Height)), Color.White);
-            spriteBatch.Draw(vidbutton, new Rectangle(GlobalGraphics.Scale(80), GlobalGraphics.Scale(104), GlobalGraphics.Scale(vidbutton.Width), GlobalGraphics.Scale(vidbutton.Height)), Color.White);
-            */
             Texture2D vidwindow = GlobalContent.GetTexture("VidWindow");
             Texture2D vidbg = GlobalContent.GetTexture("VidBG");
             spriteBatch.Draw(vidbg, new Rectangle(GlobalGraphics.Scale(0), GlobalGraphics.Scale(43), GlobalGraphics.Scale(104), GlobalGraphics.Scale(78)), Color.White);
-            // Draw flashing box in vidbg bounds if FramePlayer.processing is true
-            if(FramePlayer.processing)
-            {
-                if(!bool.Parse(SaveData.saveValues["DisableMotion"]))
-                {
-                    // Flash using FramePlayer.startedProcessing (seconds) and gameTime seconds
-                    // 0-255
-                    flash = (int)(Math.Sin((FramePlayer.startedProcessing + gameTime.TotalGameTime.TotalSeconds)*6) * 64);
-                    // Absolute value
-                    if(flash < 0)
-                        flash *= -1;
-                }
-                else
-                {
-                    // Set to middle
-                    flash = 48;
-                }
-                spriteBatch.Draw(pixel, new Rectangle(GlobalGraphics.Scale(0), GlobalGraphics.Scale(43), GlobalGraphics.Scale(104), GlobalGraphics.Scale(78)), new Color(flash, flash, flash, 255));
-            }
-            /*
-            Texture2D vidbg = GlobalContent.GetTexture("VidBG");
-            spriteBatch.Draw(vidbg, new Rectangle(GlobalGraphics.Scale(6), GlobalGraphics.Scale(45), GlobalGraphics.Scale(vidbg.Width), GlobalGraphics.Scale(vidbg.Height)), Color.White);
-            Vector2 lastPos = new(GlobalGraphics.Scale(8), GlobalGraphics.Scale(45));
-            for(int i = 0; i < lines.Count; i++)
-            {
-                spriteBatch.DrawString(munro, lines[i], new Vector2(lastPos.X + GlobalGraphics.Scale(1), lastPos.Y + GlobalGraphics.Scale(1)), Color.Black);
-                spriteBatch.DrawString(munro, lines[i], new Vector2(lastPos.X, lastPos.Y), Color.White);
-                lastPos.Y += munro.MeasureString(lines[i]).Y;
-            }
-            */
             // Draw media
             if(FramePlayer.frames.Count > 0)
             {
                 int frame = FramePlayer.currentFrame >= 0 ? FramePlayer.currentFrame : 0;
                 if(frame >= FramePlayer.frames.Count)
                     frame = 0;
-                spriteBatch.Draw(FramePlayer.frames[frame], new Rectangle(GlobalGraphics.Scale(2), GlobalGraphics.Scale(41), GlobalGraphics.Scale(104), GlobalGraphics.Scale(82)), Color.White);
+                spriteBatch.Draw(FramePlayer.frames[frame], new Rectangle(GlobalGraphics.Scale(4), GlobalGraphics.Scale(43), GlobalGraphics.Scale(100), GlobalGraphics.Scale(78)), Color.White);
+                // Red progress bar at bottom
+                if(FramePlayer.currentFrame > 0)
+                {
+                    spriteBatch.Draw(pixel, new Rectangle(GlobalGraphics.Scale(4), GlobalGraphics.Scale(118), GlobalGraphics.Scale(100), GlobalGraphics.Scale(3)), ThemeManager.GetColor("VideoPlayerProgressBarBackground"));
+                    spriteBatch.Draw(pixel, new Rectangle(GlobalGraphics.Scale(4), GlobalGraphics.Scale(118), GlobalGraphics.Scale(100) * FramePlayer.currentFrame / FramePlayer.frames.Count, GlobalGraphics.Scale(4)), ThemeManager.GetColor("VideoPlayerProgressBar"));
+                }
+            }
+            else if(FramePlayer.audioFrame != null)
+            {
+                spriteBatch.Draw(FramePlayer.audioFrame, new Rectangle(GlobalGraphics.Scale(4), GlobalGraphics.Scale(43), GlobalGraphics.Scale(100), GlobalGraphics.Scale(78)), Color.White);
+                if(FramePlayer.currentAudioTime > 0)
+                {
+                    spriteBatch.Draw(pixel, new Rectangle(GlobalGraphics.Scale(4), GlobalGraphics.Scale(118), GlobalGraphics.Scale(100), GlobalGraphics.Scale(3)), ThemeManager.GetColor("VideoPlayerProgressBarBackground"));
+                    spriteBatch.Draw(pixel, new Rectangle(GlobalGraphics.Scale(4), GlobalGraphics.Scale(118), (int)(FramePlayer.currentAudioTime * GlobalGraphics.Scale(100) / FramePlayer.audioLength), GlobalGraphics.Scale(3)), ThemeManager.GetColor("VideoPlayerProgressBar"));
+                }
             }
             // Video Window
             spriteBatch.Draw(vidwindow, new Rectangle(GlobalGraphics.Scale(0), GlobalGraphics.Scale(36), GlobalGraphics.Scale(vidwindow.Width), GlobalGraphics.Scale(vidwindow.Height)), Color.White);
             SpriteFont munro = L.FontSmall();
             // Draw window title on left side (90 degrees)
-            string altTitle = L.T(0, "Video");
+            string altTitle = L.T(0, "Video:Title");
             Vector2 titleSize = munro.MeasureString(altTitle);
             spriteBatch.DrawString(munro, altTitle, new Vector2(GlobalGraphics.Scale(111), GlobalGraphics.Scale(110)), Color.White, MathHelper.ToRadians(90), new Vector2(titleSize.X, titleSize.Y), 1, SpriteEffects.None, 0);
             // End offset spritebatch
@@ -287,9 +263,7 @@ namespace NonsensicalVideoGenerator
         {
             // Video Window
             GlobalContent.AddTexture("VidWindow", ThemeManager.LoadLayeredContent<Texture2D>("graphics/vidwindow"));
-            GlobalContent.AddTexture("VidButton", ThemeManager.LoadLayeredContent<Texture2D>("graphics/vidbutton"));
             GlobalContent.AddTexture("VidBG", ThemeManager.LoadLayeredContent<Texture2D>("graphics/vidbg"));
-            GlobalContent.AddTexture("VidOverlay", ThemeManager.LoadLayeredContent<Texture2D>("graphics/vidoverlay"));
         }
     }
 }

@@ -26,7 +26,6 @@ namespace NonsensicalVideoGenerator
         private int scrollX = 0;
         private int scrollY = 0;
         private float counter = 360;
-        private float hueColor = 0;
         public void Show()
         {
         }
@@ -83,7 +82,7 @@ namespace NonsensicalVideoGenerator
                 {
                     for(int y = 0; y < totalCount; y += tile.Height)
                     {
-                        spriteBatch.Draw(tile, new Rectangle(GlobalGraphics.Scale(x + scrollX), GlobalGraphics.Scale(y + scrollY), GlobalGraphics.Scale(tile.Width), GlobalGraphics.Scale(tile.Height)),  ThemeManager.GetColor("TileBackgroundScreen"));
+                        spriteBatch.Draw(tile, new Rectangle(GlobalGraphics.Scale(x + scrollX), GlobalGraphics.Scale(y + scrollY), GlobalGraphics.Scale(tile.Width), GlobalGraphics.Scale(tile.Height)), ThemeManager.GetColor("TileBackgroundScreen"));
                     }
                 }
                 // (DEBUG) Draw scroll position.

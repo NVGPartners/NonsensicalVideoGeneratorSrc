@@ -11,6 +11,7 @@ namespace NonsensicalVideoGenerator
         Effects,
         Options,
         Game,
+        Blog,
     }
     public static class DiscordRPC
     {
@@ -23,16 +24,18 @@ namespace NonsensicalVideoGenerator
         {
             switch(name)
             {
-                case "Generate":
+                case "PageGenerate":
                     return Tab.Generate;
-                case "Library":
+                case "PageLibrary":
                     return Tab.Library;
-                case "Addons":
+                case "PageAddons":
                     return Tab.Effects;
-                case "Options":
+                case "PageOptions":
                     return Tab.Options;
-                case "Game":
+                case "PageGame":
                     return Tab.Game;
+                case "PageBlog":
+                    return Tab.Blog;
                 default:
                     return Tab.Generate;
             }
@@ -111,6 +114,10 @@ namespace NonsensicalVideoGenerator
                     case Tab.Game:
                         presence.Assets.SmallImageKey = "game";
                         presence.Assets.SmallImageText = "Game Tab";
+                        break;
+                    case Tab.Blog:
+                        presence.Assets.SmallImageKey = "blog";
+                        presence.Assets.SmallImageText = "Blog Tab";
                         break;
                 }
                 client.SetPresence(presence);

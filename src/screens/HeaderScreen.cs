@@ -161,9 +161,12 @@ namespace NonsensicalVideoGenerator
                 // measure to center horizontally (one on top of the other)
                 Vector2 renderingSize = font.MeasureString(rendering);
                 Vector2 progressSize = font.MeasureString(Global.generator.progressText != "" ? Global.generator.progressText : (Global.generator.failureReason != "" ? Global.generator.failureReason : Global.generator.progress + "%"));
-                spriteBatch.DrawString(font, rendering, new Vector2(GlobalGraphics.Scale(320/2) - renderingSize.X/2 + GlobalGraphics.Scale(1), GlobalGraphics.Scale(8 + 1)), Color.Black);
+                if(Pagination.DrawnPage != Pagination.GetPageCount() - 3)
+                {
+                    spriteBatch.DrawString(font, rendering, new Vector2(GlobalGraphics.Scale(320/2) - renderingSize.X/2 + GlobalGraphics.Scale(1), GlobalGraphics.Scale(8 + 1)), Color.Black);
+                    spriteBatch.DrawString(font, rendering, new Vector2(GlobalGraphics.Scale(320/2) - renderingSize.X/2, GlobalGraphics.Scale(8)), Color.White);
+                }
                 spriteBatch.DrawString(font, Global.generator.progressText, new Vector2(GlobalGraphics.Scale(320/2) - progressSize.X/2 + GlobalGraphics.Scale(1), GlobalGraphics.Scale(8 + 1) + renderingSize.Y), Color.Black);
-                spriteBatch.DrawString(font, rendering, new Vector2(GlobalGraphics.Scale(320/2) - renderingSize.X/2, GlobalGraphics.Scale(8)), Color.White);
                 spriteBatch.DrawString(font, Global.generator.progressText, new Vector2(GlobalGraphics.Scale(320/2) - progressSize.X/2, GlobalGraphics.Scale(8) + renderingSize.Y), Color.White);
             }
             // End offset spritebatch
@@ -283,7 +286,8 @@ namespace NonsensicalVideoGenerator
                                 GlobalContent.GetSound("Prompt").Play(int.Parse(SaveData.saveValues["SoundEffectVolume"], System.Globalization.CultureInfo.InvariantCulture) / 100f, 0f, 0f);
                             }
                             // Seed random generator
-                            Global.generator.globalRandom = new Random(Global.generator.globalRandom.Next());
+                            Global.randomSeed = Global.generator.globalRandom.Next();
+                            Global.generator.globalRandom = new Random(Global.randomSeed);
                         }
                         else
                         {
@@ -303,12 +307,27 @@ namespace NonsensicalVideoGenerator
                                 ScreenManager.GetScreen<ContentScreen>("Content")?.Show();
                                 ScreenManager.GetScreen<ContentScreen>("Content").offset = new Vector2(0, 0);
                                 ScreenManager.GetScreen<ContentScreen>("Content").layer = 999;
+                                ScreenManager.GetScreen<VideoScreen>("Video")?.Hide();
+                                ScreenManager.GetScreen<VideoScreen>("Video").offset = new Vector2(GlobalGraphics.Scale(-124), 0);
+                                ScreenManager.GetScreen<SocialScreen>("Socials")?.Hide();
+                                ScreenManager.GetScreen<SocialScreen>("Socials").offset = new Vector2(0, GlobalGraphics.Scale(240));
+                                ScreenManager.GetScreen<MenuScreen>("Menu")?.Hide();
+                                ScreenManager.GetScreen<MenuScreen>("Menu").offset = new Vector2(GlobalGraphics.Scale(-124), 0);
                             }
                             else
                             {
                                 GlobalContent.GetSound("Back").Play(int.Parse(SaveData.saveValues["SoundEffectVolume"], System.Globalization.CultureInfo.InvariantCulture) / 100f, 0f, 0f);
                                 Pagination.SetPage(0);
+                                ScreenManager.PushNavigation("Content");
+                                ScreenManager.GetScreen<ContentScreen>("Content").Show();
+                                ScreenManager.GetScreen<ContentScreen>("Content").offset = new Vector2(0, 0);
                                 ScreenManager.GetScreen<ContentScreen>("Content").layer = 3;
+                                ScreenManager.PushNavigation("Socials");
+                                ScreenManager.GetScreen<SocialScreen>("Socials")?.Show();
+                                ScreenManager.GetScreen<SocialScreen>("Socials").offset = new Vector2(0, 0);
+                                ScreenManager.PushNavigation("Menu");
+                                ScreenManager.GetScreen<MenuScreen>("Menu")?.Show();
+                                ScreenManager.GetScreen<MenuScreen>("Menu").offset = new Vector2(0, 0);
                             }
                             return true;
                         }

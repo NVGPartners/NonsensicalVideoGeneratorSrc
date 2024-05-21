@@ -10,7 +10,7 @@ namespace NonsensicalVideoGenerator
     /// </summary>
     public class ExitPage : IPage
     {
-        public string Name { get; set; } = "Blog";
+        public string Name { get; set; } = "PageBlog";
         public string Tooltip { get; } = "Check out what's new!";
         private readonly InteractableController controller = new();
         public bool Update(GameTime gameTime, bool handleInput)

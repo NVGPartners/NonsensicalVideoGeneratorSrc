@@ -1,19 +1,22 @@
-function Query()
+function Query(localeName, localizationTokens)
+    local localizedOption1 = localizationTokens["Addons:StockDSPOption1"] or "DSP"
+    local localizedOption2 = localizationTokens["Addons:StockDSPOption2"] or "Applies vibrato or chorus audio effects."
+    local localizedOption3 = localizationTokens["Addons:StockDSPOption3"] or "Out of 100, chance for which type to apply."
     return {
         ["settings"] = {
             {
                 ["name"] = "Display Name",
-                ["value"] = "DSP",
+                ["value"] = localizedOption1,
                 ["type"] = "label",
             },
             {
                 ["name"] = "Description",
-                ["value"] = "Applies vibrato or chorus audio effects.",
+                ["value"] = localizedOption2,
                 ["type"] = "label",
             },
             {
                 ["name"] = "Chance Roll",
-                ["tooltip"] = "Out of 100, chance for which type to apply.",
+                ["tooltip"] = localizedOption3,
                 ["value"] = "50",
                 ["type"] = "int",
             },

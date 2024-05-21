@@ -1,43 +1,50 @@
-function Query()
+function Query(localeName, localizationTokens)
+    local localizedOption1 = localizationTokens["Addons:StockDanceOption1"] or "Dance"
+    local localizedOption2 = localizationTokens["Addons:StockDanceOption2"] or "Repeating forward-reverse with music."
+    local localizedOption3 = localizationTokens["Addons:StockDanceOption3"] or "Out of 100, where the video will have no music."
+    local localizedOption4 = localizationTokens["Addons:StockDanceOption4"] or "The minimum amount of time for each segment."
+    local localizedOption5 = localizationTokens["Addons:StockDanceOption5"] or "The maximum amount of time for each segment."
+    local localizedOption6 = localizationTokens["Addons:StockDanceOption6"] or "The minimum amount of time to seek music."
+    local localizedOption7 = localizationTokens["Addons:StockDanceOption7"] or "The maximum amount of time to seek music."
     return {
         ["settings"] = {
             {
                 ["name"] = "Display Name",
-                ["value"] = "Dance",
+                ["value"] = localizedOption1,
                 ["type"] = "label",
             },
             {
                 ["name"] = "Description",
-                ["value"] = "Repeating forward-reverse with music.",
+                ["value"] = localizedOption2,
                 ["type"] = "label",
             },
             {
                 ["name"] = "No Music Chance",
-                ["tooltip"] = "Out of 100, where the video will have no music.",
+                ["tooltip"] = localizedOption3,
                 ["value"] = "25",
                 ["type"] = "int",
             },
             {
                 ["name"] = "Segment Min",
-                ["tooltip"] = "The minimum amount of time for each segment.",
+                ["tooltip"] = localizedOption4,
                 ["value"] = "0.15",
                 ["type"] = "float",
             },
             {
                 ["name"] = "Segment Max",
-                ["tooltip"] = "The maximum amount of time for each segment.",
+                ["tooltip"] = localizedOption5,
                 ["value"] = "0.2",
                 ["type"] = "float",
             },
             {
                 ["name"] = "Music Seek Start",
-                ["tooltip"] = "The minimum amount of time to seek music.",
+                ["tooltip"] = localizedOption6,
                 ["value"] = "1",
                 ["type"] = "float",
             },
             {
                 ["name"] = "Music Seek End",
-                ["tooltip"] = "The maximum amount of time to seek music.",
+                ["tooltip"] = localizedOption7,
                 ["value"] = "5",
                 ["type"] = "float",
             },

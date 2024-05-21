@@ -87,12 +87,20 @@ namespace NonsensicalVideoGenerator
             spriteBatch.Draw(switchGraphic, new Rectangle(GlobalGraphics.Scale(bounds.X), GlobalGraphics.Scale(bounds.Y), GlobalGraphics.Scale(switchGraphic.Width), GlobalGraphics.Scale(switchGraphic.Height)), Color.White);
             spriteBatch.Draw(SwitchState ? onGraphic : offGraphic, new Rectangle(GlobalGraphics.Scale(bounds.X + 4), GlobalGraphics.Scale(bounds.Y + 3), GlobalGraphics.Scale(SwitchState ? onGraphic.Width : offGraphic.Width), GlobalGraphics.Scale(SwitchState ? onGraphic.Height : offGraphic.Height)), Color.White);
             // Text & shadow
-            spriteBatch.DrawString(L.FontLarge(), L.T(0, "Interactable:"+internalName+"Title"), new Vector2(GlobalGraphics.Scale(bounds.X + 29 + 1), GlobalGraphics.Scale(bounds.Y + 2 + 1)), Color.Black);
-            spriteBatch.DrawString(L.FontLarge(), L.T(0, "Interactable:"+internalName+"Title"), new Vector2(GlobalGraphics.Scale(bounds.X + 29), GlobalGraphics.Scale(bounds.Y + 2)), Color.White);
+            string localizedTitle;
+            if(internalName.StartsWith("NoLocalization:"))
+                localizedTitle = Name;
+            else
+                localizedTitle = L.T(0, "Interactable:"+internalName+"Title");
+            spriteBatch.DrawString(L.FontLarge(), localizedTitle, new Vector2(GlobalGraphics.Scale(bounds.X + 29 + 1), GlobalGraphics.Scale(bounds.Y + 2 + 1)), Color.Black);
+            spriteBatch.DrawString(L.FontLarge(), localizedTitle, new Vector2(GlobalGraphics.Scale(bounds.X + 29), GlobalGraphics.Scale(bounds.Y + 2)), Color.White);
             // If hovering, draw tooltip
             if (State >= 1 && Tooltip != "")
             {
-                Global.tooltip = L.T(0, "Interactable:"+internalName+"Tooltip");
+                if(internalName.StartsWith("NoLocalization:"))
+                    Global.tooltip = Tooltip;
+                else
+                    Global.tooltip = L.T(0, "Interactable:"+internalName+"Tooltip");
             }
         }
         public void LoadContent(ContentManager contentManager, GraphicsDevice graphicsDevice, string internalName)

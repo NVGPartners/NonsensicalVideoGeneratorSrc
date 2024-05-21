@@ -321,8 +321,7 @@ namespace NonsensicalVideoGenerator
             if(file.Type != DefaultLibraryTypes.Render)
             {
                 string achievement = "ACHIEVEMENT_LIBRARY_IMPORT";
-                ConsoleOutput.WriteLine("Awarding achievement: "+achievement, Color.LightBlue);
-                SteamUserStats.SetAchievement(achievement);
+                Achievements.Award(achievement);
                 SaveData.saveValues["TotalMediaImported"] = (int.Parse(SaveData.saveValues["TotalMediaImported"], CultureInfo.InvariantCulture) + 1).ToString(CultureInfo.InvariantCulture);
                 SaveData.Save();
             }
@@ -695,8 +694,7 @@ namespace NonsensicalVideoGenerator
                 if(key != DefaultLibraryTypes.Render)
                 {
                     string achievement = "ACHIEVEMENT_LIBRARY_IMPORT";
-                    ConsoleOutput.WriteLine("Awarding achievement: "+achievement, Color.LightBlue);
-                    SteamUserStats.SetAchievement(achievement);
+                    Achievements.Award(achievement);
                     SaveData.saveValues["TotalMediaImported"] = (int.Parse(SaveData.saveValues["TotalMediaImported"], CultureInfo.InvariantCulture) + 1).ToString(CultureInfo.InvariantCulture);
                     SaveData.Save();
                 }

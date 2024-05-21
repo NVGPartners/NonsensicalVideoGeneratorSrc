@@ -86,6 +86,8 @@ namespace NonsensicalVideoGenerator
             {"ObstaclePastimeGameScreen", Color.Black},
             {"BackgroundScreen", new Color(64, 64, 64, 255)},
             {"TileBackgroundScreen", new Color(102, 102, 102, 255)},
+            {"VideoPlayerProgressBar", new Color(255, 0, 0, 255)},
+            {"VideoPlayerProgressBarBackground", new Color(0, 0, 0, 0)},
         }, true);
         public static List<Theme> themes = new List<Theme>()
         {

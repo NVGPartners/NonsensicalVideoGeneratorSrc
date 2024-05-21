@@ -39,6 +39,7 @@
     <PackageReference Include="System.Speech" Version="7.0.0" />
     <PackageReference Include="WindowsAPICodePack-Core" Version="1.1.2" />
     <PackageReference Include="WindowsAPICodePack-Shell" Version="1.1.1" />
+    <PackageReference Include="SharpCompress" Version="0.37.2" />
   </ItemGroup>
   <ItemGroup>
     <Reference Include="Steamworks.NET">
@@ -58,6 +59,10 @@
     <BaseTemplates Include="$(ProjectDir)basetemplates\**\*.*" />
     <BaseHTML Include="$(ProjectDir)basehtml\**\*.*" />
     <BaseLocales Include="$(ProjectDir)baselocales\**\*.*" />
+    <BaseRoot Include="$(ProjectDir)baseroot\**\*.*" />
+    <BaseLayerGraphics Include="$(ProjectDir)content\graphics\**\*.*" />
+    <BaseLayerMusic Include="$(ProjectDir)basemusic\**\*.*" />
+    <BaseLayerSound Include="$(ProjectDir)content\sound\**\*.*" />
  	</ItemGroup>
 	<Target Name="CopyPlugins" AfterTargets="Build">
 		<MakeDir Directories="$(ProjectDir)bin\x64\Release\net6.0-windows\plugins" />
@@ -78,6 +83,14 @@
     <Copy SourceFiles="@(BaseTemplates)" DestinationFiles="$(ProjectDir)bin\x64\Debug\net6.0-windows\templates\%(RecursiveDir)%(Filename)%(Extension)" />
     <Copy SourceFiles="@(BaseLocales)" DestinationFiles="$(ProjectDir)bin\x64\Release\net6.0-windows\locales\%(RecursiveDir)%(Filename)%(Extension)" />
     <Copy SourceFiles="@(BaseLocales)" DestinationFiles="$(ProjectDir)bin\x64\Debug\net6.0-windows\locales\%(RecursiveDir)%(Filename)%(Extension)" />
+    <Copy SourceFiles="@(BaseRoot)" DestinationFiles="$(ProjectDir)bin\x64\Release\net6.0-windows\%(RecursiveDir)%(Filename)%(Extension)" />
+    <Copy SourceFiles="@(BaseRoot)" DestinationFiles="$(ProjectDir)bin\x64\Debug\net6.0-windows\%(RecursiveDir)%(Filename)%(Extension)" />
+    <Copy SourceFiles="@(BaseLayerGraphics)" DestinationFiles="$(ProjectDir)bin\x64\Release\net6.0-windows\templates\defaultlayer\graphics\%(RecursiveDir)%(Filename)%(Extension)" />
+    <Copy SourceFiles="@(BaseLayerGraphics)" DestinationFiles="$(ProjectDir)bin\x64\Debug\net6.0-windows\templates\defaultlayer\graphics\%(RecursiveDir)%(Filename)%(Extension)" />
+    <Copy SourceFiles="@(BaseLayerMusic)" DestinationFiles="$(ProjectDir)bin\x64\Release\net6.0-windows\templates\defaultlayer\music\%(RecursiveDir)%(Filename)%(Extension)" />
+    <Copy SourceFiles="@(BaseLayerMusic)" DestinationFiles="$(ProjectDir)bin\x64\Debug\net6.0-windows\templates\defaultlayer\music\%(RecursiveDir)%(Filename)%(Extension)" />
+    <Copy SourceFiles="@(BaseLayerSound)" DestinationFiles="$(ProjectDir)bin\x64\Release\net6.0-windows\templates\defaultlayer\sound\%(RecursiveDir)%(Filename)%(Extension)" />
+    <Copy SourceFiles="@(BaseLayerSound)" DestinationFiles="$(ProjectDir)bin\x64\Debug\net6.0-windows\templates\defaultlayer\sound\%(RecursiveDir)%(Filename)%(Extension)" />
     <!-- .\packages\Steamworks.NET\steam_api64.dll -->
     <Copy SourceFiles=".\packages\Steamworks.NET\steam_api64.dll" DestinationFiles="$(ProjectDir)bin\x64\Release\net6.0-windows\steam_api64.dll" />
     <Copy SourceFiles=".\packages\Steamworks.NET\steam_api64.dll" DestinationFiles="$(ProjectDir)bin\x64\Debug\net6.0-windows\steam_api64.dll" />

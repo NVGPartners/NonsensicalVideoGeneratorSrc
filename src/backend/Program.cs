@@ -1,5 +1,8 @@
 using System;
+using System.IO;
 using System.Linq;
+using System.Reflection;
+using Microsoft.Xna.Framework;
 #if !MONOGAME
 using System.Windows.Forms;
 #endif
@@ -11,6 +14,8 @@ namespace NonsensicalVideoGenerator
         [STAThread]
         static void Main(string[] args)
         {
+            Global.randomSeed = Global.generator.globalRandom.Next();
+            Global.generator.globalRandom = new Random(Global.randomSeed);
             ConsoleOutput.Clear();
             SaveData.Load();
             DisabledMedia.Load();
@@ -21,9 +26,10 @@ namespace NonsensicalVideoGenerator
             if(Global.parameters.Count > 0)
                 ConsoleOutput.WriteLine("Using command line parameters: " + String.Join(" ", Global.parameters.ToArray()));
 #if DEBUG
+            Debug.debugBuild = true;
             Debug.SetDebugMode(true);
 #endif
-            string? locale = null;
+            string locale = SaveData.saveValues["Locale"];
             if(Global.parameters.Contains("-lang"))
             {
                 int index = Global.parameters.IndexOf("-lang");
@@ -33,6 +39,8 @@ namespace NonsensicalVideoGenerator
                 }
             }
             L.LoadLocale(locale);
+            if(Global.parameters.Contains("-intro"))
+                SaveData.saveValues["FirstBoot"] = "true";
 #if MONOGAME
             using (var game = new UserInterface())
                 game.Run();

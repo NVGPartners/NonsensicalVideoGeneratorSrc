@@ -47,9 +47,14 @@ namespace NonsensicalVideoGenerator
         {
             // Text & shadow, that's it
             SpriteFont drawFont = L.FontLarge();
+            string localizedTitle;
+            if(internalName.StartsWith("NoLocalization:"))
+                localizedTitle = Name;
+            else
+                localizedTitle = L.T(0, "Interactable:"+internalName+"Title");
             if(UseShadow)
-                spriteBatch.DrawString(drawFont, L.T(0, "Interactable:"+internalName+"Title"), new Vector2(GlobalGraphics.Scale(Position.X + 1), GlobalGraphics.Scale(Position.Y - 3 + 1)), ShadowColor);
-            spriteBatch.DrawString(drawFont, L.T(0, "Interactable:"+internalName+"Title"), new Vector2(GlobalGraphics.Scale(Position.X), GlobalGraphics.Scale(Position.Y-3)), TextColor);
+                spriteBatch.DrawString(drawFont, localizedTitle, new Vector2(GlobalGraphics.Scale(Position.X + 1), GlobalGraphics.Scale(Position.Y - 3 + 1)), ShadowColor);
+            spriteBatch.DrawString(drawFont, localizedTitle, new Vector2(GlobalGraphics.Scale(Position.X), GlobalGraphics.Scale(Position.Y-3)), TextColor);
         }
         public void LoadContent(ContentManager contentManager, GraphicsDevice graphicsDevice, string internalName)
         {

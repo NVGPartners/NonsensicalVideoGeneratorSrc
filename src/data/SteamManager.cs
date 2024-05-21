@@ -27,16 +27,12 @@ namespace NonsensicalVideoGenerator
                     bool drm = SteamAPI.RestartAppIfNecessary(Global.appId);
                     if (drm)
                     {
-#if MONOGAME
                         if(UserInterface.instance != null)
                             UserInterface.instance.Exit();
-#else
-                        Environment.Exit(0);
-#endif
                         return;
                     }
                 }
-                catch (System.DllNotFoundException e)
+                catch (DllNotFoundException e)
                 {
                     // We catch this exception here, as it will be the first occurrence of it.
                     ConsoleOutput.WriteLine("[Steamworks.NET] Could not load [lib]steam_api.dll/so/dylib. It's likely not in the correct location. Refer to the README for more details.");
@@ -78,7 +74,7 @@ namespace NonsensicalVideoGenerator
             {
                 SteamAPI.Shutdown();
             }
-            catch (System.Exception e)
+            catch (Exception e)
             {
                 ConsoleOutput.WriteLine("[Steamworks.NET] Could not shutdown SteamAPI: " + e.ToString());
             }
