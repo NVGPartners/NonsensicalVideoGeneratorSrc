@@ -10,6 +10,7 @@ using System.Diagnostics;
 using System.IO;
 using System.Text;
 using System.Windows.Forms;
+using System.Globalization;
 
 namespace NonsensicalVideoGenerator
 {
@@ -33,6 +34,7 @@ namespace NonsensicalVideoGenerator
         private int _musicActive = 0;
         private int music;
         private bool alreadyPlayedFirstSong = false;
+        public Vector2 preferredResolution = new(320, 240);
         public UserInterface()
         {
             ConsoleOutput.WriteLine("Creating new UserInterface instance...", Color.Transparent);
@@ -46,6 +48,7 @@ namespace NonsensicalVideoGenerator
             _graphics.PreferredBackBufferWidth = width;
             _graphics.PreferredBackBufferHeight = height;
             _graphics.ApplyChanges();
+            preferredResolution = new Vector2(width, height);
         }
         // Drag and drop support.
         private void DragEnter(object? sender, DragEventArgs e)
@@ -98,10 +101,10 @@ namespace NonsensicalVideoGenerator
             GraphicsDevice.SamplerStates[0] = SamplerState.PointClamp;
             // Set screen resolution.
             ConsoleOutput.WriteLine("Setting screen resolution...", Color.Transparent);
-            int scale = int.Parse(SaveData.saveValues["ScreenScale"], System.Globalization.CultureInfo.InvariantCulture);
+            int scale = int.Parse(SaveData.saveValues["ScreenScale"], CultureInfo.InvariantCulture);
             Resize(
-                int.Parse(SaveData.saveValues["ScreenWidth"], System.Globalization.CultureInfo.InvariantCulture) * scale,
-                int.Parse(SaveData.saveValues["ScreenHeight"], System.Globalization.CultureInfo.InvariantCulture) * scale
+                int.Parse(SaveData.saveValues["ScreenWidth"], CultureInfo.InvariantCulture) * scale,
+                int.Parse(SaveData.saveValues["ScreenHeight"], CultureInfo.InvariantCulture) * scale
             );
             ConsoleOutput.WriteLine("Screen resolution set.", Color.Transparent);
             ScreenManager.LoadScreens();
@@ -210,7 +213,7 @@ namespace NonsensicalVideoGenerator
                     if((SaveData.saveValues["MuteMusicWhileTabbedOut"] == "true" ? _windowState == WindowState.Focused : true) && _musicState == MusicState.Playing && FramePlayer.canPlayBgMusic)
                     {
                         // Fade in music.
-                        float vol = int.Parse(SaveData.saveValues["MusicVolume"], System.Globalization.CultureInfo.InvariantCulture) / 100f;
+                        float vol = int.Parse(SaveData.saveValues["MusicVolume"], CultureInfo.InvariantCulture) / 100f;
                         if(MediaPlayer.Volume < vol)
                             MediaPlayer.Volume += 0.1f;
                         // Clamp music if it's over the volume level.
@@ -261,8 +264,17 @@ namespace NonsensicalVideoGenerator
                 _spriteBatch.Begin(SpriteSortMode.Deferred,
                     BlendState.AlphaBlend,
                     SamplerState.PointClamp,
-                    null, null, null, null);
+                    null, null, null, Matrix.CreateTranslation(GlobalGraphics.Scale(Global.drawOffset.X), GlobalGraphics.Scale(Global.drawOffset.Y), 0));
                 ScreenManager.Draw(gameTime, _spriteBatch);
+                // Debug pause indicator
+                if(Debug.paused)
+                {
+                    SpriteFont font = L.FontLarge();
+                    string debugPaused = "Debug Paused";
+                    Vector2 debugPausedSize = font.MeasureString(debugPaused);
+                    _spriteBatch.DrawString(font, debugPaused, new Vector2(_graphics.PreferredBackBufferWidth-GlobalGraphics.Scale(8-1)-debugPausedSize.X, GlobalGraphics.Scale(8+1)), Color.Black);
+                    _spriteBatch.DrawString(font, debugPaused, new Vector2(_graphics.PreferredBackBufferWidth-GlobalGraphics.Scale(8)-debugPausedSize.X, GlobalGraphics.Scale(8)), ThemeManager.GetColor("VideoPlayerProgressBar"));
+                }
                 _spriteBatch.End();
             }
             base.Draw(gameTime);
@@ -276,7 +288,7 @@ namespace NonsensicalVideoGenerator
                 // Exit page is always the last
                 Global.exitOpacityIncrease = 0.0075f;
                 Global.fakeExit = false;
-                GlobalContent.GetSound("Quit").Play(int.Parse(SaveData.saveValues["SoundEffectVolume"], System.Globalization.CultureInfo.InvariantCulture) / 100f, 0f, 0f);
+                GlobalContent.GetSound("Quit").Play(int.Parse(SaveData.saveValues["SoundEffectVolume"], CultureInfo.InvariantCulture) / 100f, 0f, 0f);
                 //ScreenManager.GetScreen<MenuScreen>("Menu")?.Hide();
                 //if(FramePlayer.audio != null)
                 //    ScreenManager.GetScreen<VideoScreen>("Video")?.Hide();

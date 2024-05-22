@@ -187,7 +187,7 @@ namespace NonsensicalVideoGenerator
             spriteBatch.Begin(SpriteSortMode.Deferred,
                 BlendState.AlphaBlend,
                 SamplerState.PointClamp,
-                null, null, null, null);
+                null, null, null, Matrix.CreateTranslation(GlobalGraphics.Scale(Global.drawOffset.X), GlobalGraphics.Scale(Global.drawOffset.Y), 0));
             if(tooltip != "")
             {
                 Global.tooltip = tooltip;

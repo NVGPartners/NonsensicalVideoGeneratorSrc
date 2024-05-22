@@ -118,11 +118,21 @@ namespace NonsensicalVideoGenerator
                     }
                     if(FramePlayer.audio != null)
                     {
-                        FramePlayer.audio.Stop();
-                        FramePlayer.currentAudioTime = 0;
-                        FramePlayer.audioPlaying = false;
-                        FramePlayer.canPlayBgMusic = true;
-                        Global.generator.progressText = L.T(0, "Video:StatusStop");
+                        if(FramePlayer.audioPlaying || FramePlayer.playing)
+                        {
+                            FramePlayer.audio.Stop();
+                            FramePlayer.currentAudioTime = 0;
+                            FramePlayer.audioPlaying = false;
+                            FramePlayer.canPlayBgMusic = true;
+                            Global.generator.progressText = L.T(0, "Video:StatusStop");
+                        }
+                        else
+                        {
+                            FramePlayer.audio.Play();
+                            FramePlayer.audioPlaying = true;
+                            FramePlayer.canPlayBgMusic = false;
+                            Global.generator.progressText = L.T(0, "Video:StatusPlay");
+                        }
                         GlobalContent.GetSound("Option").Play(int.Parse(SaveData.saveValues["SoundEffectVolume"], System.Globalization.CultureInfo.InvariantCulture) / 100f, 0f, 0f);
                     }
                     else
@@ -150,7 +160,7 @@ namespace NonsensicalVideoGenerator
                             }
                             if(FramePlayer.audio != null)
                             {
-                                if(FramePlayer.audioPlaying)
+                                if(FramePlayer.audioPlaying || FramePlayer.playing)
                                 {
                                     FramePlayer.audio.Stop();
                                     FramePlayer.currentAudioTime = 0;
@@ -217,7 +227,7 @@ namespace NonsensicalVideoGenerator
             // End existing spritebatch
             spriteBatch.End();
             // Use offset
-            spriteBatch.Begin(SpriteSortMode.Deferred, BlendState.AlphaBlend, SamplerState.PointClamp, null, null, null, Matrix.CreateTranslation(offset.X, offset.Y, 0));
+            spriteBatch.Begin(SpriteSortMode.Deferred, BlendState.AlphaBlend, SamplerState.PointClamp, null, null, null, Matrix.CreateTranslation(GlobalGraphics.Scale(Global.drawOffset.X)+offset.X, GlobalGraphics.Scale(Global.drawOffset.Y)+offset.Y, 0));
             Texture2D vidwindow = GlobalContent.GetTexture("VidWindow");
             Texture2D vidbg = GlobalContent.GetTexture("VidBG");
             spriteBatch.Draw(vidbg, new Rectangle(GlobalGraphics.Scale(0), GlobalGraphics.Scale(43), GlobalGraphics.Scale(104), GlobalGraphics.Scale(78)), Color.White);
@@ -257,7 +267,7 @@ namespace NonsensicalVideoGenerator
             spriteBatch.Begin(SpriteSortMode.Deferred,
                 BlendState.AlphaBlend,
                 SamplerState.PointClamp,
-                null, null, null, null);
+                null, null, null, Matrix.CreateTranslation(GlobalGraphics.Scale(Global.drawOffset.X), GlobalGraphics.Scale(Global.drawOffset.Y), 0));
         }
         public void LoadContent(ContentManager contentManager, GraphicsDevice graphicsDevice)
         {

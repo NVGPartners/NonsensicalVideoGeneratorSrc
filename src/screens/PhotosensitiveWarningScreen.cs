@@ -149,7 +149,7 @@ namespace NonsensicalVideoGenerator
                 {
                     string text = warningText[i];
                     if(text != " ")
-                        text = L.T(0, text);
+                        text = text;
                     Vector2 textSize = fontMunro.MeasureString(text);
                     spriteBatch.DrawString(fontMunro, text, new Vector2(GlobalGraphics.scaledWidth / 2 - textSize.X / 2, GlobalGraphics.Scale(24 + i * 16)), Color.White);
                 }
@@ -340,9 +340,9 @@ namespace NonsensicalVideoGenerator
                         stats[1] != 1,
                         stats[2] != 1
                     };
-                    warningText[6] = plural[0] ? L.T(0, "Intro:StatsVideosRenderedNonPlural", stats[0].ToString(CultureInfo.InvariantCulture)) : L.T(0, "Intro:StatsVideosRendered", stats[0].ToString(CultureInfo.InvariantCulture));
-                    warningText[7] = plural[1] ? L.T(0, "Intro:StatsMediaImportsNonPlural", stats[1].ToString(CultureInfo.InvariantCulture)) : L.T(0, "Intro:StatsMediaImports", stats[1].ToString(CultureInfo.InvariantCulture));
-                    warningText[8] = plural[2] ? L.T(0, "Intro:StatsClipsTrimmedNonPlural", stats[2].ToString(CultureInfo.InvariantCulture)) : L.T(0, "Intro:StatsClipsTrimmed", stats[2].ToString(CultureInfo.InvariantCulture));
+                    warningText[6] = plural[0] ? L.T(0, "Intro:StatsVideosRendered", stats[0].ToString(CultureInfo.InvariantCulture)) : L.T(0, "Intro:StatsVideosRenderedNonPlural", stats[0].ToString(CultureInfo.InvariantCulture));
+                    warningText[7] = plural[1] ? L.T(0, "Intro:StatsMediaImports", stats[1].ToString(CultureInfo.InvariantCulture)) : L.T(0, "Intro:StatsMediaImportsNonPlural", stats[1].ToString(CultureInfo.InvariantCulture));
+                    warningText[8] = plural[2] ? L.T(0, "Intro:StatsClipsTrimmed", stats[2].ToString(CultureInfo.InvariantCulture)) : L.T(0, "Intro:StatsClipsTrimmedNonPlural", stats[2].ToString(CultureInfo.InvariantCulture));
                 }
             }
             else

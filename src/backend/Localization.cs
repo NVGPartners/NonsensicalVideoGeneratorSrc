@@ -34,16 +34,24 @@ namespace NonsensicalVideoGenerator
     /// </summary>
     public static class L
     {
-        public static List<Locale> locales = new List<Locale> {};
-        public static int localeIndex = -1; // set to 0 when locales are loaded.
-        public static Locale locale {
-            get => locales[localeIndex];
-            set => localeIndex = locales.IndexOf(value);
-        }
+        public static Locale dummyLocale = new Locale("dummy", "Dummy");
+        public static List<Locale> locales = new List<Locale> {
+            dummyLocale
+        };
+        public static int localeIndex = 0; // set when locales are loaded.
         public static string invalid { get; set; } = "[%1]";
         public static string defaultLocale { get; set; } = "en_us";
         public static string localeFolder { get; set; } = "locales";
         public static int maxVersion { get; set; } = 0;
+
+        public static Locale GetLocale()
+        {
+            if(locales.Count == 0)
+                return dummyLocale;
+            if (localeIndex < 0 || localeIndex >= locales.Count)
+                localeIndex = 0;
+            return locales[localeIndex];
+        }
 
         // String translation with optional %1, %2, etc. placeholders.
         public static string T(int version, string text, params string[] args)
@@ -54,16 +62,18 @@ namespace NonsensicalVideoGenerator
             {
                 if (version >= 0 && version <= maxVersion)
                 {
-                    if (locale.localizationTokens[version].ContainsKey(text))
+                    if (GetLocale().localizationTokens.Count > version
+                        && GetLocale().localizationTokens[version].ContainsKey(text))
                     {
-                        result = locale.localizationTokens[version][text];
+                        result = GetLocale().localizationTokens[version][text];
                     }
                 }
             }
             // Fall back to default locale if translation is missing.
-            if (result == text && localeIndex > 0)
+            if (result == text && locales.Count > 0)
             {
-                if (locales[0].localizationTokens[version].ContainsKey(text))
+                if (locales[0].localizationTokens.Count > version
+                    && locales[0].localizationTokens[version].ContainsKey(text))
                 {
                     result = locales[0].localizationTokens[version][text];
                 }
@@ -85,9 +95,9 @@ namespace NonsensicalVideoGenerator
         public static SpriteFont FontLarge()
         {
             // Fall back to default font if font is missing.
-            if (GlobalContent.CheckFont(locale.fontLarge))
+            if (GlobalContent.CheckFont(GetLocale().fontLarge))
             {
-                return GlobalContent.GetFont(locale.fontLarge);
+                return GlobalContent.GetFont(GetLocale().fontLarge);
             }
             return GlobalContent.GetFont("Munro");
         }
@@ -96,9 +106,9 @@ namespace NonsensicalVideoGenerator
         public static SpriteFont FontSmall()
         {
             // Fall back to default font if font is missing.
-            if (GlobalContent.CheckFont(locale.fontSmall))
+            if (GlobalContent.CheckFont(GetLocale().fontSmall))
             {
-                return GlobalContent.GetFont(locale.fontSmall);
+                return GlobalContent.GetFont(GetLocale().fontSmall);
             }
             return GlobalContent.GetFont("MunroSmall");
         }
@@ -122,12 +132,12 @@ namespace NonsensicalVideoGenerator
             SaveData.saveValues["Locale"] = name;
             SaveData.Save();
             // Check if locale is already loaded.
-            foreach (Locale l in locales)
+            for (int i = 0; i < locales.Count; i++)
             {
-                if (l.name == name)
+                if (locales[i].name == name)
                 {
-                    locale = l;
-                    ConsoleOutput.WriteLine($"Switched to locale {name}: {locale.localizedName}", Color.Green);
+                    localeIndex = i;
+                    ConsoleOutput.WriteLine($"Switched to locale {name}: {locales[i].localizedName}", Color.Green);
                     return;
                 }
             }
@@ -178,7 +188,7 @@ namespace NonsensicalVideoGenerator
                         tokenCount += version.Count;
                     }
                     locales.Add(new Locale(name, localizedName, localizationList, fontLarge, fontSmall));
-                    locale = locales[^1];
+                    localeIndex = locales.Count - 1;
                     ConsoleOutput.WriteLine($"Loaded {tokenCount} tokens for {name}: {localizedName}", Color.Green);
                 }
                 catch (Exception e)
@@ -190,7 +200,13 @@ namespace NonsensicalVideoGenerator
             {
                 ConsoleOutput.WriteLine($"Locale {name} not found.", Color.Yellow);
             }
-
+        }
+        public static void ReloadLocales()
+        {
+            string currentLocale = SaveData.saveValues["Locale"];
+            locales.Clear();
+            locales.Add(dummyLocale);
+            LoadLocale(currentLocale);
         }
     }
 }

@@ -30,11 +30,17 @@ namespace NonsensicalVideoGenerator
         }
         public virtual bool Update(GameTime gameTime, bool handleInput, string internalName)
         {
+            // Localize title
+            string localizedTitle;
+            if(internalName.StartsWith("NoLocalization:"))
+                localizedTitle = Name;
+            else
+                localizedTitle = L.T(0, "Interactable:"+internalName+"Title", PluginHandler.GetPluginListFilter());
             // Calculate bounds
-            textSize = (L.FontLarge().MeasureString(Name) / GlobalGraphics.scale) - new Vector2(GlobalGraphics.Scale(1), 0);
+            textSize = (L.FontLarge().MeasureString(localizedTitle) / GlobalGraphics.scale) - new Vector2(GlobalGraphics.Scale(1), 0);
             textPosition = new(Position.X - textSize.X / 2, Position.Y - textSize.Y / 2);
             bounds = new((int)textPosition.X-4, (int)textPosition.Y-4, (int)textSize.X+8, 15);
-            Rectangle scaledBounds = new((int)(bounds.X * GlobalGraphics.scale), (int)(bounds.Y * GlobalGraphics.scale), (int)(bounds.Width * GlobalGraphics.scale), (int)(bounds.Height * GlobalGraphics.scale));
+            Rectangle scaledBounds = new((int)(bounds.X * GlobalGraphics.scale), (int)(bounds.Y * GlobalGraphics.scale), (int)((bounds.Width + 3) * GlobalGraphics.scale), (int)(bounds.Height * GlobalGraphics.scale));
             if (handleInput)
             {
                 int mouseButton = 0;
@@ -64,7 +70,7 @@ namespace NonsensicalVideoGenerator
                 if (mouseButton > -1)
                 {
                     State = mouseButton;
-                    bool result = Callback(mouseButton, Name);
+                    bool result = Callback(mouseButton, internalName);
                     if (result)
                         return true;
                 }
@@ -89,7 +95,7 @@ namespace NonsensicalVideoGenerator
             if(internalName.StartsWith("NoLocalization:"))
                 localizedTitle = Name;
             else
-                localizedTitle = L.T(0, "Interactable:"+internalName+"Title");
+                localizedTitle = L.T(0, "Interactable:"+internalName+"Title", PluginHandler.GetPluginListFilter());
             spriteBatch.DrawString(L.FontLarge(), localizedTitle, new Vector2(GlobalGraphics.Scale(textPosition.X + 1), GlobalGraphics.Scale(textPosition.Y - 3 + 1)), Color.Black);
             spriteBatch.DrawString(L.FontLarge(), localizedTitle, new Vector2(GlobalGraphics.Scale(textPosition.X), GlobalGraphics.Scale(textPosition.Y-3)), Color.White);
             // If hovering, draw tooltip
@@ -98,7 +104,7 @@ namespace NonsensicalVideoGenerator
                 if(internalName.StartsWith("NoLocalization:"))
                     Global.tooltip = Tooltip;
                 else
-                    Global.tooltip = L.T(0, "Interactable:"+internalName+"Tooltip");
+                    Global.tooltip = L.T(0, "Interactable:"+internalName+"Tooltip", PluginHandler.GetPluginListFilter());
             }
         }
         public virtual void LoadContent(ContentManager contentManager, GraphicsDevice graphicsDevice, string internalName)

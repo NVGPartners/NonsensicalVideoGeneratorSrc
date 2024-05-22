@@ -358,8 +358,11 @@ namespace NonsensicalVideoGenerator
             int offset = 0;
             for (int i = 0; i < libraryTypes[currentRootType].Count; i++)
             {
-                spriteBatch.DrawString(munroSmall, libraryTypes[currentRootType][i], new Vector2(GlobalGraphics.Scale(139 + 1), GlobalGraphics.Scale(71 + offset + 13 * i + 1)), Color.Black);
-                spriteBatch.DrawString(munroSmall, libraryTypes[currentRootType][i], new Vector2(GlobalGraphics.Scale(139), GlobalGraphics.Scale(71 + offset + 13 * i)), Color.White);
+                string title = libraryTypes[currentRootType][i];
+                if(i < DefaultLibraryTypes.defaultCounts[currentRootType] || title == "No Images")
+                    title = L.T(0, "Library:" + title.Replace(" ", "")+"Title");
+                spriteBatch.DrawString(munroSmall, title, new Vector2(GlobalGraphics.Scale(139 + 1), GlobalGraphics.Scale(71 + offset + 13 * i + 1)), Color.Black);
+                spriteBatch.DrawString(munroSmall, title, new Vector2(GlobalGraphics.Scale(139), GlobalGraphics.Scale(71 + offset + 13 * i)), Color.White);
             }
             // Interactable
             controller.Draw(gameTime, spriteBatch);
@@ -1182,6 +1185,7 @@ namespace NonsensicalVideoGenerator
                                                 }, false));
                                             }
                                             // Activate mask
+                                            Global.mask.color = new Color(0, 0, 0, 128);
                                             Global.mask.Enable();
                                             organizing = true;
                                             GlobalContent.GetSound("Option").Play(int.Parse(SaveData.saveValues["SoundEffectVolume"], System.Globalization.CultureInfo.InvariantCulture) / 100f, 0f, 0f);

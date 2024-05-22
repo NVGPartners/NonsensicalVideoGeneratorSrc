@@ -3,12 +3,13 @@ using System.Collections.Generic;
 using System.Diagnostics;
 using System.Reflection;
 using Steamworks;
+using Microsoft.Xna.Framework;
 
 namespace NonsensicalVideoGenerator
 {
     /// <summary>
-    /// </summary>
     /// This class stores useful global variables and functions.
+    /// </summary>
     public static class Global
     {
         public static Assembly assembly = Assembly.GetExecutingAssembly();
@@ -51,5 +52,6 @@ namespace NonsensicalVideoGenerator
         public static bool imageLibraryAvailable = false;
         public static bool imageLibraryAvailableInternal = true;
         public static int randomSeed = 0;
+        public static Vector2 drawOffset = new(0, 0);
     }
 }

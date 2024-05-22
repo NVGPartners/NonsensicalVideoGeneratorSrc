@@ -480,7 +480,7 @@ namespace NonsensicalVideoGenerator
             // End existing spritebatch
             spriteBatch.End();
             // Use offset
-            spriteBatch.Begin(SpriteSortMode.Deferred, BlendState.AlphaBlend, SamplerState.PointClamp, null, null, null, Matrix.CreateTranslation(offset.X, offset.Y, 0));
+            spriteBatch.Begin(SpriteSortMode.Deferred, BlendState.AlphaBlend, SamplerState.PointClamp, null, null, null, Matrix.CreateTranslation(GlobalGraphics.Scale(Global.drawOffset.X)+offset.X, GlobalGraphics.Scale(Global.drawOffset.Y)+offset.Y, 0));
             // Flappy bird clone
             // Draw all obstacles
             foreach (PastimeGameObstacle obstacle in obstacles)
@@ -557,7 +557,7 @@ namespace NonsensicalVideoGenerator
             spriteBatch.Begin(SpriteSortMode.Deferred,
                 BlendState.AlphaBlend,
                 SamplerState.PointClamp,
-                null, null, null, null);
+                null, null, null, Matrix.CreateTranslation(GlobalGraphics.Scale(Global.drawOffset.X), GlobalGraphics.Scale(Global.drawOffset.Y), 0));
         }
         public void LoadContent(ContentManager contentManager, GraphicsDevice graphicsDevice)
         {
@@ -584,9 +584,11 @@ namespace NonsensicalVideoGenerator
                         credits.Add(key, newCredits[key]);
                     }
                     credits.Add("End", new List<string>());
-                    // Get first key
+                    // Get first key (after start key)
                     foreach (string key in credits.Keys)
                     {
+                        if(key == "Start")
+                            continue;
                         currentCreditKey = key;
                         break;
                     }

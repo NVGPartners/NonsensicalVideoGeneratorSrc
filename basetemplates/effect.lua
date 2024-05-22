@@ -1,11 +1,46 @@
--- Welcome to your very own %filename% custom addon!
+-- [[ Effect Template ]]
+    -- Welcome to your very own %filename% custom addon!
 
--- For more information on how to modify this file, please visit:
--- https://github.com/KiwifruitDev/NonsensicalVideoGenerator/wiki
+    -- For more information on how to modify this file, please visit:
+    -- https://github.com/KiwifruitDev/NonsensicalVideoGenerator/wiki
+
+    -- If you need help, feel free to join the NVG Discord server:
+    -- https://discord.gg/8ppmspR6Wh
+
+-- [[ Localization ]]
+    -- This table is used to store the localization for your addon.
+    -- The key is the locale name, and the value is a table containing the localization tokens.
+    -- If a locale is not found, it will default to "en_us".
+
+    -- Supporting multiple languages is not required, but the option is available if you wish to do so.
+
+    -- Please keep this format consistent to ensure community contributions are possible.
+    -- "Addons:Custom%filenameraw%Option1" - Replace "%filenameraw%" if you decide to change the filename.
+local customLocalization = {
+    ["en_us"] = {
+        ["Addons:Custom%filenameraw%Option1"] = "%prettyname%",
+        ["Addons:Custom%filenameraw%Option2"] = "This is %filename%.",
+        ["Addons:Custom%filenameraw%Option3"] = "This effect will perform a",
+        ["Addons:Custom%filenameraw%Option4"] = "speed up/down on the clip.",
+        ["Addons:Custom%filenameraw%Option5"] = "Out of 100, chance for which type to apply."
+    },
+}
 
 -- This function tells the program what to display in the menu
 -- alongside which user-customizable options to display.
-function Query()
+function Query(localeName, localizationTokens)
+    -- Get the localization table for the current locale.
+    -- Otherwise, default to en_us.
+    local localization = customLocalization[localeName] or addonLocalization["en_us"]
+
+    -- Community-contributed localization tokens are added, if available.
+    -- Please preserve localization in order to support multiple languages,
+    -- even if you don't plan on translating the addon yourself.
+    for k, v in pairs(localizationTokens) do
+        localization[k] = v
+    end
+
+    -- Return the queried settings.
     return {
         -- Set up settings for this addon.
         ["settings"] = {
@@ -23,26 +58,26 @@ function Query()
             -- "Display Name" is always hidden from the settings menu.
             {
                 ["name"] = "Display Name",
-                ["value"] = "%prettyname%",
+                ["value"] = localization["Addons:Custom%filenameraw%Option1"],
                 ["type"] = "label"
             },
             -- Description is what the user will see once entering the addon settings.
             -- This is also the default description when publishing to the Workshop.
             {
                 ["name"] = "Description",
-                ["value"] = "This is %filename%.",
+                ["value"] = localization["Addons:Custom%filenameraw%Option2"],
                 ["type"] = "label"
             },
             -- Labels can be used to display text to the user in the settings menu.
             -- They are not customizable.
             {
                 ["name"] = "Label1",
-                ["value"] = "This effect will perform a",
+                ["value"] = localization["Addons:Custom%filenameraw%Option3"],
                 ["type"] = "label"
             },
             {
                 ["name"] = "Label2",
-                ["value"] = "speed up/down on the clip.",
+                ["value"] = localization["Addons:Custom%filenameraw%Option4"],
                 ["type"] = "label"
             },
             -- Here is where we can add user-customizable options.
@@ -59,7 +94,7 @@ function Query()
             -- Tooltip will be displayed once the user hovers over the option.
             {
                 ["name"] = "Chance Roll",
-                ["tooltip"] = "Out of 100, chance for which type to apply.",
+                ["tooltip"] = localization["Addons:Custom%filenameraw%Option5"],
                 ["value"] = "50",
                 ["type"] = "int"
             }

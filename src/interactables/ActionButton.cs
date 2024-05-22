@@ -52,7 +52,7 @@ namespace NonsensicalVideoGenerator
                 if (mouseButton > -1)
                 {
                     State = mouseButton;
-                    bool result = Callback(mouseButton, Name);
+                    bool result = Callback(mouseButton, internalName);
                     if (result)
                         return true;
                 }

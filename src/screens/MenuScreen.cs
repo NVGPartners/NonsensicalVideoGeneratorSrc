@@ -93,7 +93,7 @@ namespace NonsensicalVideoGenerator
             // End existing spritebatch
             spriteBatch.End();
             // Use offset
-            spriteBatch.Begin(SpriteSortMode.Deferred, BlendState.AlphaBlend, SamplerState.PointClamp, null, null, null, Matrix.CreateTranslation(offset.X, offset.Y, 0));
+            spriteBatch.Begin(SpriteSortMode.Deferred, BlendState.AlphaBlend, SamplerState.PointClamp, null, null, null, Matrix.CreateTranslation(GlobalGraphics.Scale(Global.drawOffset.X)+offset.X, GlobalGraphics.Scale(Global.drawOffset.Y)+offset.Y, 0));
             // Menu Window
             Texture2D menuwindowbg = GlobalContent.GetTexture("MenuWindowBG");
             spriteBatch.Draw(menuwindowbg, new Rectangle(GlobalGraphics.Scale(0), GlobalGraphics.Scale(134), GlobalGraphics.Scale(menuwindowbg.Width), GlobalGraphics.Scale(menuwindowbg.Height)), Color.White);
@@ -122,9 +122,13 @@ namespace NonsensicalVideoGenerator
                 spriteBatch.DrawString(L.FontLarge(), name, new Vector2(GlobalGraphics.Scale(7), GlobalGraphics.Scale(136 + (pageOffset * i))), Color.White);
             }
             // If hovering, draw tooltip
-            if (hovering && !Global.exiting && name != "")
+            if (hovering && !Global.exiting)
             {
-                Global.tooltip = L.T(0, Pagination.GetPage(hoveringPage).Name.Replace("Page","")+":Tooltip");
+                name = Pagination.GetPage(hoveringPage).Name;
+                bool isPageName = name.StartsWith("Page");
+                name = name.Replace("Page","");
+                name = isPageName ? name+":Tooltip" : "Addons:Tooltip";
+                Global.tooltip = L.T(0, name);
             }
             // End offset spritebatch
             spriteBatch.End();
@@ -132,7 +136,7 @@ namespace NonsensicalVideoGenerator
             spriteBatch.Begin(SpriteSortMode.Deferred,
                 BlendState.AlphaBlend,
                 SamplerState.PointClamp,
-                null, null, null, null);
+                null, null, null, Matrix.CreateTranslation(GlobalGraphics.Scale(Global.drawOffset.X), GlobalGraphics.Scale(Global.drawOffset.Y), 0));
         }
         public bool Update(GameTime gameTime, bool handleInput)
         {

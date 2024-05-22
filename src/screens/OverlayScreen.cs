@@ -66,6 +66,13 @@ namespace NonsensicalVideoGenerator
         public bool Update(GameTime gameTime, bool handleInput)
         {
             tooltipVisible = handleInput;
+            ConsoleScreen? consoleScreen = ScreenManager.GetScreen<ConsoleScreen>("Console");
+            if(consoleScreen != null)
+            {
+                if(consoleScreen.offset.Y < GlobalGraphics.scaledHeight
+                    && consoleScreen.offset.Y > -1024)
+                    tooltipVisible = false;
+            }
             // Update the mask.
             if(Global.mask.Update(gameTime, handleInput))
                 return true;

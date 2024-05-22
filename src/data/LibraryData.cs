@@ -120,6 +120,13 @@ namespace NonsensicalVideoGenerator
     }
     public static class DefaultLibraryTypes
     {
+        public static Dictionary<LibraryRootType, int> defaultCounts = new()
+        {
+            { LibraryRootType.All, 13 },
+            { LibraryRootType.Video, 6 },
+            { LibraryRootType.Audio, 2 },
+            { LibraryRootType.Image, 0 },
+        };
         public static LibraryType All { get; } = new LibraryType(LibraryRootType.All, LibraryFileType.All, true);
         public static LibraryType Video { get; } = new LibraryType(LibraryRootType.Video, LibraryFileType.All, true);
         public static LibraryType Audio { get; } = new LibraryType(LibraryRootType.Audio, LibraryFileType.All, true);

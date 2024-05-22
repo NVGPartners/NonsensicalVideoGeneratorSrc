@@ -268,6 +268,11 @@ namespace NonsensicalVideoGenerator
                     }
                     Debug.debugSpeedDebounce = false;
                 }
+                // F9 will reload locales
+                if(keyboardState.IsKeyDown(Keys.F9) && lastKeyboardState.IsKeyUp(Keys.F9))
+                {
+                    L.ReloadLocales();
+                }
             }
             if(!Debug.paused)
                 Accessibility.PostUpdate(gameTime);

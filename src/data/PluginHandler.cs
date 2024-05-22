@@ -836,9 +836,9 @@ namespace NonsensicalVideoGenerator
                     {
                         // Argument 1: Current locale (L.locale.name)
                         // Argument 2: Table of localization tokens (L.locale.localizationTokens)
-                        string currentLocale = L.locale.name;
+                        string currentLocale = L.GetLocale().name;
                         Table localizationTokens = new(luaScript);
-                        foreach (Dictionary<string, string> version in L.locale.localizationTokens)
+                        foreach (Dictionary<string, string> version in L.GetLocale().localizationTokens)
                         {
                             foreach (KeyValuePair<string, string> pair in version)
                             {
@@ -1747,6 +1747,9 @@ namespace NonsensicalVideoGenerator
                 // Replace "effect" with filename in the file.
                 string fileContents = File.ReadAllText(pluginFile);
                 fileContents = fileContents.Replace("%filename%", filename + ".lua");
+                string camelCaseFileName = filename.Replace(" ", "").Replace("_", "").Replace("-", "").ToLower();
+                camelCaseFileName = camelCaseFileName.First().ToString().ToUpper() + camelCaseFileName.Substring(1);
+                fileContents = fileContents.Replace("%filenameraw%", camelCaseFileName);
                 fileContents = fileContents.Replace("%prettyname%", prettyname);
                 File.WriteAllText(pluginFile, fileContents);
                 file = pluginFile;

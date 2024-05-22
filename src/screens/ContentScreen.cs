@@ -123,7 +123,7 @@ namespace NonsensicalVideoGenerator
             // End existing spritebatch
             spriteBatch.End();
             // Use offset
-            spriteBatch.Begin(SpriteSortMode.Deferred, BlendState.AlphaBlend, SamplerState.PointClamp, null, null, null, Matrix.CreateTranslation(offset.X, offset.Y, 0));
+            spriteBatch.Begin(SpriteSortMode.Deferred, BlendState.AlphaBlend, SamplerState.PointClamp, null, null, null, Matrix.CreateTranslation(GlobalGraphics.Scale(Global.drawOffset.X)+offset.X, GlobalGraphics.Scale(Global.drawOffset.Y)+offset.Y, 0));
             if(Pagination.SelectedPage != Pagination.TopPageCount)
             {
                 // Main Window
@@ -146,7 +146,7 @@ namespace NonsensicalVideoGenerator
             spriteBatch.Begin(SpriteSortMode.Deferred,
                 BlendState.AlphaBlend,
                 SamplerState.PointClamp,
-                null, null, null, null);
+                null, null, null, Matrix.CreateTranslation(GlobalGraphics.Scale(Global.drawOffset.X), GlobalGraphics.Scale(Global.drawOffset.Y), 0));
         }
         public void LoadContent(ContentManager contentManager, GraphicsDevice graphicsDevice)
         {

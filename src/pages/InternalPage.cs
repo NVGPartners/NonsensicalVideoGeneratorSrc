@@ -28,7 +28,7 @@ namespace NonsensicalVideoGenerator
                 if(MouseInput.MouseState.Y >= GlobalGraphics.Scale(33) && MouseInput.MouseState.Y <= GlobalGraphics.Scale(33+6))
                 {
                     // Search for the next logical entry in locales/*.json
-                    string currentLocale = L.locale.name;
+                    string currentLocale = L.GetLocale().name;
                     string path = Path.Combine(Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location) ?? ".", L.localeFolder);
                     if(!File.Exists(Path.Combine(path, currentLocale + ".json")))
                         currentLocale = L.defaultLocale;
@@ -126,6 +126,23 @@ namespace NonsensicalVideoGenerator
                     GlobalContent.GetSound("Select").Play(int.Parse(SaveData.saveValues["SoundEffectVolume"], CultureInfo.InvariantCulture) / 100f, 0f, 0f);
                     return true;
                 }
+                if(MouseInput.MouseState.Y >= GlobalGraphics.Scale(33+(9*7)) && MouseInput.MouseState.Y <= GlobalGraphics.Scale(33+(9*7)+6))
+                {
+                    // Set draw offset X to 53 and resize to 427x240 (wide screen).
+                    // If draw offset X is already 53, set it to 0 and resize to 320x240 (standard screen).
+                    if(Global.drawOffset.X == 0)
+                    {
+                        Global.drawOffset = new Vector2(53, 0);
+                        UserInterface.instance.Resize(GlobalGraphics.Scale(427), GlobalGraphics.Scale(240));
+                    }
+                    else
+                    {
+                        Global.drawOffset = new Vector2(0, 0);
+                        UserInterface.instance.Resize(GlobalGraphics.Scale(320), GlobalGraphics.Scale(240));
+                    }
+                    GlobalContent.GetSound("Select").Play(int.Parse(SaveData.saveValues["SoundEffectVolume"], CultureInfo.InvariantCulture) / 100f, 0f, 0f);
+                    return true;
+                }
             }
             return false;
         }
@@ -135,19 +152,22 @@ namespace NonsensicalVideoGenerator
             controller.Draw(gameTime, spriteBatch);
             if(Debug.GetDebugMode())
             {
-                DrawButton(spriteBatch, 10, 33, "Locale: " + L.locale.name + " " + L.locale.localizedName);
+                DrawButton(spriteBatch, 10, 33, "Locale: " + L.GetLocale().name + " " + L.GetLocale().localizedName);
                 DrawButton(spriteBatch, 10, 33+9, "Random Seed: " + Global.randomSeed.ToString(CultureInfo.InvariantCulture));
                 DrawButton(spriteBatch, 10, 33+(9*2), "User Resizing: " + (UserInterface.instance.Window.AllowUserResizing ? "Enabled" : "Disabled"));
                 DrawButton(spriteBatch, 10, 33+(9*3), "Game Cheat: " + (Debug.gameCheat ? "Enabled" : "Disabled"));
                 DrawButton(spriteBatch, 10, 33+(9*4), "Screen Scale: " + SaveData.saveValues["ScreenScale"]);
                 DrawButton(spriteBatch, 10, 33+(9*5), "Toggle Console On Right");
                 DrawButton(spriteBatch, 10, 33+(9*6), "Speed Boost: x" + Debug.debugSpeedBoost);
-                spriteBatch.DrawString(L.FontSmall(), Debug.debugBuild ? "Debug Build" : (Debug.GetDebugMode() ? "Release Build; Debug Mode" : "Release Build"), new Vector2(GlobalGraphics.Scale(10), GlobalGraphics.scaledHeight - GlobalGraphics.Scale(10*6) - GlobalGraphics.Scale(10)), Color.White);
-                spriteBatch.DrawString(L.FontSmall(), "CTRL + F3 / F20: Toggle Debug Mode", new Vector2(GlobalGraphics.Scale(10), GlobalGraphics.scaledHeight - GlobalGraphics.Scale(10*5) - GlobalGraphics.Scale(10)), Color.White);
-                spriteBatch.DrawString(L.FontSmall(), "F4: Toggle Main Window Tween", new Vector2(GlobalGraphics.Scale(10), GlobalGraphics.scaledHeight - GlobalGraphics.Scale(10*4) - GlobalGraphics.Scale(10)), Color.White);
-                spriteBatch.DrawString(L.FontSmall(), "F6: Pause", new Vector2(GlobalGraphics.Scale(10), GlobalGraphics.scaledHeight - GlobalGraphics.Scale(10*3) - GlobalGraphics.Scale(10)), Color.White);
-                spriteBatch.DrawString(L.FontSmall(), "F7: Advance Frame", new Vector2(GlobalGraphics.Scale(10), GlobalGraphics.scaledHeight - GlobalGraphics.Scale(10*2) - GlobalGraphics.Scale(10)), Color.White);
-                spriteBatch.DrawString(L.FontSmall(), "F8: Speed Boost", new Vector2(GlobalGraphics.Scale(10), GlobalGraphics.scaledHeight - GlobalGraphics.Scale(10) - GlobalGraphics.Scale(10)), Color.White);
+                DrawButton(spriteBatch, 10, 33+(9*7), "Draw Offset: " + Global.drawOffset.X.ToString(CultureInfo.InvariantCulture) + ", " + Global.drawOffset.Y.ToString(CultureInfo.InvariantCulture));
+                spriteBatch.DrawString(L.FontSmall(), "Mouse: " + MouseInput.MouseState.Position.X.ToString(CultureInfo.InvariantCulture) + ", " + MouseInput.MouseState.Position.Y.ToString(CultureInfo.InvariantCulture), new Vector2(GlobalGraphics.Scale(10), GlobalGraphics.scaledHeight - GlobalGraphics.Scale(10*8) - GlobalGraphics.Scale(10)), Color.White);
+                spriteBatch.DrawString(L.FontSmall(), Debug.debugBuild ? "Debug Build" : (Debug.GetDebugMode() ? "Release Build; Debug Mode" : "Release Build"), new Vector2(GlobalGraphics.Scale(10), GlobalGraphics.scaledHeight - GlobalGraphics.Scale(10*7) - GlobalGraphics.Scale(10)), Color.White);
+                spriteBatch.DrawString(L.FontSmall(), "CTRL + F3 / F20: Toggle Debug Mode", new Vector2(GlobalGraphics.Scale(10), GlobalGraphics.scaledHeight - GlobalGraphics.Scale(10*6) - GlobalGraphics.Scale(10)), Color.White);
+                spriteBatch.DrawString(L.FontSmall(), "F4: Toggle Main Window Tween", new Vector2(GlobalGraphics.Scale(10), GlobalGraphics.scaledHeight - GlobalGraphics.Scale(10*5) - GlobalGraphics.Scale(10)), Color.White);
+                spriteBatch.DrawString(L.FontSmall(), "F6: Pause", new Vector2(GlobalGraphics.Scale(10), GlobalGraphics.scaledHeight - GlobalGraphics.Scale(10*4) - GlobalGraphics.Scale(10)), Color.White);
+                spriteBatch.DrawString(L.FontSmall(), "F7: Advance Frame", new Vector2(GlobalGraphics.Scale(10), GlobalGraphics.scaledHeight - GlobalGraphics.Scale(10*3) - GlobalGraphics.Scale(10)), Color.White);
+                spriteBatch.DrawString(L.FontSmall(), "F8: Speed Boost", new Vector2(GlobalGraphics.Scale(10), GlobalGraphics.scaledHeight - GlobalGraphics.Scale(10*2) - GlobalGraphics.Scale(10)), Color.White);
+                spriteBatch.DrawString(L.FontSmall(), "F9: Reload Locales", new Vector2(GlobalGraphics.Scale(10), GlobalGraphics.scaledHeight - GlobalGraphics.Scale(10) - GlobalGraphics.Scale(10)), Color.White);
             }
         }
         public void DrawButton(SpriteBatch spriteBatch, int x, int y, string text)

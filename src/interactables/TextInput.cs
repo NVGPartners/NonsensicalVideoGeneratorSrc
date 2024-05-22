@@ -23,6 +23,7 @@ namespace NonsensicalVideoGenerator
         public Func<int, string, bool> Callback { get; set; }
         public Rectangle bounds;
         private Rectangle scaledBounds;
+        private Rectangle scaledBounds2;
         private int maxChars = 0;
         private int mode = 0;
         private string hiddenToolTip = ""; // The actual tooltip variable.
@@ -49,6 +50,7 @@ namespace NonsensicalVideoGenerator
             }
             // Calculate bounds
             scaledBounds = new((int)(bounds.X * GlobalGraphics.scale), (int)(bounds.Y * GlobalGraphics.scale), (int)(bounds.Width * GlobalGraphics.scale), (int)(bounds.Height * GlobalGraphics.scale));
+            scaledBounds2 = new(scaledBounds.X, scaledBounds.Y, scaledBounds.Width+GlobalGraphics.Scale(3), scaledBounds.Height);
             if (handleInput)
             {
                 Accessibility.CompatAccessibility(scaledBounds, L.T(0, "Accessibility:InteractableTextInput", Name, hiddenToolTip, Tooltip));
@@ -56,7 +58,7 @@ namespace NonsensicalVideoGenerator
                 oldKeyboardState = newKeyboardState;
                 newKeyboardState = Keyboard.GetState();
                 // Check if the mouse is hovering over the button.
-                if (scaledBounds.Contains(MouseInput.MouseState.Position))
+                if (scaledBounds2.Contains(MouseInput.MouseState.Position))
                 {
                     // Check if the mouse is clicking on the button.
                     if (MouseInput.LastMouseState.LeftButton == ButtonState.Released && MouseInput.MouseState.LeftButton == ButtonState.Pressed)
@@ -69,7 +71,7 @@ namespace NonsensicalVideoGenerator
                                 GlobalContent.GetSound("Error").Play(int.Parse(SaveData.saveValues["SoundEffectVolume"], CultureInfo.InvariantCulture) / 100f, 0f, 0f);
                                 return true;
                             }
-                            Callback(State, Name);
+                            Callback(State, internalName);
                             Global.editing = "";
                             //Accessibility.allowAccessibility = true;
                             GlobalContent.GetSound("Option").Play(int.Parse(SaveData.saveValues["SoundEffectVolume"], CultureInfo.InvariantCulture) / 100f, 0f, 0f);
@@ -83,24 +85,25 @@ namespace NonsensicalVideoGenerator
                                 GlobalContent.GetSound("Error").Play(int.Parse(SaveData.saveValues["SoundEffectVolume"], CultureInfo.InvariantCulture) / 100f, 0f, 0f);
                                 return true;
                             }
-                            Callback(State, Name);
+                            Callback(State, internalName);
                             Global.editing = Name + "Input";
                             //Accessibility.allowAccessibility = false;
                             GlobalContent.GetSound("Option").Play(int.Parse(SaveData.saveValues["SoundEffectVolume"], CultureInfo.InvariantCulture) / 100f, 0f, 0f);
-                            Global.mask.AddUnmaskedObject("TextEntry", new SimpleObject(scaledBounds, Color.Transparent, GlobalContent.GetTexture("Pixel"), () => {
+                            Global.mask.AddUnmaskedObject("TextEntry", new SimpleObject(new Rectangle(0, 0, GlobalGraphics.scaledWidth, GlobalGraphics.scaledHeight), Color.Transparent, GlobalContent.GetTexture("Pixel"), () => {
                                 // Check to make sure there's actually some text
                                 if (Tooltip == "")
                                 {
                                     GlobalContent.GetSound("Error").Play(int.Parse(SaveData.saveValues["SoundEffectVolume"], CultureInfo.InvariantCulture) / 100f, 0f, 0f);
                                     return true;
                                 }
-                                Callback(State, Name);
+                                Callback(State, internalName);
                                 Global.editing = "";
                                 //Accessibility.allowAccessibility = true;
                                 GlobalContent.GetSound("Option").Play(int.Parse(SaveData.saveValues["SoundEffectVolume"], CultureInfo.InvariantCulture) / 100f, 0f, 0f);
                                 Global.mask.Disable();
                                 return true;
                             }, true));
+                            Global.mask.color = Color.Transparent;
                             Global.mask.Enable();
                         }
                         else
@@ -119,7 +122,7 @@ namespace NonsensicalVideoGenerator
                                     GlobalContent.GetSound("Error").Play(int.Parse(SaveData.saveValues["SoundEffectVolume"], CultureInfo.InvariantCulture) / 100f, 0f, 0f);
                                     return true;
                                 }
-                                Callback(State, Name);
+                                Callback(State, internalName);
                                 GlobalContent.GetSound("Back").Play(int.Parse(SaveData.saveValues["SoundEffectVolume"], CultureInfo.InvariantCulture) / 100f, 0f, 0f);
                                 Global.mask.Disable();
                             }
@@ -139,7 +142,7 @@ namespace NonsensicalVideoGenerator
                             GlobalContent.GetSound("Error").Play(int.Parse(SaveData.saveValues["SoundEffectVolume"], CultureInfo.InvariantCulture) / 100f, 0f, 0f);
                             return true;
                         }
-                        Callback(0, Name);
+                        Callback(0, internalName);
                         Global.editing = "";
                         Accessibility.allowAccessibility = true;
                         GlobalContent.GetSound("Option").Play(int.Parse(SaveData.saveValues["SoundEffectVolume"], CultureInfo.InvariantCulture) / 100f, 0f, 0f);
@@ -209,9 +212,9 @@ namespace NonsensicalVideoGenerator
             spriteBatch.Draw(side, new Rectangle(GlobalGraphics.Scale(bounds.X + 1 + bounds.Width - 1 + side.Width/2), GlobalGraphics.Scale(bounds.Y + 1 - 1 + side.Height/2), GlobalGraphics.Scale(side.Width), GlobalGraphics.Scale(side.Height)), null, Color.Black, MathHelper.ToRadians(180), new Vector2(side.Width/2, side.Height/2), SpriteEffects.None, 0);
             spriteBatch.Draw(inner, new Rectangle(GlobalGraphics.Scale(bounds.X + 1+4), GlobalGraphics.Scale(bounds.Y + 1), GlobalGraphics.Scale(bounds.Width-5), GlobalGraphics.Scale(inner.Height)), Color.Black);
             // Normal
-            spriteBatch.Draw(side, new Rectangle(GlobalGraphics.Scale(bounds.X), GlobalGraphics.Scale(bounds.Y), GlobalGraphics.Scale(side.Width), GlobalGraphics.Scale(side.Height)), (Global.editing != Name + "Input") ? Color.White : Color.LightBlue);
-            spriteBatch.Draw(side, new Rectangle(GlobalGraphics.Scale(bounds.X + bounds.Width - 1 + side.Width/2), GlobalGraphics.Scale(bounds.Y - 1 + side.Height/2), GlobalGraphics.Scale(side.Width), GlobalGraphics.Scale(side.Height)), null, (Global.editing != Name + "Input") ? Color.White : Color.LightBlue, MathHelper.ToRadians(180), new Vector2(side.Width/2, side.Height/2), SpriteEffects.None, 0);
-            spriteBatch.Draw(inner, new Rectangle(GlobalGraphics.Scale(bounds.X+4), GlobalGraphics.Scale(bounds.Y), GlobalGraphics.Scale(bounds.Width-5), GlobalGraphics.Scale(inner.Height)), (Global.editing != Name + "Input") ? Color.White : Color.LightBlue);
+            spriteBatch.Draw(side, new Rectangle(GlobalGraphics.Scale(bounds.X), GlobalGraphics.Scale(bounds.Y), GlobalGraphics.Scale(side.Width), GlobalGraphics.Scale(side.Height)), (Global.editing != Name + "Input") ? Color.White : Color.White);
+            spriteBatch.Draw(side, new Rectangle(GlobalGraphics.Scale(bounds.X + bounds.Width - 1 + side.Width/2), GlobalGraphics.Scale(bounds.Y - 1 + side.Height/2), GlobalGraphics.Scale(side.Width), GlobalGraphics.Scale(side.Height)), null, (Global.editing != Name + "Input") ? Color.White : Color.White, MathHelper.ToRadians(180), new Vector2(side.Width/2, side.Height/2), SpriteEffects.None, 0);
+            spriteBatch.Draw(inner, new Rectangle(GlobalGraphics.Scale(bounds.X+4), GlobalGraphics.Scale(bounds.Y), GlobalGraphics.Scale(bounds.Width-5), GlobalGraphics.Scale(inner.Height)), (Global.editing != Name + "Input") ? Color.White : Color.White);
             // Inner text
             try
             {
@@ -244,10 +247,10 @@ namespace NonsensicalVideoGenerator
             spriteBatch.DrawString(L.FontLarge(), localizedTitle, new Vector2(GlobalGraphics.Scale(bounds.X + bounds.Width + 7 + 1), GlobalGraphics.Scale(bounds.Y + 2 + 1)), Color.Black);
             spriteBatch.DrawString(L.FontLarge(), localizedTitle, new Vector2(GlobalGraphics.Scale(bounds.X + bounds.Width + 7), GlobalGraphics.Scale(bounds.Y + 2)), Color.White);
             // Tooltip
-            if (scaledBounds.Contains(MouseInput.MouseState.Position) && hiddenToolTip != "")
+            if (scaledBounds2.Contains(MouseInput.MouseState.Position) && hiddenToolTip != "")
             {
                 if(internalName.StartsWith("NoLocalization:"))
-                    Global.tooltip = Tooltip;
+                    Global.tooltip = hiddenToolTip;
                 else
                     Global.tooltip = L.T(0, "Interactable:"+internalName+"Tooltip");
             }

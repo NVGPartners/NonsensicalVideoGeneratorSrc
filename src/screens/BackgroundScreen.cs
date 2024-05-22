@@ -72,7 +72,7 @@ namespace NonsensicalVideoGenerator
         public void Draw(GameTime gameTime, SpriteBatch spriteBatch)
         {
             // Draw background with new hue.
-            spriteBatch.Draw(GlobalContent.GetTexture("Pixel"), new Rectangle(0, 0, GlobalGraphics.scaledWidth, GlobalGraphics.scaledHeight), ThemeManager.GetColor("BackgroundScreen"));
+            spriteBatch.Draw(GlobalContent.GetTexture("Pixel"), new Rectangle(GlobalGraphics.Scale((int)-Global.drawOffset.X), GlobalGraphics.Scale((int)-Global.drawOffset.Y), (int)UserInterface.instance.preferredResolution.X, (int)UserInterface.instance.preferredResolution.Y), ThemeManager.GetColor("BackgroundScreen"));
             if(!bool.Parse(SaveData.saveValues["DisableMotion"]))
             {
                 // Draw the tiled background.

@@ -1,4 +1,4 @@
-function Query()
+function Query(localeName, localizationTokens)
     return {}
 end
 

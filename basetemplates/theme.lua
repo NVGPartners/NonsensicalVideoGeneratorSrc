@@ -1,9 +1,47 @@
--- These are the parameters that will be displayed in the addons tab.
--- When creating a theme, the entire default theme is copied over and you can edit it from there.
--- You should delete any graphics or SFX that have not been changed, as they will be loaded from the default theme.
--- For music, you can have up to 9 songs as "theme1.wma" through "theme9.wma". Only the music included in your theme will play.
--- All assets are stored inside of your addon's folder under "layer".
-function Query()
+-- [[ Theme Template ]]
+    -- These are the parameters that will be displayed in the addons tab.
+    -- When creating a theme, the entire default theme is copied over and you can edit it from there.
+
+    -- You should delete any graphics or SFX that have not been changed, as they will be loaded from the default theme.
+
+    -- For music, you can have up to 9 songs as "theme1.wma" through "theme9.wma". Only the music included in your theme will play.
+    -- All assets are stored inside of your addon's folder under "layer".
+
+    -- For more information on how to modify this file, please visit:
+    -- https://github.com/KiwifruitDev/NonsensicalVideoGenerator/wiki
+
+    -- If you need help, feel free to join the NVG Discord server:
+    -- https://discord.gg/8ppmspR6Wh
+
+-- [[ Localization ]]
+    -- This table is used to store the localization for your addon.
+    -- The key is the locale name, and the value is a table containing the localization tokens.
+    -- If a locale is not found, it will default to "en_us".
+
+    -- Supporting multiple languages is not required, but the option is available if you wish to do so.
+
+    -- Please keep this format consistent to ensure community contributions are possible.
+    -- "Addons:Custom%filenameraw%Option1" - Replace "%filenameraw%" if you decide to change the filename.
+local customLocalization = {
+    ["en_us"] = {
+        ["Addons:Custom%filenameraw%Option1"] = "%prettyname%",
+        ["Addons:Custom%filenameraw%Option2"] = "This is %filename%.",
+    },
+}
+
+function Query(localeName, localizationTokens)
+    -- Get the localization table for the current locale.
+    -- Otherwise, default to en_us.
+    local localization = customLocalization[localeName] or addonLocalization["en_us"]
+
+    -- Community-contributed localization tokens are added, if available.
+    -- Please preserve localization in order to support multiple languages,
+    -- even if you don't plan on translating the addon yourself.
+    for k, v in pairs(localizationTokens) do
+        localization[k] = v
+    end
+
+    -- Return the queried settings.
     return {
         ["settings"] = {
             {
@@ -13,12 +51,12 @@ function Query()
             },
             {
                 ["name"] = "Display Name",
-                ["value"] = "%prettyname%",
+                ["value"] = localization["Addons:Custom%filenameraw%Option1"],
                 ["type"] = "label"
             },
             {
                 ["name"] = "Description",
-                ["value"] = "This is %filename%.",
+                ["value"] = localization["Addons:Custom%filenameraw%Option2"],
                 ["type"] = "label"
             }
         },

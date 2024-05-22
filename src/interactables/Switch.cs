@@ -68,7 +68,7 @@ namespace NonsensicalVideoGenerator
                 State = (int)Math.Log(mouseButtonFlags, 2) + 1;
                 if (SwitchState)
                     mouseButtonFlags |= 256;
-                SwitchState = Callback(mouseButtonFlags, Name);
+                SwitchState = Callback(mouseButtonFlags, internalName);
                 if((mouseButtonFlags & 2) == 2)
                     return true;
             }

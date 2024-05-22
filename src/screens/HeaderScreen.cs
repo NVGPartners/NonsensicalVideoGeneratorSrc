@@ -117,7 +117,7 @@ namespace NonsensicalVideoGenerator
             // End existing spritebatch
             spriteBatch.End();
             // Use offset
-            spriteBatch.Begin(SpriteSortMode.Deferred, BlendState.AlphaBlend, SamplerState.PointClamp, null, null, null, Matrix.CreateTranslation(offset.X, offset.Y, 0));
+            spriteBatch.Begin(SpriteSortMode.Deferred, BlendState.AlphaBlend, SamplerState.PointClamp, null, null, null, Matrix.CreateTranslation(GlobalGraphics.Scale(Global.drawOffset.X)+offset.X, GlobalGraphics.Scale(Global.drawOffset.Y)+offset.Y, 0));
             
             // Logo.
             SpriteFont font = L.FontSmall();
@@ -145,7 +145,7 @@ namespace NonsensicalVideoGenerator
                 if(Pagination.SelectedPage == Pagination.TopPageCount)
                 {
                     spriteBatch.Draw(GlobalContent.GetTexture("Pixel"), new Rectangle(GlobalGraphics.Scale(10 + 21 + 51 + 1), GlobalGraphics.Scale(10 + 6 - 1 + 1), GlobalGraphics.Scale(debug.Width + 2), GlobalGraphics.Scale(debug.Height + 2)), Color.Black);
-                    spriteBatch.Draw(GlobalContent.GetTexture("Pixel"), new Rectangle(GlobalGraphics.Scale(10 + 21 + 51), GlobalGraphics.Scale(10 + 6 - 1), GlobalGraphics.Scale(debug.Width + 2), GlobalGraphics.Scale(debug.Height + 2)), Color.Red);
+                    spriteBatch.Draw(GlobalContent.GetTexture("Pixel"), new Rectangle(GlobalGraphics.Scale(10 + 21 + 51), GlobalGraphics.Scale(10 + 6 - 1), GlobalGraphics.Scale(debug.Width + 2), GlobalGraphics.Scale(debug.Height + 2)), ThemeManager.GetColor("VideoPlayerProgressBar"));
                 }
                 else
                 {
@@ -157,7 +157,7 @@ namespace NonsensicalVideoGenerator
             // Draw rendering progress
             if(Global.generator.progressText != "")
             {
-                string rendering = Global.videoTitle;
+                string rendering = Global.videoTitle.Replace("Render", "#");
                 // measure to center horizontally (one on top of the other)
                 Vector2 renderingSize = font.MeasureString(rendering);
                 Vector2 progressSize = font.MeasureString(Global.generator.progressText != "" ? Global.generator.progressText : (Global.generator.failureReason != "" ? Global.generator.failureReason : Global.generator.progress + "%"));
@@ -175,7 +175,7 @@ namespace NonsensicalVideoGenerator
             spriteBatch.Begin(SpriteSortMode.Deferred,
                 BlendState.AlphaBlend,
                 SamplerState.PointClamp,
-                null, null, null, null);
+                null, null, null, Matrix.CreateTranslation(GlobalGraphics.Scale(Global.drawOffset.X), GlobalGraphics.Scale(Global.drawOffset.Y), 0));
         }
         public bool Update(GameTime gameTime, bool handleInput)
         {
