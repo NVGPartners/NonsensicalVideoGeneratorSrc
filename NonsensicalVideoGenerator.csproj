@@ -54,7 +54,7 @@
   </ItemGroup>
 
 	<ItemGroup>
-    <BasePlugins Include="$(ProjectDir)baseplugins\user\stock\*.*" />
+    <BasePlugins Include="$(ProjectDir)baseplugins\user\stock\**\*.*" />
     <WorkshopPlugins Include="$(ProjectDir)baseplugins\user\**\*.*" />
     <BaseTemplates Include="$(ProjectDir)basetemplates\**\*.*" />
     <BaseHTML Include="$(ProjectDir)basehtml\**\*.*" />
@@ -77,7 +77,7 @@
     <MakeDir Directories="$(ProjectDir)bin\x64\Debug\net6.0-windows\templates" />
     <MakeDir Directories="$(ProjectDir)bin\x64\Release\net6.0-windows\locales" />
     <MakeDir Directories="$(ProjectDir)bin\x64\Debug\net6.0-windows\locales" />
-		<Copy SourceFiles="@(BasePlugins)" DestinationFiles="$(ProjectDir)bin\x64\Release\net6.0-windows\plugins\user\stock\%(Filename)%(Extension)" />
+		<Copy SourceFiles="@(BasePlugins)" DestinationFiles="$(ProjectDir)bin\x64\Release\net6.0-windows\plugins\user\stock\%(RecursiveDir)%(Filename)%(Extension)" />
 		<Copy SourceFiles="@(WorkshopPlugins)" DestinationFiles="$(ProjectDir)bin\x64\Debug\net6.0-windows\plugins\user\%(RecursiveDir)%(Filename)%(Extension)" />
     <Copy SourceFiles="@(BaseTemplates)" DestinationFiles="$(ProjectDir)bin\x64\Release\net6.0-windows\templates\%(RecursiveDir)%(Filename)%(Extension)" />
     <Copy SourceFiles="@(BaseTemplates)" DestinationFiles="$(ProjectDir)bin\x64\Debug\net6.0-windows\templates\%(RecursiveDir)%(Filename)%(Extension)" />

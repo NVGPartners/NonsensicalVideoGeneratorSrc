@@ -59,7 +59,7 @@ namespace NonsensicalVideoGenerator
             {"TimeOut", "30"},
             {"EnableTimeOut", "true"},
             {"SkipPhotosensitiveWarningScreen", "false"},
-            {"PluginListFilterFlags", "0"},
+            {"PluginListFilterFlags", "7"},
             {"LastVersion", ""},
             {"Locale", "en_us"}
         };
