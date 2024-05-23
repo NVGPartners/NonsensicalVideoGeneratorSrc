@@ -42,7 +42,7 @@ function StartGeneration(options, pluginSettings, functions)
     randomSound = functions.getRandomLibraryFile("audio", "sfx")
     -- Apply effect
     -- Convert randomSound to soundEffect
-    functions.runFFmpeg("-i " .. randomSound .. " -y " .. soundEffect)
+    functions.runFFmpeg("-i \"" .. randomSound .. "\" -y \"" .. soundEffect .. "\"")
     return true
 end
 
@@ -54,10 +54,10 @@ function PostCommand(commandindex, outputresult, errorresult, options, pluginSet
         local length = tonumber(outputresult)
         if muteOriginalAudio then
             -- Override original audio with sfx with video cut to length
-            functions.runFFmpeg("-i " .. soundEffect .. " -i " .. options.inputVideo .. " -filter_complex \"[0:a]apad[0a];[1:a]volume=0.0[a1];[0a][a1]amix=inputs=2:duration=first:dropout_transition=0\" -c:v copy -map 1:v -map 0:a -shortest -y " .. options.outputVideo)
+            functions.runFFmpeg("-i \"" .. soundEffect .. "\" -i " .. options.inputVideo .. " -filter_complex \"[0:a]apad[0a];[1:a]volume=0.0[a1];[0a][a1]amix=inputs=2:duration=first:dropout_transition=0\" -c:v copy -map 1:v -map 0:a -shortest -y \"" .. options.outputVideo + "\"")
         else
             -- Add sfx to original audio to length
-            functions.runFFmpeg("-i " .. soundEffect .. " -i " .. options.inputVideo .. " -filter_complex \"[0:a]apad[0a];[1:a]volume=1.0[a1];[0a][a1]amix=inputs=2:duration=first:dropout_transition=0\" -c:v copy -map 1:v -map 0:a -shortest -y " .. options.outputVideo)
+            functions.runFFmpeg("-i \"" .. soundEffect .. "\" -i " .. options.inputVideo .. " -filter_complex \"[0:a]apad[0a];[1:a]volume=1.0[a1];[0a][a1]amix=inputs=2:duration=first:dropout_transition=0\" -c:v copy -map 1:v -map 0:a -shortest -y \"" .. options.outputVideo + "\"")
         end
     end
 end
