@@ -1,4 +1,5 @@
 using System;
+using System.Diagnostics;
 using System.IO;
 using System.Linq;
 using System.Reflection;
@@ -14,21 +15,53 @@ namespace NonsensicalVideoGenerator
         [STAThread]
         static void Main(string[] args)
         {
-            Global.randomSeed = Global.generator.globalRandom.Next();
-            Global.generator.globalRandom = new Random(Global.randomSeed);
-            ConsoleOutput.Clear();
-            SaveData.Load();
-            DisabledMedia.Load();
+            // Launch options
             for(int i = 0; i < args.Length; i++)
             {
                 Global.parameters.Add(args[i]);
             }
+            if(Global.parameters.Contains("-console"))
+            {
+                string cwd = Path.Combine(Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location) ?? ".");
+                string consoleTxt = Path.Combine(cwd, "console.txt");
+                if(File.Exists(consoleTxt))
+                {
+                    ProcessStartInfo startInfo = new()
+                    {
+                        FileName = consoleTxt,
+                        UseShellExecute = true
+                    };
+                    Process.Start(startInfo);
+                    Environment.Exit(0);
+                }
+                else
+                {
+                    ConsoleOutput.Clear();
+                }
+            }
+            else if(!Global.parameters.Contains("-keeplog"))
+            {
+                ConsoleOutput.Clear();
+            }
+            Global.randomSeed = Global.generator.globalRandom.Next();
+            Global.generator.globalRandom = new Random(Global.randomSeed);
+            SaveData.Load();
+            if(Global.parameters.Contains("-v"))
+            {
+                SaveData.saveValues["HiddenVerbose"] = "true";
+                SaveData.Save();
+            }
+            DisabledMedia.Load();
             if(Global.parameters.Count > 0)
                 ConsoleOutput.WriteLine("Using command line parameters: " + String.Join(" ", Global.parameters.ToArray()));
 #if DEBUG
             Debug.debugBuild = true;
             Debug.SetDebugMode(true);
 #endif
+            if(Global.parameters.Contains("-debug"))
+            {
+                Debug.SetDebugMode(true);
+            }
             string locale = SaveData.saveValues["Locale"];
             if(Global.parameters.Contains("-lang"))
             {

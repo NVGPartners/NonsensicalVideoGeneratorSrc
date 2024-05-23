@@ -412,6 +412,8 @@
         "Interactable:ButtonContinue3Title": "View Workshop Page",
         "Interactable:ButtonContinue3Tooltip": "",
         "Interactable:ButtonContinue2Title": "Continue",
-        "Interactable:ButtonContinue2Tooltip": ""
+        "Interactable:ButtonContinue2Tooltip": "",
+        "Interactable:BlogURLTitle": "Read More",
+        "Interactable:BlogURLTooltip": "View announcement event on Steam."
     }
 }

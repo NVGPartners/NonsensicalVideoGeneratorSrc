@@ -26,9 +26,9 @@ namespace NonsensicalVideoGenerator
             new LibraryPage(),
             new PluginsPage(),
             new OptionsPage(),
+            new BlogPage(),
             new PastimePage(),
-            new ExitPage(),
-            new InternalPage(),
+            new DebugPage(),
         };
         // These two variables are the same for selectable pages, but different for subpages.
         // For subpages, the selected page is the parent page, and the drawn page is the subpage.

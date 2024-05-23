@@ -161,7 +161,7 @@ namespace NonsensicalVideoGenerator
                 // measure to center horizontally (one on top of the other)
                 Vector2 renderingSize = font.MeasureString(rendering);
                 Vector2 progressSize = font.MeasureString(Global.generator.progressText != "" ? Global.generator.progressText : (Global.generator.failureReason != "" ? Global.generator.failureReason : Global.generator.progress + "%"));
-                if(Pagination.DrawnPage != Pagination.GetPageCount() - 3)
+                if(Pagination.DrawnPage != 5)
                 {
                     spriteBatch.DrawString(font, rendering, new Vector2(GlobalGraphics.Scale(320/2) - renderingSize.X/2 + GlobalGraphics.Scale(1), GlobalGraphics.Scale(8 + 1)), Color.Black);
                     spriteBatch.DrawString(font, rendering, new Vector2(GlobalGraphics.Scale(320/2) - renderingSize.X/2, GlobalGraphics.Scale(8)), Color.White);

@@ -1,6 +1,8 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Xml;
+
 #if MONOGAME
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Audio;
@@ -61,6 +63,7 @@ namespace NonsensicalVideoGenerator
         private static Dictionary<string, Texture2D> textures = new Dictionary<string, Texture2D>();
         private static Dictionary<string, SpriteFont> fonts = new Dictionary<string, SpriteFont>();
         private static Dictionary<string, Song> songs = new Dictionary<string, Song>();
+        private static Dictionary<string, XmlDocument> xmls = new Dictionary<string, XmlDocument>();
         public static void LoadDefaultContent(ContentManager contentManager, GraphicsDevice graphicsDevice)
 #else
         private static ContentManager contentManager;
@@ -243,7 +246,18 @@ namespace NonsensicalVideoGenerator
             }
             return true;
         }
-        
+        public static bool AddXml(string name, XmlDocument xml)
+        {
+            if (xmls.ContainsKey(name))
+            {
+                xmls[name] = xml;
+            }
+            else
+            {
+                xmls.Add(name, xml);
+            }
+            return true;
+        }
         public static SoundEffect GetSound(string name)
         {
             return sounds[name];
@@ -283,6 +297,14 @@ namespace NonsensicalVideoGenerator
         public static Song GetSongByIndex(int index)
         {
             return songs.Values.ElementAt(index);
+        }
+        public static XmlDocument GetXml(string name)
+        {
+            return xmls[name];
+        }
+        public static int GetXmlCount()
+        {
+            return xmls.Count;
         }
     }
 }

@@ -163,7 +163,7 @@ namespace NonsensicalVideoGenerator
                 // -2 because the exit and game buttons are not included
                 for(int i = 0; i < Pagination.GetTopPageCount(); i++)
                 {
-                    if(i == Pagination.GetTopPageCount()-2)
+                    if(i == 5)
                         continue; // Skip Game
                     string name = Pagination.GetPage(i).Name;
                     if(i == 2)
@@ -195,7 +195,7 @@ namespace NonsensicalVideoGenerator
                                 if(segment == 2)
                                     name = L.T(0, "Addons:Title");
                                 DiscordRPC.curtab = DiscordRPC.ToTab(name);
-                                if(segment == Pagination.GetPageCount() - 3)
+                                if(segment == 5)
                                 {
                                     ScreenManager.PushNavigation("Game");
                                     ScreenManager.GetScreen<PastimeGameScreen>("Game")?.Show();
@@ -203,7 +203,7 @@ namespace NonsensicalVideoGenerator
                                 }
                                 else
                                 {
-                                    if(Pagination.DrawnPage == Pagination.GetPageCount() - 3)
+                                    if(Pagination.DrawnPage == 5)
                                     {
                                         ScreenManager.GetScreen<PastimeGameScreen>("Game")?.Hide();
                                         ScreenManager.PushNavigation("Content");

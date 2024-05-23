@@ -37,7 +37,7 @@ namespace NonsensicalVideoGenerator
         // shamelessly copied from tutorial screen
         private BackgroundWorker? updateWorker;
         private readonly InteractableController controller = new();
-        private void ErrorOut()
+        public static void ErrorOut()
         {
             if(ScreenManager.GetScreen<TutorialScreen>("Tutorial")?.screenType == ScreenType.Hidden)
             {

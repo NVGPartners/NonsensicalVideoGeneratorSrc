@@ -54,10 +54,12 @@ namespace NonsensicalVideoGenerator
         public bool generatorActive = false;
         public bool forceConcatenate = false;
         public BackgroundWorker? timeoutWorker { get; set; }
-        
         public BackgroundWorker? killWorker { get; set; }
         public int timeout = 0;
         public string tempOutput = Path.Combine(Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location) ?? ".", "library", "video", "renders", "temp.mp4");
+        public static string oldExportParams = "-c:v libx264 -crf 18 -preset veryfast -ar 32000 -shortest -avoid_negative_ts make_zero -fflags +genpts";
+        public static string betterExportParams = "-vcodec libx264 -crf 28 -preset ultrafast -ar 32000 -shortest -avoid_negative_ts make_zero -fflags +genpts";
+        public static string exportParams = oldExportParams;
         public void KillChildProcesses()
         {
             // Find all child processes of the current process and kill them.
@@ -355,19 +357,23 @@ namespace NonsensicalVideoGenerator
             }
 
             // Set global random with seed.
-            progressText = "Planting seeds...";
-            int seed = DateTime.Now.Millisecond;
-            // Convert ProjectTitle to int seed
-            /*
-            string seedString = Global.videoTitle;
-            int seed = 0;
-            foreach (char c in seedString)
+            if(Global.randomSeed != 0)
             {
-                seed += (int)c;
+                progressText = "Planting seeds...";
+                int seed = DateTime.Now.Millisecond;
+                // Convert ProjectTitle to int seed
+                /*
+                string seedString = Global.videoTitle;
+                int seed = 0;
+                foreach (char c in seedString)
+                {
+                    seed += (int)c;
+                }
+                */
+                ConsoleOutput.WriteLine("Seed: " + seed.ToString(CultureInfo.InvariantCulture), Color.Gray);
+                Global.randomSeed = seed;
+                globalRandom = new Random(seed);
             }
-            */
-            ConsoleOutput.WriteLine("Seed: " + seed.ToString(CultureInfo.InvariantCulture), Color.Gray);
-            globalRandom = new Random(seed);
             
             ConsoleOutput.WriteLine("Max clips: " + maxClips.ToString(CultureInfo.InvariantCulture), Color.Gray);
 
@@ -899,10 +905,8 @@ namespace NonsensicalVideoGenerator
                 startInfo.Arguments = "-i \"" + video
                         + "\" -ss " + startTime
                         + " -to " + endTime
-                        + " -c:v libx264"
-                        + " -crf 18"
-                        + " -preset veryfast"
                         + (SaveData.saveValues["ConstrainAspectRatio"] == "true" ? " -vf scale=" + SaveData.saveValues["VideoWidth"] + "x" + SaveData.saveValues["VideoHeight"] + ",setsar=1:1,fps=fps=30" : " -vf \"scale=(iw*sar)*min(" + SaveData.saveValues["VideoWidth"] + "/(iw*sar)\\," + SaveData.saveValues["VideoHeight"] + "/ih):ih*min(" + SaveData.saveValues["VideoWidth"] + "/(iw*sar)\\," + SaveData.saveValues["VideoHeight"] + "/ih),pad=" + SaveData.saveValues["VideoWidth"] + ":" + SaveData.saveValues["VideoHeight"] + ":(" + SaveData.saveValues["VideoWidth"] + "-iw*min(" + SaveData.saveValues["VideoWidth"] + "/iw\\," + SaveData.saveValues["VideoHeight"] + "/ih))/2:(" + SaveData.saveValues["VideoHeight"] + "-ih*min(" + SaveData.saveValues["VideoWidth"] + "/iw\\," + SaveData.saveValues["VideoHeight"] + "/ih))/2,setsar=1:1,fps=fps=30\"")
+                        + " "+exportParams
                         + " -y"
                         + " \"" + output + "\"";
                 startInfo.UseShellExecute = false;
@@ -1002,10 +1006,8 @@ namespace NonsensicalVideoGenerator
                 startInfo.WindowStyle = ProcessWindowStyle.Hidden;
                 startInfo.FileName = Global.useSystemFFmpeg ? "ffmpeg" : @".\ffmpeg.exe";
                 startInfo.Arguments = "-i \"" + video + "\" " + appendNoAudio
-                        + " -c:v libx264"
-                        + " -crf 18"
-                        + " -preset veryfast"
                         + (SaveData.saveValues["ConstrainAspectRatio"] == "true" ? " -vf scale=" + SaveData.saveValues["VideoWidth"] + "x" + SaveData.saveValues["VideoHeight"] + ",setsar=1:1,fps=fps=30" : " -vf \"scale=(iw*sar)*min(" + SaveData.saveValues["VideoWidth"] + "/(iw*sar)\\," + SaveData.saveValues["VideoHeight"] + "/ih):ih*min(" + SaveData.saveValues["VideoWidth"] + "/(iw*sar)\\," + SaveData.saveValues["VideoHeight"] + "/ih),pad=" + SaveData.saveValues["VideoWidth"] + ":" + SaveData.saveValues["VideoHeight"] + ":(" + SaveData.saveValues["VideoWidth"] + "-iw*min(" + SaveData.saveValues["VideoWidth"] + "/iw\\," + SaveData.saveValues["VideoHeight"] + "/ih))/2:(" + SaveData.saveValues["VideoHeight"] + "-ih*min(" + SaveData.saveValues["VideoWidth"] + "/iw\\," + SaveData.saveValues["VideoHeight"] + "/ih))/2,setsar=1:1,fps=fps=30\"")
+                        + " "+exportParams
                         + " -y"
                         + " \"" + output + "\"";
                 startInfo.UseShellExecute = false;
@@ -1104,12 +1106,9 @@ namespace NonsensicalVideoGenerator
                         startInfo2.WindowStyle = ProcessWindowStyle.Hidden;
                         startInfo2.FileName = Global.useSystemFFmpeg ? "ffmpeg" : @".\ffmpeg.exe";
                         startInfo2.Arguments = "-i \"" + Path.Combine(temporaryDirectory, thisClip.name) + "\" " + appendNoAudio
-                                + " -c:v libx264"
-                                + " -crf 18"
-                                + " -preset veryfast"
                                 + " -af apad"
                                 + (SaveData.saveValues["ConstrainAspectRatio"] == "true" ? " -vf scale=" + SaveData.saveValues["VideoWidth"] + "x" + SaveData.saveValues["VideoHeight"] + ",setsar=1:1,fps=fps=30" : " -vf \"scale=(iw*sar)*min(" + SaveData.saveValues["VideoWidth"] + "/(iw*sar)\\," + SaveData.saveValues["VideoHeight"] + "/ih):ih*min(" + SaveData.saveValues["VideoWidth"] + "/(iw*sar)\\," + SaveData.saveValues["VideoHeight"] + "/ih),pad=" + SaveData.saveValues["VideoWidth"] + ":" + SaveData.saveValues["VideoHeight"] + ":(" + SaveData.saveValues["VideoWidth"] + "-iw*min(" + SaveData.saveValues["VideoWidth"] + "/iw\\," + SaveData.saveValues["VideoHeight"] + "/ih))/2:(" + SaveData.saveValues["VideoHeight"] + "-ih*min(" + SaveData.saveValues["VideoWidth"] + "/iw\\," + SaveData.saveValues["VideoHeight"] + "/ih))/2,setsar=1:1,fps=fps=30\"")
-                                + " -ar 32000 -shortest -avoid_negative_ts make_zero -fflags +genpts"
+                                + " "+exportParams
                                 + " -y"
                                 + " \"" + Path.Combine(temporaryDirectory, "concat" + i2 + ".mp4") + "\"";
                         startInfo2.UseShellExecute = false;
@@ -1207,10 +1206,7 @@ namespace NonsensicalVideoGenerator
             concat += "concat=n=" + clips2.Count + ":v=1:a=1[outv][outa];[outv]scale=" + SaveData.saveValues["VideoWidth"] + "x" + SaveData.saveValues["VideoHeight"] + ",setsar=1:1,fps=fps=30[outv]\""
                     + " -map \"[outv]\""
                     + " -map \"[outa]\""
-                    + " -c:v libx264"
-                    + " -crf 18"
-                    + " -preset veryfast"
-                    + " -ar 32000 -shortest -avoid_negative_ts make_zero -fflags +genpts"
+                    + " "+exportParams
                     + " -y";
             // Run ffmpeg to concatenate them
             Process process = new Process();
@@ -1268,10 +1264,7 @@ namespace NonsensicalVideoGenerator
                 concat2 += "concat=n=" + clips3.Count + ":v=1:a=1[outv][outa];[outv]scale=" + SaveData.saveValues["VideoWidth"] + "x" + SaveData.saveValues["VideoHeight"] + ",setsar=1:1,fps=fps=30[outv]\""
                         + " -map \"[outv]\""
                         + " -map \"[outa]\""
-                        + " -c:v libx264"
-                        + " -crf 18"
-                        + " -preset veryfast"
-                        + " -ar 32000 -shortest -avoid_negative_ts make_zero -fflags +genpts"
+                        + " "+exportParams
                         + " -y";
                 // Run ffmpeg to concatenate them
                 Process process2 = new Process();
@@ -1318,7 +1311,11 @@ namespace NonsensicalVideoGenerator
                 startInfo.FileName = Global.useSystemFFmpeg ? "ffmpeg" : @".\ffmpeg.exe";
                 startInfo.Arguments = "-i \"" + video
                         + "\" -i \"" + overlay
-                        + "\" -filter_complex \"[1:v]colorkey=0x00FF00:0.3:0.2,scale=" + SaveData.saveValues["VideoWidth"] + "x" + SaveData.saveValues["VideoHeight"] + ",setsar=1:1,fps=fps=30[outv];[0:v][outv]overlay=shortest=1[finalv];[0:a][1:a]amix=inputs=2:duration=shortest[outa]\" -map \"[finalv]\" -map \"[outa]\" -c:v libx264 -crf 18 -preset veryfast -y \"" + overlayed_video + "\"";
+                        + "\" -filter_complex \"[1:v]colorkey=0x00FF00:0.3:0.2,scale=" + SaveData.saveValues["VideoWidth"] + "x" + SaveData.saveValues["VideoHeight"] + ",setsar=1:1,fps=fps=30[outv];[0:v][outv]overlay=shortest=1[finalv];[0:a][1:a]amix=inputs=2:duration=shortest[outa]\""
+                        + " -map \"[finalv]\""
+                        + " -map \"[outa]\""
+                        + " "+exportParams
+                        + " -y \"" + overlayed_video + "\"";
                 startInfo.UseShellExecute = false;
                 startInfo.RedirectStandardError = true;
                 startInfo.WorkingDirectory = Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location) ?? ".";

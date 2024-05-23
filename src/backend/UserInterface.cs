@@ -32,7 +32,7 @@ namespace NonsensicalVideoGenerator
         private WindowState _windowState = WindowState.Unfocused;
         private MusicState _musicState = MusicState.Paused;
         private int _musicActive = 0;
-        private int music;
+        public int music;
         private bool alreadyPlayedFirstSong = false;
         public Vector2 preferredResolution = new(320, 240);
         public UserInterface()
@@ -132,7 +132,7 @@ namespace NonsensicalVideoGenerator
             GlobalContent.UnloadContent();
             base.UnloadContent();
         }
-        private void FindMusic()
+        public void FindMusic()
         {
             if(!alreadyPlayedFirstSong)
             {

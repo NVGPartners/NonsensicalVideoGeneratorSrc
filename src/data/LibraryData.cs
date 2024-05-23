@@ -633,6 +633,7 @@ namespace NonsensicalVideoGenerator
                 ConsoleOutput.WriteLine("Downloaded clip to library: " + path, Color.Green);
             }
             downloadUrls.Clear();
+            youtubes.Clear();
         }
         internal static bool DownloadClip(string[] clipUrls, LibraryType key)
         {

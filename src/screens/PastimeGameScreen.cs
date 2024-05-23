@@ -256,223 +256,226 @@ namespace NonsensicalVideoGenerator
             handleInput = handleInput && !hiding && !showing;
             // Tween
             tween.Update((float)gameTime.ElapsedGameTime.TotalSeconds);
-            // Update obstacles
-            foreach (PastimeGameObstacle obstacle in obstacles)
+            if(Pagination.SelectedPage == 5)
             {
-                obstacle.Update(gameTime, handleInput);
-            }
-            if(handleInput)
-            {
-                Accessibility.CompatAccessibility(new Rectangle(GlobalGraphics.Scale(player.spacing), (int)GlobalGraphics.Scale(player.spacingPlacementY) + GlobalGraphics.Scale(player.height/2), GlobalGraphics.Scale(player.width), GlobalGraphics.Scale(player.height/2)), L.T(0, "Accessibility:GamePlayer"));
-            }
-            /*
-            if (handleInput && MouseInput.MouseState.RightButton == ButtonState.Pressed && MouseInput.LastMouseState.RightButton == ButtonState.Released)
-            {
-                GlobalContent.GetSound("Back").Play(int.Parse(SaveData.saveValues["SoundEffectVolume"], CultureInfo.InvariantCulture) / 100f, 0f, 0f);
-                Hide();
-                ScreenManager.PushNavigation("Video");
-                ScreenManager.GetScreen<VideoScreen>("Video")?.Show();
-                ScreenManager.PushNavigation("Content");
-                ScreenManager.GetScreen<ContentScreen>("Content")?.Show();
-                ScreenManager.PushNavigation("Header");
-                ScreenManager.GetScreen<HeaderScreen>("Header")?.Show();
-                ScreenManager.PushNavigation("Socials");
-                ScreenManager.GetScreen<SocialScreen>("Socials")?.Show();
-                return true;
-            }
-            */
-            // Query obstacles so player can collide with them
-            if (!player.dead)
-            {
+                // Update obstacles
                 foreach (PastimeGameObstacle obstacle in obstacles)
                 {
-                    if(!player.waiting)
+                    obstacle.Update(gameTime, handleInput);
+                }
+                if(handleInput)
+                {
+                    Accessibility.CompatAccessibility(new Rectangle(GlobalGraphics.Scale(player.spacing), (int)GlobalGraphics.Scale(player.spacingPlacementY) + GlobalGraphics.Scale(player.height/2), GlobalGraphics.Scale(player.width), GlobalGraphics.Scale(player.height/2)), L.T(0, "Accessibility:GamePlayer"));
+                }
+                /*
+                if (handleInput && MouseInput.MouseState.RightButton == ButtonState.Pressed && MouseInput.LastMouseState.RightButton == ButtonState.Released)
+                {
+                    GlobalContent.GetSound("Back").Play(int.Parse(SaveData.saveValues["SoundEffectVolume"], CultureInfo.InvariantCulture) / 100f, 0f, 0f);
+                    Hide();
+                    ScreenManager.PushNavigation("Video");
+                    ScreenManager.GetScreen<VideoScreen>("Video")?.Show();
+                    ScreenManager.PushNavigation("Content");
+                    ScreenManager.GetScreen<ContentScreen>("Content")?.Show();
+                    ScreenManager.PushNavigation("Header");
+                    ScreenManager.GetScreen<HeaderScreen>("Header")?.Show();
+                    ScreenManager.PushNavigation("Socials");
+                    ScreenManager.GetScreen<SocialScreen>("Socials")?.Show();
+                    return true;
+                }
+                */
+                // Query obstacles so player can collide with them
+                if (!player.dead)
+                {
+                    foreach (PastimeGameObstacle obstacle in obstacles)
                     {
-                        obstacle.isDead = false;
-                    }
-                    // If player is in an obstacle, die
-                    if(obstacle.CheckCollision(new Rectangle(GlobalGraphics.Scale(player.spacing), GlobalGraphics.Scale((int)player.spacingPlacementY), GlobalGraphics.Scale(player.width), GlobalGraphics.Scale(player.height))))
-                    {
-                        GlobalContent.GetSound("Error").Play(int.Parse(SaveData.saveValues["SoundEffectVolume"], CultureInfo.InvariantCulture) / 100f, 0f, 0f);
-                        player.dead = true;
-                        // timer in 0.05 seconds
-                        timer = (float)gameTime.TotalGameTime.TotalMilliseconds + 50f;
-                        if(!bool.Parse(SaveData.saveValues["DisableMotion"]))
+                        if(!player.waiting)
                         {
-                            tween.TweenTo(this, t => t.offset, new Vector2(0, GlobalGraphics.Scale(10)), 0.01f)
-                                .Easing(EasingFunctions.Linear);
+                            obstacle.isDead = false;
                         }
-                        phase = 1;
-                        break;
-                    }
-                    // Once past obstacle, earn point
-                    else if(obstacle.distance + obstacle.spacing < player.spacing)
-                    {
-                        if(!obstacle.isDead && !obstacle.point)
+                        // If player is in an obstacle, die
+                        if(obstacle.CheckCollision(new Rectangle(GlobalGraphics.Scale(player.spacing), GlobalGraphics.Scale((int)player.spacingPlacementY), GlobalGraphics.Scale(player.width), GlobalGraphics.Scale(player.height))))
                         {
-                            obstacle.point = true;
-                            GlobalContent.GetSound("AddSource").Play(int.Parse(SaveData.saveValues["SoundEffectVolume"], CultureInfo.InvariantCulture) / 100f, 0f, 0f);
-                            if(player.points < 2147483647)
-                                player.points++;
-                            if(player.points == 2147483647)
-                                GlobalContent.GetSound("RenderComplete").Play(int.Parse(SaveData.saveValues["SoundEffectVolume"], CultureInfo.InvariantCulture) / 100f, 0f, 0f);
-                            // Increment currentCreditIndex
-                            // If out of range of the key, increment currentCreditKey and set currentCreditIndex to -1
-                            if(credits.Count > 0)
+                            GlobalContent.GetSound("Error").Play(int.Parse(SaveData.saveValues["SoundEffectVolume"], CultureInfo.InvariantCulture) / 100f, 0f, 0f);
+                            player.dead = true;
+                            // timer in 0.05 seconds
+                            timer = (float)gameTime.TotalGameTime.TotalMilliseconds + 50f;
+                            if(!bool.Parse(SaveData.saveValues["DisableMotion"]))
                             {
-                                if(currentCreditIndex == -1)
+                                tween.TweenTo(this, t => t.offset, new Vector2(0, GlobalGraphics.Scale(10)), 0.01f)
+                                    .Easing(EasingFunctions.Linear);
+                            }
+                            phase = 1;
+                            break;
+                        }
+                        // Once past obstacle, earn point
+                        else if(obstacle.distance + obstacle.spacing < player.spacing)
+                        {
+                            if(!obstacle.isDead && !obstacle.point)
+                            {
+                                obstacle.point = true;
+                                GlobalContent.GetSound("AddSource").Play(int.Parse(SaveData.saveValues["SoundEffectVolume"], CultureInfo.InvariantCulture) / 100f, 0f, 0f);
+                                if(player.points < 2147483647)
+                                    player.points++;
+                                if(player.points == 2147483647)
+                                    GlobalContent.GetSound("RenderComplete").Play(int.Parse(SaveData.saveValues["SoundEffectVolume"], CultureInfo.InvariantCulture) / 100f, 0f, 0f);
+                                // Increment currentCreditIndex
+                                // If out of range of the key, increment currentCreditKey and set currentCreditIndex to -1
+                                if(credits.Count > 0)
                                 {
-                                    currentCreditIndex = 0;
-                                }
-                                else
-                                {
-                                    currentCreditIndex++;
-                                }
-                                if(currentCreditIndex >= credits[currentCreditKey].Count)
-                                {
-                                    currentCreditIndex = -1;
-                                    foreach (string key in credits.Keys)
+                                    if(currentCreditIndex == -1)
                                     {
-                                        if(key == currentCreditKey)
-                                        {
-                                            currentCreditKey = "";
-                                        }
-                                        else if(currentCreditKey == "")
-                                        {
-                                            currentCreditKey = key;
-                                            break;
-                                        }
+                                        currentCreditIndex = 0;
                                     }
-                                    // Loop back to the beginning
-                                    if(currentCreditKey == "")
+                                    else
                                     {
+                                        currentCreditIndex++;
+                                    }
+                                    if(currentCreditIndex >= credits[currentCreditKey].Count)
+                                    {
+                                        currentCreditIndex = -1;
                                         foreach (string key in credits.Keys)
                                         {
-                                            currentCreditKey = key;
-                                            break;
+                                            if(key == currentCreditKey)
+                                            {
+                                                currentCreditKey = "";
+                                            }
+                                            else if(currentCreditKey == "")
+                                            {
+                                                currentCreditKey = key;
+                                                break;
+                                            }
+                                        }
+                                        // Loop back to the beginning
+                                        if(currentCreditKey == "")
+                                        {
+                                            foreach (string key in credits.Keys)
+                                            {
+                                                currentCreditKey = key;
+                                                break;
+                                            }
                                         }
                                     }
                                 }
-                            }
-                            if(player.points >= highScore)
-                            {
-                                GlobalContent.GetSound("Prompt").Play(int.Parse(SaveData.saveValues["SoundEffectVolume"], CultureInfo.InvariantCulture) / 100f, 0f, 0f);
-                                highScore = player.points;
-                                SaveData.saveValues["GameHighScore"] = highScore.ToString(CultureInfo.InvariantCulture);
-                                SaveData.Save();
-                            }
-                            if(player.points == 50 && !Global.highScore50)
-                            {
-                                Global.highScore50 = true;
-                                string achievement = "ACHIEVEMENT_HIGH_SCORE";
-                                Achievements.Award(achievement);
+                                if(player.points >= highScore)
+                                {
+                                    GlobalContent.GetSound("Prompt").Play(int.Parse(SaveData.saveValues["SoundEffectVolume"], CultureInfo.InvariantCulture) / 100f, 0f, 0f);
+                                    highScore = player.points;
+                                    SaveData.saveValues["GameHighScore"] = highScore.ToString(CultureInfo.InvariantCulture);
+                                    SaveData.Save();
+                                }
+                                if(player.points == 50 && !Global.highScore50)
+                                {
+                                    Global.highScore50 = true;
+                                    string achievement = "ACHIEVEMENT_HIGH_SCORE";
+                                    Achievements.Award(achievement);
+                                }
                             }
                         }
+                        if(phase == 0 && player.spacingPlacementY > 240-player.height)
+                        {
+                            GlobalContent.GetSound("Error").Play(int.Parse(SaveData.saveValues["SoundEffectVolume"], CultureInfo.InvariantCulture) / 100f, 0f, 0f);
+                            player.dead = true;
+                            // timer in 0.05 seconds
+                            timer = (float)gameTime.TotalGameTime.TotalMilliseconds + 50f;
+                            if(!bool.Parse(SaveData.saveValues["DisableMotion"]))
+                            {
+                                tween.TweenTo(this, t => t.offset, new Vector2(0, GlobalGraphics.Scale(10)), 0.01f)
+                                    .Easing(EasingFunctions.Linear);
+                            }
+                            phase = 1;
+                        }
                     }
-                    if(phase == 0 && player.spacingPlacementY > 240-player.height)
+                }
+                // Re-evaluate dead
+                // Check timer
+                if (phase > 0 && timer <= (float)gameTime.TotalGameTime.TotalMilliseconds)
+                {
+                    switch(phase)
                     {
-                        GlobalContent.GetSound("Error").Play(int.Parse(SaveData.saveValues["SoundEffectVolume"], CultureInfo.InvariantCulture) / 100f, 0f, 0f);
-                        player.dead = true;
-                        // timer in 0.05 seconds
-                        timer = (float)gameTime.TotalGameTime.TotalMilliseconds + 50f;
-                        if(!bool.Parse(SaveData.saveValues["DisableMotion"]))
-                        {
-                            tween.TweenTo(this, t => t.offset, new Vector2(0, GlobalGraphics.Scale(10)), 0.01f)
-                                .Easing(EasingFunctions.Linear);
-                        }
-                        phase = 1;
+                        case 1:
+                            if(!hiding && !showing)
+                            {
+                                if(!bool.Parse(SaveData.saveValues["DisableMotion"]))
+                                {
+                                    tween.TweenTo(this, t => t.offset, new Vector2(0, -GlobalGraphics.Scale(10)), 0.05f)
+                                        .Easing(EasingFunctions.Linear);
+                                }
+                            }
+                            phase = 2;
+                            timer = (float)gameTime.TotalGameTime.TotalMilliseconds + 50f;
+                            break;
+                        case 2:
+                            if(!hiding && !showing)
+                            {
+                                if(!bool.Parse(SaveData.saveValues["DisableMotion"]))
+                                {
+                                    tween.TweenTo(this, t => t.offset, new Vector2(0, GlobalGraphics.Scale(10)), 0.05f)
+                                        .Easing(EasingFunctions.Linear);
+                                }
+                            }
+                            timer = (float)gameTime.TotalGameTime.TotalMilliseconds + 50f;
+                            phase = 6;
+                            break;
+                        case 6:
+                            if(!hiding && !showing)
+                            {
+                                if(!bool.Parse(SaveData.saveValues["DisableMotion"]))
+                                {
+                                    tween.TweenTo(this, t => t.offset, new Vector2(0, GlobalGraphics.Scale(0)), 0.05f)
+                                        .Easing(EasingFunctions.ExponentialInOut);
+                                }
+                            }
+                            timer = (float)gameTime.TotalGameTime.TotalMilliseconds + 50f;
+                            phase = 0;
+                            break;
+                        case 3:
+                            if(!hiding && !showing)
+                            {
+                                if(!bool.Parse(SaveData.saveValues["DisableMotion"]))
+                                {
+                                    tween.TweenTo(this, t => t.offset, new Vector2(GlobalGraphics.Scale(-320*2), GlobalGraphics.Scale(0)), 0.5f)
+                                        .Easing(EasingFunctions.ExponentialInOut);
+                                }
+                            }
+                            phase = 4;
+                            timer = (float)gameTime.TotalGameTime.TotalMilliseconds + 500f;
+                            break;
+                        case 4:
+                            player = new PastimeGamePlayer();
+                            obstacles.Clear();
+                            if(!hiding && !showing)
+                            {
+                                if(!bool.Parse(SaveData.saveValues["DisableMotion"]))
+                                {
+                                    offset = new Vector2(GlobalGraphics.Scale(320*2), GlobalGraphics.Scale(0));
+                                    tween.TweenTo(this, t => t.offset, new Vector2(GlobalGraphics.Scale(0), GlobalGraphics.Scale(0)), 0.5f)
+                                        .Easing(EasingFunctions.ExponentialInOut);
+                                }
+                            }
+                            phase = 5;
+                            timer = (float)gameTime.TotalGameTime.TotalMilliseconds + 500f;
+                            break;
+                        case 5:
+                            obstacles.Add(new PastimeGameObstacle(0));
+                            obstacles.Add(new PastimeGameObstacle(320 / 2));
+                            phase = 0;
+                            break;
                     }
                 }
-            }
-            // Re-evaluate dead
-            // Check timer
-            if (phase > 0 && timer <= (float)gameTime.TotalGameTime.TotalMilliseconds)
-            {
-                switch(phase)
+                else if (phase == 0 && player.dead)
                 {
-                    case 1:
-                        if(!hiding && !showing)
-                        {
-                            if(!bool.Parse(SaveData.saveValues["DisableMotion"]))
-                            {
-                                tween.TweenTo(this, t => t.offset, new Vector2(0, -GlobalGraphics.Scale(10)), 0.05f)
-                                    .Easing(EasingFunctions.Linear);
-                            }
-                        }
-                        phase = 2;
-                        timer = (float)gameTime.TotalGameTime.TotalMilliseconds + 50f;
-                        break;
-                    case 2:
-                        if(!hiding && !showing)
-                        {
-                            if(!bool.Parse(SaveData.saveValues["DisableMotion"]))
-                            {
-                                tween.TweenTo(this, t => t.offset, new Vector2(0, GlobalGraphics.Scale(10)), 0.05f)
-                                    .Easing(EasingFunctions.Linear);
-                            }
-                        }
-                        timer = (float)gameTime.TotalGameTime.TotalMilliseconds + 50f;
-                        phase = 6;
-                        break;
-                    case 6:
-                        if(!hiding && !showing)
-                        {
-                            if(!bool.Parse(SaveData.saveValues["DisableMotion"]))
-                            {
-                                tween.TweenTo(this, t => t.offset, new Vector2(0, GlobalGraphics.Scale(0)), 0.05f)
-                                    .Easing(EasingFunctions.ExponentialInOut);
-                            }
-                        }
-                        timer = (float)gameTime.TotalGameTime.TotalMilliseconds + 50f;
-                        phase = 0;
-                        break;
-                    case 3:
-                        if(!hiding && !showing)
-                        {
-                            if(!bool.Parse(SaveData.saveValues["DisableMotion"]))
-                            {
-                                tween.TweenTo(this, t => t.offset, new Vector2(GlobalGraphics.Scale(-320*2), GlobalGraphics.Scale(0)), 0.5f)
-                                    .Easing(EasingFunctions.ExponentialInOut);
-                            }
-                        }
-                        phase = 4;
-                        timer = (float)gameTime.TotalGameTime.TotalMilliseconds + 500f;
-                        break;
-                    case 4:
-                        player = new PastimeGamePlayer();
-                        obstacles.Clear();
-                        if(!hiding && !showing)
-                        {
-                            if(!bool.Parse(SaveData.saveValues["DisableMotion"]))
-                            {
-                                offset = new Vector2(GlobalGraphics.Scale(320*2), GlobalGraphics.Scale(0));
-                                tween.TweenTo(this, t => t.offset, new Vector2(GlobalGraphics.Scale(0), GlobalGraphics.Scale(0)), 0.5f)
-                                    .Easing(EasingFunctions.ExponentialInOut);
-                            }
-                        }
-                        phase = 5;
-                        timer = (float)gameTime.TotalGameTime.TotalMilliseconds + 500f;
-                        break;
-                    case 5:
-                        obstacles.Add(new PastimeGameObstacle(0));
-                        obstacles.Add(new PastimeGameObstacle(320 / 2));
-                        phase = 0;
-                        break;
+                    // Set all obstacles to dead
+                    foreach (PastimeGameObstacle obstacle in obstacles)
+                    {
+                        obstacle.isDead = true;
+                    }
+                    phase = 3;
+                    timer = (float)gameTime.TotalGameTime.TotalMilliseconds + 50f;
                 }
+                // Update player
+                if(player.Update(gameTime, handleInput))
+                    return true;
             }
-            else if (phase == 0 && player.dead)
-            {
-                // Set all obstacles to dead
-                foreach (PastimeGameObstacle obstacle in obstacles)
-                {
-                    obstacle.isDead = true;
-                }
-                phase = 3;
-                timer = (float)gameTime.TotalGameTime.TotalMilliseconds + 50f;
-            }
-            // Update player
-            if(player.Update(gameTime, handleInput))
-                return true;
             return false;
         }
         public void Draw(GameTime gameTime, SpriteBatch spriteBatch)

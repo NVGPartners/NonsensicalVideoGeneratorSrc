@@ -212,9 +212,9 @@ namespace NonsensicalVideoGenerator
             spriteBatch.Draw(side, new Rectangle(GlobalGraphics.Scale(bounds.X + 1 + bounds.Width - 1 + side.Width/2), GlobalGraphics.Scale(bounds.Y + 1 - 1 + side.Height/2), GlobalGraphics.Scale(side.Width), GlobalGraphics.Scale(side.Height)), null, Color.Black, MathHelper.ToRadians(180), new Vector2(side.Width/2, side.Height/2), SpriteEffects.None, 0);
             spriteBatch.Draw(inner, new Rectangle(GlobalGraphics.Scale(bounds.X + 1+4), GlobalGraphics.Scale(bounds.Y + 1), GlobalGraphics.Scale(bounds.Width-5), GlobalGraphics.Scale(inner.Height)), Color.Black);
             // Normal
-            spriteBatch.Draw(side, new Rectangle(GlobalGraphics.Scale(bounds.X), GlobalGraphics.Scale(bounds.Y), GlobalGraphics.Scale(side.Width), GlobalGraphics.Scale(side.Height)), (Global.editing != Name + "Input") ? Color.White : Color.White);
-            spriteBatch.Draw(side, new Rectangle(GlobalGraphics.Scale(bounds.X + bounds.Width - 1 + side.Width/2), GlobalGraphics.Scale(bounds.Y - 1 + side.Height/2), GlobalGraphics.Scale(side.Width), GlobalGraphics.Scale(side.Height)), null, (Global.editing != Name + "Input") ? Color.White : Color.White, MathHelper.ToRadians(180), new Vector2(side.Width/2, side.Height/2), SpriteEffects.None, 0);
-            spriteBatch.Draw(inner, new Rectangle(GlobalGraphics.Scale(bounds.X+4), GlobalGraphics.Scale(bounds.Y), GlobalGraphics.Scale(bounds.Width-5), GlobalGraphics.Scale(inner.Height)), (Global.editing != Name + "Input") ? Color.White : Color.White);
+            spriteBatch.Draw(side, new Rectangle(GlobalGraphics.Scale(bounds.X), GlobalGraphics.Scale(bounds.Y), GlobalGraphics.Scale(side.Width), GlobalGraphics.Scale(side.Height)), (Global.editing != Name + "Input") ? Color.White : Color.LightBlue);
+            spriteBatch.Draw(side, new Rectangle(GlobalGraphics.Scale(bounds.X + bounds.Width - 1 + side.Width/2), GlobalGraphics.Scale(bounds.Y - 1 + side.Height/2), GlobalGraphics.Scale(side.Width), GlobalGraphics.Scale(side.Height)), null, (Global.editing != Name + "Input") ? Color.White : Color.LightBlue, MathHelper.ToRadians(180), new Vector2(side.Width/2, side.Height/2), SpriteEffects.None, 0);
+            spriteBatch.Draw(inner, new Rectangle(GlobalGraphics.Scale(bounds.X+4), GlobalGraphics.Scale(bounds.Y), GlobalGraphics.Scale(bounds.Width-5), GlobalGraphics.Scale(inner.Height)), (Global.editing != Name + "Input") ? Color.White : Color.LightBlue);
             // Inner text
             try
             {
