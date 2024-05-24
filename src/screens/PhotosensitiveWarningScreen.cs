@@ -252,6 +252,12 @@ namespace NonsensicalVideoGenerator
                         {
                             askAccessibility = true;
                             warningText = new List<string>(accesibilityText);
+                            for (int i = 0; i < warningText.Count; i++)
+                            {
+                                if(warningText[i] == " ")
+                                    continue;
+                                warningText[i] = L.T(0, warningText[i]);
+                            }
                         }
                         else
                         {
@@ -347,6 +353,12 @@ namespace NonsensicalVideoGenerator
             }
             else
             {
+                for (int i = 0; i < warningText.Count; i++)
+                {
+                    if(warningText[i] == " ")
+                        continue;
+                    warningText[i] = L.T(0, warningText[i]);
+                }
                 controller.Add("Mute", new Switch("", "Mutes in-app background music.", new Vector2(147, 60-4+19*5), (int i, string n) => {
                     bool switchState = (i & 256) != 0;
                     if((i & 2) != 0)

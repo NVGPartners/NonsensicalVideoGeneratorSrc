@@ -11,6 +11,8 @@ using System.Linq;
 using System.Text.RegularExpressions;
 using System.Reflection;
 using Steamworks;
+using Microsoft.Xna.Framework.Media;
+
 #if MONOGAME
 using Microsoft.Xna.Framework;
 #else
@@ -823,6 +825,8 @@ namespace NonsensicalVideoGenerator
                     try
                     {
                         vidThreadWorker.ReportProgress(1);
+                        // Play error sting (music)
+                        UserInterface.instance.music = 1;
                     }
                     catch
                     {

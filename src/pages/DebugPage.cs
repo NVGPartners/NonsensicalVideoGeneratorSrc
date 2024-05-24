@@ -159,7 +159,7 @@ namespace NonsensicalVideoGenerator
                     if(MouseInput.MouseState.Y >= GlobalGraphics.Scale(33+(8*9)) && MouseInput.MouseState.Y <= GlobalGraphics.Scale(33+(8*9)+6))
                     {
                         // Cycle music.
-                        UserInterface.instance.FindMusic();
+                        UserInterface.instance.FindMusic(true);
                         GlobalContent.GetSound("Select").Play(int.Parse(SaveData.saveValues["SoundEffectVolume"], CultureInfo.InvariantCulture) / 100f, 0f, 0f);
                         return true;
                     }

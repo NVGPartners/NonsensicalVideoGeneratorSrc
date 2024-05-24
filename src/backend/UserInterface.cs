@@ -31,8 +31,9 @@ namespace NonsensicalVideoGenerator
         private SpriteBatch? _spriteBatch;
         private WindowState _windowState = WindowState.Unfocused;
         private MusicState _musicState = MusicState.Paused;
-        private int _musicActive = 0;
-        public int music;
+        private int _musicActive = 2;
+        public int music = 2;
+        private int oldMusic = 2;
         private bool alreadyPlayedFirstSong = false;
         public Vector2 preferredResolution = new(320, 240);
         public UserInterface()
@@ -132,21 +133,21 @@ namespace NonsensicalVideoGenerator
             GlobalContent.UnloadContent();
             base.UnloadContent();
         }
-        public void FindMusic()
+        public void FindMusic(bool all = false)
         {
-            if(!alreadyPlayedFirstSong)
+            if(!alreadyPlayedFirstSong || music < (all ? 0 : 2))
             {
                 alreadyPlayedFirstSong = true;
-                music = Global.generator.globalRandom.Next(0, GlobalContent.GetSongCount());
+                music = Global.generator.globalRandom.Next((all ? 0 : 2), GlobalContent.GetSongCount() - 1);
             }
             else
             {
                 music++;
             }
             // Make sure music is in range.
-            if(music < 0 || music >= GlobalContent.GetSongCount())
+            if(music < (all ? 0 : 2) || music >= GlobalContent.GetSongCount())
             {
-                music = 0;
+                music = (all ? 0 : 2);
             }
             _musicState = MusicState.Playing;
             try
@@ -155,7 +156,7 @@ namespace NonsensicalVideoGenerator
             }
             catch
             {
-                music = 0;
+                music = (all ? 0 : 2);
                 //ConsoleOutput.WriteLine("Failed to play music: " + ex.Message, Color.Red);
             }
         }
@@ -186,6 +187,7 @@ namespace NonsensicalVideoGenerator
                 // Exchange music if it's not the same as the active music.
                 if(_musicActive != music)
                 {
+                    oldMusic = _musicActive;
                     _musicActive = music;
                     try
                     {
@@ -193,7 +195,7 @@ namespace NonsensicalVideoGenerator
                     }
                     catch
                     {
-                        _musicActive = 0;
+                        _musicActive = 2;
                         //ConsoleOutput.WriteLine("Failed to play music: " + ex.Message, Color.Red);
                     }
                     MediaPlayer.Volume = 0f;
@@ -223,7 +225,17 @@ namespace NonsensicalVideoGenerator
                     // Loop music
                     if(MediaPlayer.State == MediaState.Stopped)
                     {
-                        FindMusic();
+                        if(music >= 2)
+                            MediaPlayer.Play(GlobalContent.GetSongByIndex(music));
+                        else if(music == 2)
+                        {
+                            if(oldMusic >= 2)
+                                music = oldMusic;
+                            else
+                                FindMusic();
+                        }
+                        else
+                            FindMusic();
                     }
                     if(SaveData.saveValues["MuteMusicWhileTabbedOut"] == "true")
                     {

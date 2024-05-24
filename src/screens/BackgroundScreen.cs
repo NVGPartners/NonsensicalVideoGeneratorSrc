@@ -7,6 +7,8 @@ using Microsoft.Xna.Framework.Content;
 using Microsoft.Xna.Framework.Graphics;
 using Microsoft.Xna.Framework.Input;
 using Microsoft.Xna.Framework.Media;
+using MonoGame.Extended;
+using MonoGame.Extended.Tweening;
 
 namespace NonsensicalVideoGenerator
 {
@@ -26,6 +28,11 @@ namespace NonsensicalVideoGenerator
         private int scrollX = 0;
         private int scrollY = 0;
         private float counter = 360;
+        private float mouseX = 0;
+        private float mouseY = 0;
+        private float lerpMouseX = 0;
+        private float lerpMouseY = 0;
+        private float lerpSpeed = 0.025f;
         public void Show()
         {
         }
@@ -59,7 +66,11 @@ namespace NonsensicalVideoGenerator
             */
             // Input.
             if(handleInput)
-            {
+            {                
+                // Pan the screen slightly when moving mouse (from center)
+                mouseX = MouseInput.MouseState.Position.X + GlobalGraphics.scaledWidth / 2;
+                mouseY = MouseInput.MouseState.Position.Y + GlobalGraphics.scaledHeight / 2;
+
                 // Detect clicks.
                 if (MouseInput.LastMouseState.LeftButton == ButtonState.Released && MouseInput.MouseState.LeftButton == ButtonState.Pressed) {
                     // Play a sound.
@@ -67,15 +78,45 @@ namespace NonsensicalVideoGenerator
                     return true;
                 }
             }
+            else
+            {
+                // Lerp last mouse position to center (smooth)
+                mouseX = MathHelper.Lerp(mouseX, GlobalGraphics.scaledWidth / 2, GlobalGraphics.Scale(lerpSpeed));
+                mouseY = MathHelper.Lerp(mouseY, GlobalGraphics.scaledHeight / 2, GlobalGraphics.Scale(lerpSpeed));
+            }
             return false;
         }
         public void Draw(GameTime gameTime, SpriteBatch spriteBatch)
         {
             // Draw background with new hue.
             spriteBatch.Draw(GlobalContent.GetTexture("Pixel"), new Rectangle(GlobalGraphics.Scale((int)-Global.drawOffset.X), GlobalGraphics.Scale((int)-Global.drawOffset.Y), (int)UserInterface.instance.preferredResolution.X, (int)UserInterface.instance.preferredResolution.Y), ThemeManager.GetColor("BackgroundScreen"));
+            
             if(!bool.Parse(SaveData.saveValues["DisableMotion"]))
             {
-                // Draw the tiled background.
+                // End existing spritebatch
+                spriteBatch.End();
+
+                // Lerp the mouse position (limit mouse movement to lerpSpeed so it smooths out)
+                lerpMouseX = MathHelper.Lerp(lerpMouseX, mouseX, GlobalGraphics.Scale(lerpSpeed));
+                lerpMouseY = MathHelper.Lerp(lerpMouseY, mouseY, GlobalGraphics.Scale(lerpSpeed));
+
+                // Clamp to screen bounds
+                lerpMouseX = Math.Clamp(lerpMouseX, -GlobalGraphics.scaledWidth, GlobalGraphics.scaledWidth*2);
+                lerpMouseY = Math.Clamp(lerpMouseY, -GlobalGraphics.scaledHeight, GlobalGraphics.scaledHeight*2);
+
+                float mX = Global.drawOffset.X - lerpMouseX;
+                float mY = Global.drawOffset.Y - lerpMouseY;
+
+                // Create matrix
+                Matrix matrix = Matrix.CreateTranslation(mX, mY, 0);
+                
+                // Create spritebatch with panning (and respect draw offset)
+                spriteBatch.Begin(SpriteSortMode.Deferred,
+                    BlendState.AlphaBlend,
+                    SamplerState.PointClamp,
+                    null, null, null, matrix);
+
+                // Draw the background.
                 // This is done by drawing four background layers, each with a different direction for the illusion of infinite scrolling.
                 Texture2D tile = GlobalContent.GetTexture("Tile");
                 for(int x = 0; x < totalCount; x += tile.Width)
@@ -85,12 +126,21 @@ namespace NonsensicalVideoGenerator
                         spriteBatch.Draw(tile, new Rectangle(GlobalGraphics.Scale(x + scrollX), GlobalGraphics.Scale(y + scrollY), GlobalGraphics.Scale(tile.Width), GlobalGraphics.Scale(tile.Height)), ThemeManager.GetColor("TileBackgroundScreen"));
                     }
                 }
+
                 // (DEBUG) Draw scroll position.
                 //spriteBatch.DrawString(L.FontSmall(), $"{scrollX}, {scrollY}", new Vector2(GlobalGraphics.Scale(16), GlobalGraphics.Scale(16)), Color.White);
                 // (DEBUG) Draw count of circles.
                 //spriteBatch.DrawString(L.FontSmall(), $"{circles.Count}", new Vector2(GlobalGraphics.Scale(16), GlobalGraphics.Scale(32)), Color.White);
                 // (DEBUG) Draw mouse click state.
                 // spriteBatch.DrawString(L.FontSmall(), $"{mouseReleased}", new Vector2(GlobalGraphics.Scale(16), GlobalGraphics.Scale(48)), Color.White);
+                
+                // End offset spritebatch
+                spriteBatch.End();
+                // Remake spritebatch
+                spriteBatch.Begin(SpriteSortMode.Deferred,
+                    BlendState.AlphaBlend,
+                    SamplerState.PointClamp,
+                    null, null, null, Matrix.CreateTranslation(GlobalGraphics.Scale(Global.drawOffset.X), GlobalGraphics.Scale(Global.drawOffset.Y), 0));
             }
         }
         public void LoadContent(ContentManager contentManager, GraphicsDevice graphicsDevice)

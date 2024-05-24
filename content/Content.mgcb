@@ -965,6 +965,18 @@
 /processorParam:TextureFormat=Color
 /build:graphics/vidwindow.png
 
+#begin music/bugcrusher.ogg
+/importer:OggImporter
+/processor:SongProcessor
+/processorParam:Quality=Best
+/build:music/bugcrusher.ogg
+
+#begin music/mystery.ogg
+/importer:OggImporter
+/processor:SongProcessor
+/processorParam:Quality=Best
+/build:music/mystery.ogg
+
 #begin music/theme1.ogg
 /importer:OggImporter
 /processor:SongProcessor

@@ -7,6 +7,7 @@ using Microsoft.Xna.Framework.Content;
 using Microsoft.Xna.Framework.Graphics;
 using MonoGame.Extended.Tweening;
 using System.Globalization;
+using Microsoft.Xna.Framework.Media;
 
 namespace NonsensicalVideoGenerator
 {
@@ -26,6 +27,7 @@ namespace NonsensicalVideoGenerator
         private readonly Tweener tween = new();
         private KeyboardState oldKeyboardState;
         private KeyboardState newKeyboardState;
+        public int oldMusic = 2;
         public void Show()
         {
             toggle = true;
@@ -126,9 +128,19 @@ namespace NonsensicalVideoGenerator
                         Accessibility.TTS(L.T(0, "Accessibility:ConsoleShown"));
                 }
                 if(!toggled)
+                {
                     GlobalContent.GetSound("Back").Play(int.Parse(SaveData.saveValues["SoundEffectVolume"], CultureInfo.InvariantCulture) / 100f, 0f, 0f);
+                    if(oldMusic >= 2)
+                        UserInterface.instance.music = oldMusic;
+                    else
+                        UserInterface.instance.FindMusic();
+                }
                 else
+                {
                     GlobalContent.GetSound("Select").Play(int.Parse(SaveData.saveValues["SoundEffectVolume"], CultureInfo.InvariantCulture) / 100f, 0f, 0f);
+                    oldMusic = UserInterface.instance.music;
+                    UserInterface.instance.music = 0;
+                }
             }
             // Scrolling will set ConsoleOutput.paused to true.
             if (MouseInput.MouseState.ScrollWheelValue != MouseInput.LastMouseState.ScrollWheelValue)

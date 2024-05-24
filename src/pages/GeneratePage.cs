@@ -122,6 +122,7 @@ namespace NonsensicalVideoGenerator
                                     GlobalContent.GetSound("Select").Play(int.Parse(SaveData.saveValues["SoundEffectVolume"], CultureInfo.InvariantCulture) / 100f, 0f, 0f);
                                     if(Accessibility.showDisambiguation)
                                         Accessibility.TTS(L.T(0, "Accessibility:ConsoleShown"));
+                                    UserInterface.instance.music = 0;
                                 }
                                 else
                                 {
