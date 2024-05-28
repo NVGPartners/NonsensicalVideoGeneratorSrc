@@ -104,8 +104,8 @@ namespace NonsensicalVideoGenerator
                 lerpMouseX = Math.Clamp(lerpMouseX, -GlobalGraphics.scaledWidth, GlobalGraphics.scaledWidth*2);
                 lerpMouseY = Math.Clamp(lerpMouseY, -GlobalGraphics.scaledHeight, GlobalGraphics.scaledHeight*2);
 
-                float mX = Global.drawOffset.X - lerpMouseX;
-                float mY = Global.drawOffset.Y - lerpMouseY;
+                float mX = Global.drawOffset.X /*- lerpMouseX*/;
+                float mY = Global.drawOffset.Y /*- lerpMouseY*/;
 
                 // Create matrix
                 Matrix matrix = Matrix.CreateTranslation(mX, mY, 0);
