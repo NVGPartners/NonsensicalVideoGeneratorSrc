@@ -569,7 +569,7 @@ namespace NonsensicalVideoGenerator
                                     {
                                         SaveData.saveValues["ActiveTheme"] = "";
                                         SaveData.Save();
-                                        ThemeManager.ApplyTheme(DefaultThemes.Nonsensical);
+                                        ThemeManager.ApplyTheme(DefaultThemes.defaultTheme);
                                     }
                                     else if(PluginHandler.plugins[i].enabled == true
                                         && PluginHandler.plugins[i].GetAddonType() == AddonType.Theme)
@@ -692,7 +692,7 @@ namespace NonsensicalVideoGenerator
                                                             {
                                                                 SaveData.saveValues["ActiveTheme"] = "";
                                                                 ThemeManager.LoadThemes();
-                                                                ThemeManager.ApplyTheme(DefaultThemes.Nonsensical);
+                                                                ThemeManager.ApplyTheme(DefaultThemes.defaultTheme);
                                                             }
                                                             Directory.Delete(Path.GetDirectoryName(PluginHandler.plugins[settingsIndex].path) ?? "", true);
                                                             GlobalContent.GetSound("Select").Play(int.Parse(SaveData.saveValues["SoundEffectVolume"], CultureInfo.InvariantCulture) / 100f, 0f, 0f);

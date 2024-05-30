@@ -19,6 +19,7 @@ namespace NonsensicalVideoGenerator
             // Respect Global.drawOffset
             int oX = GlobalGraphics.Scale((int)Global.drawOffset.X);
             int oY = GlobalGraphics.Scale((int)Global.drawOffset.Y);
+            MouseState overrideLastState = lastMouseState;
             MouseState overrideMouseState = _mouseState;
             if(Accessibility.allowAccessibility)
             {
@@ -27,7 +28,7 @@ namespace NonsensicalVideoGenerator
                 {
                     int x = Accessibility.disambiguationOptions[-(Accessibility.offset)].bounds.X + Accessibility.disambiguationOptions[-(Accessibility.offset)].bounds.Width / 2;
                     int y = Accessibility.disambiguationOptions[-(Accessibility.offset)].bounds.Y + Accessibility.disambiguationOptions[-(Accessibility.offset)].bounds.Height / 2;
-                    overrideMouseState = new MouseState(x, y, _mouseState.ScrollWheelValue, ButtonState.Released, ButtonState.Released, ButtonState.Released, ButtonState.Released, ButtonState.Released);
+                    overrideMouseState = new MouseState(x + oX, y + oY, _mouseState.ScrollWheelValue, ButtonState.Released, ButtonState.Released, ButtonState.Released, ButtonState.Released, ButtonState.Released);
                 }
                 // Build mouse state from accessibility if active
                 if(Accessibility.selectedDisambiguationOption != -1 && Accessibility.disambiguationOptions.Count > Accessibility.selectedDisambiguationOption)
@@ -35,12 +36,14 @@ namespace NonsensicalVideoGenerator
                     int x = Accessibility.disambiguationOptions[Accessibility.selectedDisambiguationOption].bounds.X + Accessibility.disambiguationOptions[Accessibility.selectedDisambiguationOption].bounds.Width / 2;
                     int y = Accessibility.disambiguationOptions[Accessibility.selectedDisambiguationOption].bounds.Y + Accessibility.disambiguationOptions[Accessibility.selectedDisambiguationOption].bounds.Height / 2;
                     bool right = Accessibility.right;
-                    lastMouseState = new MouseState(x, y, lastMouseState.ScrollWheelValue, ButtonState.Released, ButtonState.Released, ButtonState.Released, ButtonState.Released, ButtonState.Released);
-                    overrideMouseState = new MouseState(x, y, lastMouseState.ScrollWheelValue, right ? ButtonState.Released : ButtonState.Pressed, ButtonState.Released, right ? ButtonState.Pressed : ButtonState.Released, ButtonState.Released, ButtonState.Released);
+                    overrideLastState = new MouseState(x + oX, y + oY, lastMouseState.ScrollWheelValue, ButtonState.Released, ButtonState.Released, ButtonState.Released, ButtonState.Released, ButtonState.Released);
+                    overrideMouseState = new MouseState(x + oX, y + oY, lastMouseState.ScrollWheelValue, right ? ButtonState.Released : ButtonState.Pressed, ButtonState.Released, right ? ButtonState.Pressed : ButtonState.Released, ButtonState.Released, ButtonState.Released);
                 }
             }
             // Apply draw offset
+            overrideLastState = new MouseState(overrideLastState.X - oX, overrideLastState.Y - oY, overrideLastState.ScrollWheelValue, overrideLastState.LeftButton, overrideLastState.MiddleButton, overrideLastState.RightButton, overrideLastState.XButton1, overrideLastState.XButton2);
             overrideMouseState = new MouseState(overrideMouseState.X - oX, overrideMouseState.Y - oY, overrideMouseState.ScrollWheelValue, overrideMouseState.LeftButton, overrideMouseState.MiddleButton, overrideMouseState.RightButton, overrideMouseState.XButton1, overrideMouseState.XButton2);
+            lastMouseState = overrideLastState;
             return overrideMouseState;
         }
         public static MouseState LastMouseState

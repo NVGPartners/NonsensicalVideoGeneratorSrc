@@ -34,7 +34,6 @@ namespace NonsensicalVideoGenerator
         private int _musicActive = 2;
         public int music = 2;
         private int oldMusic = 2;
-        private bool alreadyPlayedFirstSong = false;
         public Vector2 preferredResolution = new(320, 240);
         public UserInterface()
         {
@@ -111,9 +110,11 @@ namespace NonsensicalVideoGenerator
             ScreenManager.LoadScreens();
             ConsoleOutput.WriteLine("Initialization complete.", Color.Transparent);
             LibraryData.SequentialName();
+#if WINDOWSDX
             Window.AllowAltF4 = false;
             Form _GameForm = (Form)Form.FromHandle(Window.Handle);
             _GameForm.Closing += ClosingForm;
+#endif
             base.Initialize();
         }
         protected override void LoadContent()
@@ -135,17 +136,16 @@ namespace NonsensicalVideoGenerator
         }
         public void FindMusic(bool all = false)
         {
-            if(!alreadyPlayedFirstSong || music < (all ? 0 : 2))
+            if(music < (all ? 0 : 2))
             {
-                alreadyPlayedFirstSong = true;
-                music = Global.generator.globalRandom.Next((all ? 0 : 2), GlobalContent.GetSongCount() - 1);
+                music = Global.generator.globalRandom.Next((all ? 0 : 2), (all ? 11 : GlobalContent.GetSongCount() - 1));
             }
             else
             {
                 music++;
             }
             // Make sure music is in range.
-            if(music < (all ? 0 : 2) || music >= GlobalContent.GetSongCount())
+            if(music < (all ? 0 : 2) || music >= (all ? 11 : GlobalContent.GetSongCount()))
             {
                 music = (all ? 0 : 2);
             }
@@ -171,9 +171,6 @@ namespace NonsensicalVideoGenerator
             */
             if(bool.Parse(SaveData.saveValues["EnableDiscordRPC"]))
                 DiscordRPC.Update();
-            // fix text entries
-            bool handleInput = Accessibility.showDisambiguation || (IsActive && MouseInput.MouseState.X >= 0 && MouseInput.MouseState.X <= GlobalGraphics.scaledWidth &&
-                MouseInput.MouseState.Y >= 0 && MouseInput.MouseState.Y <= GlobalGraphics.scaledHeight && !Global.dragDrop);
             try
             {
                 if(SteamManager.initialized)
@@ -182,7 +179,7 @@ namespace NonsensicalVideoGenerator
             catch {}
             FramePlayer.Update(gameTime);
             // Play music after 500ms.
-            if(gameTime.TotalGameTime.TotalMilliseconds > Global.readyTime + 2500 && Global.ready)
+            if(gameTime.TotalGameTime.TotalMilliseconds > Global.readyTime + Global.waitReady && Global.ready)
             {
                 // Exchange music if it's not the same as the active music.
                 if(_musicActive != music)
@@ -225,9 +222,11 @@ namespace NonsensicalVideoGenerator
                     // Loop music
                     if(MediaPlayer.State == MediaState.Stopped)
                     {
-                        if(music >= 2)
+                        if(music == 0)
+                        {
                             MediaPlayer.Play(GlobalContent.GetSongByIndex(music));
-                        else if(music == 2)
+                        }
+                        else if(music == 1)
                         {
                             if(oldMusic >= 2)
                                 music = oldMusic;
@@ -235,7 +234,9 @@ namespace NonsensicalVideoGenerator
                                 FindMusic();
                         }
                         else
+                        {
                             FindMusic();
+                        }
                     }
                     if(SaveData.saveValues["MuteMusicWhileTabbedOut"] == "true")
                     {

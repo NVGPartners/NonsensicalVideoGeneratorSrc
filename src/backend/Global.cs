@@ -53,5 +53,6 @@ namespace NonsensicalVideoGenerator
         public static bool imageLibraryAvailableInternal = true;
         public static int randomSeed = 0;
         public static Vector2 drawOffset = new(0, 0);
+        public static int waitReady = int.MaxValue;
     }
 }

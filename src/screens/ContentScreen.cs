@@ -94,8 +94,13 @@ namespace NonsensicalVideoGenerator
         {
             if(Pagination.SelectedPage != Pagination.TopPageCount)
             {
+                layer = 3;
                 if(actionController.Update(gameTime, handleInput))
                     return true;
+            }
+            else
+            {
+                layer = 999;
             }
             // When animation is done, set screen type
             if (hiding && offset.Y == GlobalGraphics.Scale(240))

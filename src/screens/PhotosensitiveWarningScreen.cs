@@ -166,6 +166,8 @@ namespace NonsensicalVideoGenerator
         }
         public bool Update(GameTime gameTime, bool handleInput)
         {
+            if(screenType == ScreenType.Hidden || Global.fakeExit)
+                return false;
             if(!accepted)
             {
                 overlayOpacity -= 16;
@@ -297,7 +299,10 @@ namespace NonsensicalVideoGenerator
                             Global.readyTime = gameTime.TotalGameTime.TotalMilliseconds;
                             // Play startup sound.
                             if(SaveData.saveValues["ActiveTheme"] == "")
+                            {
+                                Global.waitReady = 2500;
                                 GlobalContent.GetSound("Start").Play(int.Parse(SaveData.saveValues["SoundEffectVolume"], CultureInfo.InvariantCulture) / 100f, 0f, 0f);
+                            }
                             fadingIn = true;
                         }
                         accepted = false;

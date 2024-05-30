@@ -975,16 +975,32 @@ namespace NonsensicalVideoGenerator
                 // Move ffmpeg.exe and ffprobe.exe to the root folder
                 try
                 {
+                    if(File.Exists(Path.Combine(Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location) ?? ".", "ffmpeg.exe")))
+                    {
+                        File.Delete(Path.Combine(Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location) ?? ".", "ffmpeg.exe"));
+                    }
                     File.Move(ffmpegExePath, Path.Combine(Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location) ?? ".", "ffmpeg.exe"));
                 }
-                catch {}
+                catch(Exception e)
+                {
+                    ConsoleOutput.WriteLine("Failed to move ffmpeg.exe: " + e.Message, Color.Red);
+                    ffmpegExePath = "";
+                }
             }
             if(ffprobeExePath != "")
             {
                 try
                 {
+                    if(File.Exists(Path.Combine(Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location) ?? ".", "ffprobe.exe")))
+                    {
+                        File.Delete(Path.Combine(Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location) ?? ".", "ffprobe.exe"));
+                    }
                     File.Move(ffprobeExePath, Path.Combine(Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location) ?? ".", "ffprobe.exe"));
-                } catch {}
+                } catch(Exception e)
+                {
+                    ConsoleOutput.WriteLine("Failed to move ffprobe.exe: " + e.Message, Color.Red);
+                    ffprobeExePath = "";
+                }
             }
 
             // Re-scan for ffmpeg

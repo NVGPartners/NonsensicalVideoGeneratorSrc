@@ -210,18 +210,20 @@ namespace NonsensicalVideoGenerator
                 }
             }
             // Toggle debug mode
-            // F20 or CTRL+F3 will toggle debug mode
-            if((keyboardState.IsKeyDown(Keys.F20)
-                || (keyboardState.IsKeyDown(Keys.LeftControl) && keyboardState.IsKeyDown(Keys.F3)))
-                && lastKeyboardState.IsKeyUp(Keys.F20)
-                && (lastKeyboardState.IsKeyUp(Keys.LeftControl)
-                || lastKeyboardState.IsKeyUp(Keys.F3)))
+            // CTRL+F3 will toggle debug mode
+            if(keyboardState.IsKeyDown(Keys.LeftControl) && keyboardState.IsKeyDown(Keys.F3)
+                && lastKeyboardState.IsKeyUp(Keys.F3))
             {
                 Debug.SetDebugMode(!Debug.GetDebugMode());
             }
             // DEBUG
             if(Debug.GetDebugMode())
             {
+                // F3 will open the debug menu
+                if(keyboardState.IsKeyDown(Keys.F3) && lastKeyboardState.IsKeyUp(Keys.F3))
+                {
+                    Debug.ToggleDebugMenu();
+                }
                 // F4 will toggle hiding everything
                 if(keyboardState.IsKeyDown(Keys.F4) && lastKeyboardState.IsKeyUp(Keys.F4))
                 {

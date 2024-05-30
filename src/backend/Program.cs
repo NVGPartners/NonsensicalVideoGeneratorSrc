@@ -44,6 +44,17 @@ namespace NonsensicalVideoGenerator
                 ConsoleOutput.Clear();
             }
             Global.randomSeed = Global.generator.globalRandom.Next();
+            if(Global.parameters.Contains("-seed"))
+            {
+                int index = Global.parameters.IndexOf("-seed");
+                if(index + 1 < Global.parameters.Count)
+                {
+                    if(int.TryParse(Global.parameters[index + 1], out int seed))
+                    {
+                        Global.randomSeed = seed;
+                    }
+                }
+            }
             Global.generator.globalRandom = new Random(Global.randomSeed);
             SaveData.Load();
             if(Global.parameters.Contains("-v"))
@@ -74,6 +85,23 @@ namespace NonsensicalVideoGenerator
             L.LoadLocale(locale);
             if(Global.parameters.Contains("-intro"))
                 SaveData.saveValues["FirstBoot"] = "true";
+            HolidayManager.CheckHolidays();
+            if(Global.parameters.Contains("-holiday"))
+            {
+                int index = Global.parameters.IndexOf("-holiday");
+                if(index + 1 < Global.parameters.Count)
+                {
+                    string holiday = Global.parameters[index + 1];
+                    foreach(Holiday h in HolidayManager.Holidays)
+                    {
+                        if(h.InternalName == holiday.ToLower())
+                        {
+                            HolidayManager.SetHoliday(h);
+                            break;
+                        }
+                    }
+                }
+            }
 #if MONOGAME
             using (var game = new UserInterface())
                 game.Run();

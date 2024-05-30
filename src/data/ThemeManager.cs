@@ -2,6 +2,8 @@ using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
+using System.Reflection;
+
 #if MONOGAME
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Audio;
@@ -61,7 +63,7 @@ namespace NonsensicalVideoGenerator
     }
     public static class DefaultThemes
     {
-        public static Theme Nonsensical = new Theme("Nonsensical", "The default theme.", "", 7, 4, new Dictionary<string, Color>() {
+        public static Theme Nonsensical = new Theme("Nonsensical", "The default theme.", "", 6, 4, new Dictionary<string, Color>() {
             {"ClearColor", new Color(0, 0, 0, 255)},
             {"ShadowActionButtonInteractable", new Color(0, 0, 0, 255)},
             {"ShadowButtonInteractable", new Color(0, 0, 0, 255)},
@@ -89,16 +91,22 @@ namespace NonsensicalVideoGenerator
             {"VideoPlayerProgressBar", new Color(255, 0, 0, 255)},
             {"VideoPlayerProgressBarBackground", new Color(0, 0, 0, 0)},
         }, true);
+        public static Theme Spooky = new Theme("Spooky", "Trick or treat!", "themes/halloween/", 1, 5, new Dictionary<string, Color>() {
+            {"VideoPlayerProgressBar", new Color(60, 0, 128, 255)},
+        }, true);
         public static List<Theme> themes = new List<Theme>()
         {
-            Nonsensical
+            Nonsensical,
+            Spooky
         };
+        public static Theme defaultTheme = Nonsensical;
     }
     public static class ThemeManager
     {
         public static List<Theme> themes = new List<Theme>()
         {
-            DefaultThemes.Nonsensical
+            DefaultThemes.Nonsensical,
+            DefaultThemes.Spooky
         };
         public static Theme activeTheme = DefaultThemes.Nonsensical;
         public static void LoadThemes()
@@ -109,7 +117,7 @@ namespace NonsensicalVideoGenerator
                 themes.Add(theme);
             }
             bool themeChanged = false;
-            Theme newTheme = DefaultThemes.Nonsensical;
+            Theme newTheme = DefaultThemes.defaultTheme;
             List<Plugin> themeList = PluginHandler.GetEnabledPluginsOfType(AddonType.Theme);
             foreach (Plugin theme in themeList)
             {
@@ -218,6 +226,13 @@ namespace NonsensicalVideoGenerator
             // If active theme uses mgcb, apply prefix and load
             if(activeTheme.mgcb)
             {
+                // Make sure xnb file exists
+                if(!File.Exists(Path.Combine(Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location) ?? ".", "Content", activeTheme.prefix + path + ".xnb")))
+                {
+                    //ConsoleOutput.WriteLine($"Fallback: {path} not found in {activeTheme.name}.", Color.Yellow);
+                    // If not, load from default theme
+                    return contentManager.Load<T>(path);
+                }
                 return contentManager.Load<T>(activeTheme.prefix + path);
             }
             // Otherwise, load assets
@@ -288,6 +303,7 @@ namespace NonsensicalVideoGenerator
                     // Load all screen content.
                     ScreenManager.LoadContent(UserInterface.instance.Content, UserInterface.instance.GraphicsDevice);
                 }
+                Global.waitReady = 2500;
                 GlobalContent.GetSound("Start").Play(int.Parse(SaveData.saveValues["SoundEffectVolume"], System.Globalization.CultureInfo.InvariantCulture) / 100f, 0f, 0f);
                 FramePlayer.canPlayBgMusic = true;
                 return true;

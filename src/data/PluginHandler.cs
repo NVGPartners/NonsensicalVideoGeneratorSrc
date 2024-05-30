@@ -2129,5 +2129,9 @@ namespace NonsensicalVideoGenerator
         {
             return plugins.FindAll(plugin => plugin.enabled == true && plugin.GetAddonType() == type);
         }
+        public static List<Plugin> GetPluginsOfType(AddonType type)
+        {
+            return plugins.FindAll(plugin => plugin.GetAddonType() == type);
+        }
     }
 }

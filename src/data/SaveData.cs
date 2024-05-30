@@ -32,7 +32,7 @@ namespace NonsensicalVideoGenerator
             {"PlayAutomatically", "true"},
             {"GameHighScore", "0"},
             {"MusicVolume", "50"},
-            {"SoundEffectVolume", "65"},
+            {"SoundEffectVolume", "100"},
             {"VideoVolume", "100"},
             {"TransitionChance", "20"},
             {"OverlayChance", "20"},
