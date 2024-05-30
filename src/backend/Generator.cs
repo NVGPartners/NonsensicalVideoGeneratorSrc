@@ -61,7 +61,7 @@ namespace NonsensicalVideoGenerator
         public string tempOutput = Path.Combine(Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location) ?? ".", "library", "video", "renders", "temp.mp4");
         public static string oldExportParams = "-c:v libx264 -crf 18 -preset veryfast -ar 32000 -shortest -avoid_negative_ts make_zero -fflags +genpts";
         public static string betterExportParams = "-vcodec libx264 -crf 28 -preset ultrafast -ar 32000 -shortest -avoid_negative_ts make_zero -fflags +genpts";
-        public static string exportParams = oldExportParams;
+        public static string exportParams = betterExportParams;
         public void KillChildProcesses()
         {
             // Find all child processes of the current process and kill them.

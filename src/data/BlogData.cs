@@ -15,12 +15,12 @@ namespace NonsensicalVideoGenerator
     /// </summary>
     public static class BlogData
     {
-        public static string Title { get; set; } = "Milestone 5";
+        public static string Title { get; set; } = "Milestone 5: Spring Cleaning Update";
         public static string LastVersion { get; set; } = "1.0.1.0";
         public static List<string> Subtitle { get; set; } = new List<string>()
         {
             "v1.0.1.0",
-            "May 22 2024",
+            "May 30 2024",
         };
         public static List<string> Description { get; set; } = new List<string>()
         {
