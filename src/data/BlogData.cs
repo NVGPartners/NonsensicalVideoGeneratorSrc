@@ -20,7 +20,7 @@ namespace NonsensicalVideoGenerator
         public static List<string> Subtitle { get; set; } = new List<string>()
         {
             "v1.0.1.0",
-            "May 30 2024",
+            "May 31 2024",
         };
         public static List<string> Description { get; set; } = new List<string>()
         {
