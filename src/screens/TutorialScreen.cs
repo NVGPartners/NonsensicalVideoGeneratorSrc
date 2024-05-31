@@ -404,6 +404,7 @@ namespace NonsensicalVideoGenerator
                     string localizedInstalled = L.T(0, "Tutorial:ProgramInstalled");
                     string localizedNotFound = L.T(0, "Tutorial:ProgramNotFound");
                     string localizedUsingSystemPath = L.T(0, "Tutorial:ProgramUsingSystemPath");
+                    string localizedWrongVersion = L.T(0, "Tutorial:ProgramWrongVersion");
                     string ffmpeg = UpdateManager.ffmpegInstalled ? localizedInstalled : localizedNotFound;
                     string ffprobe = UpdateManager.ffprobeInstalled ? localizedInstalled : localizedNotFound;
                     string magick = UpdateManager.imagemagickInstalled ? localizedInstalled : localizedNotFound;
@@ -417,6 +418,8 @@ namespace NonsensicalVideoGenerator
                             ffmpeg = localizedUsingSystemPath;
                         }
                     }
+                    if(UpdateManager.ffmpegWrongVersion)
+                        ffmpeg = localizedWrongVersion;
                     if(Global.useSystemFFprobe)
                     {
                         if(!UpdateManager.ffprobeInstalled)
@@ -424,6 +427,9 @@ namespace NonsensicalVideoGenerator
                         else
                             ffprobe = localizedUsingSystemPath;
                     }
+                    if(UpdateManager.ffprobeWrongVersion)
+                        ffprobe = localizedWrongVersion;
+                    // FIXME: This button never gets removed because system ffmpeg is deprecated
                     if(Global.useSystemFFmpeg && Global.useSystemFFprobe
                         && UpdateManager.ffmpegInstalled && UpdateManager.ffprobeInstalled)
                     {

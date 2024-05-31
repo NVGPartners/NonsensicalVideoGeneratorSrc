@@ -5,6 +5,8 @@ using Newtonsoft.Json;
 using System.Net.Http;
 using System.Diagnostics;
 using System.Windows.Forms;
+using System.Reflection;
+
 
 #if MONOGAME
 using Microsoft.Xna.Framework;
@@ -21,8 +23,12 @@ namespace NonsensicalVideoGenerator
     {
         public static string updateUrl = "";
         public static string updateTag = "";
+        public static string requiredFFmpegVersion = "6.1.1-essentials_build-www.gyan.dev";
+        public static string requiredFFprobeVersion = "6.1.1-essentials_build-www.gyan.dev";
         public static bool ffmpegInstalled = false;
+        public static bool ffmpegWrongVersion = false;
         public static bool ffprobeInstalled = false;
+        public static bool ffprobeWrongVersion = false;
         public static bool imagemagickInstalled = false;
         public static bool ytDlpInstalled = false;
         public static bool frei0rInstalled = false;
@@ -61,6 +67,22 @@ namespace NonsensicalVideoGenerator
         }
         public static void GetDependencyStatus()
         {
+            ffmpegWrongVersion = false;
+            ffprobeWrongVersion = false;
+            if(Global.parameters.Contains("-fakedependencies"))
+            {
+                Global.useSystemFFmpeg = true;
+                Global.useSystemFFprobe = true;
+                Global.useSystemMagick = true;
+                Global.useSystemYtDlp = true;
+                Global.useSystemFrei0r = true;
+                ffmpegInstalled = true;
+                ffprobeInstalled = true;
+                imagemagickInstalled = true;
+                ytDlpInstalled = true;
+                frei0rInstalled = true;
+                return;
+            }
             // Test for dependencies.
             ConsoleOutput.WriteLine("Checking for dependencies...", Color.Magenta);
             bool[] status = new bool[5];
@@ -78,7 +100,62 @@ namespace NonsensicalVideoGenerator
             }
             else
             {
-                Global.useSystemFFmpeg = false;
+                if(!Global.parameters.Contains("-forceversion"))
+                {
+                    // Double check FFmpeg version by running .\ffmpeg.exe -version.
+                    ProcessStartInfo startInfo = new()
+                    {
+                        WindowStyle = ProcessWindowStyle.Hidden,
+                        FileName = @".\ffmpeg.exe",
+                        Arguments = "-version",
+                        UseShellExecute = false,
+                        RedirectStandardError = true,
+                        RedirectStandardOutput = true,
+                        CreateNoWindow = true,
+                        WorkingDirectory = Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location) ?? ".",
+                    };
+                    Process process = new()
+                    {
+                        StartInfo = startInfo
+                    };
+                    string output = "";
+                    DataReceivedEventHandler handler = (sender, e) =>
+                    {
+                        if (e.Data != null)
+                        {
+                            output += e.Data;
+                            ConsoleOutput.WriteLine(e.Data, Color.Transparent);
+                        }
+                    };
+                    process.ErrorDataReceived += handler;
+                    process.OutputDataReceived += handler;
+                    process.Start();
+                    process.BeginErrorReadLine();
+                    process.BeginOutputReadLine();
+                    process.WaitForExit();
+                    if (output != null && output.Contains("ffmpeg version"))
+                    {
+                        if (output.Contains(requiredFFmpegVersion))
+                        {
+                            status[0] = true;
+                            Global.useSystemFFmpeg = false;
+                        }
+                        else
+                        {
+                            ConsoleOutput.WriteLine("FFmpeg version is not correct.", Color.Red);
+                            ffmpegWrongVersion = true;
+                            Global.useSystemFFmpeg = true;
+                        }
+                    }
+                    else
+                    {
+                        Global.useSystemFFmpeg = true;
+                    }
+                }
+                else
+                {
+                    Global.useSystemFFmpeg = false;
+                }
             }
             if (!status[1])
             {
@@ -86,7 +163,57 @@ namespace NonsensicalVideoGenerator
             }
             else
             {
-                Global.useSystemFFprobe = false;
+                if(!Global.parameters.Contains("-forceversion"))
+                {
+                    // Double check FFprobe version by running .\ffprobe.exe -version.
+                    ProcessStartInfo startInfo = new()
+                    {
+                        FileName = @".\ffprobe.exe",
+                        Arguments = "-version",
+                        UseShellExecute = false,
+                        RedirectStandardError = true,
+                        RedirectStandardOutput = true,
+                        CreateNoWindow = true,
+                        WorkingDirectory = Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location) ?? ".",
+                    };
+                    Process process = new()
+                    {
+                        StartInfo = startInfo
+                    };
+                    string output = "";
+                    DataReceivedEventHandler handler = (sender, e) =>
+                    {
+                        if (e.Data != null)
+                        {
+                            output += e.Data;
+                            ConsoleOutput.WriteLine(e.Data, Color.Transparent);
+                        }
+                    };
+                    process.ErrorDataReceived += handler;
+                    process.OutputDataReceived += handler;
+                    process.Start();
+                    process.BeginErrorReadLine();
+                    process.BeginOutputReadLine();
+                    process.WaitForExit();
+                    if (output != null && output.Contains("ffprobe version"))
+                    {
+                        if (output.Contains(requiredFFprobeVersion))
+                        {
+                            status[1] = true;
+                            Global.useSystemFFprobe = false;
+                        }
+                        else
+                        {
+                            ConsoleOutput.WriteLine("FFprobe version is not correct.", Color.Red);
+                            ffprobeWrongVersion = true;
+                            Global.useSystemFFprobe = true;
+                        }
+                    }
+                    else
+                    {
+                        Global.useSystemFFprobe = true;
+                    }
+                }
             }
             if (!status[2])
             {

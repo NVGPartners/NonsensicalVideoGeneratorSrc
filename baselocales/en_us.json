@@ -96,6 +96,7 @@
         "Tutorial:ProgramUsingSystemPath": "Using system PATH",
         "Tutorial:ProgramInstalled": "Installed",
         "Tutorial:ProgramFailed": "Failed",
+        "Tutorial:ProgramWrongVersion": "Wrong version",
         "Tutorial:ProgramStatus": " - %1: %2",
         "Tutorial:ProgramName": " - %1",
         "Tutorial:Page1_0": "Welcome to Nonsensical Video Generator!",
