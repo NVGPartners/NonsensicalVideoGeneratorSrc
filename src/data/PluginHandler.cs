@@ -1451,10 +1451,11 @@ namespace NonsensicalVideoGenerator
                 }
             }
         }
-        public static List<Callback<DownloadItemResult_t>> downloadItemResult = new();
+        public static Dictionary<PublishedFileId_t, Callback<DownloadItemResult_t>> downloadItemResult = new();
         public static Callback<UserStatsReceived_t>? m_UserStatsReceived;
         public static void LoadWorkshop()
         {
+            LoadPluginsThreaded();
             if(SteamUserStats.RequestCurrentStats())
             {
                 // Add callback
@@ -1479,7 +1480,7 @@ namespace NonsensicalVideoGenerator
                 Console.WriteLine("Error requesting user stats.");
             }
             allDoneCount = 0;
-            downloadItemResult.Clear();
+            //downloadItemResult.Clear();
             // Create "plugins\workshop" if they don't exist.
             Directory.CreateDirectory(Path.Combine(pluginPath, "workshop"));
             // Load subscribed workshop items.
@@ -1490,28 +1491,32 @@ namespace NonsensicalVideoGenerator
             {
                 SteamUGC.GetSubscribedItems(subscribedItems, (uint)subscribedItems.Length);
                 ConsoleOutput.WriteLine("Updating " + subscribedItemCount + " subscribed workshop items...", Color.LightBlue);
+                /*
                 foreach (PublishedFileId_t item in subscribedItems)
                 {
                     string itemPath = Path.Combine(pluginPath, "workshop", item.m_PublishedFileId.ToString(CultureInfo.InvariantCulture));
                     bool download = SteamUGC.DownloadItem(item, true);
                     if (download)
                     {
-                        // Register callback.
-                        downloadItemResult.Add(Callback<DownloadItemResult_t>.Create((result) =>
+                        // Register callback if the item doesn't already exist in the dictionary.
+                        if (!downloadItemResult.ContainsKey(item))
                         {
-                            if (result.m_nPublishedFileId == item)
+                            downloadItemResult.Add(item, Callback<DownloadItemResult_t>.Create((result) =>
                             {
-                                if (result.m_eResult == EResult.k_EResultOK)
+                                if (result.m_nPublishedFileId == item)
                                 {
-                                    ConsoleOutput.WriteLine($"Downloaded ID {item.m_PublishedFileId.ToString(CultureInfo.InvariantCulture)} from workshop.", Color.RoyalBlue);
+                                    if (result.m_eResult == EResult.k_EResultOK)
+                                    {
+                                        ConsoleOutput.WriteLine($"Downloaded ID {item.m_PublishedFileId.ToString(CultureInfo.InvariantCulture)} from workshop.", Color.RoyalBlue);
+                                    }
+                                    else
+                                    {
+                                        ConsoleOutput.WriteLine($"Failed to download ID {item.m_PublishedFileId.ToString(CultureInfo.InvariantCulture)} from workshop.", Color.Red);
+                                    }
+                                    AllDone(subscribedItemCount);
                                 }
-                                else
-                                {
-                                    ConsoleOutput.WriteLine($"Failed to download ID {item.m_PublishedFileId.ToString(CultureInfo.InvariantCulture)} from workshop.", Color.Red);
-                                }
-                                AllDone(subscribedItemCount);
-                            }
-                        }));
+                            }));
+                        }
                     }
                     else
                     {
@@ -1523,7 +1528,9 @@ namespace NonsensicalVideoGenerator
             else
             {
                 AllDone(0);
+            */
             }
+            AllDone(0);
         }
         public static BackgroundWorker loadPluginsThread = new();
         public static void LoadPluginsThreaded()

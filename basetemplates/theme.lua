@@ -32,7 +32,7 @@ local customLocalization = {
 function Query(localeName, localizationTokens)
     -- Get the localization table for the current locale.
     -- Otherwise, default to en_us.
-    local localization = customLocalization[localeName] or addonLocalization["en_us"]
+    local localization = customLocalization[localeName] or customLocalization["en_us"]
 
     -- Community-contributed localization tokens are added, if available.
     -- Please preserve localization in order to support multiple languages,

@@ -202,6 +202,7 @@ namespace NonsensicalVideoGenerator
 
         public static void ReloadLocales()
         {
+            string currentLocale = SaveData.saveValues["Locale"];
             locales.Clear();
             locales.Add(dummyLocale);
             LoadLocale(defaultLocale); // First entry other than dummyLocale is always the default locale.
@@ -216,7 +217,6 @@ namespace NonsensicalVideoGenerator
                 L.LoadLocale(newLocale);
             }
             // Load desired locale from save data.
-            string currentLocale = SaveData.saveValues["Locale"];
             L.LoadLocale(currentLocale);
         }
     }

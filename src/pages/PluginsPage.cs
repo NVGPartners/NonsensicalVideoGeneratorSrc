@@ -665,7 +665,7 @@ namespace NonsensicalVideoGenerator
                                     if(PluginHandler.plugins[i].workshopId != ""
                                         && PluginHandler.plugins[i].workshopId != "stock")
                                     {
-                                        if(PluginHandler.plugins[i].submittedId != "")
+                                        if(PluginHandler.plugins[i].submittedId != "" || PluginHandler.plugins[i].workshopId != "")
                                         {
                                             controller.Add("VisitWorkshopPage", new Button("View Workshop", "View this effect on the Workshop.", new Vector2(119+100, 60+10+19*7), (int i, string n) => {
                                                 switch(i)
@@ -673,7 +673,7 @@ namespace NonsensicalVideoGenerator
                                                     case 2:
                                                         GlobalContent.GetSound("Select").Play(int.Parse(SaveData.saveValues["SoundEffectVolume"], CultureInfo.InvariantCulture) / 100f, 0f, 0f);
                                                         ProcessStartInfo startInfo = new();
-                                                        startInfo.FileName = "https://steamcommunity.com/sharedfiles/filedetails/?id=" + PluginHandler.plugins[settingsIndex].submittedId;
+                                                        startInfo.FileName = "https://steamcommunity.com/sharedfiles/filedetails/?id=" + PluginHandler.plugins[settingsIndex].submittedId ?? PluginHandler.plugins[settingsIndex].workshopId;
                                                         startInfo.UseShellExecute = true;
                                                         Process.Start(startInfo);
                                                         return true;
