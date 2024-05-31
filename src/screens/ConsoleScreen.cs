@@ -27,7 +27,6 @@ namespace NonsensicalVideoGenerator
         private readonly Tweener tween = new();
         private KeyboardState oldKeyboardState;
         private KeyboardState newKeyboardState;
-        public int oldMusic = 2;
         public void Show()
         {
             toggle = true;
@@ -130,15 +129,10 @@ namespace NonsensicalVideoGenerator
                 if(!toggled)
                 {
                     GlobalContent.GetSound("Back").Play(int.Parse(SaveData.saveValues["SoundEffectVolume"], CultureInfo.InvariantCulture) / 100f, 0f, 0f);
-                    if(oldMusic >= 2)
-                        UserInterface.instance.music = oldMusic;
-                    else
-                        UserInterface.instance.FindMusic();
                 }
                 else
                 {
                     GlobalContent.GetSound("Select").Play(int.Parse(SaveData.saveValues["SoundEffectVolume"], CultureInfo.InvariantCulture) / 100f, 0f, 0f);
-                    oldMusic = UserInterface.instance.music;
                     UserInterface.instance.music = 0;
                 }
             }

@@ -33,7 +33,6 @@ namespace NonsensicalVideoGenerator
         private MusicState _musicState = MusicState.Paused;
         private int _musicActive = 2;
         public int music = 2;
-        private int oldMusic = 2;
         public Vector2 preferredResolution = new(320, 240);
         public UserInterface()
         {
@@ -184,7 +183,6 @@ namespace NonsensicalVideoGenerator
                 // Exchange music if it's not the same as the active music.
                 if(_musicActive != music)
                 {
-                    oldMusic = _musicActive;
                     _musicActive = music;
                     try
                     {
@@ -222,21 +220,7 @@ namespace NonsensicalVideoGenerator
                     // Loop music
                     if(MediaPlayer.State == MediaState.Stopped)
                     {
-                        if(music == 0)
-                        {
-                            MediaPlayer.Play(GlobalContent.GetSongByIndex(music));
-                        }
-                        else if(music == 1)
-                        {
-                            if(oldMusic >= 2)
-                                music = oldMusic;
-                            else
-                                FindMusic();
-                        }
-                        else
-                        {
-                            FindMusic();
-                        }
+                        FindMusic();
                     }
                     if(SaveData.saveValues["MuteMusicWhileTabbedOut"] == "true")
                     {

@@ -158,7 +158,6 @@ namespace NonsensicalVideoGenerator
                     continue;
                 }
                 // Count layerpath/music/theme*.ogg (indexed from 1 to 9)
-                songCount = 0;
                 if(Directory.Exists(layerPath + "music/"))
                 {
                     for(int i = 1; i < 10; i++)
@@ -168,10 +167,6 @@ namespace NonsensicalVideoGenerator
                             songCount = i;
                         }
                     }
-                }
-                if (songCount == 0)
-                {
-                    songCount = DefaultThemes.Nonsensical.songCount;
                 }
                 // Count layerpath/graphics/misclick/*.png (indexed from 1 to 9)
                 if(Directory.Exists(layerPath + "graphics/misclick/"))
