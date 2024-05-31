@@ -70,12 +70,12 @@ namespace NonsensicalVideoGenerator
                 }
             }
             // Fall back to default locale if translation is missing.
-            if (result == text && locales.Count > 0)
+            if (result == text && locales.Count > 1)
             {
-                if (locales[0].localizationTokens.Count > version
-                    && locales[0].localizationTokens[version].ContainsKey(text))
+                if (locales[1].localizationTokens.Count > version
+                    && locales[1].localizationTokens[version].ContainsKey(text))
                 {
-                    result = locales[0].localizationTokens[version][text];
+                    result = locales[1].localizationTokens[version][text];
                 }
             }
             // Fall back to invalid string if translation is missing.
@@ -137,7 +137,6 @@ namespace NonsensicalVideoGenerator
                 if (locales[i].name == name)
                 {
                     localeIndex = i;
-                    ConsoleOutput.WriteLine($"Switched to locale {name}: {locales[i].localizedName}", Color.Green);
                     return;
                 }
             }
@@ -189,7 +188,6 @@ namespace NonsensicalVideoGenerator
                     }
                     locales.Add(new Locale(name, localizedName, localizationList, fontLarge, fontSmall));
                     localeIndex = locales.Count - 1;
-                    ConsoleOutput.WriteLine($"Loaded {tokenCount} tokens for {name}: {localizedName}", Color.Green);
                 }
                 catch (Exception e)
                 {
@@ -201,12 +199,25 @@ namespace NonsensicalVideoGenerator
                 ConsoleOutput.WriteLine($"Locale {name} not found.", Color.Yellow);
             }
         }
+
         public static void ReloadLocales()
         {
-            string currentLocale = SaveData.saveValues["Locale"];
             locales.Clear();
             locales.Add(dummyLocale);
-            LoadLocale(currentLocale);
+            LoadLocale(defaultLocale); // First entry other than dummyLocale is always the default locale.
+            // Load all locales in /locales.
+            string path = Path.Combine(Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location) ?? ".", L.localeFolder);
+            string[] files = Directory.GetFiles(path, "*.json");
+            for(int i = 0; i < files.Length; i++)
+            {
+                if(files[i].StartsWith(defaultLocale))
+                    continue;
+                string newLocale = Path.GetFileNameWithoutExtension(files[i]).Replace(".json", "");
+                L.LoadLocale(newLocale);
+            }
+            // Load desired locale from save data.
+            string currentLocale = SaveData.saveValues["Locale"];
+            L.LoadLocale(currentLocale);
         }
     }
 }

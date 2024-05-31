@@ -387,7 +387,7 @@ namespace NonsensicalVideoGenerator
                         return true;
                 }
                 return false;
-            }));                  
+            }));
             // RENDERING MODE
             controllerRendering.Add("Cancel", new Button("Cancel", "Stop rendering.", new Vector2(119+36, 60+10+19*8), (int i, string n) => {
                 switch(i)

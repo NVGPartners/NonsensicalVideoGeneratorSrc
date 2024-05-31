@@ -40,6 +40,7 @@ namespace NonsensicalVideoGenerator
         Addon_Effect = 2048,
         Addon_PostRenderEffect = 4096,
         Addon_Theme = 8192,
+        Effect_ImageOnly = 16384,
     }
     public enum PluginType
     {
@@ -721,7 +722,16 @@ namespace NonsensicalVideoGenerator
                             videoOptions["height"] = int.Parse(SaveData.saveValues["VideoHeight"], CultureInfo.InvariantCulture);
                             videoOptions["inputVideo"] = Path.GetFileName(video);
                             videoOptions["outputVideo"] = "output.mp4";
-                            videoOptions["workingDirectory"] = "";
+                            videoOptions["localeName"] = L.GetLocale().name;
+                            Table localizationTokens = new Table(luaScript);
+                            foreach (Dictionary<string, string> version in L.GetLocale().localizationTokens)
+                            {
+                                foreach (KeyValuePair<string, string> pair in version)
+                                {
+                                    localizationTokens[pair.Key] = pair.Value;
+                                }
+                            }
+                            videoOptions["localizationTokens"] = localizationTokens;
                             // Add settings to pluginSettings table
                             Table pluginSettings = new(luaScript);
                             foreach (KeyValuePair<string, object> setting in settings)
@@ -2022,6 +2032,10 @@ namespace NonsensicalVideoGenerator
             if((flags & WorkshopTag.Effect_AudioOnly) != 0)
             {
                 tags.Add("Audio");
+            }
+            if((flags & WorkshopTag.Effect_ImageOnly) != 0)
+            {
+                tags.Add("Image");
             }
             if((flags & WorkshopTag.Library_Material) != 0)
             {

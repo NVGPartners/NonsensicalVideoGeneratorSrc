@@ -472,6 +472,8 @@ namespace NonsensicalVideoGenerator
                             if(MouseInput.MouseState.X >= GlobalGraphics.Scale(294) && MouseInput.MouseState.X < GlobalGraphics.Scale(304)
                                 && MouseInput.MouseState.Y >= GlobalGraphics.Scale(57) && MouseInput.MouseState.Y < GlobalGraphics.Scale(68))
                             {
+                                // Set to 0 because this is the top.
+                                scrollOffset = 0;
                                 GlobalContent.GetSound("Error").Play(int.Parse(SaveData.saveValues["SoundEffectVolume"], CultureInfo.InvariantCulture) / 100f, 0f, 0f);
                                 return true;
                             }
@@ -479,6 +481,8 @@ namespace NonsensicalVideoGenerator
                             if (MouseInput.MouseState.X >= GlobalGraphics.Scale(294) && MouseInput.MouseState.X < GlobalGraphics.Scale(304)
                                 && MouseInput.MouseState.Y >= GlobalGraphics.Scale(224) && MouseInput.MouseState.Y < GlobalGraphics.Scale(235))
                             {
+                                // Set to max because this is the bottom.
+                                scrollOffset = maxScrollOffset;
                                 GlobalContent.GetSound("Error").Play(int.Parse(SaveData.saveValues["SoundEffectVolume"], CultureInfo.InvariantCulture) / 100f, 0f, 0f);
                                 return true;
                             }
@@ -806,6 +810,18 @@ namespace NonsensicalVideoGenerator
                                                             }
                                                             return switchState;
                                                         }, (selectedFlagsWorkshop & WorkshopTag.Library_SFX) != 0));
+                                                        controller.Add("Image", new Switch("Image", "Applies image effects.", new Vector2(139+55+55, 60), (int i, string n) => {
+                                                            bool switchState = (i & 256) != 0;
+                                                            if((i & 2) != 0)
+                                                            {
+                                                                // add or remove WorkshopTag.Image to flags
+                                                                if(switchState)
+                                                                    selectedFlagsWorkshop |= WorkshopTag.Effect_ImageOnly;
+                                                                else
+                                                                    selectedFlagsWorkshop &= ~WorkshopTag.Effect_ImageOnly;
+                                                            }
+                                                            return switchState;
+                                                        }, (selectedFlagsWorkshop & WorkshopTag.Effect_ImageOnly) != 0));
                                                         controller.Add("Audio", new Switch("Audio", "Applies audio effects.", new Vector2(139+55, 60), (int i, string n) => {
                                                             bool switchState = (i & 256) != 0;
                                                             if((i & 2) != 0)

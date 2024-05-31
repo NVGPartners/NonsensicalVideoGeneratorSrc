@@ -58,7 +58,7 @@
     <WorkshopPlugins Include="$(ProjectDir)baseplugins\user\**\*.*" />
     <BaseTemplates Include="$(ProjectDir)basetemplates\**\*.*" />
     <BaseHTML Include="$(ProjectDir)basehtml\**\*.*" />
-    <BaseLocales Include="$(ProjectDir)baselocales\**\*.*" />
+    <BaseLocales Include="$(ProjectDir)public\locales\**\*.*" />
     <BaseRoot Include="$(ProjectDir)baseroot\**\*.*" />
     <BaseLayerGraphics Include="$(ProjectDir)content\graphics\**\*.*" />
     <BaseLayerMusic Include="$(ProjectDir)basemusic\**\*.*" />

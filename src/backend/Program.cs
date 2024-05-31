@@ -73,16 +73,15 @@ namespace NonsensicalVideoGenerator
             {
                 Debug.SetDebugMode(true);
             }
-            string locale = SaveData.saveValues["Locale"];
-            if(Global.parameters.Contains("-lang"))
+            if(Global.parameters.Contains("-locale"))
             {
-                int index = Global.parameters.IndexOf("-lang");
+                int index = Global.parameters.IndexOf("-locale");
                 if(index + 1 < Global.parameters.Count)
                 {
-                    locale = Global.parameters[index + 1];
+                    SaveData.saveValues["Locale"] = Global.parameters[index + 1];
                 }
             }
-            L.LoadLocale(locale);
+            L.ReloadLocales();
             if(Global.parameters.Contains("-intro"))
                 SaveData.saveValues["FirstBoot"] = "true";
             HolidayManager.CheckHolidays();

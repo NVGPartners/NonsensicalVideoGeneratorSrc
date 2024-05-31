@@ -8,18 +8,19 @@ namespace NonsensicalVideoGenerator
     {
         Generate,
         Library,
-        Effects,
+        Addons,
         Options,
-        Game,
+        Locales,
         Blog,
+        Game,
     }
     public static class DiscordRPC
     {
         private static DiscordRpcClient? client;
         public static DateTime timestamp;
         private static string? curstate;
-        public static Tab prevtab;
-        public static Tab curtab;
+        public static Tab prevtab = Tab.Generate;
+        public static Tab curtab = Tab.Generate;
         public static Tab ToTab(string name)
         {
             switch(name)
@@ -29,9 +30,11 @@ namespace NonsensicalVideoGenerator
                 case "PageLibrary":
                     return Tab.Library;
                 case "PageAddons":
-                    return Tab.Effects;
+                    return Tab.Addons;
                 case "PageOptions":
                     return Tab.Options;
+                case "PageLocales":
+                    return Tab.Locales;
                 case "PageGame":
                     return Tab.Game;
                 case "PageBlog":
@@ -103,7 +106,7 @@ namespace NonsensicalVideoGenerator
                         presence.Assets.SmallImageKey = "library";
                         presence.Assets.SmallImageText = "Library Tab";
                         break;
-                    case Tab.Effects:
+                    case Tab.Addons:
                         presence.Assets.SmallImageKey = "effects";
                         presence.Assets.SmallImageText = "Addons Tab";
                         break;
@@ -111,13 +114,17 @@ namespace NonsensicalVideoGenerator
                         presence.Assets.SmallImageKey = "options";
                         presence.Assets.SmallImageText = "Options Tab";
                         break;
-                    case Tab.Game:
-                        presence.Assets.SmallImageKey = "game";
-                        presence.Assets.SmallImageText = "Game Tab";
+                    case Tab.Locales:
+                        presence.Assets.SmallImageKey = "locales";
+                        presence.Assets.SmallImageText = "Locales Tab";
                         break;
                     case Tab.Blog:
                         presence.Assets.SmallImageKey = "blog";
                         presence.Assets.SmallImageText = "Blog Tab";
+                        break;
+                    case Tab.Game:
+                        presence.Assets.SmallImageKey = "game";
+                        presence.Assets.SmallImageText = "Game Tab";
                         break;
                 }
                 client.SetPresence(presence);

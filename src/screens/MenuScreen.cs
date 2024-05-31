@@ -193,7 +193,7 @@ namespace NonsensicalVideoGenerator
                             {
                                 string name = Pagination.GetPage(segment).Name;
                                 if(segment == 2)
-                                    name = L.T(0, "Addons:Title");
+                                    name = "PageAddons";
                                 DiscordRPC.curtab = DiscordRPC.ToTab(name);
                                 if(segment == 5)
                                 {
