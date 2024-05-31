@@ -1455,7 +1455,6 @@ namespace NonsensicalVideoGenerator
         public static Callback<UserStatsReceived_t>? m_UserStatsReceived;
         public static void LoadWorkshop()
         {
-            LoadPluginsThreaded();
             if(SteamUserStats.RequestCurrentStats())
             {
                 // Add callback
