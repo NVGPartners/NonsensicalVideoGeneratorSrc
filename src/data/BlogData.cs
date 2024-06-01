@@ -31,6 +31,6 @@ namespace NonsensicalVideoGenerator
             "localization, new features,",
             "and more!",
         };
-        public static string Url { get; set; } = "https://steamcommunity.com/games/2516360/announcements/detail/6215608421537406607";
+        public static string Url { get; set; } = "https://store.steampowered.com/news/app/2516360/view/6215608421537406607";
     }
 }
