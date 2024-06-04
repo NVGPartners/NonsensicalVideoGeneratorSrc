@@ -863,13 +863,13 @@ namespace NonsensicalVideoGenerator
                                                                         {
                                                                             GlobalContent.GetSound("Error").Play(int.Parse(SaveData.saveValues["SoundEffectVolume"], CultureInfo.InvariantCulture) / 100f, 0f, 0f);
                                                                             ConsoleOutput.WriteLine("Selected Workshop Icon is too large. Must be under 1mb.", Color.Red);
-                                                                            Global.generator.progressText = "Size Too Big (>1 MB)";
+                                                                            Global.generator.progressText = L.T(0, "Addons:StatusFailPreviewSize");
                                                                             return true;
                                                                         }
                                                                         Name = "PageAddons";
                                                                         editingSettings = false;
                                                                         controller.Clear();
-                                                                        Global.generator.progressText = "Uploading...";
+                                                                        Global.generator.progressText = L.T(0, "Addons:StatusUploading");
                                                                         ConsoleOutput.WriteLine("Publishing " + Path.GetFileName(PluginHandler.plugins[settingsIndex].path) + " with icon " + Path.GetFileName(fileDialog.FileName), Color.RoyalBlue);
                                                                         PluginHandler.PublishPlugin(PluginHandler.plugins[settingsIndex], selectedFlagsWorkshop, fileDialog.FileName);
                                                                     }

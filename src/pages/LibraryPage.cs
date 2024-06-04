@@ -334,7 +334,7 @@ namespace NonsensicalVideoGenerator
                 if((selectedFlags & 4) == 4)
                     totalIndicator =    L.T(0, "Library:DownloadMediaPasteURLS");
                 if(downloading)
-                    totalIndicator =    L.T(0, "Library:DownloadMediaDownloading");
+                    totalIndicator =    L.T(0, "Library:Downloading");
                 Vector2 totalIndicatorSize = munroSmall.MeasureString(totalIndicator);
                 Vector2 totalPosition = new Vector2(rects["HeaderButton"].X + rects["HeaderButton"].Width / 2 - totalIndicatorSize.X / 2 + GlobalGraphics.Scale(1), GlobalGraphics.Scale(56));
                 spriteBatch.DrawString(munroSmall, totalIndicator, totalPosition + new Vector2(GlobalGraphics.Scale(1), GlobalGraphics.Scale(1)), Color.Black);
@@ -571,7 +571,7 @@ namespace NonsensicalVideoGenerator
                         if (!LibraryData.DownloadClip(clipboard.Split('\n'), currentLibraryType))
                         {
                             downloading = false;
-                            Global.generator.progressText = L.T(0, "Library:StatusFailDownloadMedia");
+                            Global.generator.progressText = L.T(0, "Library:StatusFailDownloadClip");
                             GlobalContent.GetSound("Error").Play(int.Parse(SaveData.saveValues["SoundEffectVolume"], System.Globalization.CultureInfo.InvariantCulture) / 100f, 0f, 0f);
                         }
                     }

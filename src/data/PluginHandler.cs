@@ -1317,7 +1317,7 @@ namespace NonsensicalVideoGenerator
         public static void LoadPlugin(string path, PluginType type, string rootPath, string workshopid = "")
         {
             Plugin plugin = new(path, type, rootPath);
-            Global.generator.progressText = $"Loading Addon {Path.GetFileName(path)}...";
+            Global.generator.progressText = L.T(0, "Addons:StatusLoading", Path.GetFileName(path));
             if(!plugin.Query())
                 throw new Exception($"Failed to query Addon {Path.GetFileName(path)}.");
             // Add entry to pluginsettings if it doesn't exist.
@@ -1350,6 +1350,9 @@ namespace NonsensicalVideoGenerator
         }
         private static void LoadPluginsRecursive(string path, PluginType type, string root = "")
         {
+            // .\plugins\user\addon\ should be the most amount of transcending.
+            if (path.Split(Path.DirectorySeparatorChar).Length > 4)
+                return;
             foreach (string file in Directory.GetFiles(path))
             {
                 switch(type)
@@ -1369,7 +1372,8 @@ namespace NonsensicalVideoGenerator
                                 else if(basename != "user")
                                 {
                                     ConsoleOutput.WriteLine($"Deleting Addon {basename} because it is not subscribed to.", Color.Red);
-                                    File.Delete(file);
+                                    // Remove entire directory, as it contains theme files.
+                                    Directory.Delete(path, true);
                                 }
                             }
                             else
@@ -1634,8 +1638,7 @@ namespace NonsensicalVideoGenerator
                 }
                 Global.justCompletedRender = true; // demand a refresh
                 LoadPluginSettings();
-                Global.generator.progressText = $"{plugins.Count} addons loaded.";
-                Global.canRender = true;
+                Global.generator.progressText = L.T(0, "Addons:StatusAddonsLoaded", plugins.Count.ToString(CultureInfo.InvariantCulture));                Global.canRender = true;
                 ThemeManager.LoadThemes();
                 LibraryData.SequentialName();
                 // Check to see if there are any plugins that need consent forms filled out.
@@ -1645,7 +1648,7 @@ namespace NonsensicalVideoGenerator
                     {
                         UserConsent.needsConsent = true;
                         UserConsent.consentForm = plugin.consentForm;
-                        Global.generator.progressText = $"Addon {plugin.GetDisplayName()} requires consent.";
+                        Global.generator.progressText = L.T(0, "Addons:StatusAddonConsentRequired", plugin.GetDisplayName());
                         FramePlayer.canPlayBgMusic = false;
                         ScreenManager.PushNavigation("Tutorial");
                         ScreenManager.GetScreen<TutorialScreen>("Tutorial")?.Show();
@@ -1663,7 +1666,7 @@ namespace NonsensicalVideoGenerator
             catch (SyntaxErrorException e)
             {
                 ConsoleOutput.WriteLine(e.DecoratedMessage, Color.Red);
-                Global.generator.progressText = $"Error loading addons!";
+                Global.generator.progressText = L.T(0, "Addons:StatusFailLoadAddons");
                 GlobalContent.GetSound("Error").Play(int.Parse(SaveData.saveValues["SoundEffectVolume"], CultureInfo.InvariantCulture) / 100f, 0f, 0f);
                 return false;
             }
@@ -1788,7 +1791,7 @@ namespace NonsensicalVideoGenerator
             // Is Steam API available?
             if(SteamAPI.IsSteamRunning() == false || !SteamManager.initialized)
             {
-                Global.generator.progressText = "Steam is not running.";
+                Global.generator.progressText = L.T(0, "Addons:StatusSteamNotRunning");
                 GlobalContent.GetSound("Error").Play(int.Parse(SaveData.saveValues["SoundEffectVolume"], CultureInfo.InvariantCulture) / 100f, 0f, 0f);
                 ConsoleOutput.WriteLine("Steam is not running, cannot publish addon.", Color.Red);
                 publishPlugin = null;
@@ -1855,13 +1858,13 @@ namespace NonsensicalVideoGenerator
             if (param.m_eResult != EResult.k_EResultOK || bIOFailure)
             {
                 ConsoleOutput.WriteLine($"Error creating workshop item: {param.m_eResult}", Color.Red);
-                Global.generator.progressText = "Error creating workshop item.";
+                Global.generator.progressText = L.T(0, "Addons:StatusFailCreateWorkshopItem");
                 GlobalContent.GetSound("Error").Play(int.Parse(SaveData.saveValues["SoundEffectVolume"], CultureInfo.InvariantCulture) / 100f, 0f, 0f);
                 publishPlugin = null;
                 publishing = false;
                 return;
             }
-            Global.generator.progressText = "Creating Workshop item...";
+            Global.generator.progressText = L.T(0, "Addons:StatusCreating");
             UpdateWorkshopItem(param.m_nPublishedFileId);
         }
         public static void UpdateWorkshopItem(PublishedFileId_t id)
@@ -1873,7 +1876,7 @@ namespace NonsensicalVideoGenerator
             if(handle.m_UGCUpdateHandle == 0)
             {
                 ConsoleOutput.WriteLine($"Error updating workshop item: Invalid handle.", Color.Red);
-                Global.generator.progressText = "Error updating workshop item.";
+                Global.generator.progressText = L.T(0, "Addons:StatusFailUpdateWorkshopItem");
                 GlobalContent.GetSound("Error").Play(int.Parse(SaveData.saveValues["SoundEffectVolume"], CultureInfo.InvariantCulture) / 100f, 0f, 0f);
                 publishPlugin = null;
                 publishing = false;
@@ -1939,7 +1942,7 @@ namespace NonsensicalVideoGenerator
             if(!cont)
             {
                 ConsoleOutput.WriteLine($"Error updating workshop item: Invalid title.", Color.Red);
-                Global.generator.progressText = "Error updating workshop item.";
+                Global.generator.progressText = L.T(0, "Addons:StatusFailUpdateWorkshopItem");
                 GlobalContent.GetSound("Error").Play(int.Parse(SaveData.saveValues["SoundEffectVolume"], CultureInfo.InvariantCulture) / 100f, 0f, 0f);
                 publishPlugin = null;
                 publishing = false;
@@ -1983,7 +1986,7 @@ namespace NonsensicalVideoGenerator
             if(!cont)
             {
                 ConsoleOutput.WriteLine($"Error updating workshop item: Invalid visibility.", Color.Red);
-                Global.generator.progressText = "Error updating workshop item.";
+                Global.generator.progressText = L.T(0, "Addons:StatusFailUpdateWorkshopItem");
                 GlobalContent.GetSound("Error").Play(int.Parse(SaveData.saveValues["SoundEffectVolume"], CultureInfo.InvariantCulture) / 100f, 0f, 0f);
                 publishPlugin = null;
                 publishing = false;
@@ -2012,7 +2015,7 @@ namespace NonsensicalVideoGenerator
             if(!cont)
             {
                 ConsoleOutput.WriteLine($"Error updating workshop item: Invalid content path.", Color.Red);
-                Global.generator.progressText = "Error updating workshop item.";
+                Global.generator.progressText = L.T(0, "Addons:StatusFailUpdateWorkshopItem");
                 GlobalContent.GetSound("Error").Play(int.Parse(SaveData.saveValues["SoundEffectVolume"], CultureInfo.InvariantCulture) / 100f, 0f, 0f);
                 publishPlugin = null;
                 publishing = false;
@@ -2023,7 +2026,7 @@ namespace NonsensicalVideoGenerator
             if(!cont)
             {
                 ConsoleOutput.WriteLine($"Error updating workshop item: Invalid preview path.", Color.Red);
-                Global.generator.progressText = "Error updating workshop item.";
+                Global.generator.progressText = L.T(0, "Addons:StatusFailUpdateWorkshopItem");
                 GlobalContent.GetSound("Error").Play(int.Parse(SaveData.saveValues["SoundEffectVolume"], CultureInfo.InvariantCulture) / 100f, 0f, 0f);
                 publishPlugin = null;
                 publishing = false;
@@ -2092,7 +2095,7 @@ namespace NonsensicalVideoGenerator
             if(!cont)
             {
                 ConsoleOutput.WriteLine($"Error updating workshop item: Invalid tags.", Color.Red);
-                Global.generator.progressText = "Error updating workshop item.";
+                Global.generator.progressText = L.T(0, "Addons:StatusFailUpdateWorkshopItem");
                 GlobalContent.GetSound("Error").Play(int.Parse(SaveData.saveValues["SoundEffectVolume"], CultureInfo.InvariantCulture) / 100f, 0f, 0f);
                 publishPlugin = null;
                 publishing = false;
@@ -2102,7 +2105,7 @@ namespace NonsensicalVideoGenerator
             SteamAPICall_t call = SteamUGC.SubmitItemUpdate(handle, "Updated addon.");
             if(updateItemResult != null)
                 updateItemResult.Set(call);
-            Global.generator.progressText = "Publishing...";
+            Global.generator.progressText = L.T(0, "Addons:StatusPublishing");
         }
         public static void OnWorkshopItemUpdated(SubmitItemUpdateResult_t param, bool bIOFailure)
         {
@@ -2110,14 +2113,14 @@ namespace NonsensicalVideoGenerator
                 return;
             if (param.m_eResult != EResult.k_EResultOK || bIOFailure)
             {
-                Global.generator.progressText = "Error publishing.";
+                Global.generator.progressText = L.T(0, "Addons:StatusFailUpload");
                 GlobalContent.GetSound("Error").Play(int.Parse(SaveData.saveValues["SoundEffectVolume"], CultureInfo.InvariantCulture) / 100f, 0f, 0f);
                 ConsoleOutput.WriteLine($"Error updating workshop item: {param.m_eResult}", Color.Red);
                 publishPlugin = null;
                 publishing = false;
                 return;
             }
-            Global.generator.progressText = "Successfully published.";
+            Global.generator.progressText = L.T(0, "Addons:StatusUploadSuccess");
             GlobalContent.GetSound("RenderComplete").Play(int.Parse(SaveData.saveValues["SoundEffectVolume"], CultureInfo.InvariantCulture) / 100f, 0f, 0f);
             if(publishPlugin != null)
             {

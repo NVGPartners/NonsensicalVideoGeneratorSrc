@@ -95,7 +95,7 @@ namespace NonsensicalVideoGenerator
             if (killWorker?.CancellationPending == true)
                 return;
             KillChildProcesses();
-            failureReason = "Generation cancelled.";
+            failureReason = L.T(0, "Generate:StatusCancelled");
             progressText = failureReason;
             ConsoleOutput.WriteLine("Generation cancelled.", Color.Red);
             if(forceConcatenate)
@@ -118,7 +118,7 @@ namespace NonsensicalVideoGenerator
                         ApplyEffects(clips[i], i, clips.Count);
                     }
                     ConsoleOutput.WriteLine("Concatenating clips...", Color.LightGreen);
-                    progressText = "Concatenating clips...";
+                    progressText = L.T(0, "Generate:StatusConcateClips");
                     progressState = ProgressState.Concatenating;
                     FFprobe_CombineVideo(clips, tempOutput);
                     bool finished = true;
@@ -127,13 +127,13 @@ namespace NonsensicalVideoGenerator
                     {
                         ConsoleOutput.WriteLine("Saving to library...", Color.LightGreen);
                         LibraryFile libraryFile = new LibraryFile(Global.videoTitle, tempOutput, DefaultLibraryTypes.Render);
-                        progressText = "Saving to library...";
+                        progressText = L.T(0, "Generate:StatusLibrarySave");
                         if(LibraryData.Load(libraryFile) == null)
                         {
                             ConsoleOutput.WriteLine("Failed to save to library.", Color.Red);
-                            progressText = "Failed to save to library.";
+                            progressText = L.T(0, "Generate:StatusFailLibrarySave");
                             progressState = ProgressState.Failed;
-                            failureReason = "Failed to save to library.";
+                            failureReason = L.T(0, "Generate:StatusFailLibrarySave");
                             finished = false;
                         }
                         else
@@ -147,14 +147,14 @@ namespace NonsensicalVideoGenerator
                     else
                     {
                         ConsoleOutput.WriteLine("Concatenation failed.", Color.Red);
-                        progressText = "Concatenation failed.";
+                        progressText = L.T(0, "Generate:StatusFailConcatenation");
                         progressState = ProgressState.Failed;
-                        failureReason = "Concatenation failed.";
+                        failureReason = L.T(0, "Generate:StatusFailConcatenation");
                         finished = false;
                     }
                     if(finished)
                     {
-                        progressText = "Completed!";
+                        progressText = L.T(0, "Generate:StatusCompleted");
                         progressState = ProgressState.Completed;
                         generatorActive = false;
                         // award achievements
@@ -256,7 +256,7 @@ namespace NonsensicalVideoGenerator
                         // Roll for effect
                         if(RandomInt(0, 100) < (thisClip.rolledForTransition ? int.Parse(SaveData.saveValues["TransitionEffectChance"], CultureInfo.InvariantCulture) : int.Parse(SaveData.saveValues["EffectChance"], CultureInfo.InvariantCulture)))
                         {
-                            progressText = (thisClip.rolledForTransition ? "Boiling" : "Baking") + " effects... (" + (i + 1) + "/" + maxClips + ")";
+                            progressText = L.T(0, thisClip.rolledForTransition ? "Generate:StatusApplyTransitionEffect" : "Generate:StatusApplyEffect", (i + 1).ToString(CultureInfo.InvariantCulture), maxClips.ToString(CultureInfo.InvariantCulture));
                             // We rolled for an effect, let's pick one.
                             PluginReturnValue effect = PluginHandler.PickRandom(globalRandom, Path.Combine(temporaryDirectory, thisClip.name));
                             if(effect.success)
@@ -343,7 +343,7 @@ namespace NonsensicalVideoGenerator
             progressState = ProgressState.Parsing;
 
             // Load library.
-            progressText = "Parsing library...";
+            progressText = L.T(0, "Generate:StatusLibraryParse");
             LibraryData.Load();
 
             int maxClips = int.Parse(SaveData.saveValues["MaxClipCount"], CultureInfo.InvariantCulture);
@@ -352,7 +352,7 @@ namespace NonsensicalVideoGenerator
             if(LibraryData.GetFileCount(DefaultLibraryTypes.Material) == 0 && maxClips > 0)
             {
                 ConsoleOutput.WriteLine("No material files found in library.", Color.Red);
-                failureReason = "No material files found in library.";
+                failureReason = L.T(0, "Generate:StatusFailLibraryEmpty");
                 progressText = failureReason;
                 CancelGeneration();
                 return;
@@ -361,7 +361,7 @@ namespace NonsensicalVideoGenerator
             // Set global random with seed.
             if(Global.randomSeed != 0)
             {
-                progressText = "Planting seeds...";
+                progressText = L.T(0, "Generate:StatusSeed");
                 int seed = DateTime.Now.Millisecond;
                 // Convert ProjectTitle to int seed
                 /*
@@ -380,7 +380,7 @@ namespace NonsensicalVideoGenerator
             ConsoleOutput.WriteLine("Max clips: " + maxClips.ToString(CultureInfo.InvariantCulture), Color.Gray);
 
             // Clean up previous temporary files.
-            progressText = "Cleaning up...";
+            progressText = L.T(0, "Generate:StatusCleanUp");
             CleanUp();
 
             if (vidThreadWorker?.CancellationPending == true)
@@ -389,7 +389,7 @@ namespace NonsensicalVideoGenerator
             // Make sure the temporary directory exists.
             Directory.CreateDirectory(temporaryDirectory);
 
-            progressText = "Starting generation...";
+            progressText = L.T(0, "Generate:StatusStarting");
             progressState = ProgressState.Rendering;
             List<Clip> clips = new();
             try
@@ -408,7 +408,7 @@ namespace NonsensicalVideoGenerator
                         if (vidThreadWorker?.CancellationPending == true)
                             return;
                         ConsoleOutput.WriteLine("Starting clip " + (i + 1) + "/" + maxClips + "...", Color.Gray);
-                        progressText = "Starting clip " + (i + 1) + "/" + maxClips + "...";
+                        progressText = L.T(0, "Generate:StatusClipStart", (i + 1).ToString(CultureInfo.InvariantCulture), maxClips.ToString(CultureInfo.InvariantCulture));
                         if (i == 0 && bool.Parse(SaveData.saveValues["IntrosEnabled"]))
                         {
                             // Add the intro.
@@ -419,7 +419,7 @@ namespace NonsensicalVideoGenerator
                                 maxClips++;
                                 ConsoleOutput.WriteLine("Intro clip enabled, adding 1 to max clips. New max clips is " + maxClips + ".", Color.Gray);
                                 progress = Convert.ToInt32(i / maxClips, CultureInfo.InvariantCulture);
-                                progressText = "Introducing ourselves... (" + (i + 1) + "/" + maxClips + ")";
+                                progressText = L.T(0, "Generate:StatusApplyIntro", (i + 1).ToString(CultureInfo.InvariantCulture), maxClips.ToString(CultureInfo.InvariantCulture));
                                 FFprobe_EncodeVideo(introPath, Path.Combine(temporaryDirectory, thisClip.name));
                             }
                         }
@@ -430,13 +430,13 @@ namespace NonsensicalVideoGenerator
                             string overlayPath = "";
                             progress = Convert.ToInt32(i / maxClips, CultureInfo.InvariantCulture);
                             ConsoleOutput.WriteLine("Clipping... (" + (i + 1) + "/" + maxClips + ")", Color.Gray);
-                            progressText = "Clipping... (" + (i + 1) + "/" + maxClips + ")";
+                            progressText = L.T(0, "Generate:StatusClipping", (i + 1).ToString(CultureInfo.InvariantCulture), maxClips.ToString(CultureInfo.InvariantCulture));
                             string sourceToPick = LibraryData.PickRandom(DefaultLibraryTypes.Material, globalRandom);
                             float source = -1;
                             if(sourceToPick == "")
                             {
                                 ConsoleOutput.WriteLine("No material files found in library.", Color.Gray);
-                                progressText = "No material files found in library.";
+                                progressText = L.T(0, "Generate:StatusFailLibraryEmpty");
                                 progressState = ProgressState.Failed;
                                 continue;
                             }
@@ -476,7 +476,7 @@ namespace NonsensicalVideoGenerator
                                 string transitionPath = LibraryData.PickRandom(DefaultLibraryTypes.Transition, globalRandom);
                                 if(transitionPath != "")
                                 {
-                                    progressText = "Transitioning... (" + (i + 1) + "/" + maxClips + ")";
+                                    progressText = L.T(0, "Generate:StatusApplyTransition", (i + 1).ToString(CultureInfo.InvariantCulture), maxClips.ToString(CultureInfo.InvariantCulture));
                                     ConsoleOutput.WriteLine("Transitioning...", Color.Gray);
                                     FFprobe_EncodeVideo(transitionPath, Path.Combine(temporaryDirectory, thisClip.name));
                                 }
@@ -510,7 +510,7 @@ namespace NonsensicalVideoGenerator
                             {
                                 if(overlayPath != null)
                                 {
-                                    progressText = "Chroma keying... (" + (i + 1) + "/" + maxClips + ")";
+                                    progressText = L.T(0, "Generate:StatusApplyOverlay", (i + 1).ToString(CultureInfo.InvariantCulture), maxClips.ToString(CultureInfo.InvariantCulture));
                                     ConsoleOutput.WriteLine("Rolled for overlay, adding overlay to clip " + i + ".", Color.Gray);
                                     // We snip the clip here in case it was a transition
                                     if(!bool.Parse(SaveData.saveValues["PlayOverlayInFull"]))
@@ -575,7 +575,7 @@ namespace NonsensicalVideoGenerator
                         return;
                     // Concatenate all clips into one video.
                     ConsoleOutput.WriteLine("Concatenating clips...", Color.LightGreen);
-                    progressText = "Concatenating clips...";
+                    progressText = L.T(0, "Generate:StatusConcateClips");
                     progressState = ProgressState.Concatenating;
                     FFprobe_CombineVideo(clips, tempOutput);
                     if (vidThreadWorker?.CancellationPending == true)
@@ -585,7 +585,7 @@ namespace NonsensicalVideoGenerator
                     int numberOfPlugins = PluginHandler.GetPluginCount(true);
                     if(numberOfPlugins > 0)
                     {
-                        progressText = "Toasting effects...";
+                        progressText = L.T(0, "Generate:StatusApplyPostRenderEffect");
                         // We rolled for an effect, let's pick one.
                         PluginReturnValue effect = PluginHandler.PickRandom(globalRandom, tempOutput, AddonType.PostRenderEffect);
                         if(effect.success)
@@ -655,13 +655,13 @@ namespace NonsensicalVideoGenerator
                     {
                         ConsoleOutput.WriteLine("Saving to library...", Color.LightGreen);
                         LibraryFile libraryFile = new LibraryFile(Global.videoTitle, tempOutput, DefaultLibraryTypes.Render);
-                        progressText = "Saving to library...";
+                        progressText = L.T(0, "Generate:StatusLibrarySave");
                         if(LibraryData.Load(libraryFile) == null)
                         {
                             ConsoleOutput.WriteLine("Failed to save to library.", Color.Red);
-                            progressText = "Failed to save to library.";
+                            progressText = L.T(0, "Generate:StatusFailLibrarySave");
                             progressState = ProgressState.Failed;
-                            failureReason = "Failed to save to library.";
+                            failureReason = L.T(0, "Generate:StatusFailLibrarySave");
                             finished = false;
                             CancelGeneration();
                         }
@@ -676,9 +676,9 @@ namespace NonsensicalVideoGenerator
                     else
                     {
                         ConsoleOutput.WriteLine("Concatenation failed.", Color.Red);
-                        progressText = "Concatenation failed.";
+                        progressText = L.T(0, "Generate:StatusFailConcatenation");
                         progressState = ProgressState.Failed;
-                        failureReason = "Concatenation failed.";
+                        failureReason = L.T(0, "Generate:StatusFailConcatenation");
                         finished = false;
                         CancelGeneration();
                     }
@@ -686,7 +686,7 @@ namespace NonsensicalVideoGenerator
                     {
                         if (vidThreadWorker?.CancellationPending == true)
                             return;
-                        progressText = "Completed!";
+                        progressText =  L.T(0, "Generate:StatusCompleted");
                         progressState = ProgressState.Completed;
                         generatorActive = false;
                         if(vidThreadWorker != null)
@@ -714,7 +714,7 @@ namespace NonsensicalVideoGenerator
                 catch(Exception ex)
                 {
                     progressState = ProgressState.Failed;
-                    failureReason = "Error: Press F5 to view console";
+                    failureReason = L.T(0, "Generate:StatusFailGeneric");
                     progressText = failureReason;
                     ConsoleOutput.WriteLine(ex.Message, Color.Red);
                     if(ex.StackTrace != null)
@@ -786,7 +786,7 @@ namespace NonsensicalVideoGenerator
             catch(Exception ex)
             {
                 progressState = ProgressState.Failed;
-                failureReason = "Error: Press F5 to view console";
+                failureReason = L.T(0, "Generate:StatusFailGeneric");
                 progressText = failureReason;
                 ConsoleOutput.WriteLine(ex.Message, Color.Red);
                 if(ex.StackTrace != null)
@@ -808,14 +808,14 @@ namespace NonsensicalVideoGenerator
                     this.forceConcatenate = forceConcatenate;
                     if(vidThreadWorker.IsBusy)
                     {
-                        failureReason = "Generation cancelling...";
+                        failureReason = L.T(0, "Generate:StatusCancelling");
                         progressText = failureReason;
                         ConsoleOutput.WriteLine("Generation cancelling...", Color.Yellow);
                         StartKillThread();
                     }
                     else
                     {
-                        failureReason = "Generation cancelled.";
+                        failureReason = L.T(0, "Generate:StatusCancelled");
                         progressText = failureReason;
                         ConsoleOutput.WriteLine("Generation cancelled.", Color.Red);
                     }
@@ -826,7 +826,7 @@ namespace NonsensicalVideoGenerator
                     {
                         vidThreadWorker.ReportProgress(1);
                         // Play error sting (music)
-                        UserInterface.instance.music = 1;
+                        //UserInterface.instance.music = 1;
                     }
                     catch
                     {
@@ -888,7 +888,7 @@ namespace NonsensicalVideoGenerator
             {
                 ConsoleOutput.WriteLine(ex.Message);
                 ConsoleOutput.WriteLine("Fatal error while getting length of video.", Color.Red);
-                Global.generator.failureReason = "Fatal error while getting length of video.";
+                Global.generator.failureReason = L.T(0, "Generate:StatusFailLength");
                 Global.generator.progressText = Global.generator.failureReason;
                 Global.generator.CancelGeneration();
                 return "0";
@@ -936,7 +936,7 @@ namespace NonsensicalVideoGenerator
             {
                 ConsoleOutput.WriteLine(ex.Message);
                 ConsoleOutput.WriteLine("Fatal error while snipping video.", Color.Red);
-                Global.generator.failureReason = "Fatal error while snipping video.";
+                Global.generator.failureReason = L.T(0, "Generate:StatusFailClipping");
                 Global.generator.progressText = Global.generator.failureReason;
                 Global.generator.CancelGeneration();
             }
@@ -984,7 +984,7 @@ namespace NonsensicalVideoGenerator
             {
                 ConsoleOutput.WriteLine(ex.Message);
                 ConsoleOutput.WriteLine("Fatal error while checking if video has audio.", Color.Red);
-                Global.generator.failureReason = "Fatal error while checking if video has audio.";
+                Global.generator.failureReason = L.T(0, "Generate:StatusFailCheckAudio");
                 Global.generator.progressText = Global.generator.failureReason;
                 Global.generator.CancelGeneration();
                 return false;
@@ -1032,7 +1032,7 @@ namespace NonsensicalVideoGenerator
             {
                 ConsoleOutput.WriteLine(ex.Message);
                 ConsoleOutput.WriteLine("Fatal error while copying video.", Color.Red);
-                Global.generator.failureReason = "Fatal error while copying video.";
+                Global.generator.failureReason = L.T(0, "Generate:StatusFailCopying");
                 Global.generator.progressText = Global.generator.failureReason;
                 Global.generator.CancelGeneration();
             }
@@ -1047,7 +1047,7 @@ namespace NonsensicalVideoGenerator
                 {
                     // We don't want to try to concatenate again
                     ConsoleOutput.WriteLine("Fatal error while concatenating videos.");
-                    Global.generator.failureReason = "Fatal error while concatenating videos.";
+                    Global.generator.failureReason = L.T(0, "Generate:StatusFailConcatenate");
                     Global.generator.progressText = Global.generator.failureReason;
                     Global.generator.CancelGeneration();
                 }
@@ -1080,7 +1080,7 @@ namespace NonsensicalVideoGenerator
                         Clip thisClip = new Clip(clips.Count + ".mp4");
                         if(!outroPath.Contains("defaultoutro.mp4"))
                             Global.usedDifferentOutro = true;
-                        Global.generator.progressText = "Closing the film spool...";
+                        Global.generator.progressText = L.T(0, "Generate:StatusApplyOutro");
                         ConsoleOutput.WriteLine("Outro clip enabled, adding 1 to max clips.", Color.Gray);
                         FFprobe_EncodeVideo(outroPath, Path.Combine(temporaryDirectory, thisClip.name));
                         clips.Add(thisClip);
@@ -1095,7 +1095,7 @@ namespace NonsensicalVideoGenerator
                     Clip thisClip = clips[i];
                     if (File.Exists(Path.Combine(temporaryDirectory, thisClip.name)))
                     {
-                        Global.generator.progressText = "Re-encoding... (" + (i + 1) + "/" + clips.Count + ")";
+                        Global.generator.progressText = L.T(0, "Generate:StatusEncode", (i + 1).ToString(CultureInfo.InvariantCulture), clips.Count.ToString(CultureInfo.InvariantCulture));
                         // Run ffmpeg to re-encode the video and add audio if it doesn't have any
                         string appendNoAudio = "";
                         if (!HasAudio(Path.Combine(temporaryDirectory, thisClip.name)))
@@ -1136,7 +1136,7 @@ namespace NonsensicalVideoGenerator
                 ConsoleOutput.WriteLine("Checking for validity...", Color.Gray);
                 for (int i = 0; i < i2; i++)
                 {
-                    Global.generator.progressText = "Checking for validity... (" + (i + 1) + "/" + i2 + ")";
+                    Global.generator.progressText = L.T(0, "Generate:StatusCheckValidity", (i + 1).ToString(CultureInfo.InvariantCulture), i2.ToString(CultureInfo.InvariantCulture));
                     // Make sure this is a valid file with ffprobe.
                     ProcessStartInfo ffprobe = new ProcessStartInfo()
                     {
@@ -1167,14 +1167,14 @@ namespace NonsensicalVideoGenerator
                 }
 
                 ConsoleOutput.WriteLine("Concatenating...", Color.Gray);
-                Global.generator.progressText = "Concatenating...";
+                Global.generator.progressText = L.T(0, "Generate:StatusConcateClips");
                 ConcatenateVideos(clips2, 0, ou);
             }
             catch(Exception ex2)
             {
                 ConsoleOutput.WriteLine(ex2.Message);
                 ConsoleOutput.WriteLine("Fatal error while concatenating videos.");
-                Global.generator.failureReason = "Fatal error while concatenating videos.";
+                Global.generator.failureReason = L.T(0, "Generate:StatusFailConcatenate");
                 Global.generator.progressText = Global.generator.failureReason;
                 Global.generator.CancelGeneration();
             }
@@ -1184,7 +1184,7 @@ namespace NonsensicalVideoGenerator
         public static void ConcatenateVideos(List<Clip> clips, int iteration, string output)
         {
             ConsoleOutput.WriteLine("Concatenating... (" + (iteration+1) + ")", Color.Gray);
-            Global.generator.progressText = "Concatenating... (" + (iteration+1) + ")";
+            Global.generator.progressText = L.T(0, "Generate:StatusConcatenating", (iteration+1).ToString(CultureInfo.InvariantCulture));
             // Up to 50 clips at once
             int max = 50;
             if (clips.Count < max)
@@ -1246,7 +1246,7 @@ namespace NonsensicalVideoGenerator
             {
                 // Concatenation is done, concat all iterations into output
                 ConsoleOutput.WriteLine("Concatenating iterations...", Color.Gray);
-                Global.generator.progressText = "Concatenating iterations...";
+                Global.generator.progressText = L.T(0, "Generate:StatusConcateIterations");
                 // Create a list of clips to concatenate
                 List<Clip> clips3 = new List<Clip>();
                 for (int i = 0; i <= iteration; i++)
@@ -1344,7 +1344,7 @@ namespace NonsensicalVideoGenerator
             {
                 ConsoleOutput.WriteLine(ex.Message);
                 ConsoleOutput.WriteLine("Skipping overlaying video.", Color.Yellow);
-                Global.generator.progressText = "Skipping overlaying video.";
+                Global.generator.progressText = L.T(0, "Generate:StatusFailOverlay");
             }
         }
         public void CleanUp()

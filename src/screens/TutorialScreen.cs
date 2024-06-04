@@ -681,7 +681,7 @@ namespace NonsensicalVideoGenerator
                             GlobalContent.GetSound("Back").Play(int.Parse(SaveData.saveValues["SoundEffectVolume"], CultureInfo.InvariantCulture) / 100f, 0f, 0f);
                             toggle = false;
                             if(UserConsent.consentForm != null)
-                                Global.generator.progressText = $"Addon {UserConsent.consentForm?.pluginName} accepted.";
+                                Global.generator.progressText = L.T(0, "Addons:StatusAddonConsentAccepted", UserConsent.consentForm?.pluginName);
                             if(!bool.Parse(SaveData.saveValues["DisableMotion"]))
                             {
                                 tween.TweenTo(this, t => t.offset, new Vector2(GlobalGraphics.Scale(-640), GlobalGraphics.Scale(240)), 0.5f)

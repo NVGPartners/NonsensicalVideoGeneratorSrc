@@ -349,8 +349,46 @@ namespace NonsensicalVideoGenerator
             actionController2.Clear();
             controller.Clear();
             // Add dials
-            actionController.Add("ActionLocales", new ActionButton("View localizations to select a different language.", new Vector2(112, 176), LocaleAction, ThemeManager.LoadLayeredContent<Texture2D>("graphics/actions/locales")));
-            actionController2.Add("ActionOptions", new ActionButton("View localizations to select a different language.", new Vector2(112, 176), LocaleAction, ThemeManager.LoadLayeredContent<Texture2D>("graphics/actions/options")));
+            actionController.Add("ActionReset", new ActionButton("Reset to default parameters.", new Vector2(112, 206), (int i, string n) => {
+                switch(i)
+                {
+                    case 2: // left click
+                        GlobalContent.GetSound("Select").Play(int.Parse(SaveData.saveValues["SoundEffectVolume"], CultureInfo.InvariantCulture) / 100f, 0f, 0f);
+                        SaveData.saveValues["MusicVolume"] = "50";
+                        SaveData.saveValues["SoundEffectVolume"] = "100";
+                        SaveData.saveValues["VideoVolume"] = "100";
+                        SaveData.saveValues["DisableMotion"] = "false";
+                        SaveData.saveValues["EnableDiscordRPC"] = "true";
+                        SaveData.saveValues["MuteMusicWhileTabbedOut"] = "true";
+                        SaveData.saveValues["VideoPlaybackScale"] = "2";
+                        SaveData.saveValues["SkipPhotosensitiveWarningScreen"] = "false";
+                        SaveData.Save();
+                        controller.interactables["MusicVolume"].Tooltip = SaveData.saveValues["MusicVolume"];
+                        controller.interactables["SFXVolume"].Tooltip = SaveData.saveValues["SoundEffectVolume"];
+                        controller.interactables["VideoVolume"].Tooltip = SaveData.saveValues["VideoVolume"];
+                        ((Switch)controller.interactables["MotionDisable"]).SwitchState = SaveData.saveValues["DisableMotion"] == "true";
+                        ((Switch)controller.interactables["EnableDiscordRPC"]).SwitchState = SaveData.saveValues["EnableDiscordRPC"] == "true";
+                        ((Switch)controller.interactables["MuteMusicWhileTabbedOut"]).SwitchState = SaveData.saveValues["MuteMusicWhileTabbedOut"] == "true";
+                        controller.interactables["VideoPlaybackScale"].Tooltip = SaveData.saveValues["VideoPlaybackScale"];
+                        ((Switch)controller.interactables["SkipPhotosensitiveWarningScreen"]).SwitchState = SaveData.saveValues["SkipPhotosensitiveWarningScreen"] == "true";
+                        return true;
+                }
+                return false;
+            }, ThemeManager.LoadLayeredContent<Texture2D>("graphics/actions/reset")));
+            actionController.Add("ActionLocales", new ActionButton("View localizations to select a different language.", new Vector2(112, 221), LocaleAction, ThemeManager.LoadLayeredContent<Texture2D>("graphics/actions/locales")));
+            actionController2.Add("ActionReset", new ActionButton("Reset to default parameters.", new Vector2(112, 206), (int i, string n) => {
+                switch(i)
+                {
+                    case 2: // left click
+                        GlobalContent.GetSound("Select").Play(int.Parse(SaveData.saveValues["SoundEffectVolume"], CultureInfo.InvariantCulture) / 100f, 0f, 0f);
+                        SaveData.saveValues["Locale"] = "en_us";
+                        SaveData.Save();
+                        L.LoadLocale("en_us");
+                        return true;
+                }
+                return false;
+            }, ThemeManager.LoadLayeredContent<Texture2D>("graphics/actions/reset")));
+            actionController2.Add("ActionOptions", new ActionButton("View localizations to select a different language.", new Vector2(112, 221), LocaleAction, ThemeManager.LoadLayeredContent<Texture2D>("graphics/actions/options")));
             controller.Add("SkipPhotosensitiveWarningScreen", new Switch("Skip Intro", "Load the menu immediately when starting.", new Vector2(139, 60+19*8), (int i, string n) => {
                 bool switchState = (i & 256) != 0;
                 if((i & 2) != 0)

@@ -16,6 +16,7 @@ using System.Drawing;
 using System.Windows.Forms;
 using System.Media;
 #endif
+using System.Globalization;
 
 namespace NonsensicalVideoGenerator
 {
@@ -74,7 +75,7 @@ namespace NonsensicalVideoGenerator
                 }
                 if(worker.CancellationPending || !processing)
                     return;
-                int scale =  int.Parse(SaveData.saveValues["VideoPlaybackScale"], System.Globalization.CultureInfo.InvariantCulture);
+                int scale =  int.Parse(SaveData.saveValues["VideoPlaybackScale"], CultureInfo.InvariantCulture);
                 int w = 100 * scale;
                 int h = 78 * scale;
                 ProcessStartInfo startInfo = new()
@@ -115,7 +116,7 @@ namespace NonsensicalVideoGenerator
                 {
                     if(worker.CancellationPending || !processing)
                         return;
-                    Global.generator.progressText = "Loading frame " + i + "/" + curcount + "...";
+                    Global.generator.progressText = L.T(0, "Video:StatusLoadFrame", i.ToString(CultureInfo.InvariantCulture), curcount.ToString(CultureInfo.InvariantCulture));
                     FileStream frameFile = File.OpenRead($".\\temp\\extracted\\frames\\{i}.bmp");
 #if MONOGAME
                     if(UserInterface.instance != null)
@@ -144,7 +145,7 @@ namespace NonsensicalVideoGenerator
                 ConsoleOutput.WriteLine($"Failed to extract frames and audio.");
                 ConsoleOutput.WriteLine(e.Message);
                 Stop();
-                GlobalContent.GetSound("Error").Play(int.Parse(SaveData.saveValues["SoundEffectVolume"], System.Globalization.CultureInfo.InvariantCulture) / 100f, 0f, 0f);
+                GlobalContent.GetSound("Error").Play(int.Parse(SaveData.saveValues["SoundEffectVolume"], CultureInfo.InvariantCulture) / 100f, 0f, 0f);
                 Global.generator.progressText = L.T(0, "Video:StatusFailPlay");
             }
             processing = false;
@@ -159,11 +160,11 @@ namespace NonsensicalVideoGenerator
                 dircount = Directory.GetFiles(".\\temp\\extracted\\frames").Length;
                 if(dircount > 0)
                 {
-                    Global.generator.progressText = "Extracting frames... (" + dircount + "/" + count + ")";
+                    Global.generator.progressText = L.T(0, "Video:StatusExtractFrames", dircount.ToString(CultureInfo.InvariantCulture), count.ToString(CultureInfo.InvariantCulture));
                 }
                 else
                 {
-                    Global.generator.progressText = "Extracting frames... (0/" + count + ")";
+                    Global.generator.progressText = L.T(0, "Video:StatusExtractFrames", "0", count.ToString(CultureInfo.InvariantCulture));
                 }
                 System.Threading.Thread.Sleep(100);
             }
@@ -190,7 +191,7 @@ namespace NonsensicalVideoGenerator
                 process.OutputDataReceived += (sender, args) => {
                     if(args.Data != null)
                     {
-                        count = int.Parse(args.Data, System.Globalization.CultureInfo.InvariantCulture);
+                        count = int.Parse(args.Data, CultureInfo.InvariantCulture);
                         ConsoleOutput.WriteLine(args.Data, Color.Transparent);
                     }
                 };
@@ -340,7 +341,7 @@ namespace NonsensicalVideoGenerator
                 process.OutputDataReceived += (sender, args) => {
                     if(args.Data != null)
                     {
-                        audioLength = double.Parse(args.Data, System.Globalization.CultureInfo.InvariantCulture) * 1000;
+                        audioLength = double.Parse(args.Data, CultureInfo.InvariantCulture) * 1000;
                         ConsoleOutput.WriteLine(args.Data, Color.Transparent);
                     }
                 };
@@ -406,7 +407,7 @@ namespace NonsensicalVideoGenerator
             }
             if(Stop())
             {
-                Global.generator.progressText = "Loading media...";
+                Global.generator.progressText = L.T(0, "Video:StatusLoad");
                 currentPath = file.Path ?? "";
                 // Extract frames and audio
                 if(!processing)
@@ -462,7 +463,7 @@ namespace NonsensicalVideoGenerator
                         {
                             ConsoleOutput.WriteLine($"Failed to play media.");
                             ConsoleOutput.WriteLine(e.Message);
-                            GlobalContent.GetSound("Error").Play(int.Parse(SaveData.saveValues["SoundEffectVolume"], System.Globalization.CultureInfo.InvariantCulture) / 100f, 0f, 0f);
+                            GlobalContent.GetSound("Error").Play(int.Parse(SaveData.saveValues["SoundEffectVolume"], CultureInfo.InvariantCulture) / 100f, 0f, 0f);
                             Global.generator.progressText = L.T(0, "Video:StatusFailPlay");
                         }
                     }
@@ -470,7 +471,7 @@ namespace NonsensicalVideoGenerator
             }
             else
             {
-                GlobalContent.GetSound("Error").Play(int.Parse(SaveData.saveValues["SoundEffectVolume"], System.Globalization.CultureInfo.InvariantCulture) / 100f, 0f, 0f);
+                GlobalContent.GetSound("Error").Play(int.Parse(SaveData.saveValues["SoundEffectVolume"], CultureInfo.InvariantCulture) / 100f, 0f, 0f);
                 Global.generator.progressText = L.T(0, "Video:StatusFailStop");
             }
         }
@@ -507,7 +508,7 @@ namespace NonsensicalVideoGenerator
                 canPlayBgMusic = false;
                 audio.Play();
 #if MONOGAME
-                audio.Volume = int.Parse(SaveData.saveValues["VideoVolume"], System.Globalization.CultureInfo.InvariantCulture) / 100f;
+                audio.Volume = int.Parse(SaveData.saveValues["VideoVolume"], CultureInfo.InvariantCulture) / 100f;
 #endif
                 currentFrame = 0;
                 playing = true;
@@ -541,7 +542,7 @@ namespace NonsensicalVideoGenerator
                 // Update volume on the fly
                 if(audio != null)
                 {
-                    audio.Volume = int.Parse(SaveData.saveValues["VideoVolume"], System.Globalization.CultureInfo.InvariantCulture) / 100f;
+                    audio.Volume = int.Parse(SaveData.saveValues["VideoVolume"], CultureInfo.InvariantCulture) / 100f;
                 }
 #endif
             }

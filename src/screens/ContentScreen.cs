@@ -29,7 +29,6 @@ namespace NonsensicalVideoGenerator
         private bool toggle = false;
         public Vector2 offset = new(0, 0);
         private readonly Tweener tween = new();
-        private readonly InteractableController actionController = new();
         public void Show()
         {
             layer = 3;
@@ -95,8 +94,6 @@ namespace NonsensicalVideoGenerator
             if(Pagination.SelectedPage != Pagination.TopPageCount)
             {
                 layer = 3;
-                if(actionController.Update(gameTime, handleInput))
-                    return true;
             }
             else
             {
@@ -141,7 +138,6 @@ namespace NonsensicalVideoGenerator
                 // Center within bounds of x 128 and x 312
                 Vector2 titleSize = L.FontSmall().MeasureString(pageTitle);
                 spriteBatch.DrawString(L.FontSmall(), pageTitle, new Vector2(GlobalGraphics.Scale(220) - titleSize.X / 2, GlobalGraphics.Scale(37)), Color.White);
-                actionController.Draw(gameTime, spriteBatch);
             }
             // Pagination
             Pagination.Draw(gameTime, spriteBatch);
@@ -155,7 +151,6 @@ namespace NonsensicalVideoGenerator
         }
         public void LoadContent(ContentManager contentManager, GraphicsDevice graphicsDevice)
         {
-            actionController.Clear();
             // Main Window
             GlobalContent.AddTexture("MainWindow", ThemeManager.LoadLayeredContent<Texture2D>("graphics/mainwindow"));
             // Pagination
@@ -167,60 +162,6 @@ namespace NonsensicalVideoGenerator
                 else
                     Hide();
             }
-            actionController.Add("ActionDiscord", new ActionButton("Join our Discord server!", new Vector2(112, 191), (int i, string n) => {
-                switch(i)
-                {
-                    case 2: // left click
-                        if(Global.ready)
-                        {
-                            GlobalContent.GetSound("Select").Play(int.Parse(SaveData.saveValues["SoundEffectVolume"], System.Globalization.CultureInfo.InvariantCulture) / 100f, 0f, 0f);
-                            ProcessStartInfo psi = new()
-                            {
-                                FileName = "https://discord.gg/8ppmspR6Wh",
-                                UseShellExecute = true
-                            };
-                            Process.Start(psi);
-                        }
-                        return true;
-                }
-                return false;
-            }, ThemeManager.LoadLayeredContent<Texture2D>("graphics/actions/discord")));
-            actionController.Add("ActionSteam", new ActionButton("View the Steam Workshop!", new Vector2(112, 191+15), (int i, string n) => {
-                switch(i)
-                {
-                    case 2: // left click
-                        if(Global.ready)
-                        {
-                            GlobalContent.GetSound("Select").Play(int.Parse(SaveData.saveValues["SoundEffectVolume"], System.Globalization.CultureInfo.InvariantCulture) / 100f, 0f, 0f);
-                            ProcessStartInfo psi = new()
-                            {
-                                FileName = "https://steamcommunity.com/app/2516360/workshop/",
-                                UseShellExecute = true
-                            };
-                            Process.Start(psi);
-                        }
-                        return true;
-                }
-                return false;
-            }, ThemeManager.LoadLayeredContent<Texture2D>("graphics/actions/steam")));
-            actionController.Add("ActionGitHub", new ActionButton("View the issue tracker on GitHub!", new Vector2(112, 191+(15*2)), (int i, string n) => {
-                switch(i)
-                {
-                    case 2: // left click
-                        if(Global.ready)
-                        {
-                            GlobalContent.GetSound("Select").Play(int.Parse(SaveData.saveValues["SoundEffectVolume"], System.Globalization.CultureInfo.InvariantCulture) / 100f, 0f, 0f);
-                            ProcessStartInfo psi = new()
-                            {
-                                FileName = "https://github.com/KiwifruitDev/NonsensicalVideoGenerator",
-                                UseShellExecute = true
-                            };
-                            Process.Start(psi);
-                        }
-                        return true;
-                }
-                return false;
-            }, ThemeManager.LoadLayeredContent<Texture2D>("graphics/actions/github")));
         }
     }
 }

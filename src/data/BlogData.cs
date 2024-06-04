@@ -15,22 +15,24 @@ namespace NonsensicalVideoGenerator
     /// </summary>
     public static class BlogData
     {
-        public static string Title { get; set; } = "Milestone 5: Spring Cleaning Update";
-        public static string LastVersion { get; set; } = "1.0.1.0";
+        public static string Title { get; set; } = "Milestone 5 Hotfix 1";
+        public static string LastVersion { get; set; } = "1.0.1.1";
         public static List<string> Subtitle { get; set; } = new List<string>()
         {
-            "v1.0.1.0",
-            "May 31 2024",
+            "v1.0.1.1",
+            "June 4 2024",
+            "Small Update"
         };
         public static List<string> Description { get; set; } = new List<string>()
         {
-            "The largest Nonsensical Video",
-            "Generator update is here!",
+            "- Addon changes and fixes.",
+            "- Added and moved action buttons.",
+            "- Updated the localization files.",
+            "- Disabled 2 music tracks for now.",
+            "- Other minor changes.",
             " ",
-            "Quality of life improvements,",
-            "localization, new features,",
-            "and more!",
+            "See full changelog on Steam.",
         };
-        public static string Url { get; set; } = "https://store.steampowered.com/news/app/2516360/view/6215608421537406607";
+        public static string Url { get; set; } = "https://store.steampowered.com/news/app/2516360/view/4192367467637706465";
     }
 }

@@ -133,7 +133,7 @@ namespace NonsensicalVideoGenerator
                 else
                 {
                     GlobalContent.GetSound("Select").Play(int.Parse(SaveData.saveValues["SoundEffectVolume"], CultureInfo.InvariantCulture) / 100f, 0f, 0f);
-                    UserInterface.instance.music = 0;
+                    //UserInterface.instance.music = 0;
                 }
             }
             // Scrolling will set ConsoleOutput.paused to true.

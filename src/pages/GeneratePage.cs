@@ -105,7 +105,7 @@ namespace NonsensicalVideoGenerator
             controllerRendering.Clear();
             controllerPage3.Clear();
             // Actions
-            actionController.Add("ActionConsole", new ActionButton("View console output.", new Vector2(112, 176), (int i, string n) => {
+            actionController.Add("ActionConsole", new ActionButton("View console output.", new Vector2(112, 221), (int i, string n) => {
                 switch(i)
                 {
                     case 2: // left click
@@ -122,7 +122,7 @@ namespace NonsensicalVideoGenerator
                                     GlobalContent.GetSound("Select").Play(int.Parse(SaveData.saveValues["SoundEffectVolume"], CultureInfo.InvariantCulture) / 100f, 0f, 0f);
                                     if(Accessibility.showDisambiguation)
                                         Accessibility.TTS(L.T(0, "Accessibility:ConsoleShown"));
-                                    UserInterface.instance.music = 0;
+                                    //UserInterface.instance.music = 0;
                                 }
                                 else
                                 {
@@ -143,7 +143,7 @@ namespace NonsensicalVideoGenerator
                 }
                 return false;
             }, ThemeManager.LoadLayeredContent<Texture2D>("graphics/actions/console")));
-            actionController.Add("ActionReset", new ActionButton("Reset to default parameters.", new Vector2(112, 176-15), (int i, string n) => {
+            actionController.Add("ActionReset", new ActionButton("Reset to default parameters.", new Vector2(112, 206), (int i, string n) => {
                 switch(i)
                 {
                     case 2: // left click
@@ -181,6 +181,9 @@ namespace NonsensicalVideoGenerator
                         SaveData.saveValues["MaxUniqueClips"] = "0";
                         SaveData.saveValues["DeleteClipsAfterMaxUniqueClips"] = "false";
                         SaveData.saveValues["DisableClipsAfterMaxUniqueClips"] = "false";
+                        SaveData.saveValues["ConstrainAspectRatio"] = "true";
+                        SaveData.saveValues["EnableTimeOut"] = "true";
+                        SaveData.saveValues["TimeOut"] = "30";
                         SaveData.Save();
                         controller.interactables["MinStreamDuration"].Tooltip = SaveData.saveValues["MinStreamDuration"];
                         controller.interactables["MaxStreamDuration"].Tooltip = SaveData.saveValues["MaxStreamDuration"];
@@ -200,11 +203,13 @@ namespace NonsensicalVideoGenerator
                         ((Switch)controllerPage3.interactables["DeleteClipsAfterMaxUniqueClips"]).SwitchState = SaveData.saveValues["DeleteClipsAfterMaxUniqueClips"] == "true";
                         ((Switch)controllerPage3.interactables["DisableClipsAfterMaxUniqueClips"]).SwitchState = SaveData.saveValues["DisableClipsAfterMaxUniqueClips"] == "true";
                         ((Switch)controllerPage3.interactables["ConstrainAspectRatio"]).SwitchState = SaveData.saveValues["ConstrainAspectRatio"] == "true";
+                        ((Switch)controllerPage3.interactables["EnableTimeOut"]).SwitchState = SaveData.saveValues["EnableTimeOut"] == "true";
+                        controllerPage3.interactables["TimeOut"].Tooltip = SaveData.saveValues["TimeOut"];
                         return true;
                 }
                 return false;
             }, ThemeManager.LoadLayeredContent<Texture2D>("graphics/actions/reset")));
-            actionController.Add("ActionPlayLast", new ActionButton("Play last rendered video.", new Vector2(112, 176-(15*2)), (int i, string n) => {
+            actionController.Add("ActionPlayLast", new ActionButton("Play last rendered video.", new Vector2(112, 191), (int i, string n) => {
                 switch(i)
                 {
                     case 2: // left click
@@ -236,7 +241,7 @@ namespace NonsensicalVideoGenerator
                 }
                 return false;
             }, ThemeManager.LoadLayeredContent<Texture2D>("graphics/actions/playlast")));
-            actionController.Add("ActionRender", new ActionButton("Start generating a new video.", new Vector2(112, 176-(15*3)), (int i, string n) => {
+            actionController.Add("ActionRender", new ActionButton("Start generating a new video.", new Vector2(112, 176), (int i, string n) => {
                 switch(i)
                 {
                     case 2: // left click

@@ -16,17 +16,14 @@ namespace NonsensicalVideoGenerator
         public string Name { get; set; } = "PageBlog";
         public string Tooltip { get; } = "Check out what's new!";
         private readonly InteractableController controller = new();
+        private readonly InteractableController actionController = new();
         public bool Update(GameTime gameTime, bool handleInput)
         {
             // Interactable
+            if(actionController.Update(gameTime, handleInput))
+                return true;
             if(controller.Update(gameTime, handleInput))
                 return true;
-            if(handleInput && SaveData.saveValues["LastVersion"] != BlogData.LastVersion)
-            {
-                Pagination.SetPage(5);
-                SaveData.saveValues["LastVersion"] = BlogData.LastVersion;
-                SaveData.Save();
-            }
             return false;
         }
         public void Draw(GameTime gameTime, SpriteBatch spriteBatch)
@@ -45,7 +42,7 @@ namespace NonsensicalVideoGenerator
             spriteBatch.Draw(banner, new Rectangle(GlobalGraphics.Scale(140), GlobalGraphics.Scale(73), GlobalGraphics.Scale(banner.Width), GlobalGraphics.Scale(banner.Height)), Color.White);
             // Draw subtitle
             int increment = 10;
-            int subtitleHeight = 90;
+            int subtitleHeight = 85;
             for(int i = 0; i < BlogData.Subtitle.Count; i++)
             {
                 Vector2 subtitleSize = font.MeasureString(BlogData.Subtitle[i]);
@@ -62,6 +59,7 @@ namespace NonsensicalVideoGenerator
                 spriteBatch.DrawString(font, BlogData.Description[i], new Vector2(GlobalGraphics.Scale(220) - descriptionSize.X / 2, GlobalGraphics.Scale(descriptionHeight)), Color.White);
                 descriptionHeight += increment;
             }
+            actionController.Draw(gameTime, spriteBatch);
         }
         public void LoadContent(ContentManager contentManager, GraphicsDevice graphicsDevice)
         {
@@ -69,6 +67,61 @@ namespace NonsensicalVideoGenerator
             // Interactable
             ParseBlog();
             controller.LoadContent(contentManager, graphicsDevice);
+            actionController.Clear();
+            actionController.Add("ActionDiscord", new ActionButton("Join our Discord server!", new Vector2(112, 191), (int i, string n) => {
+                switch(i)
+                {
+                    case 2: // left click
+                        if(Global.ready)
+                        {
+                            GlobalContent.GetSound("Select").Play(int.Parse(SaveData.saveValues["SoundEffectVolume"], System.Globalization.CultureInfo.InvariantCulture) / 100f, 0f, 0f);
+                            ProcessStartInfo psi = new()
+                            {
+                                FileName = "https://discord.gg/8ppmspR6Wh",
+                                UseShellExecute = true
+                            };
+                            Process.Start(psi);
+                        }
+                        return true;
+                }
+                return false;
+            }, ThemeManager.LoadLayeredContent<Texture2D>("graphics/actions/discord")));
+            actionController.Add("ActionSteam", new ActionButton("View the Steam Workshop!", new Vector2(112, 191+15), (int i, string n) => {
+                switch(i)
+                {
+                    case 2: // left click
+                        if(Global.ready)
+                        {
+                            GlobalContent.GetSound("Select").Play(int.Parse(SaveData.saveValues["SoundEffectVolume"], System.Globalization.CultureInfo.InvariantCulture) / 100f, 0f, 0f);
+                            ProcessStartInfo psi = new()
+                            {
+                                FileName = "https://steamcommunity.com/app/2516360/workshop/",
+                                UseShellExecute = true
+                            };
+                            Process.Start(psi);
+                        }
+                        return true;
+                }
+                return false;
+            }, ThemeManager.LoadLayeredContent<Texture2D>("graphics/actions/steam")));
+            actionController.Add("ActionGitHub", new ActionButton("View the issue tracker on GitHub!", new Vector2(112, 191+(15*2)), (int i, string n) => {
+                switch(i)
+                {
+                    case 2: // left click
+                        if(Global.ready)
+                        {
+                            GlobalContent.GetSound("Select").Play(int.Parse(SaveData.saveValues["SoundEffectVolume"], System.Globalization.CultureInfo.InvariantCulture) / 100f, 0f, 0f);
+                            ProcessStartInfo psi = new()
+                            {
+                                FileName = "https://github.com/KiwifruitDev/NonsensicalVideoGenerator",
+                                UseShellExecute = true
+                            };
+                            Process.Start(psi);
+                        }
+                        return true;
+                }
+                return false;
+            }, ThemeManager.LoadLayeredContent<Texture2D>("graphics/actions/github")));
         }
         public void ParseBlog()
         {

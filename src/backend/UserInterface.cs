@@ -109,6 +109,13 @@ namespace NonsensicalVideoGenerator
             ScreenManager.LoadScreens();
             ConsoleOutput.WriteLine("Initialization complete.", Color.Transparent);
             LibraryData.SequentialName();
+            // Show blog if new version.
+            if(SaveData.saveValues["LastVersion"] != BlogData.LastVersion)
+            {
+                Pagination.SetPage(4);
+                SaveData.saveValues["LastVersion"] = BlogData.LastVersion;
+                SaveData.Save();
+            }
 #if WINDOWSDX
             Window.AllowAltF4 = false;
             Form _GameForm = (Form)Form.FromHandle(Window.Handle);
