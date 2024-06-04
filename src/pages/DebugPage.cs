@@ -273,6 +273,20 @@ namespace NonsensicalVideoGenerator
                             }
                             return true;
                         }
+                        if(MouseInput.MouseState.Y >= GlobalGraphics.Scale(33+(8*14)) && MouseInput.MouseState.Y <= GlobalGraphics.Scale(33+(8*14)+6))
+                        {
+                            // Delete PluginHandler.pluginSettingsPath
+                            if(File.Exists(PluginHandler.pluginSettingsPath))
+                            {
+                                File.Delete(PluginHandler.pluginSettingsPath);
+                                GlobalContent.GetSound("Select").Play(int.Parse(SaveData.saveValues["SoundEffectVolume"], CultureInfo.InvariantCulture) / 100f, 0f, 0f);
+                            }
+                            else
+                            {
+                                GlobalContent.GetSound("Error").Play(int.Parse(SaveData.saveValues["SoundEffectVolume"], CultureInfo.InvariantCulture) / 100f, 0f, 0f);
+                            }
+                            return true;
+                        }
                     }
                 }
             }
@@ -298,6 +312,7 @@ namespace NonsensicalVideoGenerator
                 DrawButton(spriteBatch, 6, 33+(8*11), "Theme: " + ThemeManager.activeTheme.name);
                 DrawButton(spriteBatch, 6, 33+(8*12), "Save");
                 DrawButton(spriteBatch, 6, 33+(8*13), "Holiday: " + (HolidayManager.CurrentHoliday != null ? HolidayManager.CurrentHoliday.Name : "None"));
+                DrawButton(spriteBatch, 6, 33+(8*14), "Reset Addon Consents");
                 spriteBatch.DrawString(L.FontSmall(), Debug.debugBuild ? "Debug Build" : (Debug.GetDebugMode() ? "Release Build; Debug Mode" : "Release Build"), new Vector2(GlobalGraphics.Scale(6), GlobalGraphics.scaledHeight - GlobalGraphics.Scale(6*10) - GlobalGraphics.Scale(9)), Color.White);
                 spriteBatch.DrawString(L.FontSmall(), "Parameters: "+String.Join(" ", Global.parameters.ToArray()), new Vector2(GlobalGraphics.Scale(6), GlobalGraphics.scaledHeight - GlobalGraphics.Scale(6*9) - GlobalGraphics.Scale(9)), Color.White);
                 spriteBatch.DrawString(L.FontSmall(), "Mouse: " + MouseInput.MouseState.Position.X.ToString(CultureInfo.InvariantCulture) + ", " + MouseInput.MouseState.Position.Y.ToString(CultureInfo.InvariantCulture), new Vector2(GlobalGraphics.Scale(6), GlobalGraphics.scaledHeight - GlobalGraphics.Scale(6*8) - GlobalGraphics.Scale(9)), Color.White);

@@ -84,13 +84,14 @@ namespace NonsensicalVideoGenerator
                 }
                 for(int i = 0; i < tutorialText[3].Count; i++)
                 {
+                    bool isTitleText = tutorialText[3][i].Contains("%EFFECT%");
                     bool isPerm1Text = tutorialText[3][i].Contains("%PERM1%");
                     bool isPerm2Text = tutorialText[3][i].Contains("%PERM2%");
                     bool isPerm3Text = tutorialText[3][i].Contains("%PERM3%");
                     // consents is a flag enum with 1 bit for each consent (3 bits)
                     if(UserConsent.consentForm != null)
                     {
-                        tutorialText[3][i] = tutorialText[3][i].Replace("%1", UserConsent.consentForm.name ?? L.T(0, "Addons:UnknownName"));
+                        tutorialText[3][i] = tutorialText[3][i].Replace("%EFFECT%", L.T(0, "Tutorial:PluginConsentForm_0", UserConsent.consentForm.name ?? L.T(0, "Addons:UnknownName")));
                         // first bit
                         tutorialText[3][i] = tutorialText[3][i].Replace("%PERM1%", UserConsent.consentForm.consents.HasFlag(Consents.DownloadFiles) ? L.T(0, "Addons:ConsentDownloadFiles") : "");
                         // second bit
@@ -322,7 +323,7 @@ namespace NonsensicalVideoGenerator
             },
             new List<string>()
             { // PLUGIN CONSENT FORM
-                "Tutorial:PluginConsentForm_0",
+                "%EFFECT%",
                 " ",
                 "%PERM1%",
                 " ",

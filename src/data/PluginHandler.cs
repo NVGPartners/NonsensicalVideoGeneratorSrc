@@ -538,11 +538,14 @@ namespace NonsensicalVideoGenerator
         // AddToLibrary for lua
         public void AddToLibrary(string rootType, string subType, string path)
         {
+            // Broken beause dynamic changes (after consent form is shown) are not saved
+            /*
             if(consentForm != null && !consentForm.CheckConsentParam(Consents.AddToLibrary, ReplacePlaceholders(path)))
             {
                 ConsoleOutput.WriteLine("Addon attempted to add a file to the library without permission.", Color.Red);
                 return;
             }
+            */
             if(!ValidateInput(path))
             {
                 ConsoleOutput.WriteLine("Addon attempted to add a file to the library with an invalid path.", Color.Red);
