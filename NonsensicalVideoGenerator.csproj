@@ -3,11 +3,11 @@
     <AssemblyName>NonsensicalVideoGenerator</AssemblyName>
     <AssemblyProduct>NonsensicalVideoGenerator</AssemblyProduct>
     <AssemblyTitle>Nonsensical Video Generator</AssemblyTitle>
-    <FileVersion>1.0.1.1</FileVersion>
-    <AssemblyVersion>1.0.1.1</AssemblyVersion>
-    <Version>1.0.1.1</Version>
+    <FileVersion>1.0.1.2</FileVersion>
+    <AssemblyVersion>1.0.1.2</AssemblyVersion>
+    <Version>1.0.1.2</Version>
     <AssemblyCopyright>Copyright © KiwifruitDev 2024</AssemblyCopyright>
-    <AssemblyTrademark>Newtonsoft.Json licensed under MIT; MonoGame licensed under Ms-PL; MoonSharp licensed under BSD-3-Clause; Steamworks.NET licensed under MIT; Munro licensed under SIL OFL</AssemblyTrademark>
+    <AssemblyTrademark>MonoGame licensed under Ms-PL; Newtonsoft.Json licensed under MIT; Steamworks.NET licensed under MIT; DiscordRichPresence licensed under MIT; SharpCompress licensed under MIT; MoonSharp licensed under BSD-3-Clause; Munro licensed under SIL OFL; LanaPixel licensed under SIL OFL</AssemblyTrademark>
     <Authors>KiwifruitDev</Authors>
     <ProjectGuid>{afd0cba3-e90b-47c4-ba45-32937471bc75}</ProjectGuid>
     <RootNamespace>NonsensicalVideoGenerator</RootNamespace>

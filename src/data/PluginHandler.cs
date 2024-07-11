@@ -614,18 +614,15 @@ namespace NonsensicalVideoGenerator
                 ConsoleOutput.WriteLine("Addon attempted to download a file without permission.", Color.Red);
                 return;
             }
-            if(!ValidateInput(ReplacePlaceholders(url)))
-            {
-                ConsoleOutput.WriteLine("Addon attempted to download a file with an invalid URL.", Color.Red);
-                return;
-            }
             if(subType == "")
                 rootType = jobDirectory;
+            /*
             else if(consentForm != null && !consentForm.CheckConsentParam(Consents.AddToLibrary, Path.GetFileName(ReplacePlaceholders(url))))
             {
                 ConsoleOutput.WriteLine("Addon attempted to add a file to the library without permission.", Color.Red);
                 return;
             }
+            */
             PluginHandler.commands.Add(new Command(CommandType.Download, ReplacePlaceholders(url) + " " + rootType + " " + subType, jobDirectory));
         }
         // ExecuteProgram for lua
@@ -1176,39 +1173,27 @@ namespace NonsensicalVideoGenerator
         }
         public static string PluginListFilterToString()
         {
-            string filterString = "";
             if (pluginListFilter == (PluginListFilter.Effects | PluginListFilter.PostRenderEffects | PluginListFilter.Themes))
             {
-                filterString = "All";
+                return L.T(0, "Addons:FilterAll");
             }
-            else if (pluginListFilter == PluginListFilter.None)
+            else if (pluginListFilter == PluginListFilter.Effects)
             {
-                filterString = "None";
+                return L.T(0, "Addons:FilterEffects");
             }
-            else
+            else if (pluginListFilter == PluginListFilter.PostRenderEffects)
             {
-                if (pluginListFilter.HasFlag(PluginListFilter.Effects))
-                {
-                    filterString += "Effects";
-                }
-                if (pluginListFilter.HasFlag(PluginListFilter.PostRenderEffects))
-                {
-                    if (filterString != "")
-                    {
-                        filterString += ", ";
-                    }
-                    filterString += "Post-Render Effects";
-                }
-                if (pluginListFilter.HasFlag(PluginListFilter.Themes))
-                {
-                    if (filterString != "")
-                    {
-                        filterString += ", ";
-                    }
-                    filterString += "Themes";
-                }
+                return L.T(0, "Addons:FilterPostRenderEffects");
             }
-            return filterString;
+            else if (pluginListFilter == PluginListFilter.Themes)
+            {
+                return L.T(0, "Addons:FilterThemes");
+            }
+            else if (pluginListFilter != PluginListFilter.None)
+            {
+                return L.T(0, "Addons:FilterMixed");
+            }
+            return L.T(0, "Addons:FilterNone");
         }
         public static void CyclePluginListFilter()
         {
@@ -1368,15 +1353,22 @@ namespace NonsensicalVideoGenerator
                             // Is this in subscribedItems?
                             if(root.Contains("workshop") && subscribedItems != null)
                             {
-                                if (subscribedItems.Any(item => item.m_PublishedFileId.ToString(CultureInfo.InvariantCulture) == basename))
+                                try
                                 {
-                                    LoadPlugin(file, type, root, basename);
+                                    if (subscribedItems.Any(item => item.m_PublishedFileId.ToString(CultureInfo.InvariantCulture) == basename))
+                                    {
+                                        LoadPlugin(file, type, root, basename);
+                                    }
+                                    else if(basename != "user")
+                                    {
+                                        ConsoleOutput.WriteLine($"Deleting Addon {basename} because it is not subscribed to.", Color.Red);
+                                        // Remove entire directory, as it contains theme files.
+                                        Directory.Delete(path, true);
+                                    }
                                 }
-                                else if(basename != "user")
+                                catch (Exception ex)
                                 {
-                                    ConsoleOutput.WriteLine($"Deleting Addon {basename} because it is not subscribed to.", Color.Red);
-                                    // Remove entire directory, as it contains theme files.
-                                    Directory.Delete(path, true);
+                                    ConsoleOutput.WriteLine(ex.Message, Color.Red);
                                 }
                             }
                             else
@@ -1388,9 +1380,16 @@ namespace NonsensicalVideoGenerator
                 }
             }
             // Recurse into subdirectories.
-            foreach(string file in Directory.GetDirectories(path))
+            try
             {
-                LoadPluginsRecursive(file, type, path);
+                foreach(string file in Directory.GetDirectories(path))
+                {
+                    LoadPluginsRecursive(file, type, path);
+                }
+            }
+            catch (Exception ex)
+            {
+                ConsoleOutput.WriteLine(ex.Message, Color.Red);
             }
         }
         private static uint allDoneCount = 0;
