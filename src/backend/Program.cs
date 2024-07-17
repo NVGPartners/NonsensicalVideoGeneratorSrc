@@ -102,7 +102,7 @@ namespace NonsensicalVideoGenerator
             bool languageSet = false;
             if(SaveData.saveValues["Locale"] != "fixme")
                 languageSet = true;
-            if(SteamManager.initialized)
+            if(SteamManager.initialized && !languageSet)
             {
                 string steamLang = SteamApps.GetCurrentGameLanguage();
                 if(steamLang != null)
