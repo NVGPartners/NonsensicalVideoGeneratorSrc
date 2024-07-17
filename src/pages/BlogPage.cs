@@ -35,8 +35,8 @@ namespace NonsensicalVideoGenerator
             SpriteFont font = L.FontLarge();
             // Draw title
             Vector2 titleSize = font.MeasureString(BlogData.Title);
-            spriteBatch.DrawString(font, BlogData.Title, new Vector2(GlobalGraphics.Scale(220+1) - titleSize.X / 2, GlobalGraphics.Scale(59+1)), Color.Black);
-            spriteBatch.DrawString(font, BlogData.Title, new Vector2(GlobalGraphics.Scale(220) - titleSize.X / 2, GlobalGraphics.Scale(59)), Color.White);
+            GlobalContent.DrawString(spriteBatch, font, BlogData.Title, new Vector2(GlobalGraphics.Scale(220+1) - titleSize.X / 2, GlobalGraphics.Scale(59+1)), Color.Black);
+            GlobalContent.DrawString(spriteBatch, font, BlogData.Title, new Vector2(GlobalGraphics.Scale(220) - titleSize.X / 2, GlobalGraphics.Scale(59)), Color.White);
             // Draw banner
             spriteBatch.Draw(banner, new Rectangle(GlobalGraphics.Scale(140+1), GlobalGraphics.Scale(73+1), GlobalGraphics.Scale(banner.Width), GlobalGraphics.Scale(banner.Height)), Color.Black);
             spriteBatch.Draw(banner, new Rectangle(GlobalGraphics.Scale(140), GlobalGraphics.Scale(73), GlobalGraphics.Scale(banner.Width), GlobalGraphics.Scale(banner.Height)), Color.White);
@@ -46,8 +46,8 @@ namespace NonsensicalVideoGenerator
             for(int i = 0; i < BlogData.Subtitle.Count; i++)
             {
                 Vector2 subtitleSize = font.MeasureString(BlogData.Subtitle[i]);
-                spriteBatch.DrawString(font, BlogData.Subtitle[i], new Vector2(GlobalGraphics.Scale(273+1) - subtitleSize.X / 2, GlobalGraphics.Scale(subtitleHeight+1)), Color.Black);
-                spriteBatch.DrawString(font, BlogData.Subtitle[i], new Vector2(GlobalGraphics.Scale(273) - subtitleSize.X / 2, GlobalGraphics.Scale(subtitleHeight)), Color.White);
+                GlobalContent.DrawString(spriteBatch, font, BlogData.Subtitle[i], new Vector2(GlobalGraphics.Scale(273+1) - subtitleSize.X / 2, GlobalGraphics.Scale(subtitleHeight+1)), Color.Black);
+                GlobalContent.DrawString(spriteBatch, font, BlogData.Subtitle[i], new Vector2(GlobalGraphics.Scale(273) - subtitleSize.X / 2, GlobalGraphics.Scale(subtitleHeight)), Color.White);
                 subtitleHeight += increment;
             }
             // Draw description
@@ -55,8 +55,8 @@ namespace NonsensicalVideoGenerator
             for(int i = 0; i < BlogData.Description.Count; i++)
             {
                 Vector2 descriptionSize = font.MeasureString(BlogData.Description[i]);
-                spriteBatch.DrawString(font, BlogData.Description[i], new Vector2(GlobalGraphics.Scale(220+1) - descriptionSize.X / 2, GlobalGraphics.Scale(descriptionHeight+1)), Color.Black);
-                spriteBatch.DrawString(font, BlogData.Description[i], new Vector2(GlobalGraphics.Scale(220) - descriptionSize.X / 2, GlobalGraphics.Scale(descriptionHeight)), Color.White);
+                GlobalContent.DrawString(spriteBatch, font, BlogData.Description[i], new Vector2(GlobalGraphics.Scale(220+1) - descriptionSize.X / 2, GlobalGraphics.Scale(descriptionHeight+1)), Color.Black);
+                GlobalContent.DrawString(spriteBatch, font, BlogData.Description[i], new Vector2(GlobalGraphics.Scale(220) - descriptionSize.X / 2, GlobalGraphics.Scale(descriptionHeight)), Color.White);
                 descriptionHeight += increment;
             }
             actionController.Draw(gameTime, spriteBatch);

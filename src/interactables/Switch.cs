@@ -92,8 +92,10 @@ namespace NonsensicalVideoGenerator
                 localizedTitle = Name;
             else
                 localizedTitle = L.T(0, "Interactable:"+internalName+"Title");
-            spriteBatch.DrawString(L.FontLarge(), localizedTitle, new Vector2(GlobalGraphics.Scale(bounds.X + 29 + 1), GlobalGraphics.Scale(bounds.Y + 2 + 1)), Color.Black);
-            spriteBatch.DrawString(L.FontLarge(), localizedTitle, new Vector2(GlobalGraphics.Scale(bounds.X + 29), GlobalGraphics.Scale(bounds.Y + 2)), Color.White);
+            if(internalName.Contains("ViewLocalizationOptions"))
+                localizedTitle = L.T(0, "Interactable:"+internalName+"Title", L.cyclerLocale.localizedName);
+            GlobalContent.DrawString(spriteBatch, L.FontLarge(), localizedTitle, new Vector2(GlobalGraphics.Scale(bounds.X + 29 + 1), GlobalGraphics.Scale(bounds.Y + 2 + 1)), Color.Black, internalName.Contains("ViewLocalizationOptions"));
+            GlobalContent.DrawString(spriteBatch, L.FontLarge(), localizedTitle, new Vector2(GlobalGraphics.Scale(bounds.X + 29), GlobalGraphics.Scale(bounds.Y + 2)), Color.White, internalName.Contains("ViewLocalizationOptions"));
             // If hovering, draw tooltip
             if (State >= 1 && Tooltip != "")
             {

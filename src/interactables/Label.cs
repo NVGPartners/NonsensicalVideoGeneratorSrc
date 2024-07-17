@@ -53,8 +53,8 @@ namespace NonsensicalVideoGenerator
             else
                 localizedTitle = L.T(0, "Interactable:"+internalName+"Title");
             if(UseShadow)
-                spriteBatch.DrawString(drawFont, localizedTitle, new Vector2(GlobalGraphics.Scale(Position.X + 1), GlobalGraphics.Scale(Position.Y - 3 + 1)), ShadowColor);
-            spriteBatch.DrawString(drawFont, localizedTitle, new Vector2(GlobalGraphics.Scale(Position.X), GlobalGraphics.Scale(Position.Y-3)), TextColor);
+                GlobalContent.DrawString(spriteBatch, drawFont, localizedTitle, new Vector2(GlobalGraphics.Scale(Position.X + 1), GlobalGraphics.Scale(Position.Y - 3 + 1)), ShadowColor);
+            GlobalContent.DrawString(spriteBatch, drawFont, localizedTitle, new Vector2(GlobalGraphics.Scale(Position.X), GlobalGraphics.Scale(Position.Y-3)), TextColor);
         }
         public void LoadContent(ContentManager contentManager, GraphicsDevice graphicsDevice, string internalName)
         {

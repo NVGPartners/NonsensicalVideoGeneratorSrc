@@ -151,7 +151,7 @@ namespace NonsensicalVideoGenerator
                     if(text != " ")
                         text = text;
                     Vector2 textSize = fontMunro.MeasureString(text);
-                    spriteBatch.DrawString(fontMunro, text, new Vector2(GlobalGraphics.scaledWidth / 2 - textSize.X / 2, GlobalGraphics.Scale(24 + i * 16)), Color.White);
+                    GlobalContent.DrawString(spriteBatch, fontMunro, text, new Vector2(GlobalGraphics.scaledWidth / 2 - textSize.X / 2, GlobalGraphics.Scale(24 + i * 16)), Color.White);
                 }
                 if(!askAccessibility && !accepted)
                 {
@@ -297,6 +297,8 @@ namespace NonsensicalVideoGenerator
                             ScreenManager.GetScreen<SocialScreen>("Socials")?.Show();
                             Global.ready = true;
                             Global.readyTime = gameTime.TotalGameTime.TotalMilliseconds;
+                            if(Global.selectLanguage)
+                                Pagination.SetPage(3); // show options
                             // Play startup sound.
                             if(SaveData.saveValues["ActiveTheme"] == "")
                             {
@@ -364,18 +366,29 @@ namespace NonsensicalVideoGenerator
                         continue;
                     warningText[i] = L.T(0, warningText[i]);
                 }
-                controller.Add("Mute", new Switch("", "Mutes in-app background music.", new Vector2(147, 60-4+19*5), (int i, string n) => {
+                controller.Add("ViewLocalizationOptions", new Switch("Change language", "Visit the locale selection to change NVG's language.", new Vector2(60, 165), (int i, string n) => {
                     bool switchState = (i & 256) != 0;
                     if((i & 2) != 0)
                     {
-                        string oldValue = SaveData.saveValues["MusicVolume"];
-                        SaveData.saveValues["MusicVolume"] = switchState ? "0" : "25";
-                        if(oldValue != SaveData.saveValues["MusicVolume"])
+                        Global.selectLanguage = switchState;
+                    }
+                    return switchState;
+                }, false));
+                controller.Add("UseColorblindTheme", new Switch("", "Use colorblind-friendly theme.", new Vector2(60, 140), (int i, string n) => {
+                    bool switchState = (i & 256) != 0;
+                    if((i & 2) != 0)
+                    {
+                        string oldValue = SaveData.saveValues["ActiveTheme"];
+                        if(switchState)
+                            SaveData.saveValues["ActiveTheme"] = "colorblind.lua";
+                        else
+                            SaveData.saveValues["ActiveTheme"] = "";
+                        if(oldValue != SaveData.saveValues["ActiveTheme"])
                             SaveData.Save();
                     }
                     return switchState;
-                }, SaveData.saveValues["MusicVolume"] == "0"));
-                controller.Add("MotionDisable", new Switch("", "Turns off screen tweening and other elements.", new Vector2(147, 60+2+19*3), (int i, string n) => {
+                }, SaveData.saveValues["ActiveTheme"] == "colorblind.lua"));
+                controller.Add("MotionDisable", new Switch("", "Turns off screen tweening and other elements.", new Vector2(60, 115), (int i, string n) => {
                     bool switchState = (i & 256) != 0;
                     if((i & 2) != 0)
                     {
@@ -386,6 +399,17 @@ namespace NonsensicalVideoGenerator
                     }
                     return switchState;
                 }, SaveData.saveValues["DisableMotion"] == "true"));
+                controller.Add("Mute", new Switch("", "Mutes in-app background music.", new Vector2(60, 90), (int i, string n) => {
+                    bool switchState = (i & 256) != 0;
+                    if((i & 2) != 0)
+                    {
+                        string oldValue = SaveData.saveValues["MusicVolume"];
+                        SaveData.saveValues["MusicVolume"] = switchState ? "0" : "25";
+                        if(oldValue != SaveData.saveValues["MusicVolume"])
+                            SaveData.Save();
+                    }
+                    return switchState;
+                }, SaveData.saveValues["MusicVolume"] == "0"));
             }
             // Interactable
             controller.LoadContent(contentManager, graphicsDevice);

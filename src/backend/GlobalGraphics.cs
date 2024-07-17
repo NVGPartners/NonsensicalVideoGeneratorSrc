@@ -36,7 +36,7 @@ namespace NonsensicalVideoGenerator
             Rectangle generatedRectangle = new Rectangle(x, y, (int)measured.X, (int)measured.Y);
             spriteBatch.Draw(GlobalContent.GetTexture("Pixel"), generatedRectangle, borderColor);
             spriteBatch.Draw(GlobalContent.GetTexture("Pixel"), new Rectangle(x + Scale(1), y + Scale(1), (int)measured.X - Scale(2), (int)measured.Y - Scale(2)), color);
-            spriteBatch.DrawString(L.FontSmall(), text, new Vector2(x+Scale(2), y-Scale(4)), textColor);
+            GlobalContent.DrawString(spriteBatch, L.FontSmall(), text, new Vector2(x+Scale(2), y-Scale(4)), textColor);
             return new Rectangle(x, y, (int)measured.X, (int)measured.Y);
         }
         public static void DrawCircle(SpriteBatch spriteBatch, Vector2 pos, int radius, Color color, bool hollow = true)

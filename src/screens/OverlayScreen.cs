@@ -52,7 +52,7 @@ namespace NonsensicalVideoGenerator
                     position.Y = GlobalGraphics.scaledHeight - tooltipSize.Y - GlobalGraphics.Scale(2); 
                 spriteBatch.Draw(GlobalContent.GetTexture("Pixel"), new Rectangle((int)position.X, (int)position.Y, (int)tooltipSize.X + GlobalGraphics.Scale(2), (int)tooltipSize.Y - GlobalGraphics.Scale(2)), ThemeManager.GetColor("BackgroundTooltip"));
                 // White text
-                spriteBatch.DrawString(L.FontSmall(), tooltip, new Vector2(position.X + GlobalGraphics.Scale(2), position.Y - GlobalGraphics.Scale(2)), Color.White);
+                GlobalContent.DrawString(spriteBatch, L.FontSmall(), tooltip, new Vector2(position.X + GlobalGraphics.Scale(2), position.Y - GlobalGraphics.Scale(2)), Color.White);
             }
             // Draw mask.
             Global.mask.Draw(gameTime, spriteBatch);

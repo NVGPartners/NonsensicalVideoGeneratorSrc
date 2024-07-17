@@ -91,13 +91,19 @@ namespace NonsensicalVideoGenerator
             {"VideoPlayerProgressBar", new Color(255, 0, 0, 255)},
             {"VideoPlayerProgressBarBackground", new Color(0, 0, 0, 0)},
         }, true);
+        public static Theme Anniversary = new Theme("Anniversary", "Celebrate NVG's anniversary!", "themes/anniversary/", 6, 4, new Dictionary<string, Color>() {}, true);
+        public static Theme Birthday = new Theme("Birthday", "Happy birthday to KiwifruitDev!", "themes/birthday/", 6, 6, new Dictionary<string, Color>() {}, true);
         public static Theme Spooky = new Theme("Spooky", "Trick or treat!", "themes/halloween/", 1, 5, new Dictionary<string, Color>() {
             {"VideoPlayerProgressBar", new Color(60, 0, 128, 255)},
         }, true);
+        public static Theme Holiday = new Theme("Holiday", "Merry Christmas!", "themes/holiday/", 6, 8, new Dictionary<string, Color>() {}, true);
         public static List<Theme> themes = new List<Theme>()
         {
             Nonsensical,
-            Spooky
+            Anniversary,
+            Spooky,
+            Birthday,
+            Holiday
         };
         public static Theme defaultTheme = Nonsensical;
     }

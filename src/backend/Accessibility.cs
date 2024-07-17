@@ -284,7 +284,7 @@ namespace NonsensicalVideoGenerator
                     Vector2 position = new(GlobalGraphics.Scale(6), GlobalGraphics.Scale(2 + i * 9));
                     // Draw opaque background
                     //spriteBatch.Draw(pixel, new Rectangle((int)position.X - GlobalGraphics.Scale(2), (int)position.Y + GlobalGraphics.Scale(4) - GlobalGraphics.Scale(2), (int)size.X + GlobalGraphics.Scale(2), (int)size.Y - GlobalGraphics.Scale(5) + GlobalGraphics.Scale(2)), Color.Black);
-                    spriteBatch.DrawString(munroSmall, helpText, position, Color.White);
+                    GlobalContent.DrawString(spriteBatch, munroSmall, helpText, position, Color.White);
                 }
                 for(int i = 0; i < disambiguationOptions.Count; i++)
                 {
@@ -317,8 +317,8 @@ namespace NonsensicalVideoGenerator
                     if(i+offset >= 0)
                     {
                         int shadowDepth = GlobalGraphics.Scale(1);
-                        spriteBatch.DrawString(munroSmall, key, new Vector2(disambiguationOptions[i].bounds.X + disambiguationOptions[i].bounds.Width / 2 - munroSmall.MeasureString(key).X / 2 + shadowDepth, disambiguationOptions[i].bounds.Y + disambiguationOptions[i].bounds.Height / 2 - munroSmall.MeasureString(key).Y / 2 + shadowDepth) + offsetv, Color.Black);
-                        spriteBatch.DrawString(munroSmall, key, new Vector2(disambiguationOptions[i].bounds.X + disambiguationOptions[i].bounds.Width / 2 - munroSmall.MeasureString(key).X / 2, disambiguationOptions[i].bounds.Y + disambiguationOptions[i].bounds.Height / 2 - munroSmall.MeasureString(key).Y / 2) + offsetv, Color.White);
+                        GlobalContent.DrawString(spriteBatch, munroSmall, key, new Vector2(disambiguationOptions[i].bounds.X + disambiguationOptions[i].bounds.Width / 2 - munroSmall.MeasureString(key).X / 2 + shadowDepth, disambiguationOptions[i].bounds.Y + disambiguationOptions[i].bounds.Height / 2 - munroSmall.MeasureString(key).Y / 2 + shadowDepth) + offsetv, Color.Black);
+                        GlobalContent.DrawString(spriteBatch, munroSmall, key, new Vector2(disambiguationOptions[i].bounds.X + disambiguationOptions[i].bounds.Width / 2 - munroSmall.MeasureString(key).X / 2, disambiguationOptions[i].bounds.Y + disambiguationOptions[i].bounds.Height / 2 - munroSmall.MeasureString(key).Y / 2) + offsetv, Color.White);
                         // Input
                         Keys key2 = Keys.None;
                         if(i+offset < 1)

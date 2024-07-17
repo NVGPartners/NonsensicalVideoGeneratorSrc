@@ -73,14 +73,6 @@ namespace NonsensicalVideoGenerator
             if(bool.Parse(SaveData.saveValues["EnableDiscordRPC"]))
                 DiscordRPC.Initialize();
             ConsoleOutput.WriteLine("Starting initialization for v" + Global.productVersion + "...", Color.Transparent);
-            try
-            {
-                SteamManager.Initialize();
-            }
-            catch(Exception ex)
-            {
-                ConsoleOutput.WriteLine("SteamManager failed to initialize: " + ex.Message, Color.Red);
-            }
             Kiwano.Check();
             // File drag and drop support.
 #if WINDOWSDX
@@ -168,6 +160,7 @@ namespace NonsensicalVideoGenerator
         }
         protected override void Update(GameTime gameTime)
         {
+            L.cyclerTimer += gameTime.ElapsedGameTime.TotalSeconds;
             // DEBUG: Pressing Mouse3 at any time will FindMusic()
             /*
             if(MouseInput.MouseState.MiddleButton == Microsoft.Xna.Framework.Input.ButtonState.Pressed && MouseInput.LastMouseState.MiddleButton == Microsoft.Xna.Framework.Input.ButtonState.Released)
@@ -276,8 +269,8 @@ namespace NonsensicalVideoGenerator
                     SpriteFont font = L.FontLarge();
                     string debugPaused = "Debug Paused";
                     Vector2 debugPausedSize = font.MeasureString(debugPaused);
-                    _spriteBatch.DrawString(font, debugPaused, new Vector2(_graphics.PreferredBackBufferWidth-GlobalGraphics.Scale(8-1)-debugPausedSize.X, GlobalGraphics.Scale(8+1)), Color.Black);
-                    _spriteBatch.DrawString(font, debugPaused, new Vector2(_graphics.PreferredBackBufferWidth-GlobalGraphics.Scale(8)-debugPausedSize.X, GlobalGraphics.Scale(8)), ThemeManager.GetColor("VideoPlayerProgressBar"));
+                    GlobalContent.DrawString(_spriteBatch, font, debugPaused, new Vector2(_graphics.PreferredBackBufferWidth-GlobalGraphics.Scale(8-1)-debugPausedSize.X, GlobalGraphics.Scale(8+1)), Color.Black);
+                    GlobalContent.DrawString(_spriteBatch, font, debugPaused, new Vector2(_graphics.PreferredBackBufferWidth-GlobalGraphics.Scale(8)-debugPausedSize.X, GlobalGraphics.Scale(8)), ThemeManager.GetColor("VideoPlayerProgressBar"));
                 }
                 _spriteBatch.End();
             }

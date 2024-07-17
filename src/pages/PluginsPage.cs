@@ -183,16 +183,16 @@ namespace NonsensicalVideoGenerator
                         namWidth = GlobalGraphics.GetSmallStringWidth(nam);
                     }
 
-                    spriteBatch.DrawString(munroSmall, nam, new Vector2(GlobalGraphics.Scale(141+1), GlobalGraphics.Scale(58+1 + (i-offsetpl) * pluginEntry.Height + (i-offsetpl))), Color.Black);
-                    spriteBatch.DrawString(munroSmall, nam, new Vector2(GlobalGraphics.Scale(141), GlobalGraphics.Scale(58 + (i-offsetpl) * pluginEntry.Height + (i-offsetpl))), Color.White);
+                    GlobalContent.DrawString(spriteBatch, munroSmall, nam, new Vector2(GlobalGraphics.Scale(141+1), GlobalGraphics.Scale(58+1 + (i-offsetpl) * pluginEntry.Height + (i-offsetpl))), Color.Black);
+                    GlobalContent.DrawString(spriteBatch, munroSmall, nam, new Vector2(GlobalGraphics.Scale(141), GlobalGraphics.Scale(58 + (i-offsetpl) * pluginEntry.Height + (i-offsetpl))), Color.White);
                     if(Global.canRender)
                     {
                         spriteBatch.Draw(PluginHandler.plugins[i].enabled ? interactiveSwitchOn : interactiveSwitchOff, new Rectangle(GlobalGraphics.Scale(271), GlobalGraphics.Scale(60 + (i-offsetpl) * pluginEntry.Height + (i-offsetpl)), interactiveSwitchOn.Width * GlobalGraphics.scale, interactiveSwitchOn.Height * GlobalGraphics.scale), Color.White);
                     }
                     else
                     {
-                        spriteBatch.DrawString(munroSmall, "...", new Vector2(GlobalGraphics.Scale(277+1), GlobalGraphics.Scale(58 + 1 + (i-offsetpl) * pluginEntry.Height + (i-offsetpl))), Color.Black);
-                        spriteBatch.DrawString(munroSmall, "...", new Vector2(GlobalGraphics.Scale(277), GlobalGraphics.Scale(58 + (i-offsetpl) * pluginEntry.Height + (i-offsetpl))), Color.White);
+                        GlobalContent.DrawString(spriteBatch, munroSmall, "...", new Vector2(GlobalGraphics.Scale(277+1), GlobalGraphics.Scale(58 + 1 + (i-offsetpl) * pluginEntry.Height + (i-offsetpl))), Color.Black);
+                        GlobalContent.DrawString(spriteBatch, munroSmall, "...", new Vector2(GlobalGraphics.Scale(277), GlobalGraphics.Scale(58 + (i-offsetpl) * pluginEntry.Height + (i-offsetpl))), Color.White);
                     }
                 }
                 // create plugin
@@ -202,8 +202,8 @@ namespace NonsensicalVideoGenerator
                 else
                     curColor = ThemeManager.GetColor("PluginEntryGenericPluginsPage");
                 spriteBatch.Draw(pluginEntryBlank, new Rectangle(GlobalGraphics.Scale(136), GlobalGraphics.Scale(57 + (plcount-offsetpl) * pluginEntry.Height + (plcount-offsetpl)), pluginEntry.Width * GlobalGraphics.scale, pluginEntry.Height * GlobalGraphics.scale), curColor);
-                spriteBatch.DrawString(munroSmall, L.T(0, "Addons:AddonManagementButton"), new Vector2(GlobalGraphics.Scale(141+1), GlobalGraphics.Scale(58+1 + (plcount-offsetpl) * pluginEntry.Height + (plcount-offsetpl))), Color.Black);
-                spriteBatch.DrawString(munroSmall, L.T(0, "Addons:AddonManagementButton"), new Vector2(GlobalGraphics.Scale(141), GlobalGraphics.Scale(58 + (plcount-offsetpl) * pluginEntry.Height + (plcount-offsetpl))), Color.White);
+                GlobalContent.DrawString(spriteBatch, munroSmall, L.T(0, "Addons:AddonManagementButton"), new Vector2(GlobalGraphics.Scale(141+1), GlobalGraphics.Scale(58+1 + (plcount-offsetpl) * pluginEntry.Height + (plcount-offsetpl))), Color.Black);
+                GlobalContent.DrawString(spriteBatch, munroSmall, L.T(0, "Addons:AddonManagementButton"), new Vector2(GlobalGraphics.Scale(141), GlobalGraphics.Scale(58 + (plcount-offsetpl) * pluginEntry.Height + (plcount-offsetpl))), Color.White);
                 // End offset
                 spriteBatch.End();
                 spriteBatch.Begin(SpriteSortMode.Deferred, BlendState.AlphaBlend, SamplerState.PointClamp, null, null, null, Matrix.CreateTranslation(GlobalGraphics.Scale(Global.drawOffset.X), GlobalGraphics.Scale(Global.drawOffset.Y), 0));

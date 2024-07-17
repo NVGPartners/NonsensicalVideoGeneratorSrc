@@ -128,11 +128,11 @@ namespace NonsensicalVideoGenerator
                 }
 
                 // (DEBUG) Draw scroll position.
-                //spriteBatch.DrawString(L.FontSmall(), $"{scrollX}, {scrollY}", new Vector2(GlobalGraphics.Scale(16), GlobalGraphics.Scale(16)), Color.White);
+                //GlobalContent.DrawString(spriteBatch, L.FontSmall(), $"{scrollX}, {scrollY}", new Vector2(GlobalGraphics.Scale(16), GlobalGraphics.Scale(16)), Color.White);
                 // (DEBUG) Draw count of circles.
-                //spriteBatch.DrawString(L.FontSmall(), $"{circles.Count}", new Vector2(GlobalGraphics.Scale(16), GlobalGraphics.Scale(32)), Color.White);
+                //GlobalContent.DrawString(spriteBatch, L.FontSmall(), $"{circles.Count}", new Vector2(GlobalGraphics.Scale(16), GlobalGraphics.Scale(32)), Color.White);
                 // (DEBUG) Draw mouse click state.
-                // spriteBatch.DrawString(L.FontSmall(), $"{mouseReleased}", new Vector2(GlobalGraphics.Scale(16), GlobalGraphics.Scale(48)), Color.White);
+                // GlobalContent.DrawString(spriteBatch, L.FontSmall(), $"{mouseReleased}", new Vector2(GlobalGraphics.Scale(16), GlobalGraphics.Scale(48)), Color.White);
                 
                 // End offset spritebatch
                 spriteBatch.End();

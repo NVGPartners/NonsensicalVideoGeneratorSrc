@@ -63,6 +63,7 @@ namespace NonsensicalVideoGenerator
             {
                 Enabled = true,
                 Priority = 1,
+                Theme = DefaultThemes.Anniversary,
                 Start = new SimpleDateTime(7, 23, 0, 0, 0),
                 End = new SimpleDateTime(7, 23, 23, 59, 59)
             },
@@ -70,6 +71,7 @@ namespace NonsensicalVideoGenerator
             {
                 Enabled = true,
                 Priority = 2,
+                Theme = DefaultThemes.Birthday,
                 Start = new SimpleDateTime(10, 14, 0, 0, 0),
                 End = new SimpleDateTime(10, 14, 23, 59, 59)
             },
@@ -81,6 +83,14 @@ namespace NonsensicalVideoGenerator
                 Start = new SimpleDateTime(10, 15, 12, 0, 0),
                 End = new SimpleDateTime(10, 31, 23, 59, 59)
             },
+            new Holiday("christmas", "Christmas")
+            {
+                Enabled = true,
+                Priority = 1,
+                Theme = DefaultThemes.Holiday,
+                Start = new SimpleDateTime(12, 1, 0, 0, 0),
+                End = new SimpleDateTime(12, 25, 23, 59, 59)
+            }
         };
         public static void SetHoliday(Holiday? holiday = null)
         {

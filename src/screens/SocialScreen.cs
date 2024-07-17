@@ -180,7 +180,7 @@ namespace NonsensicalVideoGenerator
             spriteBatch.Draw(socialscreen, new Rectangle(GlobalGraphics.Scale(69), GlobalGraphics.Scale(203), GlobalGraphics.Scale(socialscreen.Width), GlobalGraphics.Scale(socialscreen.Height)), Color.White);
             // Draw text
             SpriteFont munroSmall = L.FontSmall();
-            spriteBatch.DrawString(munroSmall, title, new Vector2(GlobalGraphics.Scale(83), GlobalGraphics.Scale(204)), Color.White);
+            GlobalContent.DrawString(spriteBatch, munroSmall, title, new Vector2(GlobalGraphics.Scale(83), GlobalGraphics.Scale(204)), Color.White);
             // End offset spritebatch
             spriteBatch.End();
             // Remake spritebatch

@@ -57,6 +57,12 @@
     ],
     "FontLicense": [
         "Munro (SIL Open Font License)",
-        "LanaPixel (SIL Open Font License)"
+        "LanaPixel (SIL Open Font License)",
+        "Noto Sans (SIL Open Font License)"
+    ],
+    "Attribution": [
+        "Freepik (Flaticon)",
+        "Pixel perfect (Flaticon)",
+        "SeyfDesigner (Flaticon)"
     ]
 }

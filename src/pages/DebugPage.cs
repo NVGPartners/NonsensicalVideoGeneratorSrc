@@ -287,6 +287,14 @@ namespace NonsensicalVideoGenerator
                             }
                             return true;
                         }
+                        if(MouseInput.MouseState.Y >= GlobalGraphics.Scale(33+(8*15)) && MouseInput.MouseState.Y <= GlobalGraphics.Scale(33+(8*15)+6))
+                        {
+                            // Set first boot state.
+                            SaveData.saveValues["FirstBoot"] = "true";
+                            SaveData.Save();
+                            GlobalContent.GetSound("Select").Play(int.Parse(SaveData.saveValues["SoundEffectVolume"], CultureInfo.InvariantCulture) / 100f, 0f, 0f);
+                            return true;
+                        }
                     }
                 }
             }
@@ -313,16 +321,17 @@ namespace NonsensicalVideoGenerator
                 DrawButton(spriteBatch, 6, 33+(8*12), "Save");
                 DrawButton(spriteBatch, 6, 33+(8*13), "Holiday: " + (HolidayManager.CurrentHoliday != null ? HolidayManager.CurrentHoliday.Name : "None"));
                 DrawButton(spriteBatch, 6, 33+(8*14), "Reset Addon Consents");
-                spriteBatch.DrawString(L.FontSmall(), Debug.debugBuild ? "Debug Build" : (Debug.GetDebugMode() ? "Release Build; Debug Mode" : "Release Build"), new Vector2(GlobalGraphics.Scale(6), GlobalGraphics.scaledHeight - GlobalGraphics.Scale(6*10) - GlobalGraphics.Scale(9)), Color.White);
-                spriteBatch.DrawString(L.FontSmall(), "Parameters: "+String.Join(" ", Global.parameters.ToArray()), new Vector2(GlobalGraphics.Scale(6), GlobalGraphics.scaledHeight - GlobalGraphics.Scale(6*9) - GlobalGraphics.Scale(9)), Color.White);
-                spriteBatch.DrawString(L.FontSmall(), "Mouse: " + MouseInput.MouseState.Position.X.ToString(CultureInfo.InvariantCulture) + ", " + MouseInput.MouseState.Position.Y.ToString(CultureInfo.InvariantCulture), new Vector2(GlobalGraphics.Scale(6), GlobalGraphics.scaledHeight - GlobalGraphics.Scale(6*8) - GlobalGraphics.Scale(9)), Color.White);
-                spriteBatch.DrawString(L.FontSmall(), "CTRL + F3: Toggle Debug Mode", new Vector2(GlobalGraphics.Scale(6), GlobalGraphics.scaledHeight - GlobalGraphics.Scale(6*7) - GlobalGraphics.Scale(9)), Color.White);
-                spriteBatch.DrawString(L.FontSmall(), "F3: Toggle Debug Menu", new Vector2(GlobalGraphics.Scale(6), GlobalGraphics.scaledHeight - GlobalGraphics.Scale(6*6) - GlobalGraphics.Scale(9)), Color.White);
-                spriteBatch.DrawString(L.FontSmall(), "F4: Toggle Main Window Tween", new Vector2(GlobalGraphics.Scale(6), GlobalGraphics.scaledHeight - GlobalGraphics.Scale(6*5) - GlobalGraphics.Scale(9)), Color.White);
-                spriteBatch.DrawString(L.FontSmall(), "F6: Pause", new Vector2(GlobalGraphics.Scale(6), GlobalGraphics.scaledHeight - GlobalGraphics.Scale(6*4) - GlobalGraphics.Scale(9)), Color.White);
-                spriteBatch.DrawString(L.FontSmall(), "F7: Advance Frame", new Vector2(GlobalGraphics.Scale(6), GlobalGraphics.scaledHeight - GlobalGraphics.Scale(6*3) - GlobalGraphics.Scale(9)), Color.White);
-                spriteBatch.DrawString(L.FontSmall(), "F8: Speed Boost", new Vector2(GlobalGraphics.Scale(6), GlobalGraphics.scaledHeight - GlobalGraphics.Scale(6*2) - GlobalGraphics.Scale(9)), Color.White);
-                spriteBatch.DrawString(L.FontSmall(), "F9: Reload Locales", new Vector2(GlobalGraphics.Scale(6), GlobalGraphics.scaledHeight - GlobalGraphics.Scale(6) - GlobalGraphics.Scale(9)), Color.White);
+                DrawButton(spriteBatch, 6, 33+(8*15), "Set first boot state");
+                GlobalContent.DrawString(spriteBatch, L.FontSmall(), Debug.debugBuild ? "Debug Build" : (Debug.GetDebugMode() ? "Release Build; Debug Mode" : "Release Build"), new Vector2(GlobalGraphics.Scale(6), GlobalGraphics.scaledHeight - GlobalGraphics.Scale(6*10) - GlobalGraphics.Scale(9)), Color.White);
+                GlobalContent.DrawString(spriteBatch, L.FontSmall(), "Parameters: "+String.Join(" ", Global.parameters.ToArray()), new Vector2(GlobalGraphics.Scale(6), GlobalGraphics.scaledHeight - GlobalGraphics.Scale(6*9) - GlobalGraphics.Scale(9)), Color.White);
+                GlobalContent.DrawString(spriteBatch, L.FontSmall(), "Mouse: " + MouseInput.MouseState.Position.X.ToString(CultureInfo.InvariantCulture) + ", " + MouseInput.MouseState.Position.Y.ToString(CultureInfo.InvariantCulture), new Vector2(GlobalGraphics.Scale(6), GlobalGraphics.scaledHeight - GlobalGraphics.Scale(6*8) - GlobalGraphics.Scale(9)), Color.White);
+                GlobalContent.DrawString(spriteBatch, L.FontSmall(), "CTRL + F3: Toggle Debug Mode", new Vector2(GlobalGraphics.Scale(6), GlobalGraphics.scaledHeight - GlobalGraphics.Scale(6*7) - GlobalGraphics.Scale(9)), Color.White);
+                GlobalContent.DrawString(spriteBatch, L.FontSmall(), "F3: Toggle Debug Menu", new Vector2(GlobalGraphics.Scale(6), GlobalGraphics.scaledHeight - GlobalGraphics.Scale(6*6) - GlobalGraphics.Scale(9)), Color.White);
+                GlobalContent.DrawString(spriteBatch, L.FontSmall(), "F4: Toggle Main Window Tween", new Vector2(GlobalGraphics.Scale(6), GlobalGraphics.scaledHeight - GlobalGraphics.Scale(6*5) - GlobalGraphics.Scale(9)), Color.White);
+                GlobalContent.DrawString(spriteBatch, L.FontSmall(), "F6: Pause", new Vector2(GlobalGraphics.Scale(6), GlobalGraphics.scaledHeight - GlobalGraphics.Scale(6*4) - GlobalGraphics.Scale(9)), Color.White);
+                GlobalContent.DrawString(spriteBatch, L.FontSmall(), "F7: Advance Frame", new Vector2(GlobalGraphics.Scale(6), GlobalGraphics.scaledHeight - GlobalGraphics.Scale(6*3) - GlobalGraphics.Scale(9)), Color.White);
+                GlobalContent.DrawString(spriteBatch, L.FontSmall(), "F8: Speed Boost", new Vector2(GlobalGraphics.Scale(6), GlobalGraphics.scaledHeight - GlobalGraphics.Scale(6*2) - GlobalGraphics.Scale(9)), Color.White);
+                GlobalContent.DrawString(spriteBatch, L.FontSmall(), "F9: Reload Locales", new Vector2(GlobalGraphics.Scale(6), GlobalGraphics.scaledHeight - GlobalGraphics.Scale(6) - GlobalGraphics.Scale(9)), Color.White);
             }
         }
         public void DrawButton(SpriteBatch spriteBatch, int x, int y, string text)

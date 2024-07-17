@@ -20,13 +20,17 @@ namespace NonsensicalVideoGenerator
         public string fontLarge { get; set; } = "Munro";
         public string fontSmall { get; set; } = "MunroSmall";
         public List<Dictionary<string, string>> localizationTokens { get; set; } = new List<Dictionary<string, string>>();
-        public Locale(string name, string localizedName, List<Dictionary<string, string>>? localizationTokens = null, string fontLarge = "Munro", string fontSmall = "MunroSmall")
+        public float percentageComplete { get; set; } = 0;
+        public int totalTokens { get; set; } = 0;
+        public Locale(string name, string localizedName, List<Dictionary<string, string>>? localizationTokens = null, string fontLarge = "Munro", string fontSmall = "MunroSmall", int totalTokens = 0, float percentageComplete = 0)
         {
             this.name = name;
             this.localizedName = localizedName;
             this.fontLarge = fontLarge;
             this.fontSmall = fontSmall;
             this.localizationTokens = localizationTokens ?? new List<Dictionary<string, string>>();
+            this.totalTokens = totalTokens;
+            this.percentageComplete = percentageComplete;
         }
     }
     /// <summary>
@@ -40,10 +44,12 @@ namespace NonsensicalVideoGenerator
         };
         public static int localeIndex = 0; // set when locales are loaded.
         public static string invalid { get; set; } = "[%1]";
-        public static string defaultLocale { get; set; } = "en_us";
+        public static string defaultLocale { get; set; } = "english";
         public static string localeFolder { get; set; } = "locales";
         public static int maxVersion { get; set; } = 0;
-
+        public static double cyclerTimer { get; set; } = 0;
+        public static Locale? cyclerLocale = null;
+        public static int cyclerLocaleIndex = 1;
         public static Locale GetLocale()
         {
             if(locales.Count == 0)
@@ -56,16 +62,34 @@ namespace NonsensicalVideoGenerator
         // String translation with optional %1, %2, etc. placeholders.
         public static string T(int version, string text, params string[] args)
         {
+            Locale locale = GetLocale();
+            int curLocaleIndex = localeIndex;
+            // If text contains Interactable:ViewLocalizationOptions then cycle language variables.
+            if (text.Contains("Interactable:ViewLocalizationOptions"))
+            {
+                if (cyclerLocale == null)
+                    cyclerLocale = locale;
+                locale = cyclerLocale;
+                curLocaleIndex = cyclerLocaleIndex;
+                if (cyclerTimer >= 1)
+                {
+                    cyclerTimer = 0;
+                    cyclerLocaleIndex++;
+                    if (cyclerLocaleIndex >= locales.Count)
+                        cyclerLocaleIndex = 1;
+                    cyclerLocale = locales[curLocaleIndex];
+                }
+            }
             string? result = text;
             // Version is used to ensure updated strings are used.
-            if (localeIndex >= 0 && localeIndex < locales.Count)
+            if (curLocaleIndex >= 0 && curLocaleIndex < locales.Count)
             {
                 if (version >= 0 && version <= maxVersion)
                 {
-                    if (GetLocale().localizationTokens.Count > version
-                        && GetLocale().localizationTokens[version].ContainsKey(text))
+                    if (locale.localizationTokens.Count > version
+                        && locale.localizationTokens[version].ContainsKey(text))
                     {
-                        result = GetLocale().localizationTokens[version][text];
+                        result = locale.localizationTokens[version][text];
                     }
                 }
             }
@@ -184,9 +208,27 @@ namespace NonsensicalVideoGenerator
                     int tokenCount = 0;
                     foreach (Dictionary<string, string> version in localizationList)
                     {
-                        tokenCount += version.Count;
+                        // Don't count "" or "[ ]" as tokens.
+                        foreach (KeyValuePair<string, string> token in version)
+                        {
+                            if (token.Value != "" && token.Value != "[ ]" && token.Value != " ")
+                            {
+                                tokenCount++;
+                            }
+                        }
                     }
-                    locales.Add(new Locale(name, localizedName, localizationList, fontLarge, fontSmall));
+                    float percentageComplete = 1f;
+                    if(name != defaultLocale)
+                    {
+                        percentageComplete = 0f;
+                        int defaultTokenCount = locales[1].totalTokens;
+                        // Calculate how many tokens are included vs the default locale.
+                        if (defaultTokenCount > 0)
+                        {
+                            percentageComplete = (float)tokenCount / (float)defaultTokenCount;
+                        }
+                    }
+                    locales.Add(new Locale(name, localizedName, localizationList, fontLarge, fontSmall, tokenCount, percentageComplete));
                     localeIndex = locales.Count - 1;
                 }
                 catch (Exception e)

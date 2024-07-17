@@ -10,14 +10,14 @@
 -- [[ Localization ]]
     -- This table is used to store the localization for your addon.
     -- The key is the locale name, and the value is a table containing the localization tokens.
-    -- If a locale is not found, it will default to "en_us".
+    -- If a locale is not found, it will default to "english".
 
     -- Supporting multiple languages is not required, but the option is available if you wish to do so.
 
     -- Please keep this format consistent to ensure community contributions are possible.
     -- "Addons:Custom%filenameraw%Option1" - Replace "%filenameraw%" if you decide to change the filename.
 local customLocalization = {
-    ["en_us"] = {
+    ["english"] = {
         ["Addons:Custom%filenameraw%Option1"] = "%prettyname%",
         ["Addons:Custom%filenameraw%Option2"] = "This is %filename%.",
         ["Addons:Custom%filenameraw%Option3"] = "This effect will perform a",
@@ -30,8 +30,8 @@ local customLocalization = {
 -- alongside which user-customizable options to display.
 function Query(localeName, localizationTokens)
     -- Get the localization table for the current locale.
-    -- Otherwise, default to en_us.
-    local localization = customLocalization[localeName] or customLocalization["en_us"]
+    -- Otherwise, default to english.
+    local localization = customLocalization[localeName] or customLocalization["english"]
 
     -- Community-contributed localization tokens are added, if available.
     -- Please preserve localization in order to support multiple languages,

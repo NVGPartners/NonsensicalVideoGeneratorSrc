@@ -54,5 +54,6 @@ namespace NonsensicalVideoGenerator
         public static int randomSeed = 0;
         public static Vector2 drawOffset = new(0, 0);
         public static int waitReady = int.MaxValue;
+        public static bool selectLanguage = false;
     }
 }

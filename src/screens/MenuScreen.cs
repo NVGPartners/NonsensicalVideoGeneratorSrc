@@ -110,7 +110,7 @@ namespace NonsensicalVideoGenerator
             // Draw window title
             string localizedTitle = L.T(0, title+":Title");
             Vector2 titleSize = L.FontSmall().MeasureString(localizedTitle);
-            spriteBatch.DrawString(L.FontSmall(), localizedTitle, new Vector2(GlobalGraphics.Scale(52), GlobalGraphics.Scale(203)), Color.White, MathHelper.ToRadians(90), new Vector2(titleSize.X, titleSize.Y), 1, SpriteEffects.None, 0);
+            GlobalContent.DrawString(spriteBatch, L.FontSmall(), localizedTitle, new Vector2(GlobalGraphics.Scale(52), GlobalGraphics.Scale(203)), Color.White, MathHelper.ToRadians(90), new Vector2(titleSize.X, titleSize.Y), 1, SpriteEffects.None, 0);
             // Draw option text
             string name = "";
             for (int i = 0; i < Pagination.GetTopPageCount(); i++)
@@ -118,8 +118,8 @@ namespace NonsensicalVideoGenerator
                 name = L.T(0, Pagination.GetPage(i).Name.Replace("Page","")+":Title");
                 if(i == 2)
                     name = L.T(0, "Addons:Title");
-                spriteBatch.DrawString(L.FontLarge(), name, new Vector2(GlobalGraphics.Scale(7+1), GlobalGraphics.Scale(136 + (pageOffset * i)+1)), Color.Black);
-                spriteBatch.DrawString(L.FontLarge(), name, new Vector2(GlobalGraphics.Scale(7), GlobalGraphics.Scale(136 + (pageOffset * i))), Color.White);
+                GlobalContent.DrawString(spriteBatch, L.FontLarge(), name, new Vector2(GlobalGraphics.Scale(7+1), GlobalGraphics.Scale(136 + (pageOffset * i)+1)), Color.Black);
+                GlobalContent.DrawString(spriteBatch, L.FontLarge(), name, new Vector2(GlobalGraphics.Scale(7), GlobalGraphics.Scale(136 + (pageOffset * i))), Color.White);
             }
             // If hovering, draw tooltip
             if (hovering && !Global.exiting)

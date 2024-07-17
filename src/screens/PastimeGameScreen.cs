@@ -106,8 +106,8 @@ namespace NonsensicalVideoGenerator
                 if(Debug.gameCheat)
                 {
                     // Use mouse cursor to control the bird
-                    spacingPlacementY = MouseInput.MouseState.Y / GlobalGraphics.scale;
-                    spacing = MouseInput.MouseState.X / GlobalGraphics.scale;
+                    spacingPlacementY = (MouseInput.MouseState.Y / GlobalGraphics.scale) - 1;
+                    spacing = (MouseInput.MouseState.X / GlobalGraphics.scale) - 1;
                 }
                 else
                 {
@@ -501,8 +501,8 @@ namespace NonsensicalVideoGenerator
             // Center horizontally
             if (!player.waiting && player.points < 2147483647)
             {
-                spriteBatch.DrawString(font, points, new Vector2(GlobalGraphics.Scale(160) - (textSize.X / 2) + GlobalGraphics.Scale(1), GlobalGraphics.Scale(240) - textSize.Y - GlobalGraphics.Scale(8) + GlobalGraphics.Scale(1)), Color.Black);
-                spriteBatch.DrawString(font, points, new Vector2(GlobalGraphics.Scale(160) - (textSize.X / 2), GlobalGraphics.Scale(240) - textSize.Y - GlobalGraphics.Scale(8)), Color.White);
+                GlobalContent.DrawString(spriteBatch, font, points, new Vector2(GlobalGraphics.Scale(160) - (textSize.X / 2) + GlobalGraphics.Scale(1), GlobalGraphics.Scale(240) - textSize.Y - GlobalGraphics.Scale(8) + GlobalGraphics.Scale(1)), Color.Black);
+                GlobalContent.DrawString(spriteBatch, font, points, new Vector2(GlobalGraphics.Scale(160) - (textSize.X / 2), GlobalGraphics.Scale(240) - textSize.Y - GlobalGraphics.Scale(8)), Color.White);
                 // Draw score text
                 string scoreText = L.T(0, "Game:Score");
                 if(player.points == highScore)
@@ -511,21 +511,21 @@ namespace NonsensicalVideoGenerator
                 }
                 textSize = font.MeasureString(scoreText);
                 // Center horizontally
-                spriteBatch.DrawString(font, scoreText, new Vector2(GlobalGraphics.Scale(160) - (textSize.X / 2) + GlobalGraphics.Scale(1), GlobalGraphics.Scale(240) - textSize.Y - GlobalGraphics.Scale(16) + GlobalGraphics.Scale(1)), Color.Black);
-                spriteBatch.DrawString(font, scoreText, new Vector2(GlobalGraphics.Scale(160) - (textSize.X / 2), GlobalGraphics.Scale(240) - textSize.Y - GlobalGraphics.Scale(16)), Color.White);
+                GlobalContent.DrawString(spriteBatch, font, scoreText, new Vector2(GlobalGraphics.Scale(160) - (textSize.X / 2) + GlobalGraphics.Scale(1), GlobalGraphics.Scale(240) - textSize.Y - GlobalGraphics.Scale(16) + GlobalGraphics.Scale(1)), Color.Black);
+                GlobalContent.DrawString(spriteBatch, font, scoreText, new Vector2(GlobalGraphics.Scale(160) - (textSize.X / 2), GlobalGraphics.Scale(240) - textSize.Y - GlobalGraphics.Scale(16)), Color.White);
             }
             else if(highScore < 2147483647)
             {
                 // Draw high score text
                 textSize = font.MeasureString(L.T(0, "Game:HighScore"));
                 // Center horizontally
-                spriteBatch.DrawString(font, L.T(0, "Game:HighScore"), new Vector2(GlobalGraphics.Scale(160) - (textSize.X / 2) + GlobalGraphics.Scale(1), GlobalGraphics.Scale(240) - textSize.Y - GlobalGraphics.Scale(16) + GlobalGraphics.Scale(1)), Color.Black);
-                spriteBatch.DrawString(font, L.T(0, "Game:HighScore"), new Vector2(GlobalGraphics.Scale(160) - (textSize.X / 2), GlobalGraphics.Scale(240) - textSize.Y - GlobalGraphics.Scale(16)), Color.White);
+                GlobalContent.DrawString(spriteBatch, font, L.T(0, "Game:HighScore"), new Vector2(GlobalGraphics.Scale(160) - (textSize.X / 2) + GlobalGraphics.Scale(1), GlobalGraphics.Scale(240) - textSize.Y - GlobalGraphics.Scale(16) + GlobalGraphics.Scale(1)), Color.Black);
+                GlobalContent.DrawString(spriteBatch, font, L.T(0, "Game:HighScore"), new Vector2(GlobalGraphics.Scale(160) - (textSize.X / 2), GlobalGraphics.Scale(240) - textSize.Y - GlobalGraphics.Scale(16)), Color.White);
                 // Draw high score
                 textSize = font.MeasureString(highScore.ToString(CultureInfo.InvariantCulture));
                 // Center horizontally
-                spriteBatch.DrawString(font, highScore.ToString(CultureInfo.InvariantCulture), new Vector2(GlobalGraphics.Scale(160) - (textSize.X / 2) + GlobalGraphics.Scale(1), GlobalGraphics.Scale(240) - textSize.Y - GlobalGraphics.Scale(8) + GlobalGraphics.Scale(1)), Color.Black);
-                spriteBatch.DrawString(font, highScore.ToString(CultureInfo.InvariantCulture), new Vector2(GlobalGraphics.Scale(160) - (textSize.X / 2), GlobalGraphics.Scale(240) - textSize.Y - GlobalGraphics.Scale(8)), Color.White);
+                GlobalContent.DrawString(spriteBatch, font, highScore.ToString(CultureInfo.InvariantCulture), new Vector2(GlobalGraphics.Scale(160) - (textSize.X / 2) + GlobalGraphics.Scale(1), GlobalGraphics.Scale(240) - textSize.Y - GlobalGraphics.Scale(8) + GlobalGraphics.Scale(1)), Color.Black);
+                GlobalContent.DrawString(spriteBatch, font, highScore.ToString(CultureInfo.InvariantCulture), new Vector2(GlobalGraphics.Scale(160) - (textSize.X / 2), GlobalGraphics.Scale(240) - textSize.Y - GlobalGraphics.Scale(8)), Color.White);
             }
             string credit = "";
             if(credits.Count > 0 && currentCreditKey != "" && credits.ContainsKey(currentCreditKey))
@@ -540,18 +540,18 @@ namespace NonsensicalVideoGenerator
                 }
             }
             textSize = font.MeasureString(credit);
-            spriteBatch.DrawString(font, credit, new Vector2(GlobalGraphics.Scale(320) - textSize.X - GlobalGraphics.Scale(8), GlobalGraphics.Scale(9)), Color.Black);
-            spriteBatch.DrawString(font, credit, new Vector2(GlobalGraphics.Scale(320) - textSize.X - GlobalGraphics.Scale(9), GlobalGraphics.Scale(8)), Color.White);
+            GlobalContent.DrawString(spriteBatch, font, credit, new Vector2(GlobalGraphics.Scale(320) - textSize.X - GlobalGraphics.Scale(8), GlobalGraphics.Scale(9)), Color.Black);
+            GlobalContent.DrawString(spriteBatch, font, credit, new Vector2(GlobalGraphics.Scale(320) - textSize.X - GlobalGraphics.Scale(9), GlobalGraphics.Scale(8)), Color.White);
             // Draw render progress on right side (pastime)
             /*
             if(Global.generator.progressText != "")
             {
                 textSize = font.MeasureString(Global.videoTitle);
-                spriteBatch.DrawString(font, Global.videoTitle, new Vector2(GlobalGraphics.Scale(320) - textSize.X - GlobalGraphics.Scale(8), GlobalGraphics.Scale(9)), Color.Black);
-                spriteBatch.DrawString(font, Global.videoTitle, new Vector2(GlobalGraphics.Scale(320) - textSize.X - GlobalGraphics.Scale(9), GlobalGraphics.Scale(8)), Color.White);
+                GlobalContent.DrawString(spriteBatch, font, Global.videoTitle, new Vector2(GlobalGraphics.Scale(320) - textSize.X - GlobalGraphics.Scale(8), GlobalGraphics.Scale(9)), Color.Black);
+                GlobalContent.DrawString(spriteBatch, font, Global.videoTitle, new Vector2(GlobalGraphics.Scale(320) - textSize.X - GlobalGraphics.Scale(9), GlobalGraphics.Scale(8)), Color.White);
                 Vector2 textSize2 = font.MeasureString(Global.generator.progressText);
-                spriteBatch.DrawString(font, Global.generator.progressText, new Vector2(GlobalGraphics.Scale(320) - textSize2.X - GlobalGraphics.Scale(8), GlobalGraphics.Scale(9) + textSize.Y), Color.Black);
-                spriteBatch.DrawString(font, Global.generator.progressText, new Vector2(GlobalGraphics.Scale(320) - textSize2.X - GlobalGraphics.Scale(9), GlobalGraphics.Scale(8) + textSize.Y), Color.White);
+                GlobalContent.DrawString(spriteBatch, font, Global.generator.progressText, new Vector2(GlobalGraphics.Scale(320) - textSize2.X - GlobalGraphics.Scale(8), GlobalGraphics.Scale(9) + textSize.Y), Color.Black);
+                GlobalContent.DrawString(spriteBatch, font, Global.generator.progressText, new Vector2(GlobalGraphics.Scale(320) - textSize2.X - GlobalGraphics.Scale(9), GlobalGraphics.Scale(8) + textSize.Y), Color.White);
             }
             */
             // End offset spritebatch

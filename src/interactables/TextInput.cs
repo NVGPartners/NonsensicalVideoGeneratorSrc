@@ -218,8 +218,8 @@ namespace NonsensicalVideoGenerator
             // Inner text
             try
             {
-                spriteBatch.DrawString(L.FontLarge(), Tooltip, new Vector2(GlobalGraphics.Scale(bounds.X + 4 + 1), GlobalGraphics.Scale(bounds.Y + 1 + 1)), Color.Black);
-                spriteBatch.DrawString(L.FontLarge(), Tooltip, new Vector2(GlobalGraphics.Scale(bounds.X + 4), GlobalGraphics.Scale(bounds.Y + 1)), Color.White);
+                GlobalContent.DrawString(spriteBatch, L.FontLarge(), Tooltip, new Vector2(GlobalGraphics.Scale(bounds.X + 4 + 1), GlobalGraphics.Scale(bounds.Y + 1 + 1)), Color.Black);
+                GlobalContent.DrawString(spriteBatch, L.FontLarge(), Tooltip, new Vector2(GlobalGraphics.Scale(bounds.X + 4), GlobalGraphics.Scale(bounds.Y + 1)), Color.White);
             }
             catch (ArgumentException)
             {
@@ -231,12 +231,12 @@ namespace NonsensicalVideoGenerator
             {
                 int cursorX = (int)L.FontLarge().MeasureString(Tooltip).X;
                 // could have just used a line here
-                spriteBatch.DrawString(L.FontLarge(), ":", new Vector2(cursorX + GlobalGraphics.Scale(bounds.X + 4 + 1), GlobalGraphics.Scale(bounds.Y + 1 + 1)), Color.Black);
-                spriteBatch.DrawString(L.FontLarge(), ":", new Vector2(cursorX + GlobalGraphics.Scale(bounds.X + 4 + 1), GlobalGraphics.Scale(bounds.Y + 1)), Color.Black);
-                spriteBatch.DrawString(L.FontLarge(), ":", new Vector2(cursorX + GlobalGraphics.Scale(bounds.X + 4 + 1), GlobalGraphics.Scale(bounds.Y)), Color.Black);
-                spriteBatch.DrawString(L.FontLarge(), ":", new Vector2(cursorX + GlobalGraphics.Scale(bounds.X + 4), GlobalGraphics.Scale(bounds.Y + 1)), Color.White);
-                spriteBatch.DrawString(L.FontLarge(), ":", new Vector2(cursorX + GlobalGraphics.Scale(bounds.X + 4), GlobalGraphics.Scale(bounds.Y)), Color.White);
-                spriteBatch.DrawString(L.FontLarge(), ":", new Vector2(cursorX + GlobalGraphics.Scale(bounds.X + 4), GlobalGraphics.Scale(bounds.Y - 1)), Color.White);
+                GlobalContent.DrawString(spriteBatch, L.FontLarge(), ":", new Vector2(cursorX + GlobalGraphics.Scale(bounds.X + 4 + 1), GlobalGraphics.Scale(bounds.Y + 1 + 1)), Color.Black);
+                GlobalContent.DrawString(spriteBatch, L.FontLarge(), ":", new Vector2(cursorX + GlobalGraphics.Scale(bounds.X + 4 + 1), GlobalGraphics.Scale(bounds.Y + 1)), Color.Black);
+                GlobalContent.DrawString(spriteBatch, L.FontLarge(), ":", new Vector2(cursorX + GlobalGraphics.Scale(bounds.X + 4 + 1), GlobalGraphics.Scale(bounds.Y)), Color.Black);
+                GlobalContent.DrawString(spriteBatch, L.FontLarge(), ":", new Vector2(cursorX + GlobalGraphics.Scale(bounds.X + 4), GlobalGraphics.Scale(bounds.Y + 1)), Color.White);
+                GlobalContent.DrawString(spriteBatch, L.FontLarge(), ":", new Vector2(cursorX + GlobalGraphics.Scale(bounds.X + 4), GlobalGraphics.Scale(bounds.Y)), Color.White);
+                GlobalContent.DrawString(spriteBatch, L.FontLarge(), ":", new Vector2(cursorX + GlobalGraphics.Scale(bounds.X + 4), GlobalGraphics.Scale(bounds.Y - 1)), Color.White);
             }
             // Label
             string localizedTitle;
@@ -244,8 +244,8 @@ namespace NonsensicalVideoGenerator
                 localizedTitle = Name;
             else
                 localizedTitle = L.T(0, "Interactable:"+internalName+"Title");
-            spriteBatch.DrawString(L.FontLarge(), localizedTitle, new Vector2(GlobalGraphics.Scale(bounds.X + bounds.Width + 7 + 1), GlobalGraphics.Scale(bounds.Y + 2 + 1)), Color.Black);
-            spriteBatch.DrawString(L.FontLarge(), localizedTitle, new Vector2(GlobalGraphics.Scale(bounds.X + bounds.Width + 7), GlobalGraphics.Scale(bounds.Y + 2)), Color.White);
+            GlobalContent.DrawString(spriteBatch, L.FontLarge(), localizedTitle, new Vector2(GlobalGraphics.Scale(bounds.X + bounds.Width + 7 + 1), GlobalGraphics.Scale(bounds.Y + 2 + 1)), Color.Black);
+            GlobalContent.DrawString(spriteBatch, L.FontLarge(), localizedTitle, new Vector2(GlobalGraphics.Scale(bounds.X + bounds.Width + 7), GlobalGraphics.Scale(bounds.Y + 2)), Color.White);
             // Tooltip
             if (scaledBounds2.Contains(MouseInput.MouseState.Position) && hiddenToolTip != "")
             {

@@ -137,7 +137,7 @@ namespace NonsensicalVideoGenerator
                     pageTitle = L.T(0, pageTitle.Replace("Page","")+":Title");
                 // Center within bounds of x 128 and x 312
                 Vector2 titleSize = L.FontSmall().MeasureString(pageTitle);
-                spriteBatch.DrawString(L.FontSmall(), pageTitle, new Vector2(GlobalGraphics.Scale(220) - titleSize.X / 2, GlobalGraphics.Scale(37)), Color.White);
+                GlobalContent.DrawString(spriteBatch, L.FontSmall(), pageTitle, new Vector2(GlobalGraphics.Scale(220) - titleSize.X / 2, GlobalGraphics.Scale(37)), Color.White);
             }
             // Pagination
             Pagination.Draw(gameTime, spriteBatch);

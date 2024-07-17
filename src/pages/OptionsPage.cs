@@ -29,6 +29,11 @@ namespace NonsensicalVideoGenerator
         private string internalTooltip = "";
         public bool Update(GameTime gameTime, bool handleInput)
         {
+            if(Global.selectLanguage)
+            {
+                Global.selectLanguage = false;
+                LocaleAction(2, "");
+            }
             // Interactable
             if(viewingLocalizations)
             {
@@ -51,7 +56,9 @@ namespace NonsensicalVideoGenerator
                         if (MouseInput.MouseState.X >= GlobalGraphics.Scale(138) && MouseInput.MouseState.X < GlobalGraphics.Scale(inRange)
                             && MouseInput.MouseState.Y >= GlobalGraphics.Scale(59 + ((i-offsetpl) * 16) - scrollOffset) && MouseInput.MouseState.Y < GlobalGraphics.Scale(70 + ((i-offsetpl) * 16) - scrollOffset))
                         {
-                            internalTooltip = L.locales[i+1].name.ToUpper().Replace("_", "-");
+                            // Capitalize first letter of L.locales[i+1].name
+                            string properLocaleName = L.locales[i+1].name.Substring(0, 1).ToUpper() + L.locales[i+1].name.Substring(1);
+                            internalTooltip = properLocaleName + " (" + Math.Round(L.locales[i+1].percentageComplete * 100) + "%)";
                         }
                     }
                     if(maxScrollOffset > 0)
@@ -309,8 +316,8 @@ namespace NonsensicalVideoGenerator
                         localeFont = GlobalContent.GetFont(localeFontName);
                     }
 
-                    spriteBatch.DrawString(localeFont, nam, new Vector2(GlobalGraphics.Scale(141+1), GlobalGraphics.Scale(58+1 + (i-offsetpl) * pluginEntry.Height + (i-offsetpl))), Color.Black);
-                    spriteBatch.DrawString(localeFont, nam, new Vector2(GlobalGraphics.Scale(141), GlobalGraphics.Scale(58 + (i-offsetpl) * pluginEntry.Height + (i-offsetpl))), Color.White);
+                    GlobalContent.DrawString(spriteBatch, localeFont, nam, new Vector2(GlobalGraphics.Scale(141+1), GlobalGraphics.Scale(58+1 + (i-offsetpl) * pluginEntry.Height + (i-offsetpl))), Color.Black);
+                    GlobalContent.DrawString(spriteBatch, localeFont, nam, new Vector2(GlobalGraphics.Scale(141), GlobalGraphics.Scale(58 + (i-offsetpl) * pluginEntry.Height + (i-offsetpl))), Color.White);
                 }
                 // End offset
                 spriteBatch.End();
@@ -381,9 +388,9 @@ namespace NonsensicalVideoGenerator
                 {
                     case 2: // left click
                         GlobalContent.GetSound("Select").Play(int.Parse(SaveData.saveValues["SoundEffectVolume"], CultureInfo.InvariantCulture) / 100f, 0f, 0f);
-                        SaveData.saveValues["Locale"] = "en_us";
+                        SaveData.saveValues["Locale"] = "english";
                         SaveData.Save();
-                        L.LoadLocale("en_us");
+                        L.LoadLocale("english");
                         return true;
                 }
                 return false;

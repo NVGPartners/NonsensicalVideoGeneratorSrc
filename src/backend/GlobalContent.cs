@@ -62,6 +62,7 @@ namespace NonsensicalVideoGenerator
 #if MONOGAME
         private static Dictionary<string, Texture2D> textures = new Dictionary<string, Texture2D>();
         private static Dictionary<string, SpriteFont> fonts = new Dictionary<string, SpriteFont>();
+        private static Dictionary<SpriteFont, Vector2> fontOffsets = new Dictionary<SpriteFont, Vector2>();
         private static Dictionary<string, Song> songs = new Dictionary<string, Song>();
         private static Dictionary<string, XmlDocument> xmls = new Dictionary<string, XmlDocument>();
         public static void LoadDefaultContent(ContentManager contentManager, GraphicsDevice graphicsDevice)
@@ -86,10 +87,11 @@ namespace NonsensicalVideoGenerator
 #if MONOGAME
             // Load default fonts.
             int scale = int.Parse(SaveData.saveValues["ScreenScale"], System.Globalization.CultureInfo.InvariantCulture);
-            AddFont("Munro", ThemeManager.LoadLayeredContent<SpriteFont>("fonts/munro-x"+scale));
-            AddFont("MunroNarrow", ThemeManager.LoadLayeredContent<SpriteFont>("fonts/munro-narrow-x"+scale));
-            AddFont("MunroSmall", ThemeManager.LoadLayeredContent<SpriteFont>("fonts/munro-small-x"+scale));
-            AddFont("LanaPixel", ThemeManager.LoadLayeredContent<SpriteFont>("fonts/lanapixel-x"+scale));
+            AddFont("Munro", ThemeManager.LoadLayeredContent<SpriteFont>("fonts/munro-x"+scale), new Vector2(0, 0));
+            AddFont("MunroNarrow", ThemeManager.LoadLayeredContent<SpriteFont>("fonts/munro-narrow-x"+scale), new Vector2(0, 0));
+            AddFont("MunroSmall", ThemeManager.LoadLayeredContent<SpriteFont>("fonts/munro-small-x"+scale), new Vector2(0, 0));
+            AddFont("LanaPixel", ThemeManager.LoadLayeredContent<SpriteFont>("fonts/lanapixel-x"+scale), new Vector2(0, -scale/2));
+            AddFont("NotoSans", ThemeManager.LoadLayeredContent<SpriteFont>("fonts/notosans-x"+scale), new Vector2(-scale/2, -scale*2f));
             AddSong($"BugCrusher", ThemeManager.LoadLayeredContent<Song>($"music/bugcrusher"));
             AddSong($"Mystery", ThemeManager.LoadLayeredContent<Song>($"music/mystery"));
             // Fallback (multi-language support) system font.
@@ -171,10 +173,13 @@ namespace NonsensicalVideoGenerator
             AddTexture("ActionButton", ThemeManager.LoadLayeredContent<Texture2D>("graphics/actionbutton"));
             AddTexture("InteractiveButtonSide", ThemeManager.LoadLayeredContent<Texture2D>("graphics/interactivebuttonside"));
             AddTexture("InteractiveButtonInner", ThemeManager.LoadLayeredContent<Texture2D>("graphics/interactivebuttoninner"));
+            // Why are dials still sticking around?
+            /*
             AddTexture("InteractiveDial", ThemeManager.LoadLayeredContent<Texture2D>("graphics/interactivedial"));
             // Values
             for(int i = 0; i < 30; i++)
                 AddTexture("InteractiveDialValue" + i, ThemeManager.LoadLayeredContent<Texture2D>("graphics/interactivedialvalue" + i));
+            */
             AddTexture("InteractiveSwitch", ThemeManager.LoadLayeredContent<Texture2D>("graphics/interactiveswitch"));
             AddTexture("InteractiveSwitchOn", ThemeManager.LoadLayeredContent<Texture2D>("graphics/interactiveswitchon"));
             AddTexture("InteractiveSwitchOff", ThemeManager.LoadLayeredContent<Texture2D>("graphics/interactiveswitchoff"));
@@ -210,15 +215,17 @@ namespace NonsensicalVideoGenerator
             }
             return true;
         }
-        public static bool AddFont(string name, SpriteFont font)
+        public static bool AddFont(string name, SpriteFont font, Vector2 offset)
         {
             if (fonts.ContainsKey(name))
             {
                 fonts[name] = font;
+                fontOffsets[font] = offset;
             }
             else
             {
                 fonts.Add(name, font);
+                fontOffsets.Add(font, offset);
             }
             return true;
         }
@@ -307,6 +314,31 @@ namespace NonsensicalVideoGenerator
         public static int GetXmlCount()
         {
             return xmls.Count;
+        }
+        public static void DrawString(SpriteBatch spriteBatch, SpriteFont spriteFont, string text, Vector2 position, Color color, float rotation, Vector2 origin, float scale, SpriteEffects effects, float layerDepth)
+        {
+            Vector2 scale2 = new Vector2(scale, scale);
+            DrawString(spriteBatch, spriteFont, text, position, color, rotation, origin, scale2, effects, layerDepth);
+        }
+        public static void DrawString(SpriteBatch spriteBatch, SpriteFont spriteFont, string text, Vector2 position, Color color, float rotation, Vector2 origin, Vector2 scale, SpriteEffects effects, float layerDepth)
+        {
+            // Offset text if font has an offset.
+            if (fontOffsets.ContainsKey(spriteFont))
+            {
+                position += fontOffsets[spriteFont];
+            }
+            spriteBatch.DrawString(spriteFont, text, position, color, rotation, origin, scale, effects, layerDepth);
+        }
+        public static void DrawString(SpriteBatch spriteBatch, SpriteFont spriteFont, string text, Vector2 position, Color color, bool cycler = false)
+        {
+            if(cycler)
+                spriteFont = GetFont(L.cyclerLocale.fontLarge);
+            // Offset text if font has an offset.
+            if (fontOffsets.ContainsKey(spriteFont))
+            {
+                position += fontOffsets[spriteFont];
+            }
+            spriteBatch.DrawString(spriteFont, text, position, color);
         }
     }
 }

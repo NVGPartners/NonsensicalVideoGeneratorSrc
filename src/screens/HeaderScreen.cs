@@ -163,11 +163,11 @@ namespace NonsensicalVideoGenerator
                 Vector2 progressSize = font.MeasureString(Global.generator.progressText != "" ? Global.generator.progressText : (Global.generator.failureReason != "" ? Global.generator.failureReason : Global.generator.progress + "%"));
                 if(Pagination.DrawnPage != 5)
                 {
-                    spriteBatch.DrawString(font, rendering, new Vector2(GlobalGraphics.Scale(320/2) - renderingSize.X/2 + GlobalGraphics.Scale(1), GlobalGraphics.Scale(8 + 1)), Color.Black);
-                    spriteBatch.DrawString(font, rendering, new Vector2(GlobalGraphics.Scale(320/2) - renderingSize.X/2, GlobalGraphics.Scale(8)), Color.White);
+                    GlobalContent.DrawString(spriteBatch, font, rendering, new Vector2(GlobalGraphics.Scale(320/2) - renderingSize.X/2 + GlobalGraphics.Scale(1), GlobalGraphics.Scale(8 + 1)), Color.Black);
+                    GlobalContent.DrawString(spriteBatch, font, rendering, new Vector2(GlobalGraphics.Scale(320/2) - renderingSize.X/2, GlobalGraphics.Scale(8)), Color.White);
                 }
-                spriteBatch.DrawString(font, Global.generator.progressText, new Vector2(GlobalGraphics.Scale(320/2) - progressSize.X/2 + GlobalGraphics.Scale(1), GlobalGraphics.Scale(8 + 1) + renderingSize.Y), Color.Black);
-                spriteBatch.DrawString(font, Global.generator.progressText, new Vector2(GlobalGraphics.Scale(320/2) - progressSize.X/2, GlobalGraphics.Scale(8) + renderingSize.Y), Color.White);
+                GlobalContent.DrawString(spriteBatch, font, Global.generator.progressText, new Vector2(GlobalGraphics.Scale(320/2) - progressSize.X/2 + GlobalGraphics.Scale(1), GlobalGraphics.Scale(8 + 1) + renderingSize.Y), Color.Black);
+                GlobalContent.DrawString(spriteBatch, font, Global.generator.progressText, new Vector2(GlobalGraphics.Scale(320/2) - progressSize.X/2, GlobalGraphics.Scale(8) + renderingSize.Y), Color.White);
             }
             // End offset spritebatch
             spriteBatch.End();
@@ -314,7 +314,7 @@ namespace NonsensicalVideoGenerator
             GlobalContent.AddTexture("LogoMask", ThemeManager.LoadLayeredContent<Texture2D>("graphics/logomask"));
             GlobalContent.AddTexture("Icon", ThemeManager.LoadLayeredContent<Texture2D>("graphics/icon"));
             GlobalContent.AddTexture("IconMask", ThemeManager.LoadLayeredContent<Texture2D>("graphics/iconmask"));
-            GlobalContent.AddTexture("LogoBG", ThemeManager.LoadLayeredContent<Texture2D>("graphics/bannerbg"));
+            //GlobalContent.AddTexture("LogoBG", ThemeManager.LoadLayeredContent<Texture2D>("graphics/bannerbg"));
             GlobalContent.AddTexture("Debug", ThemeManager.LoadLayeredContent<Texture2D>("graphics/debug"));
         }
     }

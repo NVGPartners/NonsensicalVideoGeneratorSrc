@@ -61,7 +61,7 @@ namespace NonsensicalVideoGenerator
             {"SkipPhotosensitiveWarningScreen", "false"},
             {"PluginListFilterFlags", "7"},
             {"LastVersion", ""},
-            {"Locale", "en_us"}
+            {"Locale", "fixme"}
         };
         public static string saveFileName = "Options.json";
         public static bool Save()

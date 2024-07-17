@@ -185,7 +185,7 @@ namespace NonsensicalVideoGenerator
             // Draw the center title bar text.
             string newTitle = L.T(0, "Console:Title", offset.X == 0 ? L.T(0, "Console:TitleExtra") : "");
             Vector2 titleSize = L.FontSmall().MeasureString(newTitle);
-            spriteBatch.DrawString(L.FontSmall(), newTitle, new Vector2(GlobalGraphics.scaledWidth / 2 - titleSize.X / 2, (6 * GlobalGraphics.scale) - GlobalGraphics.Scale(1)), Color.White);
+            GlobalContent.DrawString(spriteBatch, L.FontSmall(), newTitle, new Vector2(GlobalGraphics.scaledWidth / 2 - titleSize.X / 2, (6 * GlobalGraphics.scale) - GlobalGraphics.Scale(1)), Color.White);
             // Draw lines.
             int lineHeight = 8 * GlobalGraphics.scale;
             int lineSpacing = 2 * GlobalGraphics.scale;
@@ -195,14 +195,14 @@ namespace NonsensicalVideoGenerator
                 foreach (ColoredString line in ConsoleOutput.GetOutput())
                 {
                     Vector2 lineSize = L.FontSmall().MeasureString(line.Text);
-                    spriteBatch.DrawString(L.FontSmall(), line.Text, new Vector2(GlobalGraphics.Scale(8), lineY), line.Color);
+                    GlobalContent.DrawString(spriteBatch, L.FontSmall(), line.Text, new Vector2(GlobalGraphics.Scale(8), lineY), line.Color);
                     lineY += lineHeight;
                 }
             }
             catch {}
             // Draw assembly version.
             string version = L.T(0, "Console:Footer", Global.productVersion, ConsoleOutput.scrollAmount > -1 ? (ConsoleOutput.scrollAmount + 1).ToString(CultureInfo.InvariantCulture) : (ConsoleOutput.proxyOutput.Count - ConsoleOutput.maxLines + 1).ToString(CultureInfo.InvariantCulture), ConsoleOutput.proxyOutput.Count.ToString(CultureInfo.InvariantCulture));
-            spriteBatch.DrawString(L.FontSmall(), version, new Vector2(GlobalGraphics.Scale(8), lineY), Color.White);
+            GlobalContent.DrawString(spriteBatch, L.FontSmall(), version, new Vector2(GlobalGraphics.Scale(8), lineY), Color.White);
             // End offset spritebatch
             spriteBatch.End();
             // Remake spritebatch

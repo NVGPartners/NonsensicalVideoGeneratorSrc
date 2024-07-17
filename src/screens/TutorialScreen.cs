@@ -357,13 +357,13 @@ namespace NonsensicalVideoGenerator
             string title3 = L.T(0, "Tutorial:Title", "3", "3");
             string title4 = L.T(0, "Tutorial:UserConsentFormTitle");
             Vector2 titleSize1 = L.FontSmall().MeasureString(title1);
-            spriteBatch.DrawString(L.FontSmall(), title1, new Vector2(GlobalGraphics.scaledWidth / 2 - titleSize1.X / 2, (6 * GlobalGraphics.scale) - GlobalGraphics.Scale(1-32)), Color.White);
+            GlobalContent.DrawString(spriteBatch, L.FontSmall(), title1, new Vector2(GlobalGraphics.scaledWidth / 2 - titleSize1.X / 2, (6 * GlobalGraphics.scale) - GlobalGraphics.Scale(1-32)), Color.White);
             Vector2 titleSize2 = L.FontSmall().MeasureString(title2);
-            spriteBatch.DrawString(L.FontSmall(), title2, new Vector2(GlobalGraphics.scaledWidth / 2 - titleSize2.X / 2 + GlobalGraphics.Scale(320), (6 * GlobalGraphics.scale) - GlobalGraphics.Scale(1-32)), Color.White);
+            GlobalContent.DrawString(spriteBatch, L.FontSmall(), title2, new Vector2(GlobalGraphics.scaledWidth / 2 - titleSize2.X / 2 + GlobalGraphics.Scale(320), (6 * GlobalGraphics.scale) - GlobalGraphics.Scale(1-32)), Color.White);
             Vector2 titleSize3 = L.FontSmall().MeasureString(title3);
-            spriteBatch.DrawString(L.FontSmall(), title3, new Vector2(GlobalGraphics.scaledWidth / 2 - titleSize3.X / 2 + GlobalGraphics.Scale(640), (6 * GlobalGraphics.scale) - GlobalGraphics.Scale(1-32)), Color.White);
+            GlobalContent.DrawString(spriteBatch, L.FontSmall(), title3, new Vector2(GlobalGraphics.scaledWidth / 2 - titleSize3.X / 2 + GlobalGraphics.Scale(640), (6 * GlobalGraphics.scale) - GlobalGraphics.Scale(1-32)), Color.White);
             Vector2 titleSize4 = L.FontSmall().MeasureString(title4);
-            spriteBatch.DrawString(L.FontSmall(), title4, new Vector2(GlobalGraphics.scaledWidth / 2 - titleSize4.X / 2 + GlobalGraphics.Scale(960), (6 * GlobalGraphics.scale) - GlobalGraphics.Scale(1-32)), Color.White);
+            GlobalContent.DrawString(spriteBatch, L.FontSmall(), title4, new Vector2(GlobalGraphics.scaledWidth / 2 - titleSize4.X / 2 + GlobalGraphics.Scale(960), (6 * GlobalGraphics.scale) - GlobalGraphics.Scale(1-32)), Color.White);
             // Draw tutorial text
             for(int i = 0; i < tutorialText.Length; i++)
             {
@@ -380,8 +380,8 @@ namespace NonsensicalVideoGenerator
                     curText = curText.Replace("%FREI0RSTATUS%", L.T(0, "Tutorial:ProgramStatus", "frei0r plugins", L.T(0, "Tutorial:ProgramChecking")));
                     if(curText.StartsWith("Tutorial:"))
                         curText = L.T(0, curText);
-                    spriteBatch.DrawString(L.FontSmall(), curText, new Vector2(GlobalGraphics.Scale(8+16+1+320*i), GlobalGraphics.Scale(60+offsetText+1)), Color.Black);
-                    spriteBatch.DrawString(L.FontSmall(), curText, new Vector2(GlobalGraphics.Scale(8+16+320*i), GlobalGraphics.Scale(60+offsetText)), Color.White);
+                    GlobalContent.DrawString(spriteBatch, L.FontSmall(), curText, new Vector2(GlobalGraphics.Scale(8+16+1+320*i), GlobalGraphics.Scale(60+offsetText+1)), Color.Black);
+                    GlobalContent.DrawString(spriteBatch, L.FontSmall(), curText, new Vector2(GlobalGraphics.Scale(8+16+320*i), GlobalGraphics.Scale(60+offsetText)), Color.White);
                     offsetText += 8;
                 }
             }

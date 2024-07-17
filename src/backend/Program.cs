@@ -7,6 +7,7 @@ using Microsoft.Xna.Framework;
 #if !MONOGAME
 using System.Windows.Forms;
 #endif
+using Steamworks;
 
 namespace NonsensicalVideoGenerator
 {
@@ -69,6 +70,15 @@ namespace NonsensicalVideoGenerator
             Debug.debugBuild = true;
             Debug.SetDebugMode(true);
 #endif
+            // Initialize Steam
+            try
+            {
+                SteamManager.Initialize();
+            }
+            catch(Exception ex)
+            {
+                ConsoleOutput.WriteLine("SteamManager failed to initialize: " + ex.Message, Color.Red);
+            }
             if(Global.parameters.Contains("-debug"))
             {
                 Debug.SetDebugMode(true);
@@ -81,6 +91,29 @@ namespace NonsensicalVideoGenerator
                     SaveData.saveValues["Locale"] = Global.parameters[index + 1];
                 }
             }
+            // Fix locales that had their names changed
+            if(SaveData.saveValues["Locale"] == "en_us")
+                SaveData.saveValues["Locale"] = "english";
+            else if(SaveData.saveValues["Locale"] == "es_mx")
+                SaveData.saveValues["Locale"] = "latam";
+            else if(SaveData.saveValues["Locale"] == "de_de")
+                SaveData.saveValues["Locale"] = "german";
+            // Get language that Steam reports
+            bool languageSet = false;
+            if(SaveData.saveValues["Locale"] != "fixme")
+                languageSet = true;
+            if(SteamManager.initialized)
+            {
+                string steamLang = SteamApps.GetCurrentGameLanguage();
+                if(steamLang != null)
+                {
+                    SaveData.saveValues["Locale"] = steamLang;
+                    languageSet = true;
+                }
+            }
+            // Default to English
+            if(!languageSet)
+                SaveData.saveValues["Locale"] = "english";
             L.ReloadLocales();
             if(Global.parameters.Contains("-intro"))
                 SaveData.saveValues["FirstBoot"] = "true";

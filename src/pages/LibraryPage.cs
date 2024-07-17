@@ -223,8 +223,8 @@ namespace NonsensicalVideoGenerator
                         }
                         else if(deleteConfirmPos == position)
                         {
-                            spriteBatch.DrawString(munroSmall, L.T(0, "Library:AskToDelete"), new Vector2(deleteConfirmRect.X - GlobalGraphics.Scale(1-1), deleteConfirmRect.Y - GlobalGraphics.Scale(14-1)), Color.Black);
-                            spriteBatch.DrawString(munroSmall, L.T(0, "Library:AskToDelete"), new Vector2(deleteConfirmRect.X - GlobalGraphics.Scale(1), deleteConfirmRect.Y - GlobalGraphics.Scale(14)), Color.White);
+                            GlobalContent.DrawString(spriteBatch, munroSmall, L.T(0, "Library:AskToDelete"), new Vector2(deleteConfirmRect.X - GlobalGraphics.Scale(1-1), deleteConfirmRect.Y - GlobalGraphics.Scale(14-1)), Color.Black);
+                            GlobalContent.DrawString(spriteBatch, munroSmall, L.T(0, "Library:AskToDelete"), new Vector2(deleteConfirmRect.X - GlobalGraphics.Scale(1), deleteConfirmRect.Y - GlobalGraphics.Scale(14)), Color.White);
                             spriteBatch.Draw(deleteConfirm, deleteConfirmRect, Color.White);
                         }
                         else if(currentLibraryType != DefaultLibraryTypes.Render && currentLibraryType != DefaultLibraryTypes.NoImages)
@@ -296,36 +296,36 @@ namespace NonsensicalVideoGenerator
                 switch(currentRootType)
                 {
                     case LibraryRootType.Video:
-                        spriteBatch.DrawString(munroSmall, L.T(0, "Library:VideoTitle"), new Vector2(GlobalGraphics.Scale(139 + 1), GlobalGraphics.Scale(56 + 1)), Color.Black);
-                        spriteBatch.DrawString(munroSmall, L.T(0, "Library:VideoTitle"), new Vector2(GlobalGraphics.Scale(139), GlobalGraphics.Scale(56)), Color.White);
-                        spriteBatch.DrawString(munroSmall, L.T(0, "Library:AudioTitle"), new Vector2(GlobalGraphics.Scale(170 + 1), GlobalGraphics.Scale(56 + 1)), Color.Black);
-                        spriteBatch.DrawString(munroSmall, L.T(0, "Library:AudioTitle"), new Vector2(GlobalGraphics.Scale(170), GlobalGraphics.Scale(56)), Color.White);
+                        GlobalContent.DrawString(spriteBatch, munroSmall, L.T(0, "Library:VideoTitle"), new Vector2(GlobalGraphics.Scale(139 + 1), GlobalGraphics.Scale(56 + 1)), Color.Black);
+                        GlobalContent.DrawString(spriteBatch, munroSmall, L.T(0, "Library:VideoTitle"), new Vector2(GlobalGraphics.Scale(139), GlobalGraphics.Scale(56)), Color.White);
+                        GlobalContent.DrawString(spriteBatch, munroSmall, L.T(0, "Library:AudioTitle"), new Vector2(GlobalGraphics.Scale(170 + 1), GlobalGraphics.Scale(56 + 1)), Color.Black);
+                        GlobalContent.DrawString(spriteBatch, munroSmall, L.T(0, "Library:AudioTitle"), new Vector2(GlobalGraphics.Scale(170), GlobalGraphics.Scale(56)), Color.White);
                         break;
                     case LibraryRootType.Audio:
-                        spriteBatch.DrawString(munroSmall, L.T(0, "Library:AudioTitle"), new Vector2(GlobalGraphics.Scale(139 + 1), GlobalGraphics.Scale(56 + 1)), Color.Black);
-                        spriteBatch.DrawString(munroSmall, L.T(0, "Library:AudioTitle"), new Vector2(GlobalGraphics.Scale(139), GlobalGraphics.Scale(56)), Color.White);
-                        spriteBatch.DrawString(munroSmall, L.T(0, "Library:ImageTitle"), new Vector2(GlobalGraphics.Scale(170 + 1), GlobalGraphics.Scale(56 + 1)), Color.Black);
-                        spriteBatch.DrawString(munroSmall, L.T(0, "Library:ImageTitle"), new Vector2(GlobalGraphics.Scale(170), GlobalGraphics.Scale(56)), Color.White);
+                        GlobalContent.DrawString(spriteBatch, munroSmall, L.T(0, "Library:AudioTitle"), new Vector2(GlobalGraphics.Scale(139 + 1), GlobalGraphics.Scale(56 + 1)), Color.Black);
+                        GlobalContent.DrawString(spriteBatch, munroSmall, L.T(0, "Library:AudioTitle"), new Vector2(GlobalGraphics.Scale(139), GlobalGraphics.Scale(56)), Color.White);
+                        GlobalContent.DrawString(spriteBatch, munroSmall, L.T(0, "Library:ImageTitle"), new Vector2(GlobalGraphics.Scale(170 + 1), GlobalGraphics.Scale(56 + 1)), Color.Black);
+                        GlobalContent.DrawString(spriteBatch, munroSmall, L.T(0, "Library:ImageTitle"), new Vector2(GlobalGraphics.Scale(170), GlobalGraphics.Scale(56)), Color.White);
                         break;
                     case LibraryRootType.Image:
-                        spriteBatch.DrawString(munroSmall, L.T(0, "Library:ImageTitle"), new Vector2(GlobalGraphics.Scale(139 + 1), GlobalGraphics.Scale(56 + 1)), Color.Black);
-                        spriteBatch.DrawString(munroSmall, L.T(0, "Library:ImageTitle"), new Vector2(GlobalGraphics.Scale(139), GlobalGraphics.Scale(56)), Color.White);
-                        spriteBatch.DrawString(munroSmall, L.T(0, "Library:VideoTitle"), new Vector2(GlobalGraphics.Scale(170 + 1), GlobalGraphics.Scale(56 + 1)), Color.Black);
-                        spriteBatch.DrawString(munroSmall, L.T(0, "Library:VideoTitle"), new Vector2(GlobalGraphics.Scale(170), GlobalGraphics.Scale(56)), Color.White);
+                        GlobalContent.DrawString(spriteBatch, munroSmall, L.T(0, "Library:ImageTitle"), new Vector2(GlobalGraphics.Scale(139 + 1), GlobalGraphics.Scale(56 + 1)), Color.Black);
+                        GlobalContent.DrawString(spriteBatch, munroSmall, L.T(0, "Library:ImageTitle"), new Vector2(GlobalGraphics.Scale(139), GlobalGraphics.Scale(56)), Color.White);
+                        GlobalContent.DrawString(spriteBatch, munroSmall, L.T(0, "Library:VideoTitle"), new Vector2(GlobalGraphics.Scale(170 + 1), GlobalGraphics.Scale(56 + 1)), Color.Black);
+                        GlobalContent.DrawString(spriteBatch, munroSmall, L.T(0, "Library:VideoTitle"), new Vector2(GlobalGraphics.Scale(170), GlobalGraphics.Scale(56)), Color.White);
                         break;
                 }
             }
             else
             {
-                spriteBatch.DrawString(munroSmall, L.T(0, "Library:VideoTitle"), new Vector2(GlobalGraphics.Scale(139 + 1), GlobalGraphics.Scale(56 + 1)), Color.Black);
-                spriteBatch.DrawString(munroSmall, L.T(0, "Library:VideoTitle"), new Vector2(GlobalGraphics.Scale(139), GlobalGraphics.Scale(56)), Color.White);
-                spriteBatch.DrawString(munroSmall, L.T(0, "Library:AudioTitle"), new Vector2(GlobalGraphics.Scale(170 + 1), GlobalGraphics.Scale(56 + 1)), Color.Black);
-                spriteBatch.DrawString(munroSmall, L.T(0, "Library:AudioTitle"), new Vector2(GlobalGraphics.Scale(170), GlobalGraphics.Scale(56)), Color.White);
+                GlobalContent.DrawString(spriteBatch, munroSmall, L.T(0, "Library:VideoTitle"), new Vector2(GlobalGraphics.Scale(139 + 1), GlobalGraphics.Scale(56 + 1)), Color.Black);
+                GlobalContent.DrawString(spriteBatch, munroSmall, L.T(0, "Library:VideoTitle"), new Vector2(GlobalGraphics.Scale(139), GlobalGraphics.Scale(56)), Color.White);
+                GlobalContent.DrawString(spriteBatch, munroSmall, L.T(0, "Library:AudioTitle"), new Vector2(GlobalGraphics.Scale(170 + 1), GlobalGraphics.Scale(56 + 1)), Color.Black);
+                GlobalContent.DrawString(spriteBatch, munroSmall, L.T(0, "Library:AudioTitle"), new Vector2(GlobalGraphics.Scale(170), GlobalGraphics.Scale(56)), Color.White);
             }
-            spriteBatch.DrawString(munroSmall, L.T(0, "Library:BackButton"), new Vector2(GlobalGraphics.Scale(205 + 1), GlobalGraphics.Scale(223 + 1)), Color.Black);
-            spriteBatch.DrawString(munroSmall, L.T(0, "Library:BackButton"), new Vector2(GlobalGraphics.Scale(205), GlobalGraphics.Scale(223)), Color.White);
-            spriteBatch.DrawString(munroSmall, L.T(0, "Library:NextButton"), new Vector2(GlobalGraphics.Scale(281 + 1), GlobalGraphics.Scale(223 + 1)), Color.Black);
-            spriteBatch.DrawString(munroSmall, L.T(0, "Library:NextButton"), new Vector2(GlobalGraphics.Scale(281), GlobalGraphics.Scale(223)), Color.White);
+            GlobalContent.DrawString(spriteBatch, munroSmall, L.T(0, "Library:BackButton"), new Vector2(GlobalGraphics.Scale(205 + 1), GlobalGraphics.Scale(223 + 1)), Color.Black);
+            GlobalContent.DrawString(spriteBatch, munroSmall, L.T(0, "Library:BackButton"), new Vector2(GlobalGraphics.Scale(205), GlobalGraphics.Scale(223)), Color.White);
+            GlobalContent.DrawString(spriteBatch, munroSmall, L.T(0, "Library:NextButton"), new Vector2(GlobalGraphics.Scale(281 + 1), GlobalGraphics.Scale(223 + 1)), Color.Black);
+            GlobalContent.DrawString(spriteBatch, munroSmall, L.T(0, "Library:NextButton"), new Vector2(GlobalGraphics.Scale(281), GlobalGraphics.Scale(223)), Color.White);
             // Downloader
 #if WINDOWSDX
             if(currentLibraryType != DefaultLibraryTypes.Render && currentLibraryType != DefaultLibraryTypes.NoImages)
@@ -337,8 +337,8 @@ namespace NonsensicalVideoGenerator
                     totalIndicator =    L.T(0, "Library:Downloading");
                 Vector2 totalIndicatorSize = munroSmall.MeasureString(totalIndicator);
                 Vector2 totalPosition = new Vector2(rects["HeaderButton"].X + rects["HeaderButton"].Width / 2 - totalIndicatorSize.X / 2 + GlobalGraphics.Scale(1), GlobalGraphics.Scale(56));
-                spriteBatch.DrawString(munroSmall, totalIndicator, totalPosition + new Vector2(GlobalGraphics.Scale(1), GlobalGraphics.Scale(1)), Color.Black);
-                spriteBatch.DrawString(munroSmall, totalIndicator, totalPosition, Color.White);
+                GlobalContent.DrawString(spriteBatch, munroSmall, totalIndicator, totalPosition + new Vector2(GlobalGraphics.Scale(1), GlobalGraphics.Scale(1)), Color.Black);
+                GlobalContent.DrawString(spriteBatch, munroSmall, totalIndicator, totalPosition, Color.White);
             }
 #endif
             // Page indicator is centered
@@ -352,8 +352,8 @@ namespace NonsensicalVideoGenerator
                 string pageIndicator = page + 1 + "/" + maxPages;
                 Vector2 pageIndicatorSize = munroSmall.MeasureString(pageIndicator);
                 int pivot = 252; 
-                spriteBatch.DrawString(munroSmall, pageIndicator, new Vector2(GlobalGraphics.Scale(pivot + 1) - pageIndicatorSize.X / 2, GlobalGraphics.Scale(223 + 1)), Color.Black);
-                spriteBatch.DrawString(munroSmall, pageIndicator, new Vector2(GlobalGraphics.Scale(pivot) - pageIndicatorSize.X / 2, GlobalGraphics.Scale(223)), Color.White);
+                GlobalContent.DrawString(spriteBatch, munroSmall, pageIndicator, new Vector2(GlobalGraphics.Scale(pivot + 1) - pageIndicatorSize.X / 2, GlobalGraphics.Scale(223 + 1)), Color.Black);
+                GlobalContent.DrawString(spriteBatch, munroSmall, pageIndicator, new Vector2(GlobalGraphics.Scale(pivot) - pageIndicatorSize.X / 2, GlobalGraphics.Scale(223)), Color.White);
             }
             int offset = 0;
             for (int i = 0; i < libraryTypes[currentRootType].Count; i++)
@@ -361,8 +361,8 @@ namespace NonsensicalVideoGenerator
                 string title = libraryTypes[currentRootType][i];
                 if(i < DefaultLibraryTypes.defaultCounts[currentRootType] || title == "No Images")
                     title = L.T(0, "Library:" + title.Replace(" ", "")+"Title");
-                spriteBatch.DrawString(munroSmall, title, new Vector2(GlobalGraphics.Scale(139 + 1), GlobalGraphics.Scale(71 + offset + 13 * i + 1)), Color.Black);
-                spriteBatch.DrawString(munroSmall, title, new Vector2(GlobalGraphics.Scale(139), GlobalGraphics.Scale(71 + offset + 13 * i)), Color.White);
+                GlobalContent.DrawString(spriteBatch, munroSmall, title, new Vector2(GlobalGraphics.Scale(139 + 1), GlobalGraphics.Scale(71 + offset + 13 * i + 1)), Color.Black);
+                GlobalContent.DrawString(spriteBatch, munroSmall, title, new Vector2(GlobalGraphics.Scale(139), GlobalGraphics.Scale(71 + offset + 13 * i)), Color.White);
             }
             // Interactable
             controller.Draw(gameTime, spriteBatch);

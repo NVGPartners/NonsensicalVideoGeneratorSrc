@@ -1,0 +1,27 @@
+Milestone 5 Hotfix 3 (v1.0.1.3)
+
+Here are the changes in this update:
+
+[h3]Localization[/h3]
+[list]
+[*]Added Noto Sans as an alternative font for locales.
+[*]Added a language option to the initial setup.
+[*]Added German localization support.
+[*]Updated the localization files.
+[*]Steam client language is now selected by default.
+[/list]
+[h3]Assets[/h3]
+[list]
+[*]Added themes for the following events:
+[list]
+[*]KiwifruitDev's Birthday
+[*]Christmas
+[*]NVG Anniversary
+[/list]
+[*]Removed unused content.
+[/list]
+Let me know if you have any issues with this update.
+Also, please help translate NVG into your language on [url=https://github.com/KiwifruitDev/NonsensicalVideoGenerator/wiki/Localization]GitHub[/url]!
+Happy generating!
+
+[url=https://store.steampowered.com/app/2516360/Nonsensical_Video_Generator/][img]{STEAM_CLAN_IMAGE}/44378200/ff687f086ff77748ead1a7a7f33a8fbcfdb6a772.png[/img][/url] [url=https://steamcommunity.com/id/KiwifruitDev][img]{STEAM_CLAN_IMAGE}/44378200/a9f98b6b95b65dddf1d44f23bef423f6d6b2cb57.png[/img][/url]

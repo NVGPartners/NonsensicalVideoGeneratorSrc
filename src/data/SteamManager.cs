@@ -12,6 +12,14 @@ namespace NonsensicalVideoGenerator
         {
             try
             {
+#if DEBUG
+                // Check for -nosteam launch option
+                if(Global.parameters.Contains("-nosteam"))
+                {
+                    Debug.Log("Disabled Steamworks API.");
+                    return;
+                }
+#endif
                 if (!Packsize.Test())
                     ConsoleOutput.WriteLine("[Steamworks.NET] Packsize Test returned false, the wrong version of Steamworks.NET is being run in this platform.");
                 if (!DllCheck.Test())
