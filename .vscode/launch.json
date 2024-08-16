@@ -7,10 +7,16 @@
             "request": "launch",
             "preLaunchTask": "build",
             "program": "${workspaceFolder}/bin/x64/debug/net6.0-windows/NonsensicalVideoGenerator.dll",
-            "args": ["-nopath", "-nosteam"],
+            "args": ["-nopath"],
             "cwd": "${workspaceFolder}/bin/x64/debug/net6.0-windows",
             "console": "internalConsole",
             "stopAtEntry": false
+        },
+        {
+            "name": "Attach to Process",
+            "type": "coreclr",
+            "request": "attach",
+            "processId": "${command:pickProcess}",
         },
         {
             "name": "Build and Launch (Debug DesktopGL)",

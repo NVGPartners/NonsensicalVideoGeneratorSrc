@@ -34,6 +34,7 @@ namespace NonsensicalVideoGenerator
         public WorkshopTag selectedFlagsWorkshop = WorkshopTag.None;
         private readonly InteractableController controller = new();
         private readonly InteractableController controllerPluginCreation = new();
+        private readonly InteractableController actionController = new();
         public void Draw(GameTime gameTime, SpriteBatch spriteBatch)
         {
             // 135, 56 PluginPage
@@ -231,9 +232,12 @@ namespace NonsensicalVideoGenerator
             {
                 Global.tooltip = internalTooltip;
             }
+            actionController.Draw(gameTime, spriteBatch);
         }
         public bool Update(GameTime gameTime, bool handleInput)
         {
+            if(actionController.Update(gameTime, handleInput))
+                return true;
             int plcount = PluginHandler.GetPluginCount();
             int offsetpl = 0;
             for(int i = 0; i < plcount; i++)
@@ -1028,12 +1032,73 @@ namespace NonsensicalVideoGenerator
         public void LoadContent(ContentManager contentManager, GraphicsDevice graphicsDevice)
         {
             // Clear all controllers
+            actionController.Clear();
             controller.Clear();
             controllerPluginCreation.Clear();
             GlobalContent.AddTexture("PluginPage", ThemeManager.LoadLayeredContent<Texture2D>("graphics/pluginpage"));
             GlobalContent.AddTexture("PluginEntryBlank", ThemeManager.LoadLayeredContent<Texture2D>("graphics/pluginentryblank"));
             GlobalContent.AddTexture("PluginEntry", ThemeManager.LoadLayeredContent<Texture2D>("graphics/pluginentry"));
             GlobalContent.AddTexture("ScrollHandle", ThemeManager.LoadLayeredContent<Texture2D>("graphics/scrollhandle"));
+            actionController.Add("Filter", new ActionButton("Change the filter type in the addon list.", new Vector2(112, 191), (int i, string n) => {
+                switch(i)
+                {
+                    case 2: // left click
+                        GlobalContent.GetSound("Select").Play(int.Parse(SaveData.saveValues["SoundEffectVolume"], CultureInfo.InvariantCulture) / 100f, 0f, 0f);
+                        PluginHandler.CyclePluginListFilter();
+                        if(PluginHandler.pluginListFilter == (PluginListFilter.Effects | PluginListFilter.PostRenderEffects | PluginListFilter.Themes))
+                            Name = "PageAddons";
+                        else
+                            Name = PluginHandler.GetPluginListFilter();
+                        scrollOffset = 0;
+                        return true;
+                }
+                return false;
+            }, ThemeManager.LoadLayeredContent<Texture2D>("graphics/actions/filter")));
+            actionController.Add("ActionEnableAll", new ActionButton("Enable all content in this category.", new Vector2(112, 206), (int i, string n) => {
+                switch(i)
+                {
+                    case 2: // left click
+                        GlobalContent.GetSound("Select").Play(int.Parse(SaveData.saveValues["SoundEffectVolume"], CultureInfo.InvariantCulture) / 100f, 0f, 0f);
+                        if(PluginHandler.pluginListFilter == PluginListFilter.Themes)
+                        {
+                            GlobalContent.GetSound("Error").Play(int.Parse(SaveData.saveValues["SoundEffectVolume"], CultureInfo.InvariantCulture) / 100f, 0f, 0f);
+                            return true;
+                        }
+                        for(int index = 0; index < PluginHandler.plugins.Count; index++)
+                        {
+                            AddonType type = PluginHandler.plugins[index].GetAddonType();
+                            if(PluginHandler.pluginListFilter.HasFlag(PluginListFilter.Effects) && type == AddonType.Effect)
+                                PluginHandler.plugins[index].enabled = true;
+                            if(PluginHandler.pluginListFilter.HasFlag(PluginListFilter.PostRenderEffects) && type == AddonType.PostRenderEffect)
+                                PluginHandler.plugins[index].enabled = true;
+                        }
+                        PluginHandler.SavePluginSettings();
+                        return true;
+                }
+                return false;
+            }, ThemeManager.LoadLayeredContent<Texture2D>("graphics/actions/enableall")));
+            actionController.Add("ActionDisableAll", new ActionButton("Disable all content in this category.", new Vector2(112, 221), (int i, string n) => {
+                switch(i)
+                {
+                    case 2: // left click
+                        GlobalContent.GetSound("Select").Play(int.Parse(SaveData.saveValues["SoundEffectVolume"], CultureInfo.InvariantCulture) / 100f, 0f, 0f);
+                        if(PluginHandler.pluginListFilter == PluginListFilter.Themes)
+                        {
+                            GlobalContent.GetSound("Error").Play(int.Parse(SaveData.saveValues["SoundEffectVolume"], CultureInfo.InvariantCulture) / 100f, 0f, 0f);
+                            return true;
+                        }
+                        for(int index = 0; index < PluginHandler.plugins.Count; index++)
+                        {
+                            AddonType type = PluginHandler.plugins[index].GetAddonType();
+                            if(PluginHandler.pluginListFilter.HasFlag(PluginListFilter.Effects) && type == AddonType.Effect)
+                                PluginHandler.plugins[index].enabled = false;
+                            if(PluginHandler.pluginListFilter.HasFlag(PluginListFilter.PostRenderEffects) && type == AddonType.PostRenderEffect)
+                                PluginHandler.plugins[index].enabled = false;
+                        }
+                        return true;
+                }
+                return false;
+            }, ThemeManager.LoadLayeredContent<Texture2D>("graphics/actions/disableall")));
             controllerPluginCreation.Add("PluginTheme", new Switch("Theme Template", "Create a theme for " + Global.productNameShort + ".", new Vector2(139, 60+19*3), (int i, string n) => {
                 bool switchState = (i & 256) != 0;
                 if((i & 2) != 0)

@@ -30,13 +30,13 @@ function Query()
                 {
                     ["flag"] = "DownloadFiles",
                     ["params"] = {
-                        "https://cdn.discordapp.com/attachments/1131731781402509362/1131860281253965864/gentle_breeze.mp3",
+                        "https://github.com/KiwifruitDev/NonsensicalVideoGenerator/raw/main/addonlibraries/distort.mp3",
                     }
                 },
                 {
                     ["flag"] = "AddToLibrary",
                     ["params"] = {
-                        "gentle_breeze.mp3"
+                        "distort.mp3"
                     }
                 },
             }
@@ -68,8 +68,8 @@ local indexoffset = 0
 
 function StartGeneration(options, pluginSettings, functions)
     -- Download default media
-    if not functions.libraryHasFile("audio", "distort", "gentle_breeze.mp3") then
-        functions.downloadFile("https://cdn.discordapp.com/attachments/1131731781402509362/1131860281253965864/gentle_breeze.mp3", "audio", "distort")
+    if not functions.libraryHasFile("audio", "distort", "distort.mp3") then
+        functions.downloadFile("https://github.com/KiwifruitDev/NonsensicalVideoGenerator/raw/main/addonlibraries/distort.mp3", "audio", "distort")
         indexoffset = 1
     else
         -- Set variables

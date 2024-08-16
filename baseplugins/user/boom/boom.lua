@@ -41,15 +41,15 @@ function Query()
                 {
                     ["flag"] = "DownloadFiles",
                     ["params"] = {
-                        "https://cdn.discordapp.com/attachments/872900991530467418/1128912970068533288/wtfboomstart2.mp3",
-                        "https://cdn.discordapp.com/attachments/872900991530467418/1128917906902753300/WTFBoom7.mp4",
+                        "https://github.com/KiwifruitDev/NonsensicalVideoGenerator/raw/main/addonlibraries/whatthe.mp3",
+                        "https://github.com/KiwifruitDev/NonsensicalVideoGenerator/raw/main/addonlibraries/boom.mp4",
                     }
                 },
                 {
                     ["flag"] = "AddToLibrary",
                     ["params"] = {
-                        "wtfboomstart2.mp3",
-                        "WTFBoom7.mp4",
+                        "whatthe.mp3",
+                        "boom.mp4",
                     }
                 },
             }
@@ -74,11 +74,11 @@ local indexoffset = 0
 
 function StartGeneration(options, pluginSettings, functions)
     -- Download default media
-    if not functions.libraryHasFile("audio", "whatthe", "wtfboomstart2.mp3") then
-        functions.downloadFile("https://cdn.discordapp.com/attachments/872900991530467418/1128912970068533288/wtfboomstart2.mp3", "audio", "whatthe")
+    if not functions.libraryHasFile("audio", "whatthe", "whatthe.mp3") then
+        functions.downloadFile("https://github.com/KiwifruitDev/NonsensicalVideoGenerator/raw/main/addonlibraries/whatthe.mp3", "audio", "whatthe")
         indexoffset = 1
-    elseif not functions.libraryHasFile("video", "boom", "WTFBoom7.mp4") then
-        functions.downloadFile("https://cdn.discordapp.com/attachments/872900991530467418/1128917906902753300/WTFBoom7.mp4", "video", "boom")
+    elseif not functions.libraryHasFile("video", "boom", "boom.mp4") then
+        functions.downloadFile("https://github.com/KiwifruitDev/NonsensicalVideoGenerator/raw/main/addonlibraries/boom.mp4", "video", "boom")
         indexoffset = 1
     else
         -- Set variables
@@ -93,8 +93,8 @@ end
 
 function PostCommand(commandindex, outputresult, errorresult, options, pluginSettings, functions)
     if commandindex == 1 and indexoffset == 1 then
-        if not functions.libraryHasFile("video", "boom", "WTFBoom7.mp4") then
-            functions.downloadFile("https://cdn.discordapp.com/attachments/872900991530467418/1128917906902753300/WTFBoom7.mp4", "video", "boom")
+        if not functions.libraryHasFile("video", "boom", "boom.mp4") then
+            functions.downloadFile("https://github.com/KiwifruitDev/NonsensicalVideoGenerator/raw/main/addonlibraries/boom.mp4", "video", "boom")
             indexoffset = 2
         else
             -- Set variables

@@ -48,6 +48,8 @@ namespace NonsensicalVideoGenerator
         }
         public bool CheckConsentParam(Consents consents, string param)
         {
+            if(Global.disableConsents)
+                return true;
             if(!CheckConsent(consents))
                 return false;
             if(!consentParams.ContainsKey(consents))
@@ -66,6 +68,8 @@ namespace NonsensicalVideoGenerator
         // Returns true if consent is needed or requires updating
         public static bool CheckConsentForm(ConsentForm checkConsentForm)
         {
+            if(Global.disableConsents)
+                return true;
             // Create consent file if it doesn't exist
             if(!File.Exists(consentFileName))
             {

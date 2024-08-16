@@ -3,9 +3,9 @@
     <AssemblyName>NonsensicalVideoGenerator</AssemblyName>
     <AssemblyProduct>NonsensicalVideoGenerator</AssemblyProduct>
     <AssemblyTitle>Nonsensical Video Generator</AssemblyTitle>
-    <FileVersion>1.0.1.3</FileVersion>
-    <AssemblyVersion>1.0.1.3</AssemblyVersion>
-    <Version>1.0.1.3</Version>
+    <FileVersion>1.0.1.4</FileVersion>
+    <AssemblyVersion>1.0.1.4</AssemblyVersion>
+    <Version>1.0.1.4</Version>
     <AssemblyCopyright>Copyright © KiwifruitDev 2024</AssemblyCopyright>
     <AssemblyTrademark>MonoGame licensed under Ms-PL; Newtonsoft.Json licensed under MIT; Steamworks.NET licensed under MIT; DiscordRichPresence licensed under MIT; SharpCompress licensed under MIT; MoonSharp licensed under BSD-3-Clause; Munro licensed under SIL OFL; LanaPixel licensed under SIL OFL</AssemblyTrademark>
     <Authors>KiwifruitDev</Authors>
@@ -57,7 +57,6 @@
     <BasePlugins Include="$(ProjectDir)baseplugins\user\stock\**\*.*" />
     <WorkshopPlugins Include="$(ProjectDir)baseplugins\user\**\*.*" />
     <BaseTemplates Include="$(ProjectDir)basetemplates\**\*.*" />
-    <BaseHTML Include="$(ProjectDir)basehtml\**\*.*" />
     <BaseLocales Include="$(ProjectDir)public\locales\**\*.*" />
     <BaseRoot Include="$(ProjectDir)baseroot\**\*.*" />
     <BaseLayerGraphics Include="$(ProjectDir)content\graphics\**\*.*" />

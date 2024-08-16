@@ -16,6 +16,7 @@ using System.ComponentModel;
 using System.Linq;
 using System.Reflection;
 using System.Windows;
+using System.Globalization;
 
 namespace NonsensicalVideoGenerator
 {
@@ -50,6 +51,7 @@ namespace NonsensicalVideoGenerator
         private static bool downloading = false;
         private static KeyboardState oldKeyboardState;
         private static KeyboardState newKeyboardState;
+        private readonly InteractableController actionController = new();
         public void CacheLibrary()
         {
             libraryFileCache.Clear();
@@ -70,6 +72,46 @@ namespace NonsensicalVideoGenerator
         }
         public void LoadContent(ContentManager contentManager, GraphicsDevice graphicsDevice)
         {
+            controller.Clear();
+            actionController.Clear();
+            actionController.Add("ActionEnableAll", new ActionButton("Enable all content in this category.", new Vector2(112, 206), (int i, string n) => {
+                switch(i)
+                {
+                    case 2: // left click
+                        GlobalContent.GetSound("Select").Play(int.Parse(SaveData.saveValues["SoundEffectVolume"], CultureInfo.InvariantCulture) / 100f, 0f, 0f);
+                        if(currentLibraryType == DefaultLibraryTypes.Render)
+                        {
+                            GlobalContent.GetSound("Error").Play(int.Parse(SaveData.saveValues["SoundEffectVolume"], CultureInfo.InvariantCulture) / 100f, 0f, 0f);
+                            return true;
+                        }
+                        for(int j = 0; j < libraryFileCache[currentLibraryType].Count; j++)
+                        {
+                            libraryFileCache[currentLibraryType][j].Enabled = true;
+                        }
+                        LibraryData.SetAllEnabled(currentLibraryType, true);
+                        return true;
+                }
+                return false;
+            }, ThemeManager.LoadLayeredContent<Texture2D>("graphics/actions/enableall")));
+            actionController.Add("ActionDisableAll", new ActionButton("Disable all content in this category.", new Vector2(112, 221), (int i, string n) => {
+                switch(i)
+                {
+                    case 2: // left click
+                        GlobalContent.GetSound("Select").Play(int.Parse(SaveData.saveValues["SoundEffectVolume"], CultureInfo.InvariantCulture) / 100f, 0f, 0f);
+                        if(currentLibraryType == DefaultLibraryTypes.Render)
+                        {
+                            GlobalContent.GetSound("Error").Play(int.Parse(SaveData.saveValues["SoundEffectVolume"], CultureInfo.InvariantCulture) / 100f, 0f, 0f);
+                            return true;
+                        }
+                        for(int j = 0; j < libraryFileCache[currentLibraryType].Count; j++)
+                        {
+                            libraryFileCache[currentLibraryType][j].Enabled = false;
+                        }
+                        LibraryData.SetAllEnabled(currentLibraryType, false);
+                        return true;
+                }
+                return false;
+            }, ThemeManager.LoadLayeredContent<Texture2D>("graphics/actions/disableall")));
             // Library assets
             GlobalContent.AddTexture("DeleteConfirm", ThemeManager.LoadLayeredContent<Texture2D>("graphics/library/deleteconfirm"));
             GlobalContent.AddTexture("AddVideoOverlay", ThemeManager.LoadLayeredContent<Texture2D>("graphics/library/addvideooverlay"));
@@ -366,6 +408,7 @@ namespace NonsensicalVideoGenerator
             }
             // Interactable
             controller.Draw(gameTime, spriteBatch);
+            actionController.Draw(gameTime, spriteBatch);
             if(tooltip != "")
             {
                 Global.tooltip = tooltip;
@@ -584,6 +627,8 @@ namespace NonsensicalVideoGenerator
         }
         public bool Update(GameTime gameTime, bool handleInput)
         {
+            if(actionController.Update(gameTime, handleInput))
+                return true;
             if(!registered)
             {
                 GameWindow? window = UserInterface.instance?.Window;
@@ -1390,6 +1435,8 @@ namespace NonsensicalVideoGenerator
                 }
             }
             // Interactable
+            if(actionController.Update(gameTime, handleInput))
+                return true;
             if(controller.Update(gameTime, handleInput))
                 return true;
             return false;

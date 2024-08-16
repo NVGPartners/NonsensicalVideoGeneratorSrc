@@ -1,25 +1,27 @@
-Milestone 5 Hotfix 3 (v1.0.1.3)
+Milestone 5 Hotfix 4 (v1.0.1.4)
 
 Here are the changes in this update:
 
-[h3]Localization[/h3]
+[h3]Addons[/h3]
 [list]
-[*]Added Noto Sans as an alternative font for locales.
-[*]Added a language option to the initial setup.
-[*]Added German localization support.
+[*]Increased verbosity of Lua error messages.
+[*]Disabled addon consent forms for now.
+[*]Addons can no longer download from Discord.
+[*]Addons can now download from YouTube.
+[/list]
+[h3]Actions[/h3]
+[list]
+[*]Added enable all and disable all action buttons to the Library and Addons tabs.
+[*]Added a filter action button to the Addons tab.
+[/list]
+[h3]Miscellaneous[/h3]
+[list]
+[*]Removed optional programs from the Tutorial screen.
+[*]Updated yt-dlp, this should fix issues when downloading from YouTube.
 [*]Updated the localization files.
-[*]Steam client language is now selected by default.
+[*]Updated the credits.
 [/list]
-[h3]Assets[/h3]
-[list]
-[*]Added themes for the following events:
-[list]
-[*]KiwifruitDev's Birthday
-[*]Christmas
-[*]NVG Anniversary
-[/list]
-[*]Removed unused content.
-[/list]
+
 Let me know if you have any issues with this update.
 Also, please help translate NVG into your language on [url=https://github.com/KiwifruitDev/NonsensicalVideoGenerator/wiki/Localization]GitHub[/url]!
 Happy generating!

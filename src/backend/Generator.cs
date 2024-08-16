@@ -328,9 +328,10 @@ namespace NonsensicalVideoGenerator
                     }
                 }
             }
-            catch
+            catch(Exception ex)
             {
-                ConsoleOutput.WriteLine("Failed to apply effect to clip " + (i + 1) +".", Color.Red);
+                ConsoleOutput.WriteLine(ex.Message, Color.Red);
+                ConsoleOutput.WriteLine("Failed to apply effect to clip " + i + ".", Color.Red);
             }
         }
         public void VidThread(object? sender, DoWorkEventArgs e)
@@ -648,7 +649,8 @@ namespace NonsensicalVideoGenerator
                             if(!bool.Parse(SaveData.saveValues["HiddenKeepTemporaryJobFolders"]))
                                 Directory.Delete(effect.jobFolder, true);
                         }
-                        ConsoleOutput.WriteLine(effect.success ? "Applied "+effect.pluginName+" to render." : "Failed to apply "+effect.pluginName+" to render.", effect.success ? Color.LightGreen : Color.Red);
+                        if(effect.pluginName != "")
+                            ConsoleOutput.WriteLine(effect.success ? "Applied "+effect.pluginName+" to render." : "Failed to apply "+effect.pluginName+" to render.", effect.success ? Color.LightGreen : Color.Red);
                     }
                     // Save to library if it exists.
                     if (File.Exists(tempOutput))

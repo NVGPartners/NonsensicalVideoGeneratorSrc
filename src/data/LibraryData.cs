@@ -425,6 +425,17 @@ namespace NonsensicalVideoGenerator
                 }
             }
         }
+        public static void SetAllEnabled(LibraryType type, bool enabled)
+        {
+            // Set whether or not all files of a certain type are enabled.
+            for(int i = 0; i < libraryFiles.Count; i++)
+            {
+                if(libraryFiles[i].Type == type)
+                {
+                    SetEnabled(libraryFiles[i], enabled);
+                }
+            }
+        }
         public static List<LibraryFile> calledMedia = new();
         public static string PickRandom(LibraryType type, Random rnd)
         {

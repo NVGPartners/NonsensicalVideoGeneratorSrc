@@ -129,7 +129,7 @@ namespace NonsensicalVideoGenerator
         }
         public string[] Call()
         {
-            if(type != CommandType.Download)
+            if(type != CommandType.Download && type != CommandType.YtDlp)
             {
                 string args = this.args ?? "";
                 ProcessStartInfo startInfo = new()
@@ -215,6 +215,10 @@ namespace NonsensicalVideoGenerator
                 // If libraryRoot is not empty, download to library instead of job folder
                 string downloadPath = subType != "" ? Path.Join(Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location) ?? ".", "library", rootType, subType) : rootType;
                 string combinedPath = Path.Combine(downloadPath, Path.GetFileName(url));
+                if(type == CommandType.YtDlp)
+                {
+                    combinedPath = Path.Combine(downloadPath, "%(title)s.%(ext)s");
+                }
                 // get complete path
                 combinedPath = Path.GetFullPath(combinedPath);
                 // create directory if it doesn't exist
@@ -224,11 +228,49 @@ namespace NonsensicalVideoGenerator
                     ConsoleOutput.WriteLine($"File {combinedPath} already exists.", Color.LightBlue);
                     return new string[] { "", "" };
                 }
-                // Download file
-                ConsoleOutput.WriteLine($"Downloading {url}" + (subType != "" ? " to library " + rootType + "\\" + subType : ""), Color.LightBlue);
-                using (WebClient client = new WebClient())
+                if(type == CommandType.Download)
                 {
-                    client.DownloadFile(url, combinedPath);
+                    // Download file
+                    ConsoleOutput.WriteLine($"Downloading {url}" + (subType != "" ? " to library " + rootType + "\\" + subType : ""), Color.LightBlue);
+                    using (WebClient client = new WebClient())
+                    {
+                        client.DownloadFile(url, combinedPath);
+                    }
+                }
+                else if(type == CommandType.YtDlp)
+                {
+                    // Download YouTube video
+                    string ytdlp = Global.useSystemYtDlp ? "yt-dlp" : @".\yt-dlp.exe";
+                    bool sound = rootType == "audio";
+                    ProcessStartInfo startInfo = new ProcessStartInfo(ytdlp, "-o \"" + combinedPath + "\" " + (sound ? "--extract-audio --audio-format mp3 " : "--format mp4 ") + url)
+                    {
+                        UseShellExecute = false,
+                        RedirectStandardOutput = true,
+                        RedirectStandardError = true
+                    };
+                    Process process = new Process
+                    {
+                        StartInfo = startInfo
+                    };
+                    process.OutputDataReceived += (object sender, DataReceivedEventArgs e) =>
+                    {
+                        if(e.Data != null)
+                            ConsoleOutput.WriteLine(e.Data, Color.Transparent);
+                    };
+                    process.ErrorDataReceived += (object sender, DataReceivedEventArgs e) =>
+                    {
+                        if(e.Data != null)
+                            ConsoleOutput.WriteLine(e.Data, Color.Red);
+                    };
+                    process.Start();
+                    process.BeginOutputReadLine();
+                    process.BeginErrorReadLine();
+                    process.WaitForExit();
+                }
+                else
+                {
+                    ConsoleOutput.WriteLine("Invalid download command.", Color.Red);
+                    return new string[] { "", "" };
                 }
                 // Load to library
                 if(dummyType != null)
@@ -609,7 +651,14 @@ namespace NonsensicalVideoGenerator
         // DownloadFile for lua
         public void DownloadFile(string url, string rootType = "", string subType = "")
         {
-            if(consentForm != null && !consentForm.CheckConsentParam(Consents.DownloadFiles, ReplacePlaceholders(url)))
+            string replacedUrl = ReplacePlaceholders(url);
+            // If it contains discordapp.com, deny it
+            if(replacedUrl.Contains("discord.com") || replacedUrl.Contains("discordapp.com"))
+            {
+                ConsoleOutput.WriteLine("Addons can't download from Discord, tell the author!", Color.Red);
+                return;
+            }
+            if(consentForm != null && !consentForm.CheckConsentParam(Consents.DownloadFiles, replacedUrl))
             {
                 ConsoleOutput.WriteLine("Addon attempted to download a file without permission.", Color.Red);
                 return;
@@ -623,11 +672,23 @@ namespace NonsensicalVideoGenerator
                 return;
             }
             */
-            PluginHandler.commands.Add(new Command(CommandType.Download, ReplacePlaceholders(url) + " " + rootType + " " + subType, jobDirectory));
+            CommandType commandType = CommandType.Download;
+            // Is it a YouTube url?
+            if (replacedUrl.Contains("youtube.com") || replacedUrl.Contains("youtu.be"))
+            {
+                // It's a YouTube url.
+                commandType = CommandType.YtDlp;
+            }
+            PluginHandler.commands.Add(new Command(commandType, replacedUrl + " " + rootType + " " + subType, jobDirectory));
         }
         // ExecuteProgram for lua
         public void ExecuteProgram(string program, string args)
         {
+            if(Global.disableConsents)
+            {
+                ConsoleOutput.WriteLine("Addon attempted to execute a program but consents are disabled.", Color.Red);
+                return;
+            }
             if(consentForm != null && !consentForm.CheckConsentParam(Consents.ExecutePrograms, ReplacePlaceholders(program)))
             {
                 ConsoleOutput.WriteLine("Addon attempted to execute a program without permission.", Color.Red);
@@ -1022,6 +1083,8 @@ namespace NonsensicalVideoGenerator
         }
         public bool CheckConsent()
         {
+            if(Global.disableConsents)
+                return true;
             if (consentForm == null)
                 return false;
             return UserConsent.CheckConsentForm(consentForm);
@@ -1644,24 +1707,27 @@ namespace NonsensicalVideoGenerator
                 ThemeManager.LoadThemes();
                 LibraryData.SequentialName();
                 // Check to see if there are any plugins that need consent forms filled out.
-                foreach(Plugin plugin in plugins)
+                if(!Global.disableConsents)
                 {
-                    if(plugin.CheckConsent())
+                    foreach(Plugin plugin in plugins)
                     {
-                        UserConsent.needsConsent = true;
-                        UserConsent.consentForm = plugin.consentForm;
-                        Global.generator.progressText = L.T(0, "Addons:StatusAddonConsentRequired", plugin.GetDisplayName());
-                        FramePlayer.canPlayBgMusic = false;
-                        ScreenManager.PushNavigation("Tutorial");
-                        ScreenManager.GetScreen<TutorialScreen>("Tutorial")?.Show();
-                        ScreenManager.GetScreen<ContentScreen>("Content")?.Hide();
-                        ScreenManager.GetScreen<MenuScreen>("Menu")?.Hide();
-                        if(FramePlayer.audio != null)
-                            ScreenManager.GetScreen<VideoScreen>("Video")?.Hide();
-                        ScreenManager.GetScreen<BackgroundScreen>("Background")?.Hide();
-                        ScreenManager.GetScreen<SocialScreen>("Socials")?.Hide();
-                        GlobalContent.GetSound("Prompt").Play(int.Parse(SaveData.saveValues["SoundEffectVolume"], CultureInfo.InvariantCulture) / 100f, 0f, 0f);
-                        break;
+                        if(plugin.CheckConsent())
+                        {
+                            UserConsent.needsConsent = true;
+                            UserConsent.consentForm = plugin.consentForm;
+                            Global.generator.progressText = L.T(0, "Addons:StatusAddonConsentRequired", plugin.GetDisplayName());
+                            FramePlayer.canPlayBgMusic = false;
+                            ScreenManager.PushNavigation("Tutorial");
+                            ScreenManager.GetScreen<TutorialScreen>("Tutorial")?.Show();
+                            ScreenManager.GetScreen<ContentScreen>("Content")?.Hide();
+                            ScreenManager.GetScreen<MenuScreen>("Menu")?.Hide();
+                            if(FramePlayer.audio != null)
+                                ScreenManager.GetScreen<VideoScreen>("Video")?.Hide();
+                            ScreenManager.GetScreen<BackgroundScreen>("Background")?.Hide();
+                            ScreenManager.GetScreen<SocialScreen>("Socials")?.Hide();
+                            GlobalContent.GetSound("Prompt").Play(int.Parse(SaveData.saveValues["SoundEffectVolume"], CultureInfo.InvariantCulture) / 100f, 0f, 0f);
+                            break;
+                        }
                     }
                 }
             }

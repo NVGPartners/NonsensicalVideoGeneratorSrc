@@ -189,6 +189,18 @@
 /processorParam:TextureFormat=Color
 /build:graphics/actions/console.png
 
+#begin graphics/actions/disableall.png
+/importer:TextureImporter
+/processor:TextureProcessor
+/processorParam:ColorKeyColor=255,0,255,255
+/processorParam:ColorKeyEnabled=True
+/processorParam:GenerateMipmaps=False
+/processorParam:PremultiplyAlpha=True
+/processorParam:ResizeToPowerOfTwo=False
+/processorParam:MakeSquare=False
+/processorParam:TextureFormat=Color
+/build:graphics/actions/disableall.png
+
 #begin graphics/actions/discord.png
 /importer:TextureImporter
 /processor:TextureProcessor
@@ -200,6 +212,30 @@
 /processorParam:MakeSquare=False
 /processorParam:TextureFormat=Color
 /build:graphics/actions/discord.png
+
+#begin graphics/actions/enableall.png
+/importer:TextureImporter
+/processor:TextureProcessor
+/processorParam:ColorKeyColor=255,0,255,255
+/processorParam:ColorKeyEnabled=True
+/processorParam:GenerateMipmaps=False
+/processorParam:PremultiplyAlpha=True
+/processorParam:ResizeToPowerOfTwo=False
+/processorParam:MakeSquare=False
+/processorParam:TextureFormat=Color
+/build:graphics/actions/enableall.png
+
+#begin graphics/actions/filter.png
+/importer:TextureImporter
+/processor:TextureProcessor
+/processorParam:ColorKeyColor=255,0,255,255
+/processorParam:ColorKeyEnabled=True
+/processorParam:GenerateMipmaps=False
+/processorParam:PremultiplyAlpha=True
+/processorParam:ResizeToPowerOfTwo=False
+/processorParam:MakeSquare=False
+/processorParam:TextureFormat=Color
+/build:graphics/actions/filter.png
 
 #begin graphics/actions/github.png
 /importer:TextureImporter
@@ -1245,6 +1281,18 @@
 /processorParam:TextureFormat=Color
 /build:themes/anniversary/graphics/menuwindowbg.png
 
+#begin themes/birthday/graphics/actions/enableall.png
+/importer:TextureImporter
+/processor:TextureProcessor
+/processorParam:ColorKeyColor=255,0,255,255
+/processorParam:ColorKeyEnabled=True
+/processorParam:GenerateMipmaps=False
+/processorParam:PremultiplyAlpha=True
+/processorParam:ResizeToPowerOfTwo=False
+/processorParam:MakeSquare=False
+/processorParam:TextureFormat=Color
+/build:themes/birthday/graphics/actions/enableall.png
+
 #begin themes/birthday/graphics/debug.png
 /importer:TextureImporter
 /processor:TextureProcessor
@@ -1508,6 +1556,30 @@
 /processorParam:MakeSquare=False
 /processorParam:TextureFormat=Color
 /build:themes/birthday/graphics/tile.png
+
+#begin themes/halloween/graphics/actions/disableall.png
+/importer:TextureImporter
+/processor:TextureProcessor
+/processorParam:ColorKeyColor=255,0,255,255
+/processorParam:ColorKeyEnabled=True
+/processorParam:GenerateMipmaps=False
+/processorParam:PremultiplyAlpha=True
+/processorParam:ResizeToPowerOfTwo=False
+/processorParam:MakeSquare=False
+/processorParam:TextureFormat=Color
+/build:themes/halloween/graphics/actions/disableall.png
+
+#begin themes/halloween/graphics/actions/enableall.png
+/importer:TextureImporter
+/processor:TextureProcessor
+/processorParam:ColorKeyColor=255,0,255,255
+/processorParam:ColorKeyEnabled=True
+/processorParam:GenerateMipmaps=False
+/processorParam:PremultiplyAlpha=True
+/processorParam:ResizeToPowerOfTwo=False
+/processorParam:MakeSquare=False
+/processorParam:TextureFormat=Color
+/build:themes/halloween/graphics/actions/enableall.png
 
 #begin themes/halloween/graphics/debug.png
 /importer:TextureImporter
