@@ -500,11 +500,12 @@ namespace NonsensicalVideoGenerator
                 case 2: // left click
                     if(!UserConsent.needsConsent)
                     {
+                        Global.generator.CleanUp();
                         Global.generator.progressText = L.T(0, "Tutorial:StatusStartDownload");
 
                         GlobalContent.GetSound("Option").Play(int.Parse(SaveData.saveValues["SoundEffectVolume"], CultureInfo.InvariantCulture) / 100f, 0f, 0f);
-                        tutorialText[1][3] = L.T(0, "Tutorial:ProgramStatus", "ffmpeg", L.T(0, "Tutorial:ProgramDownloading"));
-                        tutorialText[1][4] = L.T(0, "Tutorial:ProgramStatus", "ffprobe", L.T(0, "Tutorial:ProgramDownloading"));
+                        tutorialText[1][2] = L.T(0, "Tutorial:ProgramStatus", "ffmpeg", L.T(0, "Tutorial:ProgramDownloading"));
+                        tutorialText[1][3] = L.T(0, "Tutorial:ProgramStatus", "ffprobe", L.T(0, "Tutorial:ProgramDownloading"));
                         controller.Remove("ButtonFFmpeg");
 
                         // Create temp folder
@@ -528,15 +529,15 @@ namespace NonsensicalVideoGenerator
                                 client.DownloadProgressChanged += (sender, e) => {
                                     downloading = true;
                                     Global.generator.progressText = L.T(0, "Tutorial:StatusDownload", e.ProgressPercentage.ToString(CultureInfo.InvariantCulture)) + " (" + (downloads+1) + "/" + totalDownloads + ")";
-                                    tutorialText[1][3] = L.T(0, "Tutorial:ProgramStatus", "ffmpeg", Global.generator.progressText);
-                                    tutorialText[1][4] = L.T(0, "Tutorial:ProgramStatus", "ffprobe", Global.generator.progressText);
+                                    tutorialText[1][2] = L.T(0, "Tutorial:ProgramStatus", "ffmpeg", Global.generator.progressText);
+                                    tutorialText[1][3] = L.T(0, "Tutorial:ProgramStatus", "ffprobe", Global.generator.progressText);
                                 };
                                 client.DownloadFileCompleted += (sender, e) => {
                                     downloading = false;
                                     extracting = true;
                                     Global.generator.progressText = L.T(0, "Tutorial:ProgramExtracting") + " (" + (downloads+1) + "/" + totalDownloads + ")";
-                                    tutorialText[1][3] = L.T(0, "Tutorial:ProgramStatus", "ffmpeg", Global.generator.progressText);
-                                    tutorialText[1][4] = L.T(0, "Tutorial:ProgramStatus", "ffprobe", Global.generator.progressText);
+                                    tutorialText[1][2] = L.T(0, "Tutorial:ProgramStatus", "ffmpeg", Global.generator.progressText);
+                                    tutorialText[1][3] = L.T(0, "Tutorial:ProgramStatus", "ffprobe", Global.generator.progressText);
                                     freiorDownloadWorker = new BackgroundWorker();
                                     freiorDownloadWorker.DoWork += (object? sender, DoWorkEventArgs e) => {
                                         DownloadFFmpegThread();
@@ -994,15 +995,15 @@ namespace NonsensicalVideoGenerator
                         client.DownloadProgressChanged += (sender, e) => {
                             downloading = true;
                             Global.generator.progressText = L.T(0, "Tutorial:StatusDownload", e.ProgressPercentage.ToString(CultureInfo.InvariantCulture)) + " (" + (downloads+1) + "/" + totalDownloads + ")";
-                            tutorialText[1][3] = L.T(0, "Tutorial:ProgramStatus", "ffmpeg", Global.generator.progressText);
-                            tutorialText[1][4] = L.T(0, "Tutorial:ProgramStatus", "ffprobe", Global.generator.progressText);
+                            tutorialText[1][2] = L.T(0, "Tutorial:ProgramStatus", "ffmpeg", Global.generator.progressText);
+                            tutorialText[1][3] = L.T(0, "Tutorial:ProgramStatus", "ffprobe", Global.generator.progressText);
                         };
                         client.DownloadFileCompleted += (sender, e) => {
                             downloading = false;
                             extracting = true;
                             Global.generator.progressText = L.T(0, "Tutorial:ProgramExtracting") + " (" + (downloads+1) + "/" + totalDownloads + ")";
-                            tutorialText[1][3] = L.T(0, "Tutorial:ProgramStatus", "ffmpeg", Global.generator.progressText);
-                            tutorialText[1][4] = L.T(0, "Tutorial:ProgramStatus", "ffprobe", Global.generator.progressText);
+                            tutorialText[1][2] = L.T(0, "Tutorial:ProgramStatus", "ffmpeg", Global.generator.progressText);
+                            tutorialText[1][3] = L.T(0, "Tutorial:ProgramStatus", "ffprobe", Global.generator.progressText);
                             freiorDownloadWorker = new BackgroundWorker();
                             freiorDownloadWorker.DoWork += (object? sender, DoWorkEventArgs e) => {
                                 DownloadFrei0rThread();
@@ -1052,7 +1053,7 @@ namespace NonsensicalVideoGenerator
                 dependencyWorker.RunWorkerAsync();
                 extracting = false;
                 downloading = false;
-                Global.generator.progressText = L.T(0, "Failed to download.");
+                Global.generator.progressText = L.T(0, "Tutorial:StatusFailDownload");
                 GlobalContent.GetSound("Error").Play(int.Parse(SaveData.saveValues["SoundEffectVolume"], CultureInfo.InvariantCulture) / 100f, 0f, 0f);
             }
         }
@@ -1166,7 +1167,7 @@ namespace NonsensicalVideoGenerator
             }
             else
             {
-                Global.generator.progressText = L.T(0, "Failed to download.");
+                Global.generator.progressText = L.T(0, "Tutorial:StatusFailDownload");
                 GlobalContent.GetSound("Error").Play(int.Parse(SaveData.saveValues["SoundEffectVolume"], CultureInfo.InvariantCulture) / 100f, 0f, 0f);
             }
         }

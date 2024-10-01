@@ -1,7 +1,7 @@
 function Query(localeName, localizationTokens)
     local localizedOption1 = localizationTokens["Addons:StockVocoderOption1"] or "Vocoder"
-    local localizedOption2 = localizationTokens["Addons:StockVocoderOption2"] or "Vocoder"
-    local localizedOption3 = localizationTokens["Addons:StockVocoderOption3"] or "Vocoder"
+    local localizedOption2 = localizationTokens["Addons:StockVocoderOption2"] or "Makes speech sound cool."
+    local localizedOption3 = localizationTokens["Addons:StockVocoderOption3"] or "Carrier sounds for Vocoder effect."
     return {
         ["settings"] = {
             {
