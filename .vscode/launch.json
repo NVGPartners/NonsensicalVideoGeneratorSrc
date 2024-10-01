@@ -6,9 +6,20 @@
             "type": "coreclr",
             "request": "launch",
             "preLaunchTask": "build",
-            "program": "${workspaceFolder}/bin/x64/debug/net6.0-windows/NonsensicalVideoGenerator.dll",
+            "program": "${workspaceFolder}/bin/x64/debug/net8.0-windows/NonsensicalVideoGenerator.dll",
             "args": ["-nopath"],
-            "cwd": "${workspaceFolder}/bin/x64/debug/net6.0-windows",
+            "cwd": "${workspaceFolder}/bin/x64/debug/net8.0-windows",
+            "console": "internalConsole",
+            "stopAtEntry": false
+        },
+        {
+            "name": "Build and Launch (Release WindowsDX)",
+            "type": "coreclr",
+            "request": "launch",
+            "preLaunchTask": "publish",
+            "program": "${workspaceFolder}/bin/x64/release/net8.0-windows/NonsensicalVideoGenerator.dll",
+            "args": ["-nopath"],
+            "cwd": "${workspaceFolder}/bin/x64/release/net8.0-windows",
             "console": "internalConsole",
             "stopAtEntry": false
         },
@@ -18,38 +29,5 @@
             "request": "attach",
             "processId": "${command:pickProcess}",
         },
-        {
-            "name": "Build and Launch (Debug DesktopGL)",
-            "type": "coreclr",
-            "request": "launch",
-            "preLaunchTask": "buildgl",
-            "program": "${workspaceFolder}/bin/x64/debug/net6.0-windows/NonsensicalVideoGenerator.dll",
-            "args": [],
-            "cwd": "${workspaceFolder}/bin/x64/debug/net6.0-windows",
-            "console": "internalConsole",
-            "stopAtEntry": false
-        },
-        {
-            "name": "Build and Launch (Release WindowsDX)",
-            "type": "coreclr",
-            "request": "launch",
-            "preLaunchTask": "publish",
-            "program": "${workspaceFolder}/bin/x64/release/net6.0-windows/NonsensicalVideoGenerator.dll",
-            "args": [],
-            "cwd": "${workspaceFolder}/bin/x64/release/net6.0-windows",
-            "console": "internalConsole",
-            "stopAtEntry": false
-        },
-        {
-            "name": "Build and Launch (Release DesktopGL)",
-            "type": "coreclr",
-            "request": "launch",
-            "preLaunchTask": "publishgl",
-            "program": "${workspaceFolder}/bin/x64/release/net6.0-windows/NonsensicalVideoGenerator.dll",
-            "args": [],
-            "cwd": "${workspaceFolder}/bin/x64/release/net6.0-windows",
-            "console": "internalConsole",
-            "stopAtEntry": false
-        }
     ]
 }

@@ -25,62 +25,6 @@
 /processorParam:TextureFormat=Color
 /build:blog/banner.png
 
-#begin fonts/lanapixel-x1.spritefont
-/importer:FontDescriptionImporter
-/processor:FontDescriptionProcessor
-/processorParam:PremultiplyAlpha=True
-/processorParam:TextureFormat=Compressed
-/build:fonts/lanapixel-x1.spritefont
-
-#begin fonts/lanapixel-x2.spritefont
-/importer:FontDescriptionImporter
-/processor:FontDescriptionProcessor
-/processorParam:PremultiplyAlpha=True
-/processorParam:TextureFormat=Compressed
-/build:fonts/lanapixel-x2.spritefont
-
-#begin fonts/lanapixel-x3.spritefont
-/importer:FontDescriptionImporter
-/processor:FontDescriptionProcessor
-/processorParam:PremultiplyAlpha=True
-/processorParam:TextureFormat=Compressed
-/build:fonts/lanapixel-x3.spritefont
-
-#begin fonts/lanapixel-x4.spritefont
-/importer:FontDescriptionImporter
-/processor:FontDescriptionProcessor
-/processorParam:PremultiplyAlpha=True
-/processorParam:TextureFormat=Compressed
-/build:fonts/lanapixel-x4.spritefont
-
-#begin fonts/munro-narrow-x1.spritefont
-/importer:FontDescriptionImporter
-/processor:FontDescriptionProcessor
-/processorParam:PremultiplyAlpha=True
-/processorParam:TextureFormat=Compressed
-/build:fonts/munro-narrow-x1.spritefont
-
-#begin fonts/munro-narrow-x2.spritefont
-/importer:FontDescriptionImporter
-/processor:FontDescriptionProcessor
-/processorParam:PremultiplyAlpha=True
-/processorParam:TextureFormat=Compressed
-/build:fonts/munro-narrow-x2.spritefont
-
-#begin fonts/munro-narrow-x3.spritefont
-/importer:FontDescriptionImporter
-/processor:FontDescriptionProcessor
-/processorParam:PremultiplyAlpha=True
-/processorParam:TextureFormat=Compressed
-/build:fonts/munro-narrow-x3.spritefont
-
-#begin fonts/munro-narrow-x4.spritefont
-/importer:FontDescriptionImporter
-/processor:FontDescriptionProcessor
-/processorParam:PremultiplyAlpha=True
-/processorParam:TextureFormat=Compressed
-/build:fonts/munro-narrow-x4.spritefont
-
 #begin fonts/munro-small-x1.spritefont
 /importer:FontDescriptionImporter
 /processor:FontDescriptionProcessor
@@ -284,6 +228,18 @@
 /processorParam:MakeSquare=False
 /processorParam:TextureFormat=Color
 /build:graphics/actions/playlast.png
+
+#begin graphics/actions/reload.png
+/importer:TextureImporter
+/processor:TextureProcessor
+/processorParam:ColorKeyColor=255,0,255,255
+/processorParam:ColorKeyEnabled=True
+/processorParam:GenerateMipmaps=False
+/processorParam:PremultiplyAlpha=True
+/processorParam:ResizeToPowerOfTwo=False
+/processorParam:MakeSquare=False
+/processorParam:TextureFormat=Color
+/build:graphics/actions/reload.png
 
 #begin graphics/actions/render.png
 /importer:TextureImporter
@@ -1053,18 +1009,6 @@
 /processorParam:TextureFormat=Color
 /build:graphics/vidwindow.png
 
-#begin music/bugcrusher.ogg
-/importer:OggImporter
-/processor:SongProcessor
-/processorParam:Quality=Best
-/build:music/bugcrusher.ogg
-
-#begin music/mystery.ogg
-/importer:OggImporter
-/processor:SongProcessor
-/processorParam:Quality=Best
-/build:music/mystery.ogg
-
 #begin music/theme1.ogg
 /importer:OggImporter
 /processor:SongProcessor
@@ -1317,18 +1261,6 @@
 /processorParam:TextureFormat=Color
 /build:themes/birthday/graphics/icon.png
 
-#begin themes/birthday/graphics/iconmask.png
-/importer:TextureImporter
-/processor:TextureProcessor
-/processorParam:ColorKeyColor=255,0,255,255
-/processorParam:ColorKeyEnabled=True
-/processorParam:GenerateMipmaps=False
-/processorParam:PremultiplyAlpha=True
-/processorParam:ResizeToPowerOfTwo=False
-/processorParam:MakeSquare=False
-/processorParam:TextureFormat=Color
-/build:themes/birthday/graphics/iconmask.png
-
 #begin themes/birthday/graphics/interactiveswitchon.png
 /importer:TextureImporter
 /processor:TextureProcessor
@@ -1425,18 +1357,6 @@
 /processorParam:TextureFormat=Color
 /build:themes/birthday/graphics/logo.png
 
-#begin themes/birthday/graphics/logomask.png
-/importer:TextureImporter
-/processor:TextureProcessor
-/processorParam:ColorKeyColor=255,0,255,255
-/processorParam:ColorKeyEnabled=True
-/processorParam:GenerateMipmaps=False
-/processorParam:PremultiplyAlpha=True
-/processorParam:ResizeToPowerOfTwo=False
-/processorParam:MakeSquare=False
-/processorParam:TextureFormat=Color
-/build:themes/birthday/graphics/logomask.png
-
 #begin themes/birthday/graphics/menuselected.png
 /importer:TextureImporter
 /processor:TextureProcessor
@@ -1532,18 +1452,6 @@
 /processorParam:MakeSquare=False
 /processorParam:TextureFormat=Color
 /build:themes/birthday/graphics/misclick/5.png
-
-#begin themes/birthday/graphics/misclick/6.png
-/importer:TextureImporter
-/processor:TextureProcessor
-/processorParam:ColorKeyColor=255,0,255,255
-/processorParam:ColorKeyEnabled=True
-/processorParam:GenerateMipmaps=False
-/processorParam:PremultiplyAlpha=True
-/processorParam:ResizeToPowerOfTwo=False
-/processorParam:MakeSquare=False
-/processorParam:TextureFormat=Color
-/build:themes/birthday/graphics/misclick/6.png
 
 #begin themes/birthday/graphics/tile.png
 /importer:TextureImporter

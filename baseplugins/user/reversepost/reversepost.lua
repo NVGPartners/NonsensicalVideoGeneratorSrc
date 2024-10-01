@@ -52,7 +52,7 @@ function StartGeneration(options, pluginSettings, functions)
     if forwardNormal then
         -- Reverse effect
         -- Invoke-Command -ScriptBlock {&$ffmpeg -i "$video" -vf reverse -af areverse -preset veryfast -y "$output"}
-        functions.runFFmpeg("-i \"" .. options.inputVideo .. "\" -vf reverse -af areverse -preset veryfast -y \"" .. options.outputVideo .. "\"")
+        functions.runFFmpeg("-i \"" .. options.inputVideo .. "\" -vcodec libx264 -crf 28 -preset ultrafast -ac 2 -c:a aac -b:a 160k -reset_timestamps 1 -shortest -fflags +genpts -af \"aresample=async=1000\" -vf reverse -af areverse -y \"" .. options.outputVideo .. "\"")
     else
         -- Forward-reverse effect
         -- Invoke-Command -ScriptBlock {&$ffprobe -v error -show_entries format=duration -of default=noprint_wrappers=1:nokey=1 "$video"}
@@ -67,13 +67,13 @@ function PostCommand(commandindex, outputresult, errorresult, options, pluginSet
             length = tonumber(outputresult)
             halfLength = length / 2
             -- Invoke-Command -ScriptBlock {&$ffmpeg -i "$video" -t $halfLength -preset veryfast -y "$temp2"}
-            functions.runFFmpeg("-i \"" .. options.inputVideo .. "\" -t " .. halfLength .. " -preset veryfast -y \"" .. temp2 .. "\"")
+            functions.runFFmpeg("-i \"" .. options.inputVideo .. "\" -t " .. halfLength .. " -vcodec libx264 -crf 28 -preset ultrafast -ac 2 -c:a aac -b:a 160k -reset_timestamps 1 -shortest -fflags +genpts -af \"aresample=async=1000\" -y \"" .. temp2 .. "\"")
         elseif commandindex == 2 then
             -- Invoke-Command -ScriptBlock {&$ffmpeg -i "$temp2" -vf reverse -af areverse -preset veryfast -y "$temp3"}
-            functions.runFFmpeg("-i \"" .. temp2 .. "\" -vf reverse -af areverse -preset veryfast -y \"" .. temp3 .. "\"")
+            functions.runFFmpeg("-i \"" .. temp2 .. "\" -vf reverse -af \"areverse,aresample=async=1000\" -vcodec libx264 -crf 28 -preset ultrafast -ac 2 -c:a aac -b:a 160k -reset_timestamps 1 -shortest -fflags +genpts -y \"" .. temp3 .. "\"")
         elseif commandindex == 3 then
             -- Invoke-Command -ScriptBlock {&$ffmpeg -i "$temp2" -i "$temp3" -filter_complex "[0:v:0][0:a:0][1:v:0][1:a:0]concat=n=2:v=1:a=1[v][a]" -map "[v]" -map "[a]" -preset veryfast -y "$output"}
-            functions.runFFmpeg("-i \"" .. temp2 .. "\" -i \"" .. temp3 .. "\" -filter_complex \"[0:v:0][0:a:0][1:v:0][1:a:0]concat=n=2:v=1:a=1[v][a]\" -map \"[v]\" -map \"[a]\" -preset veryfast -y \"" .. options.outputVideo .. "\"")
+            functions.runFFmpeg("-i \"" .. temp2 .. "\" -i \"" .. temp3 .. "\" -filter_complex \"[0:v:0][0:a:0][1:v:0][1:a:0]concat=n=2:v=1:a=1[v][a];[a]aresample=async=1000[outa]\" -map \"[v]\" -map \"[outa]\" -vcodec libx264 -crf 28 -preset ultrafast -ac 2 -c:a aac -b:a 160k -reset_timestamps 1 -shortest -fflags +genpts -y \"" .. options.outputVideo .. "\"")
         end
     end
 end

@@ -37,7 +37,6 @@ namespace NonsensicalVideoGenerator
         public static bool useSystemFFprobe = false;
         public static bool useSystemMagick = false;
         public static bool useSystemYtDlp = false;
-        public static bool useSystemFrei0r = false;
         public static string editing = "";
         public static AppId_t appId = new(2516360);
         public static string videoTitle = "Render1";
@@ -52,9 +51,40 @@ namespace NonsensicalVideoGenerator
         public static bool imageLibraryAvailable = false;
         public static bool imageLibraryAvailableInternal = true;
         public static int randomSeed = 0;
-        public static Vector2 drawOffset = new(0, 0);
         public static int waitReady = int.MaxValue;
         public static bool selectLanguage = false;
         public static bool disableConsents = true;
+        
+        // Aspect ratio functions
+        public static (int, int) ConvertToFraction(double aspectRatio, double tolerance = 0.01)
+        {
+            int numerator = 1;
+            int denominator = 1;
+
+            while (Math.Abs((double)numerator / denominator - aspectRatio) > tolerance)
+            {
+                if ((double)numerator / denominator < aspectRatio)
+                    numerator++;
+                else
+                    denominator++;
+            }
+
+            // Simplify the fraction
+            int gcd = GCD(numerator, denominator);
+            numerator /= gcd;
+            denominator /= gcd;
+
+            return (numerator, denominator);
+        }
+        public static int GCD(int a, int b)
+        {
+            while (b != 0)
+            {
+                int temp = b;
+                b = a % b;
+                a = temp;
+            }
+            return a;
+        }
     }
 }

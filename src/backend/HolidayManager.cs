@@ -43,7 +43,7 @@ namespace NonsensicalVideoGenerator
                 return true;
             return false;
         }
-        public Holiday(string internalName = "", string name = "", int priority = 0, bool enabled = false, Theme theme = null, SimpleDateTime start = null, SimpleDateTime end = null)
+        public Holiday(string internalName = "", string name = "", int priority = 0, bool enabled = false, Theme? theme = null, SimpleDateTime? start = null, SimpleDateTime? end = null)
         {
             InternalName = internalName;
             Name = name;
@@ -94,25 +94,17 @@ namespace NonsensicalVideoGenerator
         };
         public static void SetHoliday(Holiday? holiday = null)
         {
-            if(holiday == null)
-            {
-                CurrentHoliday = null;
-                DefaultThemes.defaultTheme = DefaultThemes.Nonsensical;
-                ThemeManager.activeTheme = DefaultThemes.Nonsensical;
-                return;
-            }
-            ConsoleOutput.WriteLine($"Holiday: {holiday.Name}", Color.Yellow);
+            if(SaveData.saveValues["DisableHolidays"] == "true")
+                holiday = null;
             CurrentHoliday = holiday;
-            if(holiday.Theme != null)
-            {
-                DefaultThemes.defaultTheme = holiday.Theme;
-                ThemeManager.activeTheme = holiday.Theme;
-            }
+            ConsoleOutput.WriteLine($"Holiday: {(holiday != null ? holiday.Name : "None")}", Color.Yellow);
+            DefaultThemes.defaultTheme = holiday != null ? holiday.Theme : DefaultThemes.Nonsensical;
+            ThemeManager.activeTheme = holiday != null ? holiday.Theme : DefaultThemes.Nonsensical;
         }
         public static void CheckHolidays()
         {
             // Respect priority.
-            Holiday newHoliday = new();
+            Holiday? newHoliday = new();
             foreach(Holiday holiday in Holidays)
             {
                 if(holiday.CheckDate())
@@ -123,10 +115,9 @@ namespace NonsensicalVideoGenerator
                     }
                 }
             }
-            if(newHoliday.Name != "")
-            {
-                SetHoliday(newHoliday);
-            }
+            if(newHoliday.Name == "")
+                newHoliday = null;
+            SetHoliday(newHoliday);
         }
     }
 }

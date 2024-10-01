@@ -1,9 +1,7 @@
-#if MONOGAME
 using System;
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.IO;
-using System.IO.Compression;
 using System.Net;
 using System.Reflection;
 using Microsoft.Xna.Framework;
@@ -16,6 +14,7 @@ using MonoGame.Extended.Tweening;
 using System.Diagnostics;
 using System.Globalization;
 using SharpCompress.Archives.SevenZip;
+using SharpCompress.Archives.Zip;
 using SharpCompress.Archives;
 using SharpCompress.Common;
 
@@ -39,7 +38,10 @@ namespace NonsensicalVideoGenerator
         private bool check = false;
         private bool extracting = false;
         private bool downloading = false;
-        private string zip = "ffmpeg-6.1.1-essentials_build.7z";
+        private string zip = "ffmpeg-7.0.2-full_build.7z";
+        private string frie0r = "frei0r-v2.3.3_win64.zip";
+        private int totalDownloads = 2;
+        private int downloads = 0;
         public Vector2 offset = new(0, 0);
         private readonly Tweener tween = new();
         private readonly InteractableController controller = new();
@@ -270,56 +272,38 @@ namespace NonsensicalVideoGenerator
             new List<string>()
             { // PAGE 1
                 "Tutorial:Page1_0",
-                " ",
                 "Tutorial:Page1_1",
                 "Tutorial:Page1_2",
-                "",
+                " ",
                 "Tutorial:Page1_3",
                 "%FFMPEGNAME%",
                 "%FFPROBENAME%",
                 " ",
                 "Tutorial:Page1_4",
-                " ",
-                "Tutorial:Page1_5",
-                " ",
-                " ",
-                " ",
-                " ",
-                " ",
-                "Tutorial:Page1_7"
+                "Tutorial:Page1_7",
             },
             new List<string>()
             { // PAGE 2
                 "Tutorial:Page2_0",
-                " ",
                 "Tutorial:Page2_1",
                 "%FFMPEGSTATUS%",
                 "%FFPROBESTATUS%",
                 " ",
-                " ",
-                " ",
-                " ",
-                " ",
                 "Tutorial:Page2_3",
-                " ",
                 "Tutorial:Page2_4",
-                " ",
-                "Tutorial:Page2_5"
+                "Tutorial:Page2_5",
             },
             new List<string>()
             { // PAGE 3
                 "Tutorial:Page3_0",
-                " ",
                 "Tutorial:Page3_1",
                 "Tutorial:Page3_2",
-                " ",
                 "Tutorial:Page3_3",
                 " ",
                 "Tutorial:Page3_4",
                 "Tutorial:Page3_5",
                 "Tutorial:Page3_6",
-                " ",
-                "Tutorial:Page3_7"
+                "Tutorial:Page3_7",
             },
             new List<string>()
             { // PLUGIN CONSENT FORM
@@ -343,7 +327,7 @@ namespace NonsensicalVideoGenerator
             // End existing spritebatch
             spriteBatch.End();
             // Use offset
-            spriteBatch.Begin(SpriteSortMode.Deferred, BlendState.AlphaBlend, SamplerState.PointClamp, null, null, null, Matrix.CreateTranslation(GlobalGraphics.Scale(Global.drawOffset.X)+offset.X, GlobalGraphics.Scale(Global.drawOffset.Y)+offset.Y, 0));
+            spriteBatch.Begin(SpriteSortMode.Deferred, BlendState.AlphaBlend, SamplerState.PointClamp, null, null, null, Matrix.CreateTranslation(GlobalGraphics.Scale(GlobalGraphics.drawOffset.X)+offset.X, GlobalGraphics.Scale(GlobalGraphics.drawOffset.Y)+offset.Y, 0));
             // Tutorial window
             Texture2D tutorialWindow = GlobalContent.GetTexture("TutorialWindow");
             spriteBatch.Draw(tutorialWindow, new Rectangle(GlobalGraphics.Scale(8), GlobalGraphics.Scale(36), GlobalGraphics.Scale(tutorialWindow.Width), GlobalGraphics.Scale(tutorialWindow.Height)), Color.White);
@@ -372,17 +356,13 @@ namespace NonsensicalVideoGenerator
                 {
                     string curText = tutorialText[i][j].Replace("%FFMPEGNAME%", L.T(0, "Tutorial:ProgramName", "ffmpeg"));
                     curText = curText.Replace("%FFPROBENAME%", L.T(0, "Tutorial:ProgramName", "ffprobe"));
-                    curText = curText.Replace("%MAGICKNAME%", L.T(0, "Tutorial:ProgramName", "magick"));
-                    curText = curText.Replace("%FREI0RNAME%", L.T(0, "Tutorial:ProgramName", "frei0r plugins"));
                     curText = curText.Replace("%FFMPEGSTATUS%", L.T(0, "Tutorial:ProgramStatus", "ffmpeg", L.T(0, "Tutorial:ProgramChecking")));
                     curText = curText.Replace("%FFPROBESTATUS%", L.T(0, "Tutorial:ProgramStatus", "ffprobe", L.T(0, "Tutorial:ProgramChecking")));
-                    curText = curText.Replace("%MAGICKSTATUS%", L.T(0, "Tutorial:ProgramStatus", "magick", L.T(0, "Tutorial:ProgramChecking")));
-                    curText = curText.Replace("%FREI0RSTATUS%", L.T(0, "Tutorial:ProgramStatus", "frei0r plugins", L.T(0, "Tutorial:ProgramChecking")));
                     if(curText.StartsWith("Tutorial:"))
                         curText = L.T(0, curText);
                     GlobalContent.DrawString(spriteBatch, L.FontSmall(), curText, new Vector2(GlobalGraphics.Scale(8+16+1+320*i), GlobalGraphics.Scale(60+offsetText+1)), Color.Black);
                     GlobalContent.DrawString(spriteBatch, L.FontSmall(), curText, new Vector2(GlobalGraphics.Scale(8+16+320*i), GlobalGraphics.Scale(60+offsetText)), Color.White);
-                    offsetText += 8;
+                    offsetText += 16;
                 }
             }
             // End offset spritebatch
@@ -391,7 +371,7 @@ namespace NonsensicalVideoGenerator
             spriteBatch.Begin(SpriteSortMode.Deferred,
                 BlendState.AlphaBlend,
                 SamplerState.PointClamp,
-                null, null, null, Matrix.CreateTranslation(GlobalGraphics.Scale(Global.drawOffset.X), GlobalGraphics.Scale(Global.drawOffset.Y), 0));
+                null, null, null, Matrix.CreateTranslation(GlobalGraphics.Scale(GlobalGraphics.drawOffset.X), GlobalGraphics.Scale(GlobalGraphics.drawOffset.Y), 0));
         }
         private BackgroundWorker? dependencyWorker;
         private void DependencyCheckThread(object? sender, DoWorkEventArgs e)
@@ -408,8 +388,6 @@ namespace NonsensicalVideoGenerator
                     string localizedWrongVersion = L.T(0, "Tutorial:ProgramWrongVersion");
                     string ffmpeg = UpdateManager.ffmpegInstalled ? localizedInstalled : localizedNotFound;
                     string ffprobe = UpdateManager.ffprobeInstalled ? localizedInstalled : localizedNotFound;
-                    string magick = UpdateManager.imagemagickInstalled ? localizedInstalled : localizedNotFound;
-                    string frei0r = UpdateManager.frei0rInstalled ? localizedInstalled : localizedNotFound;
                     if(Global.useSystemFFmpeg)
                     {
                         if(!UpdateManager.ffmpegInstalled)
@@ -437,24 +415,8 @@ namespace NonsensicalVideoGenerator
                         // Remove ffmpeg button
                         controller.Remove("ButtonFFmpeg");
                     }
-                    if(Global.useSystemMagick)
-                    {
-                        if(!UpdateManager.imagemagickInstalled)
-                            magick = localizedNotFound;
-                        else
-                            magick = localizedUsingSystemPath;
-                    }
-                    if(Global.useSystemFrei0r)
-                    {
-                        if(!UpdateManager.frei0rInstalled)
-                            frei0r = localizedNotFound;
-                        else
-                            frei0r = localizedUsingSystemPath;
-                    }
                     tutorialText[h][j] = tutorialText[h][j].Replace("%FFMPEGSTATUS%", L.T(0, "Tutorial:ProgramStatus", "ffmpeg", ffmpeg));
                     tutorialText[h][j] = tutorialText[h][j].Replace("%FFPROBESTATUS%", L.T(0, "Tutorial:ProgramStatus", "ffprobe", ffprobe));
-                    tutorialText[h][j] = tutorialText[h][j].Replace("%MAGICKSTATUS%", L.T(0, "Tutorial:ProgramStatus", "magick", magick));
-                    tutorialText[h][j] = tutorialText[h][j].Replace("%FREI0RSTATUS%", L.T(0, "Tutorial:ProgramStatus", "frei0r plugins", frei0r));
                 }
             }
             check = false;
@@ -465,6 +427,7 @@ namespace NonsensicalVideoGenerator
         }
         private bool check3 = false;
         private BackgroundWorker? ffmpegDownloadWorker;
+        private BackgroundWorker? freiorDownloadWorker;
         public bool PreviousPage1(int i, string n)
         {
             switch(i)
@@ -564,21 +527,21 @@ namespace NonsensicalVideoGenerator
                             {
                                 client.DownloadProgressChanged += (sender, e) => {
                                     downloading = true;
-                                    Global.generator.progressText = L.T(0, "Tutorial:StatusDownload", e.ProgressPercentage.ToString(CultureInfo.InvariantCulture));
+                                    Global.generator.progressText = L.T(0, "Tutorial:StatusDownload", e.ProgressPercentage.ToString(CultureInfo.InvariantCulture)) + " (" + (downloads+1) + "/" + totalDownloads + ")";
                                     tutorialText[1][3] = L.T(0, "Tutorial:ProgramStatus", "ffmpeg", Global.generator.progressText);
                                     tutorialText[1][4] = L.T(0, "Tutorial:ProgramStatus", "ffprobe", Global.generator.progressText);
                                 };
                                 client.DownloadFileCompleted += (sender, e) => {
                                     downloading = false;
                                     extracting = true;
-                                    Global.generator.progressText = L.T(0, "Tutorial:ProgramExtracting");
+                                    Global.generator.progressText = L.T(0, "Tutorial:ProgramExtracting") + " (" + (downloads+1) + "/" + totalDownloads + ")";
                                     tutorialText[1][3] = L.T(0, "Tutorial:ProgramStatus", "ffmpeg", Global.generator.progressText);
                                     tutorialText[1][4] = L.T(0, "Tutorial:ProgramStatus", "ffprobe", Global.generator.progressText);
-                                    ffmpegDownloadWorker = new BackgroundWorker();
-                                    ffmpegDownloadWorker.DoWork += (object? sender, DoWorkEventArgs e) => {
+                                    freiorDownloadWorker = new BackgroundWorker();
+                                    freiorDownloadWorker.DoWork += (object? sender, DoWorkEventArgs e) => {
                                         DownloadFFmpegThread();
                                     };
-                                    ffmpegDownloadWorker.RunWorkerAsync();
+                                    freiorDownloadWorker.RunWorkerAsync();
                                 };
                                 client.DownloadFileAsync(url, path);
                             }
@@ -921,9 +884,9 @@ namespace NonsensicalVideoGenerator
                     }
                 }
             }
-            catch
+            catch(Exception e)
             {
-                ConsoleOutput.WriteLine("Failed to extract zip", Color.Red);
+                ConsoleOutput.WriteLine("Failed to extract zip: " + e.Message, Color.Red);
             }
 
             string ffmpegPath = "";
@@ -1010,6 +973,174 @@ namespace NonsensicalVideoGenerator
                 }
             }
 
+            // Continue to next download
+            if(ffmpegExePath != "" && ffprobeExePath != "")
+            {
+                downloads += 1;
+                // Download frei0r!!!
+                Uri freiorUrl = new("https://github.com/dyne/frei0r/releases/download/v2.3.3/"+frie0r);
+                string freiorPath = Path.Combine(Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location) ?? ".", "temp", frie0r);
+
+                // Delete file if it exists
+                if(File.Exists(Path.Combine(Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location) ?? ".", "temp", frie0r)))
+                {
+                    File.Delete(Path.Combine(Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location) ?? ".", "temp", frie0r));
+                }
+
+                try
+                {
+                    using (WebClient client = new WebClient())
+                    {
+                        client.DownloadProgressChanged += (sender, e) => {
+                            downloading = true;
+                            Global.generator.progressText = L.T(0, "Tutorial:StatusDownload", e.ProgressPercentage.ToString(CultureInfo.InvariantCulture)) + " (" + (downloads+1) + "/" + totalDownloads + ")";
+                            tutorialText[1][3] = L.T(0, "Tutorial:ProgramStatus", "ffmpeg", Global.generator.progressText);
+                            tutorialText[1][4] = L.T(0, "Tutorial:ProgramStatus", "ffprobe", Global.generator.progressText);
+                        };
+                        client.DownloadFileCompleted += (sender, e) => {
+                            downloading = false;
+                            extracting = true;
+                            Global.generator.progressText = L.T(0, "Tutorial:ProgramExtracting") + " (" + (downloads+1) + "/" + totalDownloads + ")";
+                            tutorialText[1][3] = L.T(0, "Tutorial:ProgramStatus", "ffmpeg", Global.generator.progressText);
+                            tutorialText[1][4] = L.T(0, "Tutorial:ProgramStatus", "ffprobe", Global.generator.progressText);
+                            freiorDownloadWorker = new BackgroundWorker();
+                            freiorDownloadWorker.DoWork += (object? sender, DoWorkEventArgs e) => {
+                                DownloadFrei0rThread();
+                            };
+                            freiorDownloadWorker.RunWorkerAsync();
+                        };
+                        client.DownloadFileAsync(freiorUrl, freiorPath);
+                    }
+                }
+                catch
+                {
+                    ConsoleOutput.WriteLine("Failed to download zip", Color.Red);
+                    // Re-scan for ffmpeg
+                    for(int h = 0; h < baseTutorialText.Length; h++)
+                    {
+                        tutorialText[h] = new List<string>();
+                        for(int j = 0; j < baseTutorialText[h].Count; j++)
+                        {
+                            tutorialText[h].Add(baseTutorialText[h][j]);
+                        }
+                    }
+                    downloading = false;
+                    extracting = false;
+                    check = true;
+                    dependencyWorker = new BackgroundWorker();
+                    dependencyWorker.DoWork += DependencyCheckThread;
+                    dependencyWorker.RunWorkerAsync();
+                    Global.generator.progressText = L.T(0, "Tutorial:StatusFailDownload");
+                    // Play sound effect
+                    GlobalContent.GetSound("Error").Play(int.Parse(SaveData.saveValues["SoundEffectVolume"], CultureInfo.InvariantCulture) / 100f, 0f, 0f);
+                }
+            }
+            else
+            {
+                // Re-scan for ffmpeg
+                for(int h = 0; h < baseTutorialText.Length; h++)
+                {
+                    tutorialText[h] = new List<string>();
+                    for(int j = 0; j < baseTutorialText[h].Count; j++)
+                    {
+                        tutorialText[h].Add(baseTutorialText[h][j]);
+                    }
+                }
+                check = true;
+                dependencyWorker = new BackgroundWorker();
+                dependencyWorker.DoWork += DependencyCheckThread;
+                dependencyWorker.RunWorkerAsync();
+                extracting = false;
+                downloading = false;
+                Global.generator.progressText = L.T(0, "Failed to download.");
+                GlobalContent.GetSound("Error").Play(int.Parse(SaveData.saveValues["SoundEffectVolume"], CultureInfo.InvariantCulture) / 100f, 0f, 0f);
+            }
+        }
+        public void DownloadFrei0rThread()
+        {
+            string path = Path.Combine(Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location) ?? ".", "temp", frie0r);
+
+            // Extract frei0r to temp folder
+            try
+            {
+                //ZipFile.ExtractToDirectory(path, Path.Combine(Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location) ?? ".", "temp"), true);
+                using(ZipArchive archive = ZipArchive.Open(path))
+                {
+                    foreach(ZipArchiveEntry entry in archive.Entries)
+                    {
+                        entry.WriteToDirectory(Path.Combine(Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location) ?? ".", "temp"), new ExtractionOptions
+                        {
+                            ExtractFullPath = true,
+                            Overwrite = true
+                        });
+                    }
+                }
+            }
+            catch(Exception e)
+            {
+                ConsoleOutput.WriteLine("Failed to extract zip: " + e.Message, Color.Red);
+            }
+
+            string freiorPath = "";
+            string freiorFilterPath = "";
+            
+            // Check to see if ffmpeg-*.*-release-build folder exists inside temp folder
+            string[] directories = Directory.GetDirectories(Path.Combine(Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location) ?? ".", "temp"));
+            foreach(string directory in directories)
+            {
+                if(directory.Contains("frei0r-"))
+                {
+                    freiorPath = directory;
+                    break;
+                }
+            }
+            
+            // Check to see if bin folder exists inside ffmpeg-*.*-release-build folder
+            if(freiorPath != "")
+            {
+                directories = Directory.GetDirectories(freiorPath);
+                foreach(string directory in directories)
+                {
+                    if(directory.Contains("filter"))
+                    {
+                        freiorFilterPath = directory;
+                        break;
+                    }
+                }
+            }
+
+            bool success = false;
+
+            // Check to see if ffmpeg.exe exists inside bin folder
+            if(freiorFilterPath != "")
+            {
+                string[] files = Directory.GetFiles(freiorFilterPath);
+                foreach(string file in files)
+                {
+                    // Move dll to .\frei0r-1
+                    string freior1 = Path.Combine(Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location) ?? ".", "frei0r-1");
+                    try
+                    {
+                        // Create frei0r-1 folder if it doesn't exist
+                        if(!Directory.Exists(freior1))
+                        {
+                            Directory.CreateDirectory(freior1);
+                        }
+                        // Delete dll files if they already exist
+                        if(File.Exists(Path.Combine(freior1, Path.GetFileName(file))))
+                        {
+                            File.Delete(Path.Combine(freior1, Path.GetFileName(file)));
+                        }
+                        File.Move(file, Path.Combine(freior1, Path.GetFileName(file)));
+                        success = true;
+                    }
+                    catch(Exception e)
+                    {
+                        ConsoleOutput.WriteLine("Failed to move frei0r plugins: " + e.Message, Color.Red);
+                    }
+                }
+            }
+
             // Re-scan for ffmpeg
             for(int h = 0; h < baseTutorialText.Length; h++)
             {
@@ -1025,8 +1156,10 @@ namespace NonsensicalVideoGenerator
             dependencyWorker.RunWorkerAsync();
             extracting = false;
             downloading = false;
+            downloads += 1;
+
             // Play sound effect
-            if(ffmpegExePath != "" && ffprobeExePath != "")
+            if(success)
             {
                 Global.generator.progressText = L.T(0, "Tutorial:StatusDownloadComplete");
                 GlobalContent.GetSound("RenderComplete").Play(int.Parse(SaveData.saveValues["SoundEffectVolume"], CultureInfo.InvariantCulture) / 100f, 0f, 0f);
@@ -1039,4 +1172,3 @@ namespace NonsensicalVideoGenerator
         }
     }
 }
-#endif

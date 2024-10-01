@@ -118,7 +118,6 @@ function StartGeneration(options, pluginSettings, functions)
 end
 
 function PostCommand(commandindex, outputresult, errorresult, options, pluginSettings, functions)
-    print(commandindex .. " " .. lastindex .. " " .. sfxcount)
     -- delay, spadinner, delay, spadinner, delay, spadinner, delay ...
     if commandindex == 1 then
         -- Get the length of the material
@@ -127,7 +126,7 @@ function PostCommand(commandindex, outputresult, errorresult, options, pluginSet
         -- outputResult is the duration of the material
         starttime = functions.randomDouble(0, tonumber(outputresult))
         -- Trim material to start at starttime and resize to options.width x options.height at 30 fps
-        functions.runFFmpeg("-ss " .. starttime .. " -i \"" .. material .. "\" -filter:v \"fps=30,scale=" .. options.width .. ":" .. options.height .. "\" -c:a copy -c:v libx264 -preset ultrafast -crf 0 -y \"" .. materialclip .. "\"")
+        functions.runFFmpeg("-ss " .. starttime .. " -i \"" .. material .. "\" -filter:v \"fps=30,scale=" .. options.width .. ":" .. options.height .. "\" -vcodec libx264 -crf 28 -preset ultrafast -ac 2 -c:a aac -b:a 160k -reset_timestamps 1 -shortest -fflags +genpts -af \"aresample=async=1000\" -y \"" .. materialclip .. "\"")
     elseif commandindex > 2 and commandindex <= sfxcount + 2 then
         -- Convert all spadinners to 44100hz, 224k bitrate, and mp3
         local index = commandindex - 2
@@ -154,7 +153,7 @@ function PostCommand(commandindex, outputresult, errorresult, options, pluginSet
         functions.runFFmpeg("-i \"concat:" .. concat .. "\" -acodec copy \"" .. combinedspadinner .. "\"")
     elseif commandindex-lastindex == sfxcount + 4 then
         -- Combine material and spadinner
-        functions.runFFmpeg("-async 30 -i \"" .. materialclip .. "\" -i \"" .. combinedspadinner .. "\" -filter_complex \"[0:a]volume=1[0a];[1:a]volume=1.5[1a];[0a][1a]amix=inputs=2:duration=shortest[out]\" -map \"[out]\" -map 0:v -shortest -c:v libx264 -preset ultrafast -crf 0 -y \"" .. options.outputVideo .. "\"")
+        functions.runFFmpeg("-async 30 -i \"" .. materialclip .. "\" -i \"" .. combinedspadinner .. "\" -filter_complex \"[0:a]volume=1[0a];[1:a]volume=1.5[1a];[0a][1a]amix=inputs=2:duration=shortest,aresample=async=1000[out]\" -map \"[out]\" -map 0:v -vcodec libx264 -crf 28 -preset ultrafast -ac 2 -c:a aac -b:a 160k -reset_timestamps 1 -shortest -fflags +genpts -y \"" .. options.outputVideo .. "\"")
     end
 end
 

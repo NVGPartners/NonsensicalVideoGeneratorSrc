@@ -148,9 +148,9 @@ duration 0.467
 ]]
         functions.fileWrite(concatdistort, concatstring)
         -- convert mp3 to wav
-        functions.runFFmpeg("-i \"" .. distortmusic .. "\" -acodec pcm_s16le -ac 2 -ar 44100 \"" .. music .. "\"")
+        functions.runFFmpeg("-i \"" .. distortmusic .. "\" -acodec pcm_s16le -ac 2 -ar 44100 -af \"aresample=async=1000\" -y \"" .. music .. "\"")
     elseif commandindex == 8+indexoffset then
-        functions.runFFmpeg("-f concat -i \"" .. concatdistort .. "\" -i \"" .. music .. "\" -c:v libx264 -c:a aac -pix_fmt yuv420p -preset veryfast -shortest -y \"" .. options.outputVideo .. "\"")
+        functions.runFFmpeg("-f concat -i \"" .. concatdistort .. "\" -i \"" .. music .. "\" -vcodec libx264 -crf 28 -preset ultrafast -ac 2 -c:a aac -b:a 160k -reset_timestamps 1 -shortest -fflags +genpts -af \"aresample=async=1000\" -y \"" .. options.outputVideo .. "\"")
     end
 end
 

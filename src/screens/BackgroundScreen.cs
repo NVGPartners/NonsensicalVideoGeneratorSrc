@@ -24,7 +24,7 @@ namespace NonsensicalVideoGenerator
         public int layer { get; set; } = 0;
         public int currentPlacement { get; set; } = -1;
         public ScreenType screenType { get; set; } = ScreenType.Hidden;
-        private static int totalCount = 1024;
+        private static int totalCount = 2048; // TODO: Calculate this based on screen size.
         private int scrollX = 0;
         private int scrollY = 0;
         private float counter = 360;
@@ -56,8 +56,8 @@ namespace NonsensicalVideoGenerator
             // I started off making this scroll from top right to bottom left.
             // Then I changed it to scroll in a circular motion.
             // Now it scrolls in some sort of zig-zag pattern.
-            scrollX = (-totalCount/4) - (int)(Math.Sin(counter * Math.PI / -90) * GlobalGraphics.width / 2);
-            scrollY = (-totalCount/4) - (int)(Math.Cos(counter * Math.PI / -180) * GlobalGraphics.height / 2);
+            scrollX = (-totalCount/4) - (int)(Math.Sin(counter * Math.PI / -90) * (GlobalGraphics.scaledWidth/GlobalGraphics.scale) / 2);
+            scrollY = (-totalCount/4) - (int)(Math.Cos(counter * Math.PI / -180) * (GlobalGraphics.scaledHeight/GlobalGraphics.scale) / 2);
             /*
             if(scrollX >= -GlobalGraphics.width-1)
                 scrollX = -totalCount + GlobalGraphics.width;
@@ -89,7 +89,7 @@ namespace NonsensicalVideoGenerator
         public void Draw(GameTime gameTime, SpriteBatch spriteBatch)
         {
             // Draw background with new hue.
-            spriteBatch.Draw(GlobalContent.GetTexture("Pixel"), new Rectangle(GlobalGraphics.Scale((int)-Global.drawOffset.X), GlobalGraphics.Scale((int)-Global.drawOffset.Y), (int)UserInterface.instance.preferredResolution.X, (int)UserInterface.instance.preferredResolution.Y), ThemeManager.GetColor("BackgroundScreen"));
+            spriteBatch.Draw(GlobalContent.GetTexture("Pixel"), new Rectangle(GlobalGraphics.Scale((int)-GlobalGraphics.drawOffset.X), GlobalGraphics.Scale((int)-GlobalGraphics.drawOffset.Y), (int)GlobalGraphics.preferredResolution.X, (int)GlobalGraphics.preferredResolution.Y), ThemeManager.GetColor("BackgroundScreen"));
             
             if(!bool.Parse(SaveData.saveValues["DisableMotion"]))
             {
@@ -104,8 +104,8 @@ namespace NonsensicalVideoGenerator
                 lerpMouseX = Math.Clamp(lerpMouseX, -GlobalGraphics.scaledWidth, GlobalGraphics.scaledWidth*2);
                 lerpMouseY = Math.Clamp(lerpMouseY, -GlobalGraphics.scaledHeight, GlobalGraphics.scaledHeight*2);
 
-                float mX = Global.drawOffset.X /*- lerpMouseX*/;
-                float mY = Global.drawOffset.Y /*- lerpMouseY*/;
+                float mX = GlobalGraphics.drawOffset.X /*- lerpMouseX*/;
+                float mY = GlobalGraphics.drawOffset.Y /*- lerpMouseY*/;
 
                 // Create matrix
                 Matrix matrix = Matrix.CreateTranslation(mX, mY, 0);
@@ -140,7 +140,7 @@ namespace NonsensicalVideoGenerator
                 spriteBatch.Begin(SpriteSortMode.Deferred,
                     BlendState.AlphaBlend,
                     SamplerState.PointClamp,
-                    null, null, null, Matrix.CreateTranslation(GlobalGraphics.Scale(Global.drawOffset.X), GlobalGraphics.Scale(Global.drawOffset.Y), 0));
+                    null, null, null, Matrix.CreateTranslation(GlobalGraphics.Scale(GlobalGraphics.drawOffset.X), GlobalGraphics.Scale(GlobalGraphics.drawOffset.Y), 0));
             }
         }
         public void LoadContent(ContentManager contentManager, GraphicsDevice graphicsDevice)

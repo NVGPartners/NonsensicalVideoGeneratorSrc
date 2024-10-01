@@ -47,7 +47,7 @@ namespace NonsensicalVideoGenerator
             Texture2D interactiveSwitchOn = GlobalContent.GetTexture("InteractiveSwitchOn");
             Texture2D interactiveSwitchOff = GlobalContent.GetTexture("InteractiveSwitchOff");
             SpriteFont munroSmall = L.FontSmall();
-            Texture2D pixel = GlobalContent.GetTexture("Pixel");
+            actionController.Draw(gameTime, spriteBatch);
             if(!editingSettings)
             {
                 // Draw scroll bar
@@ -63,10 +63,10 @@ namespace NonsensicalVideoGenerator
                 {
                     spriteBatch.End();
                     // Mask to specific area
-                    spriteBatch.GraphicsDevice.ScissorRectangle = new Rectangle(GlobalGraphics.Scale(135), GlobalGraphics.Scale(56), GlobalGraphics.Scale(293), GlobalGraphics.Scale(236)); 
+                    spriteBatch.GraphicsDevice.ScissorRectangle = new Rectangle((int)GlobalGraphics.Scale(GlobalGraphics.drawOffset.X+135), (int)GlobalGraphics.Scale(GlobalGraphics.drawOffset.Y+56), GlobalGraphics.Scale(293), GlobalGraphics.Scale(GlobalGraphics.preferredResolution.Y-56));
                     RasterizerState rasterizerState = new RasterizerState();
                     rasterizerState.ScissorTestEnable = true;
-                    spriteBatch.Begin(SpriteSortMode.Deferred, BlendState.AlphaBlend, SamplerState.PointClamp, null, rasterizerState, null, Matrix.CreateTranslation(GlobalGraphics.Scale(Global.drawOffset.X)+GlobalGraphics.Scale(cntscr.offset.X / GlobalGraphics.scale), GlobalGraphics.Scale(Global.drawOffset.Y)+GlobalGraphics.Scale((cntscr.offset.Y / GlobalGraphics.scale) + -scrollOffset), 0));
+                    spriteBatch.Begin(SpriteSortMode.Deferred, BlendState.AlphaBlend, SamplerState.PointClamp, null, rasterizerState, null, Matrix.CreateTranslation(GlobalGraphics.Scale(GlobalGraphics.drawOffset.X)+GlobalGraphics.Scale(cntscr.offset.X / GlobalGraphics.scale), GlobalGraphics.Scale(GlobalGraphics.drawOffset.Y)+GlobalGraphics.Scale((cntscr.offset.Y / GlobalGraphics.scale) + -scrollOffset), 0));
                 }
                 int plcount = PluginHandler.GetPluginCount();
                 int offsetpl = 0;
@@ -207,7 +207,7 @@ namespace NonsensicalVideoGenerator
                 GlobalContent.DrawString(spriteBatch, munroSmall, L.T(0, "Addons:AddonManagementButton"), new Vector2(GlobalGraphics.Scale(141), GlobalGraphics.Scale(58 + (plcount-offsetpl) * pluginEntry.Height + (plcount-offsetpl))), Color.White);
                 // End offset
                 spriteBatch.End();
-                spriteBatch.Begin(SpriteSortMode.Deferred, BlendState.AlphaBlend, SamplerState.PointClamp, null, null, null, Matrix.CreateTranslation(GlobalGraphics.Scale(Global.drawOffset.X), GlobalGraphics.Scale(Global.drawOffset.Y), 0));
+                spriteBatch.Begin(SpriteSortMode.Deferred, BlendState.AlphaBlend, SamplerState.PointClamp, null, null, null, Matrix.CreateTranslation(GlobalGraphics.Scale(GlobalGraphics.drawOffset.X), GlobalGraphics.Scale(GlobalGraphics.drawOffset.Y), 0));
             }
             else
             {
@@ -232,7 +232,6 @@ namespace NonsensicalVideoGenerator
             {
                 Global.tooltip = internalTooltip;
             }
-            actionController.Draw(gameTime, spriteBatch);
         }
         public bool Update(GameTime gameTime, bool handleInput)
         {
@@ -854,6 +853,7 @@ namespace NonsensicalVideoGenerator
                                                             {
                                                                 case 2: // left click
                                                                     GlobalContent.GetSound("Option").Play(int.Parse(SaveData.saveValues["SoundEffectVolume"], CultureInfo.InvariantCulture) / 100f, 0f, 0f);
+#if WINDOWSDX
                                                                     // Select png, jpg, or gif icon with file dialog
                                                                     System.Windows.Forms.OpenFileDialog fileDialog = new System.Windows.Forms.OpenFileDialog();
                                                                     fileDialog.Filter = "Joint Photographic Experts Group (*.jpg, *.jpeg)|*.jpg;*.jpeg";
@@ -877,6 +877,7 @@ namespace NonsensicalVideoGenerator
                                                                         ConsoleOutput.WriteLine("Publishing " + Path.GetFileName(PluginHandler.plugins[settingsIndex].path) + " with icon " + Path.GetFileName(fileDialog.FileName), Color.RoyalBlue);
                                                                         PluginHandler.PublishPlugin(PluginHandler.plugins[settingsIndex], selectedFlagsWorkshop, fileDialog.FileName);
                                                                     }
+#endif
                                                                     return true;
                                                             }
                                                             return false;
@@ -1035,10 +1036,22 @@ namespace NonsensicalVideoGenerator
             actionController.Clear();
             controller.Clear();
             controllerPluginCreation.Clear();
-            GlobalContent.AddTexture("PluginPage", ThemeManager.LoadLayeredContent<Texture2D>("graphics/pluginpage"));
             GlobalContent.AddTexture("PluginEntryBlank", ThemeManager.LoadLayeredContent<Texture2D>("graphics/pluginentryblank"));
             GlobalContent.AddTexture("PluginEntry", ThemeManager.LoadLayeredContent<Texture2D>("graphics/pluginentry"));
-            GlobalContent.AddTexture("ScrollHandle", ThemeManager.LoadLayeredContent<Texture2D>("graphics/scrollhandle"));
+            actionController.Add("ReloadPlugins", new ActionButton("Force reload all addons.", new Vector2(112, 176), (int i, string n) => {
+                switch(i)
+                {
+                    case 2: // left click
+                        GlobalContent.GetSound("Select").Play(int.Parse(SaveData.saveValues["SoundEffectVolume"], CultureInfo.InvariantCulture) / 100f, 0f, 0f);
+                        if(SteamManager.initialized)
+                            PluginHandler.LoadWorkshop();
+                        else
+                            PluginHandler.LoadPluginsThreaded();
+                        scrollOffset = 0;
+                        return true;
+                }
+                return false;
+            }, ThemeManager.LoadLayeredContent<Texture2D>("graphics/actions/reload")));
             actionController.Add("Filter", new ActionButton("Change the filter type in the addon list.", new Vector2(112, 191), (int i, string n) => {
                 switch(i)
                 {

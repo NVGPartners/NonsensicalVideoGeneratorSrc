@@ -16,9 +16,9 @@ namespace NonsensicalVideoGenerator
         }
         public static MouseState CompatMouseState()
         {
-            // Respect Global.drawOffset
-            int oX = GlobalGraphics.Scale((int)Global.drawOffset.X);
-            int oY = GlobalGraphics.Scale((int)Global.drawOffset.Y);
+            // Respect GlobalGraphics.drawOffset
+            int oX = GlobalGraphics.Scale((int)GlobalGraphics.drawOffset.X);
+            int oY = GlobalGraphics.Scale((int)GlobalGraphics.drawOffset.Y);
             MouseState overrideLastState = lastMouseState;
             MouseState overrideMouseState = _mouseState;
             if(Accessibility.allowAccessibility)

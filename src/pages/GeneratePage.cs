@@ -18,38 +18,25 @@ namespace NonsensicalVideoGenerator
     {
         public string Name { get; set; } = "PageGenerate";
         public string Tooltip { get; } = "Render a nonsensical video.";
+        private readonly ScrollView scrollView = new();
         private readonly InteractableController actionController = new();
-        private readonly InteractableController controller = new();
-        private readonly InteractableController controllerAdvanced = new();
+        private readonly InteractableController actionControllerRendering = new();
         private readonly InteractableController controllerRendering = new();
-        private readonly InteractableController controllerPage3 = new();
-        private int page = 0;
         public bool Update(GameTime gameTime, bool handleInput)
         {
-            if(actionController.Update(gameTime, handleInput))
-                return true;
             if(Global.generator.generatorActive)
             {
                 if(controllerRendering.Update(gameTime, handleInput))
                     return true;
+                if(actionControllerRendering.Update(gameTime, handleInput))
+                    return true;
             }
             else
             {
-                switch(page)
-                {
-                    case 0:
-                        if(controller.Update(gameTime, handleInput))
-                            return true;
-                        break;
-                    case 1:
-                        if(controllerAdvanced.Update(gameTime, handleInput))
-                            return true;
-                        break;
-                    case 2:
-                        if(controllerPage3.Update(gameTime, handleInput))
-                            return true;
-                        break;
-                }
+                if(scrollView.Update(gameTime, handleInput))
+                    return true;
+                if(actionController.Update(gameTime, handleInput))
+                    return true;
             }
             return false;
         }
@@ -70,86 +57,133 @@ namespace NonsensicalVideoGenerator
                 GlobalContent.DrawString(spriteBatch, font, text, new Vector2(GlobalGraphics.Scale(1) + GlobalGraphics.Scale(135) + (GlobalGraphics.Scale(306) - GlobalGraphics.Scale(135) - textSize.X) / 2, GlobalGraphics.Scale(1) + GlobalGraphics.Scale(58) + (GlobalGraphics.Scale(236) - GlobalGraphics.Scale(58) - textSize.Y) / 2), Color.Black);
                 GlobalContent.DrawString(spriteBatch, font, text, new Vector2(GlobalGraphics.Scale(135) + (GlobalGraphics.Scale(306) - GlobalGraphics.Scale(135) - textSize.X) / 2, GlobalGraphics.Scale(58) + (GlobalGraphics.Scale(236) - GlobalGraphics.Scale(58) - textSize.Y) / 2), Color.White);
                 controllerRendering.Draw(gameTime, spriteBatch);
+                actionControllerRendering.Draw(gameTime, spriteBatch);
             }
             else
             {
-                if(page > 0)
-                {
-                    spriteBatch.Draw(GlobalContent.GetTexture("Pixel"), new Rectangle(GlobalGraphics.Scale(137), GlobalGraphics.Scale(56), GlobalGraphics.Scale(167-1), GlobalGraphics.Scale(180)), ThemeManager.GetColor("OverlayContentScreen"));
-                    spriteBatch.Draw(GlobalContent.GetTexture("Pixel"), new Rectangle(GlobalGraphics.Scale(136), GlobalGraphics.Scale(57), GlobalGraphics.Scale(1), GlobalGraphics.Scale(179)), ThemeManager.GetColor("OverlayContentScreen"));
-                    spriteBatch.Draw(GlobalContent.GetTexture("Pixel"), new Rectangle(GlobalGraphics.Scale(304-1), GlobalGraphics.Scale(57), GlobalGraphics.Scale(1), GlobalGraphics.Scale(179)), ThemeManager.GetColor("OverlayContentScreen"));
-                    spriteBatch.Draw(GlobalContent.GetTexture("Pixel"), new Rectangle(GlobalGraphics.Scale(135), GlobalGraphics.Scale(58), GlobalGraphics.Scale(1), GlobalGraphics.Scale(178)), ThemeManager.GetColor("OverlayContentScreen"));
-                    spriteBatch.Draw(GlobalContent.GetTexture("Pixel"), new Rectangle(GlobalGraphics.Scale(305-1), GlobalGraphics.Scale(58), GlobalGraphics.Scale(1), GlobalGraphics.Scale(178)), ThemeManager.GetColor("OverlayContentScreen"));
-                }
-                switch(page)
-                {
-                    case 0:
-                        controller.Draw(gameTime, spriteBatch);
-                        break;
-                    case 1:
-                        controllerAdvanced.Draw(gameTime, spriteBatch);
-                        break;
-                    case 2:
-                        controllerPage3.Draw(gameTime, spriteBatch);
-                        break;
-                }
+                actionController.Draw(gameTime, spriteBatch);
+                scrollView.Draw(gameTime, spriteBatch);
             }
-            actionController.Draw(gameTime, spriteBatch);
+        }
+        public bool ConsoleButton(int i, string n)
+        {
+            switch(i)
+            {
+                case 2: // left click
+                    if(Global.ready)
+                    {
+                        Global.editing = "";
+                        Accessibility.allowAccessibility = true;
+                        ConsoleScreen? consoleScreen = ScreenManager.GetScreen<ConsoleScreen>("Console");
+                        if(consoleScreen != null)
+                        {
+                            if(consoleScreen.Toggle())
+                            {
+                                ConsoleOutput.ResetScroll();
+                                GlobalContent.GetSound("Select").Play(int.Parse(SaveData.saveValues["SoundEffectVolume"], CultureInfo.InvariantCulture) / 100f, 0f, 0f);
+                                if(Accessibility.showDisambiguation)
+                                    Accessibility.TTS(L.T(0, "Accessibility:ConsoleShown"));
+                                //UserInterface.instance.music = 0;
+                            }
+                            else
+                            {
+                                GlobalContent.GetSound("Back").Play(int.Parse(SaveData.saveValues["SoundEffectVolume"], CultureInfo.InvariantCulture) / 100f, 0f, 0f);
+                                if(Accessibility.showDisambiguation)
+                                    Accessibility.TTS(L.T(0, "Accessibility:ConsoleHidden"));
+                            }
+                        }
+                        else
+                        {
+                            ConsoleOutput.WriteLine("Console not found!!!");
+                            GlobalContent.GetSound("Error").Play(int.Parse(SaveData.saveValues["SoundEffectVolume"], CultureInfo.InvariantCulture) / 100f, 0f, 0f);
+                            if(Accessibility.showDisambiguation)
+                                Accessibility.TTS(L.T(0, "Accessibility:ConsoleNotFound"));
+                        }
+                    }
+                    return true;
+            }
+            return false;
+        }
+        public bool GenerateButton(int i, string n)
+        {
+            switch(i)
+            {
+                case 2: // left click
+                    if(!Global.canRender || Global.generator.generatorActive)
+                    {
+                        GlobalContent.GetSound("Error").Play(int.Parse(SaveData.saveValues["SoundEffectVolume"], CultureInfo.InvariantCulture) / 100f, 0f, 0f);
+                        return true;
+                    }
+                    GlobalContent.GetSound("Select").Play(int.Parse(SaveData.saveValues["SoundEffectVolume"], CultureInfo.InvariantCulture) / 100f, 0f, 0f);
+                    Global.generator.StartGeneration((sender, e) => {
+                        if(e.ProgressPercentage == 100)
+                        {
+                            try
+                            {
+                                // award achievements
+                                if (SteamManager.initialized && Global.canAchieve)
+                                {
+                                    List<string> achievements = new()
+                                    {
+                                        "ACHIEVEMENT_FIRST_RENDER",
+                                    };
+                                    if(Global.usedWorkshopPlugin)
+                                    {
+                                        Global.usedWorkshopPlugin = false;
+                                        achievements.Add("ACHIEVEMENT_WORKSHOP_USAGE");
+                                    }
+                                    if(Global.rolledForOverlay)
+                                    {
+                                        Global.rolledForOverlay = false;
+                                        achievements.Add("ACHIEVEMENT_CHROMA_KEY");
+                                    }
+                                    if(Global.usedAllEffectChance)
+                                    {
+                                        Global.usedAllEffectChance = false;
+                                        achievements.Add("ACHIEVEMENT_ALL_EFFECTS");
+                                    }
+                                    if(Global.usedDifferentOutro)
+                                    {
+                                        Global.usedDifferentOutro = false;
+                                        achievements.Add("ACHIEVEMENT_OUTRO_OVERRIDE");
+                                    }
+                                    foreach(string achievement in achievements)
+                                    {
+                                        Achievements.Award(achievement);
+                                    }
+                                }
+                            }
+                            catch {}
+                            SaveData.saveValues["TotalVideosRendered"] = (int.Parse(SaveData.saveValues["TotalVideosRendered"], CultureInfo.InvariantCulture) + 1).ToString(CultureInfo.InvariantCulture);
+                            SaveData.Save();
+                            GlobalContent.GetSound("RenderComplete").Play(int.Parse(SaveData.saveValues["SoundEffectVolume"], CultureInfo.InvariantCulture) / 100f, 0f, 0f);
+                        }
+                        else
+                        {
+                            GlobalContent.GetSound("Error").Play(int.Parse(SaveData.saveValues["SoundEffectVolume"], CultureInfo.InvariantCulture) / 100f, 0f, 0f);
+                        }
+                        Global.justCompletedRender = true;
+                        //SteamUserStats.SetAchievement("RENDER_VIDEO");
+                    }, (sender, e) => {});
+                    return true;
+            }
+            return false;
         }
         public void LoadContent(ContentManager contentManager, GraphicsDevice graphicsDevice)
         {
             // Clear all controllers
             actionController.Clear();
-            controller.Clear();
-            controllerAdvanced.Clear();
+            actionControllerRendering.Clear();
             controllerRendering.Clear();
-            controllerPage3.Clear();
+            scrollView.Controller.Clear();
             // Actions
-            actionController.Add("ActionConsole", new ActionButton("View console output.", new Vector2(112, 221), (int i, string n) => {
-                switch(i)
-                {
-                    case 2: // left click
-                        if(Global.ready)
-                        {
-                            Global.editing = "";
-                            Accessibility.allowAccessibility = true;
-                            ConsoleScreen? consoleScreen = ScreenManager.GetScreen<ConsoleScreen>("Console");
-                            if(consoleScreen != null)
-                            {
-                                if(consoleScreen.Toggle())
-                                {
-                                    ConsoleOutput.ResetScroll();
-                                    GlobalContent.GetSound("Select").Play(int.Parse(SaveData.saveValues["SoundEffectVolume"], CultureInfo.InvariantCulture) / 100f, 0f, 0f);
-                                    if(Accessibility.showDisambiguation)
-                                        Accessibility.TTS(L.T(0, "Accessibility:ConsoleShown"));
-                                    //UserInterface.instance.music = 0;
-                                }
-                                else
-                                {
-                                    GlobalContent.GetSound("Back").Play(int.Parse(SaveData.saveValues["SoundEffectVolume"], CultureInfo.InvariantCulture) / 100f, 0f, 0f);
-                                    if(Accessibility.showDisambiguation)
-                                        Accessibility.TTS(L.T(0, "Accessibility:ConsoleHidden"));
-                                }
-                            }
-                            else
-                            {
-                                ConsoleOutput.WriteLine("Console not found!!!");
-                                GlobalContent.GetSound("Error").Play(int.Parse(SaveData.saveValues["SoundEffectVolume"], CultureInfo.InvariantCulture) / 100f, 0f, 0f);
-                                if(Accessibility.showDisambiguation)
-                                    Accessibility.TTS(L.T(0, "Accessibility:ConsoleNotFound"));
-                            }
-                        }
-                        return true;
-                }
-                return false;
-            }, ThemeManager.LoadLayeredContent<Texture2D>("graphics/actions/console")));
+            actionControllerRendering.Add("ActionConsole", new ActionButton("View console output.", new Vector2(112, 221), ConsoleButton, ThemeManager.LoadLayeredContent<Texture2D>("graphics/actions/console")));
+            actionController.Add("ActionConsole", new ActionButton("View console output.", new Vector2(112, 221), ConsoleButton, ThemeManager.LoadLayeredContent<Texture2D>("graphics/actions/console")));
             actionController.Add("ActionReset", new ActionButton("Reset to default parameters.", new Vector2(112, 206), (int i, string n) => {
                 switch(i)
                 {
                     case 2: // left click
                         GlobalContent.GetSound("Select").Play(int.Parse(SaveData.saveValues["SoundEffectVolume"], CultureInfo.InvariantCulture) / 100f, 0f, 0f);
-                        //SaveData.saveValues["ScreenWidth"] = "320";
-                        //SaveData.saveValues["ScreenHeight"] = "240";
                         //SaveData.saveValues["ScreenScale"] = "2";
                         //SaveData.saveValues["BackgroundSaturation"] = "0";
                         SaveData.saveValues["MinStreamDuration"] = "0.2";
@@ -183,28 +217,28 @@ namespace NonsensicalVideoGenerator
                         SaveData.saveValues["DisableClipsAfterMaxUniqueClips"] = "false";
                         SaveData.saveValues["ConstrainAspectRatio"] = "true";
                         SaveData.saveValues["EnableTimeOut"] = "true";
-                        SaveData.saveValues["TimeOut"] = "30";
+                        SaveData.saveValues["TimeOut"] = "60";
                         SaveData.Save();
-                        controller.interactables["MinStreamDuration"].Tooltip = SaveData.saveValues["MinStreamDuration"];
-                        controller.interactables["MaxStreamDuration"].Tooltip = SaveData.saveValues["MaxStreamDuration"];
-                        controller.interactables["ClipCount"].Tooltip = SaveData.saveValues["MaxClipCount"];
-                        controllerAdvanced.interactables["Width"].Tooltip = SaveData.saveValues["VideoWidth"];
-                        controllerAdvanced.interactables["Height"].Tooltip = SaveData.saveValues["VideoHeight"];
-                        ((Switch)controller.interactables["SaveToLibrary"]).SwitchState = SaveData.saveValues["PlayAutomatically"] == "true";
-                        ((Switch)controller.interactables["InsertIntro"]).SwitchState = SaveData.saveValues["IntrosEnabled"] == "true";
-                        ((Switch)controller.interactables["InsertOutro"]).SwitchState = SaveData.saveValues["OutrosEnabled"] == "true";
-                        controllerAdvanced.interactables["TransitionChance"].Tooltip = SaveData.saveValues["TransitionChance"];
-                        controllerAdvanced.interactables["OverlayChance"].Tooltip = SaveData.saveValues["OverlayChance"];
-                        controllerAdvanced.interactables["EffectChance"].Tooltip = SaveData.saveValues["EffectChance"];
-                        ((Switch)controllerAdvanced.interactables["TransitionEffects"]).SwitchState = SaveData.saveValues["TransitionEffects"] == "true";
-                        controllerAdvanced.interactables["TransitionEffectChance"].Tooltip = SaveData.saveValues["TransitionEffectChance"];
-                        ((Switch)controllerAdvanced.interactables["PlayOverlayInFull"]).SwitchState = SaveData.saveValues["PlayOverlayInFull"] == "true";
-                        controllerPage3.interactables["MaxUniqueClips"].Tooltip = SaveData.saveValues["MaxUniqueClips"];
-                        ((Switch)controllerPage3.interactables["DeleteClipsAfterMaxUniqueClips"]).SwitchState = SaveData.saveValues["DeleteClipsAfterMaxUniqueClips"] == "true";
-                        ((Switch)controllerPage3.interactables["DisableClipsAfterMaxUniqueClips"]).SwitchState = SaveData.saveValues["DisableClipsAfterMaxUniqueClips"] == "true";
-                        ((Switch)controllerPage3.interactables["ConstrainAspectRatio"]).SwitchState = SaveData.saveValues["ConstrainAspectRatio"] == "true";
-                        ((Switch)controllerPage3.interactables["EnableTimeOut"]).SwitchState = SaveData.saveValues["EnableTimeOut"] == "true";
-                        controllerPage3.interactables["TimeOut"].Tooltip = SaveData.saveValues["TimeOut"];
+                        scrollView.Controller.interactables["MinStreamDuration"].Tooltip = SaveData.saveValues["MinStreamDuration"];
+                        scrollView.Controller.interactables["MaxStreamDuration"].Tooltip = SaveData.saveValues["MaxStreamDuration"];
+                        scrollView.Controller.interactables["ClipCount"].Tooltip = SaveData.saveValues["MaxClipCount"];
+                        scrollView.Controller.interactables["Width"].Tooltip = SaveData.saveValues["VideoWidth"];
+                        scrollView.Controller.interactables["Height"].Tooltip = SaveData.saveValues["VideoHeight"];
+                        ((Switch)scrollView.Controller.interactables["SaveToLibrary"]).SwitchState = SaveData.saveValues["PlayAutomatically"] == "true";
+                        ((Switch)scrollView.Controller.interactables["InsertIntro"]).SwitchState = SaveData.saveValues["IntrosEnabled"] == "true";
+                        ((Switch)scrollView.Controller.interactables["InsertOutro"]).SwitchState = SaveData.saveValues["OutrosEnabled"] == "true";
+                        scrollView.Controller.interactables["TransitionChance"].Tooltip = SaveData.saveValues["TransitionChance"];
+                        scrollView.Controller.interactables["OverlayChance"].Tooltip = SaveData.saveValues["OverlayChance"];
+                        scrollView.Controller.interactables["EffectChance"].Tooltip = SaveData.saveValues["EffectChance"];
+                        ((Switch)scrollView.Controller.interactables["TransitionEffects"]).SwitchState = SaveData.saveValues["TransitionEffects"] == "true";
+                        scrollView.Controller.interactables["TransitionEffectChance"].Tooltip = SaveData.saveValues["TransitionEffectChance"];
+                        ((Switch)scrollView.Controller.interactables["PlayOverlayInFull"]).SwitchState = SaveData.saveValues["PlayOverlayInFull"] == "true";
+                        scrollView.Controller.interactables["MaxUniqueClips"].Tooltip = SaveData.saveValues["MaxUniqueClips"];
+                        ((Switch)scrollView.Controller.interactables["DeleteClipsAfterMaxUniqueClips"]).SwitchState = SaveData.saveValues["DeleteClipsAfterMaxUniqueClips"] == "true";
+                        ((Switch)scrollView.Controller.interactables["DisableClipsAfterMaxUniqueClips"]).SwitchState = SaveData.saveValues["DisableClipsAfterMaxUniqueClips"] == "true";
+                        ((Switch)scrollView.Controller.interactables["ConstrainAspectRatio"]).SwitchState = SaveData.saveValues["ConstrainAspectRatio"] == "true";
+                        ((Switch)scrollView.Controller.interactables["EnableTimeOut"]).SwitchState = SaveData.saveValues["EnableTimeOut"] == "true";
+                        scrollView.Controller.interactables["TimeOut"].Tooltip = SaveData.saveValues["TimeOut"];
                         return true;
                 }
                 return false;
@@ -241,72 +275,76 @@ namespace NonsensicalVideoGenerator
                 }
                 return false;
             }, ThemeManager.LoadLayeredContent<Texture2D>("graphics/actions/playlast")));
-            actionController.Add("ActionRender", new ActionButton("Start generating a new video.", new Vector2(112, 176), (int i, string n) => {
+            actionController.Add("ActionRender", new ActionButton("Start generating a new video.", new Vector2(112, 176), GenerateButton, ThemeManager.LoadLayeredContent<Texture2D>("graphics/actions/render")));
+            // RENDERING MODE
+            controllerRendering.Add("Cancel", new Button("Cancel", "Stop rendering.", new Vector2(119+36, 60+10+(19*8)), (int i, string n) => {
                 switch(i)
                 {
                     case 2: // left click
-                        if(!Global.canRender || Global.generator.generatorActive)
-                        {
-                            GlobalContent.GetSound("Error").Play(int.Parse(SaveData.saveValues["SoundEffectVolume"], CultureInfo.InvariantCulture) / 100f, 0f, 0f);
-                            return true;
-                        }
                         GlobalContent.GetSound("Select").Play(int.Parse(SaveData.saveValues["SoundEffectVolume"], CultureInfo.InvariantCulture) / 100f, 0f, 0f);
-                        Global.generator.StartGeneration((sender, e) => {
-                            if(e.ProgressPercentage == 100)
-                            {
-                                try
-                                {
-                                    // award achievements
-                                    if (SteamManager.initialized && Global.canAchieve)
-                                    {
-                                        List<string> achievements = new()
-                                        {
-                                            "ACHIEVEMENT_FIRST_RENDER",
-                                        };
-                                        if(Global.usedWorkshopPlugin)
-                                        {
-                                            Global.usedWorkshopPlugin = false;
-                                            achievements.Add("ACHIEVEMENT_WORKSHOP_USAGE");
-                                        }
-                                        if(Global.rolledForOverlay)
-                                        {
-                                            Global.rolledForOverlay = false;
-                                            achievements.Add("ACHIEVEMENT_CHROMA_KEY");
-                                        }
-                                        if(Global.usedAllEffectChance)
-                                        {
-                                            Global.usedAllEffectChance = false;
-                                            achievements.Add("ACHIEVEMENT_ALL_EFFECTS");
-                                        }
-                                        if(Global.usedDifferentOutro)
-                                        {
-                                            Global.usedDifferentOutro = false;
-                                            achievements.Add("ACHIEVEMENT_OUTRO_OVERRIDE");
-                                        }
-                                        foreach(string achievement in achievements)
-                                        {
-                                            Achievements.Award(achievement);
-                                        }
-                                    }
-                                }
-                                catch {}
-                                SaveData.saveValues["TotalVideosRendered"] = (int.Parse(SaveData.saveValues["TotalVideosRendered"], CultureInfo.InvariantCulture) + 1).ToString(CultureInfo.InvariantCulture);
-                                SaveData.Save();
-                                GlobalContent.GetSound("RenderComplete").Play(int.Parse(SaveData.saveValues["SoundEffectVolume"], CultureInfo.InvariantCulture) / 100f, 0f, 0f);
-                            }
-                            else
-                            {
-                                GlobalContent.GetSound("Error").Play(int.Parse(SaveData.saveValues["SoundEffectVolume"], CultureInfo.InvariantCulture) / 100f, 0f, 0f);
-                            }
-                            Global.justCompletedRender = true;
-                            //SteamUserStats.SetAchievement("RENDER_VIDEO");
-                        }, (sender, e) => {});
+                        Global.generator.CancelGeneration(true);
                         return true;
                 }
                 return false;
-            }, ThemeManager.LoadLayeredContent<Texture2D>("graphics/actions/render")));
+            }));
+            controllerRendering.Add("ForceConcatenate", new Button("Combine Clips Now", "Stop rendering and force concatenation.", new Vector2(119+36+104, 60+10+(19*8)), (int i, string n) => {
+                switch(i)
+                {
+                    case 2: // left click
+                        GlobalContent.GetSound("Select").Play(int.Parse(SaveData.saveValues["SoundEffectVolume"], CultureInfo.InvariantCulture) / 100f, 0f, 0f);
+                        Global.generator.CancelGeneration(true, true);
+                        return true;
+                }
+                return false;
+            }));
             // PAGE 3
-            controllerPage3.Add("EnableTimeOut", new Switch("", "Cancel operations if they take too long.", new Vector2(139, 60+19*4), (int i, string n) => {
+            scrollView.Controller.Add("DisableClipsAfterMaxUniqueClips", new Switch("Disable Clips After Max Reached", "Disable clips after they reach the max unique clip count.", new Vector2(139, 60-(8*3)+(19*18)+(10*1)+(9*1)), (int i, string n) => {
+                bool switchState = (i & 256) != 0;
+                if((i & 2) != 0)
+                {
+                    string oldValue = SaveData.saveValues["DisableClipsAfterMaxUniqueClips"];
+                    SaveData.saveValues["DisableClipsAfterMaxUniqueClips"] = switchState.ToString().ToLower();
+                    if(oldValue != SaveData.saveValues["DisableClipsAfterMaxUniqueClips"])
+                    {
+                        SaveData.saveValues["DeleteClipsAfterMaxUniqueClips"] = "false";
+                        Switch? pageSwitches = scrollView.Controller.interactables["DeleteClipsAfterMaxUniqueClips"] as Switch;
+                        if(pageSwitches != null)
+                            pageSwitches.SwitchState = false;
+                        SaveData.Save();
+                    }
+                }
+                return switchState;
+            }, SaveData.saveValues["DisableClipsAfterMaxUniqueClips"] == "true"));
+            scrollView.Controller.Add("DeleteClipsAfterMaxUniqueClips", new Switch("Delete Clips After Max Reached", "Delete clips after they reach the max unique clip count.", new Vector2(139, 60-(8*3)+(19*17)+(10*1)+(9*1)), (int i, string n) => {
+                bool switchState = (i & 256) != 0;
+                if((i & 2) != 0)
+                {
+                    string oldValue = SaveData.saveValues["DeleteClipsAfterMaxUniqueClips"];
+                    SaveData.saveValues["DeleteClipsAfterMaxUniqueClips"] = switchState.ToString().ToLower();
+                    if(oldValue != SaveData.saveValues["DeleteClipsAfterMaxUniqueClips"])
+                    {
+                        SaveData.saveValues["DisableClipsAfterMaxUniqueClips"] = "false";
+                        Switch? pageSwitches = scrollView.Controller.interactables["DisableClipsAfterMaxUniqueClips"] as Switch;
+                        if(pageSwitches != null)
+                            pageSwitches.SwitchState = false;
+                        SaveData.Save();
+                    }
+                }
+                return switchState;
+            }, SaveData.saveValues["DeleteClipsAfterMaxUniqueClips"] == "true"));
+            scrollView.Controller.Add("MaxUniqueClips", new TextEntry("Max Unique Media", "The max times a unique media file can be used.", SaveData.saveValues["MaxUniqueClips"], new Vector2(139, 60-(8*3)+(19*16)+(10*1)+(9*1)), 24, 3, 1, (int i, string n) => {
+                int oldValue = int.Parse(SaveData.saveValues["MaxUniqueClips"], CultureInfo.InvariantCulture);
+                // Range: 0-100
+                if(int.Parse(scrollView.Controller.interactables["MaxUniqueClips"].Tooltip, CultureInfo.InvariantCulture) < 0)
+                    scrollView.Controller.interactables["MaxUniqueClips"].Tooltip = "0";
+                SaveData.saveValues["MaxUniqueClips"] = scrollView.Controller.interactables["MaxUniqueClips"].Tooltip;
+                if(oldValue != int.Parse(SaveData.saveValues["MaxUniqueClips"], CultureInfo.InvariantCulture))
+                    SaveData.Save();
+                return false;
+            }));
+            scrollView.Controller.Add("StreamerOptions", new Label("Streamer Options:", new Vector2(139, 60-(8*2)+(19*15)+(10*1)+(9*1))));
+            // ADVANCED MODE
+            scrollView.Controller.Add("EnableTimeOut", new Switch("", "Cancel operations if they take too long.", new Vector2(139, 60-(8*2)+(19*14)+(10*1)+(9*1)), (int i, string n) => {
                 bool switchState = (i & 256) != 0;
                 if((i & 2) != 0)
                 {
@@ -317,17 +355,17 @@ namespace NonsensicalVideoGenerator
                 }
                 return switchState;
             }, SaveData.saveValues["EnableTimeOut"] == "true"));
-            controllerPage3.Add("TimeOut", new TextEntry("Time Out", "How long until operations are canceled, in seconds.", SaveData.saveValues["TimeOut"], new Vector2(168, 60+19*4), 24, 3, 1, (int i, string n) => {
+            scrollView.Controller.Add("TimeOut", new TextEntry("Time Out", "How long until operations are canceled, in seconds.", SaveData.saveValues["TimeOut"], new Vector2(168, 60-(8*2)+(19*14)+(10*1)+(9*1)), 24, 3, 1, (int i, string n) => {
                 int oldValue = int.Parse(SaveData.saveValues["TimeOut"], CultureInfo.InvariantCulture);
                 // Range: 0-100
-                if(int.Parse(controllerPage3.interactables["TimeOut"].Tooltip, CultureInfo.InvariantCulture) < 0)
-                    controllerPage3.interactables["TimeOut"].Tooltip = "0";
-                SaveData.saveValues["TimeOut"] = controllerPage3.interactables["TimeOut"].Tooltip;
+                if(int.Parse(scrollView.Controller.interactables["TimeOut"].Tooltip, CultureInfo.InvariantCulture) < 0)
+                    scrollView.Controller.interactables["TimeOut"].Tooltip = "0";
+                SaveData.saveValues["TimeOut"] = scrollView.Controller.interactables["TimeOut"].Tooltip;
                 if(oldValue != int.Parse(SaveData.saveValues["TimeOut"], CultureInfo.InvariantCulture))
                     SaveData.Save();
                 return false;
             }));
-            controllerPage3.Add("ConstrainAspectRatio", new Switch("Constrain Aspect Ratio", "Clips will retain their original aspect ratio when disabled.", new Vector2(139, 60+19*3), (int i, string n) => {
+            scrollView.Controller.Add("ConstrainAspectRatio", new Switch("Constrain Aspect Ratio", "Clips will retain their original aspect ratio when disabled.", new Vector2(139, 60-(8*2)+(19*13)+(10*1)+(9*1)), (int i, string n) => {
                 bool switchState = (i & 256) != 0;
                 if((i & 2) != 0)
                 {
@@ -338,95 +376,7 @@ namespace NonsensicalVideoGenerator
                 }
                 return switchState;
             }, SaveData.saveValues["ConstrainAspectRatio"] == "true"));
-            controllerPage3.Add("DisableClipsAfterMaxUniqueClips", new Switch("Disable Clips After Max Reached", "Disable clips after they reach the max unique clip count.", new Vector2(139, 60+19*2), (int i, string n) => {
-                bool switchState = (i & 256) != 0;
-                if((i & 2) != 0)
-                {
-                    string oldValue = SaveData.saveValues["DisableClipsAfterMaxUniqueClips"];
-                    SaveData.saveValues["DisableClipsAfterMaxUniqueClips"] = switchState.ToString().ToLower();
-                    if(oldValue != SaveData.saveValues["DisableClipsAfterMaxUniqueClips"])
-                    {
-                        SaveData.saveValues["DeleteClipsAfterMaxUniqueClips"] = "false";
-                        Switch? pageSwitches = controllerPage3.interactables["DeleteClipsAfterMaxUniqueClips"] as Switch;
-                        if(pageSwitches != null)
-                            pageSwitches.SwitchState = false;
-                        SaveData.Save();
-                    }
-                }
-                return switchState;
-            }, SaveData.saveValues["DisableClipsAfterMaxUniqueClips"] == "true"));
-            controllerPage3.Add("DeleteClipsAfterMaxUniqueClips", new Switch("Delete Clips After Max Reached", "Delete clips after they reach the max unique clip count.", new Vector2(139, 60+19), (int i, string n) => {
-                bool switchState = (i & 256) != 0;
-                if((i & 2) != 0)
-                {
-                    string oldValue = SaveData.saveValues["DeleteClipsAfterMaxUniqueClips"];
-                    SaveData.saveValues["DeleteClipsAfterMaxUniqueClips"] = switchState.ToString().ToLower();
-                    if(oldValue != SaveData.saveValues["DeleteClipsAfterMaxUniqueClips"])
-                    {
-                        SaveData.saveValues["DisableClipsAfterMaxUniqueClips"] = "false";
-                        Switch? pageSwitches = controllerPage3.interactables["DisableClipsAfterMaxUniqueClips"] as Switch;
-                        if(pageSwitches != null)
-                            pageSwitches.SwitchState = false;
-                        SaveData.Save();
-                    }
-                }
-                return switchState;
-            }, SaveData.saveValues["DeleteClipsAfterMaxUniqueClips"] == "true"));
-            controllerPage3.Add("MaxUniqueClips", new TextEntry("Max Unique Media", "The max times a unique media file can be used.", SaveData.saveValues["MaxUniqueClips"], new Vector2(139, 60), 24, 3, 1, (int i, string n) => {
-                int oldValue = int.Parse(SaveData.saveValues["MaxUniqueClips"], CultureInfo.InvariantCulture);
-                // Range: 0-100
-                if(int.Parse(controllerPage3.interactables["MaxUniqueClips"].Tooltip, CultureInfo.InvariantCulture) < 0)
-                    controllerPage3.interactables["MaxUniqueClips"].Tooltip = "0";
-                SaveData.saveValues["MaxUniqueClips"] = controllerPage3.interactables["MaxUniqueClips"].Tooltip;
-                if(oldValue != int.Parse(SaveData.saveValues["MaxUniqueClips"], CultureInfo.InvariantCulture))
-                    SaveData.Save();
-                return false;
-            }));
-            controllerPage3.Add("Page3Label", new Label("Page 3", new Vector2(144, 64+19*8)));
-            controllerPage3.Add("PrevPage", new Button("Next Page", "Next page of options.", new Vector2(239+36, 60+10+19*8), (int i, string n) => {
-                switch(i)
-                {
-                    case 2: // left click
-                        page = 0;
-                        GlobalContent.GetSound("Back").Play(int.Parse(SaveData.saveValues["SoundEffectVolume"], CultureInfo.InvariantCulture) / 100f, 0f, 0f);
-                        return true;
-                }
-                return false;
-            }));
-            // RENDERING MODE
-            controllerRendering.Add("Cancel", new Button("Cancel", "Stop rendering.", new Vector2(119+36, 60+10+19*8), (int i, string n) => {
-                switch(i)
-                {
-                    case 2: // left click
-                        GlobalContent.GetSound("Select").Play(int.Parse(SaveData.saveValues["SoundEffectVolume"], CultureInfo.InvariantCulture) / 100f, 0f, 0f);
-                        Global.generator.CancelGeneration(true);
-                        return true;
-                }
-                return false;
-            }));
-            controllerRendering.Add("ForceConcatenate", new Button("Combine Clips Now", "Stop rendering and force concatenation.", new Vector2(119+36+104, 60+10+19*8), (int i, string n) => {
-                switch(i)
-                {
-                    case 2: // left click
-                        GlobalContent.GetSound("Select").Play(int.Parse(SaveData.saveValues["SoundEffectVolume"], CultureInfo.InvariantCulture) / 100f, 0f, 0f);
-                        Global.generator.CancelGeneration(true, true);
-                        return true;
-                }
-                return false;
-            }));
-            // ADVANCED MODE
-            controllerAdvanced.Add("AdvancedLabel", new Label("Page 2", new Vector2(144, 64+19*8)));
-            controllerAdvanced.Add("BackToRegularOptions", new Button("Next Page", "Next page of options.", new Vector2(239+36, 60+10+19*8), (int i, string n) => {
-                switch(i)
-                {
-                    case 2: // left click
-                        page++;
-                        GlobalContent.GetSound("Select").Play(int.Parse(SaveData.saveValues["SoundEffectVolume"], CultureInfo.InvariantCulture) / 100f, 0f, 0f);
-                        return true;
-                }
-                return false;
-            }));
-            controllerAdvanced.Add("PlayOverlayInFull", new Switch("Overlays Play in Full", "Play overlays at their full length.", new Vector2(139, 60+19*6), (int i, string n) => {
+            scrollView.Controller.Add("PlayOverlayInFull", new Switch("Overlays Play in Full", "Play overlays at their full length.", new Vector2(139, 60-(8*2)+(19*12)+(10*1)+(9*1)), (int i, string n) => {
                 bool switchState = (i & 256) != 0;
                 if((i & 2) != 0)
                 {
@@ -437,19 +387,19 @@ namespace NonsensicalVideoGenerator
                 }
                 return switchState;
             }, SaveData.saveValues["PlayOverlayInFull"] == "true"));                       
-            controllerAdvanced.Add("TransitionEffectChance", new TextEntry("Transition Effect Chance", "How often transitions get effects, from 0-100.", SaveData.saveValues["TransitionEffectChance"], new Vector2(139, 60+19*5), 24, 3, 1, (int i, string n) => {
+            scrollView.Controller.Add("TransitionEffectChance", new TextEntry("Transition Effect Chance", "How often transitions get effects, from 0-100.", SaveData.saveValues["TransitionEffectChance"], new Vector2(139, 60-(8*2)+(19*11)+(10*1)+(9*1)), 24, 3, 1, (int i, string n) => {
                 int oldValue = int.Parse(SaveData.saveValues["TransitionEffectChance"], CultureInfo.InvariantCulture);
                 // Range: 0-100
-                if(int.Parse(controllerAdvanced.interactables["TransitionEffectChance"].Tooltip, CultureInfo.InvariantCulture) < 0)
-                    controllerAdvanced.interactables["TransitionEffectChance"].Tooltip = "0";
-                if(int.Parse(controllerAdvanced.interactables["TransitionEffectChance"].Tooltip, CultureInfo.InvariantCulture) > 100)
-                    controllerAdvanced.interactables["TransitionEffectChance"].Tooltip = "100";
-                SaveData.saveValues["TransitionEffectChance"] = controllerAdvanced.interactables["TransitionEffectChance"].Tooltip;
+                if(int.Parse(scrollView.Controller.interactables["TransitionEffectChance"].Tooltip, CultureInfo.InvariantCulture) < 0)
+                    scrollView.Controller.interactables["TransitionEffectChance"].Tooltip = "0";
+                if(int.Parse(scrollView.Controller.interactables["TransitionEffectChance"].Tooltip, CultureInfo.InvariantCulture) > 100)
+                    scrollView.Controller.interactables["TransitionEffectChance"].Tooltip = "100";
+                SaveData.saveValues["TransitionEffectChance"] = scrollView.Controller.interactables["TransitionEffectChance"].Tooltip;
                 if(oldValue != int.Parse(SaveData.saveValues["TransitionEffectChance"], CultureInfo.InvariantCulture))
                     SaveData.Save();
                 return false;
             }));
-            controllerAdvanced.Add("TransitionEffects", new Switch("Transition Effects", "Allow transitions to use effects.", new Vector2(139, 60+19*4), (int i, string n) => {
+            scrollView.Controller.Add("TransitionEffects", new Switch("Transition Effects", "Allow transitions to use effects.", new Vector2(139, 60-(8*2)+(19*10)+(10*1)+(9*1)), (int i, string n) => {
                 bool switchState = (i & 256) != 0;
                 if((i & 2) != 0)
                 {
@@ -460,181 +410,107 @@ namespace NonsensicalVideoGenerator
                 }
                 return switchState;
             }, SaveData.saveValues["TransitionEffects"] == "true"));
-            controllerAdvanced.Add("TransitionChance", new TextEntry("Transition Chance", "How often transitions are rolled, from 0-100.", SaveData.saveValues["TransitionChance"], new Vector2(139, 60+19*3), 24, 3, 1, (int i, string n) => {
+            scrollView.Controller.Add("TransitionChance", new TextEntry("Transition Chance", "How often transitions are rolled, from 0-100.", SaveData.saveValues["TransitionChance"], new Vector2(139, 60-(8*2)+(19*9)+(10*1)+(9*1)), 24, 3, 1, (int i, string n) => {
                 int oldValue = int.Parse(SaveData.saveValues["TransitionChance"], CultureInfo.InvariantCulture);
-                if(int.Parse(controllerAdvanced.interactables["TransitionChance"].Tooltip, CultureInfo.InvariantCulture) < 0)
-                    controllerAdvanced.interactables["TransitionChance"].Tooltip = "0";
-                if(int.Parse(controllerAdvanced.interactables["TransitionChance"].Tooltip, CultureInfo.InvariantCulture) > 100)
-                    controllerAdvanced.interactables["TransitionChance"].Tooltip = "100";
-                SaveData.saveValues["TransitionChance"] = controllerAdvanced.interactables["TransitionChance"].Tooltip;
+                if(int.Parse(scrollView.Controller.interactables["TransitionChance"].Tooltip, CultureInfo.InvariantCulture) < 0)
+                    scrollView.Controller.interactables["TransitionChance"].Tooltip = "0";
+                if(int.Parse(scrollView.Controller.interactables["TransitionChance"].Tooltip, CultureInfo.InvariantCulture) > 100)
+                    scrollView.Controller.interactables["TransitionChance"].Tooltip = "100";
+                SaveData.saveValues["TransitionChance"] = scrollView.Controller.interactables["TransitionChance"].Tooltip;
                 if(oldValue != int.Parse(SaveData.saveValues["TransitionChance"], CultureInfo.InvariantCulture))
                     SaveData.Save();
                 return false;
             }));
-            controllerAdvanced.Add("EffectChance", new TextEntry("Effect Chance", "How often any effect are used, from 0-100.", SaveData.saveValues["EffectChance"], new Vector2(139, 60+19*2), 24, 3, 1, (int i, string n) => {
+            scrollView.Controller.Add("EffectChance", new TextEntry("Effect Chance", "How often any effect are used, from 0-100.", SaveData.saveValues["EffectChance"], new Vector2(139, 60-(8*2)+(19*8)+(10*1)+(9*1)), 24, 3, 1, (int i, string n) => {
                 int oldValue = int.Parse(SaveData.saveValues["EffectChance"], CultureInfo.InvariantCulture);
-                if(int.Parse(controllerAdvanced.interactables["EffectChance"].Tooltip, CultureInfo.InvariantCulture) < 0)
-                    controllerAdvanced.interactables["EffectChance"].Tooltip = "0";
-                if(int.Parse(controllerAdvanced.interactables["EffectChance"].Tooltip, CultureInfo.InvariantCulture) > 100)
-                    controllerAdvanced.interactables["EffectChance"].Tooltip = "100";
-                SaveData.saveValues["EffectChance"] = controllerAdvanced.interactables["EffectChance"].Tooltip;
+                if(int.Parse(scrollView.Controller.interactables["EffectChance"].Tooltip, CultureInfo.InvariantCulture) < 0)
+                    scrollView.Controller.interactables["EffectChance"].Tooltip = "0";
+                if(int.Parse(scrollView.Controller.interactables["EffectChance"].Tooltip, CultureInfo.InvariantCulture) > 100)
+                    scrollView.Controller.interactables["EffectChance"].Tooltip = "100";
+                SaveData.saveValues["EffectChance"] = scrollView.Controller.interactables["EffectChance"].Tooltip;
                 if(oldValue != int.Parse(SaveData.saveValues["EffectChance"], CultureInfo.InvariantCulture))
                     SaveData.Save();
                 return false;
             }));
-            controllerAdvanced.Add("OverlayChance", new TextEntry("Overlay Chance", "How often overlays are rolled, from 0-100.", SaveData.saveValues["OverlayChance"], new Vector2(139, 60+19), 24, 3, 1, (int i, string n) => {
+            scrollView.Controller.Add("OverlayChance", new TextEntry("Overlay Chance", "How often overlays are rolled, from 0-100.", SaveData.saveValues["OverlayChance"], new Vector2(139, 60-(8*2)+(19*7)+(10*1)+(9*1)), 24, 3, 1, (int i, string n) => {
                 int oldValue = int.Parse(SaveData.saveValues["OverlayChance"], CultureInfo.InvariantCulture);
-                if(int.Parse(controllerAdvanced.interactables["OverlayChance"].Tooltip, CultureInfo.InvariantCulture) < 0)
-                    controllerAdvanced.interactables["OverlayChance"].Tooltip = "0";
-                if(int.Parse(controllerAdvanced.interactables["OverlayChance"].Tooltip, CultureInfo.InvariantCulture) > 100)
-                    controllerAdvanced.interactables["OverlayChance"].Tooltip = "100";
-                SaveData.saveValues["OverlayChance"] = controllerAdvanced.interactables["OverlayChance"].Tooltip;
+                if(int.Parse(scrollView.Controller.interactables["OverlayChance"].Tooltip, CultureInfo.InvariantCulture) < 0)
+                    scrollView.Controller.interactables["OverlayChance"].Tooltip = "0";
+                if(int.Parse(scrollView.Controller.interactables["OverlayChance"].Tooltip, CultureInfo.InvariantCulture) > 100)
+                    scrollView.Controller.interactables["OverlayChance"].Tooltip = "100";
+                SaveData.saveValues["OverlayChance"] = scrollView.Controller.interactables["OverlayChance"].Tooltip;
                 if(oldValue != int.Parse(SaveData.saveValues["OverlayChance"], CultureInfo.InvariantCulture))
                     SaveData.Save();
                 return false;
             }));
-            controllerAdvanced.Add("Height", new TextEntry("Output Resolution", "Height: how tall the result is.", SaveData.saveValues["VideoHeight"], new Vector2(170, 60), 24, 4, 1, (int i, string n) => {
+            scrollView.Controller.Add("Height", new TextEntry("Output Resolution", "Height: how tall the result is.", SaveData.saveValues["VideoHeight"], new Vector2(170, 60-(8*2)+(19*6)+(10*1)+(9*1)), 24, 4, 1, (int i, string n) => {
                 string oldValue = SaveData.saveValues["VideoHeight"];
                 // minimum must be 240
-                if(int.Parse(controllerAdvanced.interactables["Height"].Tooltip, CultureInfo.InvariantCulture) < 128)
-                    controllerAdvanced.interactables["Height"].Tooltip = "128";
+                if(int.Parse(scrollView.Controller.interactables["Height"].Tooltip, CultureInfo.InvariantCulture) < 128)
+                    scrollView.Controller.interactables["Height"].Tooltip = "128";
                 // maximum must be 2160
-                if(int.Parse(controllerAdvanced.interactables["Height"].Tooltip, CultureInfo.InvariantCulture) > 2160)
-                    controllerAdvanced.interactables["Height"].Tooltip = "2160";
+                if(int.Parse(scrollView.Controller.interactables["Height"].Tooltip, CultureInfo.InvariantCulture) > 2160)
+                    scrollView.Controller.interactables["Height"].Tooltip = "2160";
                 // height must be a multiple of 2
-                if(int.Parse(controllerAdvanced.interactables["Height"].Tooltip, CultureInfo.InvariantCulture) % 2 != 0)
-                    controllerAdvanced.interactables["Height"].Tooltip = (int.Parse(controllerAdvanced.interactables["Height"].Tooltip, CultureInfo.InvariantCulture) - 1).ToString(CultureInfo.InvariantCulture);
-                SaveData.saveValues["VideoHeight"] = controllerAdvanced.interactables["Height"].Tooltip;
+                if(int.Parse(scrollView.Controller.interactables["Height"].Tooltip, CultureInfo.InvariantCulture) % 2 != 0)
+                    scrollView.Controller.interactables["Height"].Tooltip = (int.Parse(scrollView.Controller.interactables["Height"].Tooltip, CultureInfo.InvariantCulture) - 1).ToString(CultureInfo.InvariantCulture);
+                SaveData.saveValues["VideoHeight"] = scrollView.Controller.interactables["Height"].Tooltip;
                 if(oldValue != SaveData.saveValues["VideoHeight"])
                     SaveData.Save();
                 return false;
             }));
-            controllerAdvanced.Add("Width", new TextEntry("     ", "Width: how wide the result is.", SaveData.saveValues["VideoWidth"], new Vector2(139, 60), 24, 4, 1, (int i, string n) => {
+            scrollView.Controller.Add("Width", new TextEntry("     ", "Width: how wide the result is.", SaveData.saveValues["VideoWidth"], new Vector2(139, 60-(8*2)+(19*6)+(10*1)+(9*1)), 24, 4, 1, (int i, string n) => {
                 string oldValue = SaveData.saveValues["VideoWidth"];
                 // minimum must be 320
-                if(int.Parse(controllerAdvanced.interactables["Width"].Tooltip, CultureInfo.InvariantCulture) < 128)
-                    controllerAdvanced.interactables["Width"].Tooltip = "128";
+                if(int.Parse(scrollView.Controller.interactables["Width"].Tooltip, CultureInfo.InvariantCulture) < 128)
+                    scrollView.Controller.interactables["Width"].Tooltip = "128";
                 // maximum must be 3840
-                if(int.Parse(controllerAdvanced.interactables["Width"].Tooltip, CultureInfo.InvariantCulture) > 3840)
-                    controllerAdvanced.interactables["Width"].Tooltip = "3840";
+                if(int.Parse(scrollView.Controller.interactables["Width"].Tooltip, CultureInfo.InvariantCulture) > 3840)
+                    scrollView.Controller.interactables["Width"].Tooltip = "3840";
                 // width must be a multiple of 2
-                if(int.Parse(controllerAdvanced.interactables["Width"].Tooltip, CultureInfo.InvariantCulture) % 2 != 0)
-                    controllerAdvanced.interactables["Width"].Tooltip = (int.Parse(controllerAdvanced.interactables["Width"].Tooltip, CultureInfo.InvariantCulture) - 1).ToString(CultureInfo.InvariantCulture);
-                SaveData.saveValues["VideoWidth"] = controllerAdvanced.interactables["Width"].Tooltip;
+                if(int.Parse(scrollView.Controller.interactables["Width"].Tooltip, CultureInfo.InvariantCulture) % 2 != 0)
+                    scrollView.Controller.interactables["Width"].Tooltip = (int.Parse(scrollView.Controller.interactables["Width"].Tooltip, CultureInfo.InvariantCulture) - 1).ToString(CultureInfo.InvariantCulture);
+                SaveData.saveValues["VideoWidth"] = scrollView.Controller.interactables["Width"].Tooltip;
                 if(oldValue != SaveData.saveValues["VideoWidth"])
                     SaveData.Save();
                 return false;
             }));
+            scrollView.Controller.Add("AdvancedOptions", new Label("Advanced Options:", new Vector2(139, 60-(8*1)+(19*5)+(10*1)+(9*1))));
             // REGULAR MODE
-            // Add buttons
-            controller.Add("MoreOptions", new Button("Next Page", "Next page of options.", new Vector2(239+36, 60+10+19*8), (int i, string n) => {
-                switch(i)
-                {
-                    case 2: // left click
-                        page++;
-                        GlobalContent.GetSound("Select").Play(int.Parse(SaveData.saveValues["SoundEffectVolume"], CultureInfo.InvariantCulture) / 100f, 0f, 0f);
-                        return true;
-                }
-                return false;
-            }));
-            controller.Add("StartRendering", new Button("Start Rendering", "Start generating a new video.", new Vector2(139+36, 60+10+19*8), (int i, string n) => {
-                switch(i)
-                {
-                    case 2: // left click
-                        if(!Global.canRender || Global.generator.generatorActive)
-                        {
-                            GlobalContent.GetSound("Error").Play(int.Parse(SaveData.saveValues["SoundEffectVolume"], CultureInfo.InvariantCulture) / 100f, 0f, 0f);
-                            return true;
-                        }
-                        GlobalContent.GetSound("Select").Play(int.Parse(SaveData.saveValues["SoundEffectVolume"], CultureInfo.InvariantCulture) / 100f, 0f, 0f);
-                        Global.generator.StartGeneration((sender, e) => {
-                            if(e.ProgressPercentage == 100)
-                            {
-                                try
-                                {
-                                    // award achievements
-                                    if (SteamManager.initialized && Global.canAchieve)
-                                    {
-                                        List<string> achievements = new()
-                                        {
-                                            "ACHIEVEMENT_FIRST_RENDER",
-                                        };
-                                        if(Global.usedWorkshopPlugin)
-                                        {
-                                            Global.usedWorkshopPlugin = false;
-                                            achievements.Add("ACHIEVEMENT_WORKSHOP_USAGE");
-                                        }
-                                        if(Global.rolledForOverlay)
-                                        {
-                                            Global.rolledForOverlay = false;
-                                            achievements.Add("ACHIEVEMENT_CHROMA_KEY");
-                                        }
-                                        if(Global.usedAllEffectChance)
-                                        {
-                                            Global.usedAllEffectChance = false;
-                                            achievements.Add("ACHIEVEMENT_ALL_EFFECTS");
-                                        }
-                                        if(Global.usedDifferentOutro)
-                                        {
-                                            Global.usedDifferentOutro = false;
-                                            achievements.Add("ACHIEVEMENT_OUTRO_OVERRIDE");
-                                        }
-                                        foreach(string achievement in achievements)
-                                        {
-                                            Achievements.Award(achievement);
-                                        }
-                                    }
-                                }
-                                catch {}
-                                SaveData.saveValues["TotalVideosRendered"] = (int.Parse(SaveData.saveValues["TotalVideosRendered"], CultureInfo.InvariantCulture) + 1).ToString(CultureInfo.InvariantCulture);
-                                SaveData.Save();
-                                GlobalContent.GetSound("RenderComplete").Play(int.Parse(SaveData.saveValues["SoundEffectVolume"], CultureInfo.InvariantCulture) / 100f, 0f, 0f);
-                            }
-                            else
-                            {
-                                GlobalContent.GetSound("Error").Play(int.Parse(SaveData.saveValues["SoundEffectVolume"], CultureInfo.InvariantCulture) / 100f, 0f, 0f);
-                            }
-                            Global.justCompletedRender = true;
-                            //SteamUserStats.SetAchievement("RENDER_VIDEO");
-                        }, (sender, e) => {});
-                        return true;
-                }
-                return false;
-            }));
             // Add text entries
-            controller.Add("MaxStreamDuration", new TextEntry("Random Clip Length", "End of random length range.", SaveData.saveValues["MaxStreamDuration"], new Vector2(172, 60+19*3), 26, 5, 2, (int i, string n) => {
+            scrollView.Controller.Add("MaxStreamDuration", new TextEntry("Random Clip Length", "End of random length range.", SaveData.saveValues["MaxStreamDuration"], new Vector2(172, 60-(8*1)+(19*4)+(10*1)+(9*1)), 26, 5, 2, (int i, string n) => {
                 string oldValue = SaveData.saveValues["MaxStreamDuration"];
-                if(float.Parse(controller.interactables["MaxStreamDuration"].Tooltip, CultureInfo.InvariantCulture) < 0.2)
-                    controller.interactables["MaxStreamDuration"].Tooltip = "0.2";
-                SaveData.saveValues["MaxStreamDuration"] = controller.interactables["MaxStreamDuration"].Tooltip;
+                if(float.Parse(scrollView.Controller.interactables["MaxStreamDuration"].Tooltip, CultureInfo.InvariantCulture) < 0.2)
+                    scrollView.Controller.interactables["MaxStreamDuration"].Tooltip = "0.2";
+                SaveData.saveValues["MaxStreamDuration"] = scrollView.Controller.interactables["MaxStreamDuration"].Tooltip;
                 if(oldValue != SaveData.saveValues["MaxStreamDuration"])
                     SaveData.Save();
                 return false;
             }));
-            controller.Add("MinStreamDuration", new TextEntry("  ", "Start of random length range.", SaveData.saveValues["MinStreamDuration"], new Vector2(139, 60+19*3), 26, 5, 2, (int i, string n) => {
+            scrollView.Controller.Add("MinStreamDuration", new TextEntry("  ", "Start of random length range.", SaveData.saveValues["MinStreamDuration"], new Vector2(139, 60-(8*1)+(19*4)+(10*1)+(9*1)), 26, 5, 2, (int i, string n) => {
                 string oldValue = SaveData.saveValues["MinStreamDuration"];
-                //if(float.Parse(controller.interactables["MinStreamDuration"].Tooltip, CultureInfo.InvariantCulture) < 0.2)
-                    //controller.interactables["MinStreamDuration"].Tooltip = "0.2";
-                SaveData.saveValues["MinStreamDuration"] = controller.interactables["MinStreamDuration"].Tooltip;
+                //if(float.Parse(scrollView.Controller.interactables["MinStreamDuration"].Tooltip, CultureInfo.InvariantCulture) < 0.2)
+                    //scrollView.Controller.interactables["MinStreamDuration"].Tooltip = "0.2";
+                SaveData.saveValues["MinStreamDuration"] = scrollView.Controller.interactables["MinStreamDuration"].Tooltip;
                 if(oldValue != SaveData.saveValues["MinStreamDuration"])
                     SaveData.Save();
                 return false;
             }));
-            controller.Add("ClipCount", new TextEntry("Clip Segment Count", "How many clips to generate.", SaveData.saveValues["MaxClipCount"], new Vector2(139, 60+19*2), 24, 3, 1, (int i, string n) => {
+            scrollView.Controller.Add("ClipCount", new TextEntry("Clip Segment Count", "How many clips to generate.", SaveData.saveValues["MaxClipCount"], new Vector2(139, 60-(8*1)+(19*3)+(10*1)+(9*1)), 24, 3, 1, (int i, string n) => {
                 string oldValue = SaveData.saveValues["MaxClipCount"];
-                if(int.Parse(controller.interactables["ClipCount"].Tooltip, CultureInfo.InvariantCulture) < 0)
-                    controller.interactables["ClipCount"].Tooltip = "0";
+                if(int.Parse(scrollView.Controller.interactables["ClipCount"].Tooltip, CultureInfo.InvariantCulture) < 0)
+                    scrollView.Controller.interactables["ClipCount"].Tooltip = "0";
                 /*
-                if(int.Parse(controller.interactables["ClipCount"].Tooltip, CultureInfo.InvariantCulture) > 100)
-                    controller.interactables["ClipCount"].Tooltip = "100";
+                if(int.Parse(scrollView.Controller.interactables["ClipCount"].Tooltip, CultureInfo.InvariantCulture) > 100)
+                    scrollView.Controller.interactables["ClipCount"].Tooltip = "100";
                 */
-                SaveData.saveValues["MaxClipCount"] = controller.interactables["ClipCount"].Tooltip;
+                SaveData.saveValues["MaxClipCount"] = scrollView.Controller.interactables["ClipCount"].Tooltip;
                 if(oldValue != SaveData.saveValues["MaxClipCount"])
                     SaveData.Save();
                 return false;
             }));
             // Add switches
-            controller.Add("InsertOutro", new Switch("Insert Outro", "Ends with a random outro.", new Vector2(219, 60+19), (int i, string n) => {
+            scrollView.Controller.Add("InsertOutro", new Switch("Use Outro", "Ends with a random outro.", new Vector2(208, 60-(8*1)+(19*2)+(10*1)+(9*1)), (int i, string n) => {
                 bool switchState = (i & 256) != 0;
                 if((i & 2) != 0)
                 {
@@ -645,7 +521,7 @@ namespace NonsensicalVideoGenerator
                 }
                 return switchState;
             }, SaveData.saveValues["OutrosEnabled"] == "true"));
-            controller.Add("InsertIntro", new Switch("Insert Intro", "Begins with a random intro.", new Vector2(139, 60+19), (int i, string n) => {
+            scrollView.Controller.Add("InsertIntro", new Switch("Use Intro", "Begins with a random intro.", new Vector2(139, 60-(8*1)+(19*2)+(10*1)+(9*1)), (int i, string n) => {
                 bool switchState = (i & 256) != 0;
                 if((i & 2) != 0)
                 {
@@ -656,7 +532,7 @@ namespace NonsensicalVideoGenerator
                 }
                 return switchState;
             }, SaveData.saveValues["IntrosEnabled"] == "true"));
-            controller.Add("SaveToLibrary", new Switch("Play Automatically", "Immediately start playing once complete.", new Vector2(139, 60), (int i, string n) => {
+            scrollView.Controller.Add("SaveToLibrary", new Switch("Play Automatically", "Immediately start playing once complete.", new Vector2(139, 60-(8*1)+(19*1)+(10*1)+(9*1)), (int i, string n) => {
                 bool switchState = (i & 256) != 0;
                 if((i & 2) != 0)
                 {
@@ -667,12 +543,14 @@ namespace NonsensicalVideoGenerator
                 }
                 return switchState;
             }, SaveData.saveValues["PlayAutomatically"] == "true"));
+            scrollView.Controller.Add("CommonOptions", new Label("Common Options:", new Vector2(139, 60-(8*0)+(19*0)+(10*1)+(9*1))));
+            scrollView.Controller.Add("StartRendering", new Button("Start Rendering", "Start generating a new video.", new Vector2(219, 60-(8*0)+(19*0)+(10*1)+(9*0)), GenerateButton));
             // Interactable
-            controller.LoadContent(contentManager, graphicsDevice);
-            controllerAdvanced.LoadContent(contentManager, graphicsDevice);
+            scrollView.LoadContent(contentManager, graphicsDevice);
             controllerRendering.LoadContent(contentManager, graphicsDevice);
-            controllerPage3.LoadContent(contentManager, graphicsDevice);
             actionController.LoadContent(contentManager, graphicsDevice);
+            actionControllerRendering.LoadContent(contentManager, graphicsDevice);
+            scrollView.MaxScrollOffset = 16*12;
         }
     }
 }

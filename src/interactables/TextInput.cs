@@ -1,4 +1,3 @@
-#if MONOGAME
 using System;
 using System.Collections.Generic;
 using System.Globalization;
@@ -41,7 +40,7 @@ namespace NonsensicalVideoGenerator
             this.maxChars = maxChars;
             this.mode = mode;
         }
-        public bool Update(GameTime gameTime, bool handleInput, string internalName)
+        public bool Update(GameTime gameTime, bool handleInput, string internalName, Vector2 mousePosition)
         {
             if(!registered)
             {
@@ -58,7 +57,7 @@ namespace NonsensicalVideoGenerator
                 oldKeyboardState = newKeyboardState;
                 newKeyboardState = Keyboard.GetState();
                 // Check if the mouse is hovering over the button.
-                if (scaledBounds2.Contains(MouseInput.MouseState.Position))
+                if (scaledBounds2.Contains(mousePosition))
                 {
                     // Check if the mouse is clicking on the button.
                     if (MouseInput.LastMouseState.LeftButton == ButtonState.Released && MouseInput.MouseState.LeftButton == ButtonState.Pressed)
@@ -202,7 +201,7 @@ namespace NonsensicalVideoGenerator
             }
             return false;
         }
-        public void Draw(GameTime gameTime, SpriteBatch spriteBatch, string internalName)
+        public void Draw(GameTime gameTime, SpriteBatch spriteBatch, string internalName, Vector2 mousePosition)
         {
             // Draw the sides
             Texture2D side = GlobalContent.GetTexture("InteractiveTextEntrySide");
@@ -247,7 +246,7 @@ namespace NonsensicalVideoGenerator
             GlobalContent.DrawString(spriteBatch, L.FontLarge(), localizedTitle, new Vector2(GlobalGraphics.Scale(bounds.X + bounds.Width + 7 + 1), GlobalGraphics.Scale(bounds.Y + 2 + 1)), Color.Black);
             GlobalContent.DrawString(spriteBatch, L.FontLarge(), localizedTitle, new Vector2(GlobalGraphics.Scale(bounds.X + bounds.Width + 7), GlobalGraphics.Scale(bounds.Y + 2)), Color.White);
             // Tooltip
-            if (scaledBounds2.Contains(MouseInput.MouseState.Position) && hiddenToolTip != "")
+            if (scaledBounds2.Contains(mousePosition) && hiddenToolTip != "")
             {
                 if(internalName.StartsWith("NoLocalization:"))
                     Global.tooltip = hiddenToolTip;
@@ -369,4 +368,3 @@ namespace NonsensicalVideoGenerator
         }
     }
 }
-#endif

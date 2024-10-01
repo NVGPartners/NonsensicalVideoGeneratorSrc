@@ -571,7 +571,8 @@ namespace NonsensicalVideoGenerator
                 bool youtube = youtubes[i];
                 ConsoleOutput.WriteLine("Downloading clip from " + downloadUrl + "...", Color.Yellow);
                 // Download the clip.
-                string filename = Path.GetFileName(downloadUrl).Replace(" ", "").Split('?')[0].Split('&')[0].Split('#')[0];
+                // Remove parameters, domain, navigation, etc. from URL for filename and extension.
+                string filename = Path.GetFileName(downloadUrl).Replace(" ", "_").Split('?')[0];
                 string path = Path.Combine(libraryRootPath, libraryPaths[downloadType], filename);
                 try
                 {
@@ -650,22 +651,16 @@ namespace NonsensicalVideoGenerator
         {
             foreach(string clipUrl in clipUrls)
             {
+                // Skip blank URLs.
+                if (string.IsNullOrWhiteSpace(clipUrl))
+                    continue;
                 // Download a clip from a URL and add it to the library.
-                // Remove everything after ?, &, or #.
-                string filename = Path.GetFileName(clipUrl).Replace(" ", "").Split('?')[0].Split('&')[0].Split('#')[0];
-                string path = Path.Combine(libraryRootPath, libraryPaths[key], filename);
+                string filename = Path.GetFileName(clipUrl).Replace(" ", "%20");
                 ConsoleOutput.WriteLine("Downloading clip " + filename + "...", Color.Yellow);
-                // Does it end in a file extension?
-                if (!filename.Contains("."))
+                // Is it a YouTube url?
+                if (clipUrl.Contains("youtube.com") || clipUrl.Contains("youtu.be"))
                 {
-                    // If not, is it a YouTube url?
-                    if (!clipUrl.Contains("youtube.com") && !clipUrl.Contains("youtu.be"))
-                    {
-                        // Error: We don't know what to do with this.
-                        ConsoleOutput.WriteLine("Failed to download clip: URL is unknown.", Color.Red);
-                        continue;
-                    }
-                    // Can't download YouTube URLs if an image is being downloaded.
+                    // Can't download YouTube URLs as images.
                     if (key == DefaultLibraryTypes.Image)
                     {
                         ConsoleOutput.WriteLine("Failed to download clip: Images cannot be downloaded from YouTube.", Color.Red);
@@ -676,22 +671,7 @@ namespace NonsensicalVideoGenerator
                 }
                 else
                 {
-                    // check against file extensions in libraryFileTypes[DefaultLibraryTypes.All]
-                    bool found = false;
-                    foreach(string filetype in libraryFileTypes[key])
-                    {
-                        if (filename.EndsWith(filetype))
-                        {
-                            found = true;
-                            break;
-                        }
-                    }
-                    if (!found)
-                    {
-                        // Error: We don't know what to do with this.
-                        ConsoleOutput.WriteLine("Failed to download clip: Invalid file extension.", Color.Red);
-                        continue;
-                    }
+                    // Not a YouTube url.
                     youtubes.Add(false);
                 }
                 downloadUrls.Add(clipUrl);

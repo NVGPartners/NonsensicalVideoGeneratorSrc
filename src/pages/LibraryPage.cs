@@ -1,4 +1,3 @@
-#if MONOGAME
 using System.Collections.Generic;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Content;
@@ -460,6 +459,7 @@ namespace NonsensicalVideoGenerator
                             {
                                 case LibraryRootType.Video:
                                 {
+#if WINDOWSDX
                                     // Get thumbnail of video using shell
                                     ShellFile shellFile = ShellFile.FromFilePath(libraryFile.Path);
                                     BitmapSource bitmapSource = shellFile.Thumbnail.BitmapSource;
@@ -495,10 +495,12 @@ namespace NonsensicalVideoGenerator
                                         }
                                     }
                                     texture.SetData(colorData);
+#endif
                                     break;
                                 }
                                 case LibraryRootType.Audio:
                                 {
+#if WINDOWSDX
                                     // Generate audio waveform using ffmpeg
                                     string tempBmp = Path.Combine(Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location) ?? ".", "temp", "wave.bmp");
                                     Process bmpProcess = Generator.GenerateTempAudioWaveformImage(libraryFile.Path, tempBmp);
@@ -541,6 +543,7 @@ namespace NonsensicalVideoGenerator
                                     // Delete temp file
                                     bitmap.Dispose();
                                     File.Delete(tempBmp);
+#endif
                                     break;
                                 }
                                 case LibraryRootType.Image:
@@ -1323,6 +1326,7 @@ namespace NonsensicalVideoGenerator
                                     {
                                         // Add button: Open file dialog with filters from library type
                                         GlobalContent.GetSound("Option").Play(int.Parse(SaveData.saveValues["SoundEffectVolume"], System.Globalization.CultureInfo.InvariantCulture) / 100f, 0f, 0f);
+#if WINDOWSDX
                                         if(!currentLibraryType.Special)
                                         {
                                             string filter = LibraryData.libraryNames[currentLibraryType] + "|";
@@ -1363,6 +1367,7 @@ namespace NonsensicalVideoGenerator
                                                 }
                                             }
                                         }
+#endif
                                         return true;
                                     }
                                 }
@@ -1443,4 +1448,3 @@ namespace NonsensicalVideoGenerator
         }
     }
 }
-#endif

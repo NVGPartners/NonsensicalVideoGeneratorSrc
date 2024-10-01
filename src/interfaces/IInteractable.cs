@@ -4,6 +4,7 @@ using System.Collections.Generic;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Content;
 using Microsoft.Xna.Framework.Graphics;
+using Microsoft.Xna.Framework.Input;
 
 namespace NonsensicalVideoGenerator
 {
@@ -17,8 +18,8 @@ namespace NonsensicalVideoGenerator
         public int State { get; set; }
         public Vector2 Position { get; set; }
         public Func<int, string, bool> Callback { get; set; }
-        public bool Update(GameTime gameTime, bool handleInput, string internalName);
-        public void Draw(GameTime gameTime, SpriteBatch spriteBatch, string internalName);
+        public bool Update(GameTime gameTime, bool handleInput, string internalName, Vector2 mousePosition);
+        public void Draw(GameTime gameTime, SpriteBatch spriteBatch, string internalName, Vector2 mousePosition);
         public void LoadContent(ContentManager contentManager, GraphicsDevice graphicsDevice, string internalName);
     }
 }

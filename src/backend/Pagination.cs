@@ -1,4 +1,3 @@
-#if MONOGAME
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Content;
 using Microsoft.Xna.Framework.Graphics;
@@ -6,19 +5,11 @@ using Microsoft.Xna.Framework.Graphics;
 namespace NonsensicalVideoGenerator
 {
     /// <summary>
-    /// A page, which is drawn from the content window and selectable from the menu screen.
-    /// </summary>
-    public interface IPage : IObject
-    {
-        public string Name { get; set; }
-        public string Tooltip { get; }
-    }
-    /// <summary>
     /// Here is where pages are kept. Each page is a class that implements IObject with a name and tooltip.
     /// </summary>
     public static class Pagination
     {
-        public static int TopPageCount = 6;
+        public static int TopPageCount = 6; // Amount of valid pages
         public static IPage[] Pages = new IPage[]
         {
             // Selectable pages (from menu)
@@ -28,10 +19,11 @@ namespace NonsensicalVideoGenerator
             new OptionsPage(),
             new BlogPage(),
             new PastimePage(),
+            // Debug page is not selectable from menu
             new DebugPage(),
         };
-        // These two variables are the same for selectable pages, but different for subpages.
-        // For subpages, the selected page is the parent page, and the drawn page is the subpage.
+        // Page hierarchy is a legacy feature
+        // TODO: This should be removed
         public static int SelectedPage = 0;
         public static int DrawnPage = 0;
         public static void SetParentPage(int page)
@@ -108,4 +100,3 @@ namespace NonsensicalVideoGenerator
         }
     }
 }
-#endif

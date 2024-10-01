@@ -19,8 +19,6 @@ namespace NonsensicalVideoGenerator
     {
         public static Dictionary<string, string> saveValues = new Dictionary<string, string>()
         {
-            {"ScreenWidth", "320"},
-            {"ScreenHeight", "240"},
             {"ScreenScale", "2"}, // 1 - 4 ONLY!
             {"MinStreamDuration", "0.2"},
             {"MaxStreamDuration", "0.4"},
@@ -56,12 +54,13 @@ namespace NonsensicalVideoGenerator
             {"MuteMusicWhileTabbedOut", "true"},
             {"VideoPlaybackScale", "2"},
             {"ActiveTheme", ""},
-            {"TimeOut", "30"},
+            {"TimeOut", "60"},
             {"EnableTimeOut", "true"},
             {"SkipPhotosensitiveWarningScreen", "false"},
             {"PluginListFilterFlags", "7"},
             {"LastVersion", ""},
-            {"Locale", "fixme"}
+            {"Locale", "fixme"},
+            {"DisableHolidays", "false"}
         };
         public static string saveFileName = "Options.json";
         public static bool Save()

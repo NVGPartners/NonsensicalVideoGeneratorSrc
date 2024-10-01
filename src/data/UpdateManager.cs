@@ -4,15 +4,8 @@ using System.IO;
 using Newtonsoft.Json;
 using System.Net.Http;
 using System.Diagnostics;
-using System.Windows.Forms;
 using System.Reflection;
-
-
-#if MONOGAME
 using Microsoft.Xna.Framework;
-#else
-using System.Drawing;
-#endif
 
 namespace NonsensicalVideoGenerator
 {    
@@ -23,15 +16,14 @@ namespace NonsensicalVideoGenerator
     {
         public static string updateUrl = "";
         public static string updateTag = "";
-        public static string requiredFFmpegVersion = "6.1.1-essentials_build-www.gyan.dev";
-        public static string requiredFFprobeVersion = "6.1.1-essentials_build-www.gyan.dev";
+        public static string requiredFFmpegVersion = "7.0.2-full_build-www.gyan.dev";
+        public static string requiredFFprobeVersion = "7.0.2-full_build-www.gyan.dev";
         public static bool ffmpegInstalled = false;
         public static bool ffmpegWrongVersion = false;
         public static bool ffprobeInstalled = false;
         public static bool ffprobeWrongVersion = false;
         public static bool imagemagickInstalled = false;
         public static bool ytDlpInstalled = false;
-        public static bool frei0rInstalled = false;
         public static bool DoesCommandExist(string command)
         {
             // skip if needed and return false
@@ -75,23 +67,23 @@ namespace NonsensicalVideoGenerator
                 Global.useSystemFFprobe = true;
                 Global.useSystemMagick = true;
                 Global.useSystemYtDlp = true;
-                Global.useSystemFrei0r = true;
                 ffmpegInstalled = true;
                 ffprobeInstalled = true;
                 imagemagickInstalled = true;
                 ytDlpInstalled = true;
-                frei0rInstalled = true;
                 return;
             }
             // Test for dependencies.
             ConsoleOutput.WriteLine("Checking for dependencies...", Color.Magenta);
-            bool[] status = new bool[5];
-            // Check if .\ffmpeg.exe and .\ffprobe.exe exist.
-            status[0] = File.Exists(@".\ffmpeg.exe");
-            status[1] = File.Exists(@".\ffprobe.exe");
-            status[2] = File.Exists(@".\magick.exe");
-            status[3] = File.Exists(@".\yt-dlp.exe");
-            status[4] = Directory.Exists(@".\frei0r-1");
+            bool[] status =
+            [
+                // Check if .\ffmpeg.exe and .\ffprobe.exe exist.
+                File.Exists(@".\ffmpeg.exe"),
+                File.Exists(@".\ffprobe.exe"),
+                File.Exists(@".\magick.exe"),
+                File.Exists(@".\yt-dlp.exe"),
+                Directory.Exists(@".\frei0r-1"),
+            ];
             // If these don't exist, set Global.useSystemFFmpeg to true
             // so that the program will use the system ffmpeg and ffprobe.
             if (!status[0])
@@ -215,6 +207,19 @@ namespace NonsensicalVideoGenerator
                     }
                 }
             }
+            // check for .\frei0r-1 folder
+            if(status[0] && status[0])
+            {
+                string frei0rPath = Path.Combine(Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location) ?? ".", "frei0r-1");
+                if (!Directory.Exists(frei0rPath))
+                {
+                    ConsoleOutput.WriteLine("frei0r-1 folder not found.", Color.Red);
+                    ffmpegWrongVersion = true;
+                    ffprobeWrongVersion = true;
+                    status[0] = false;
+                    status[1] = false;
+                }
+            }
             if (!status[2])
             {
                 Global.useSystemMagick = true;
@@ -230,14 +235,6 @@ namespace NonsensicalVideoGenerator
             else
             {
                 Global.useSystemYtDlp = false;
-            }
-            if(!status[4])
-            {
-                Global.useSystemFrei0r = true;
-            }
-            else
-            {
-                Global.useSystemFrei0r = false;
             }
             if(!Global.useSystemFFmpeg)
             {
@@ -270,14 +267,6 @@ namespace NonsensicalVideoGenerator
             else
             {
                 ytDlpInstalled = DoesCommandExist("yt-dlp");
-            }
-            if(!Global.useSystemFrei0r)
-            {
-                frei0rInstalled = status[4];
-            }
-            else
-            {
-                frei0rInstalled = DoesEnvironmentVariableExist("FREI0R_PATH");
             }
         }
         public static void DownloadUpdate()

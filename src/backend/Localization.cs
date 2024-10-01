@@ -64,8 +64,8 @@ namespace NonsensicalVideoGenerator
         {
             Locale locale = GetLocale();
             int curLocaleIndex = localeIndex;
-            // If text contains Interactable:ViewLocalizationOptions then cycle language variables.
-            if (text.Contains("Interactable:ViewLocalizationOptions"))
+            // If text contains ViewLocalizationOptions then cycle language variables.
+            if (text.Contains("ViewLocalizationOptions") || text.Contains("SelectLanguageOptionsPage"))
             {
                 if (cyclerLocale == null)
                     cyclerLocale = locale;

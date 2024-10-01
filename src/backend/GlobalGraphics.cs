@@ -1,4 +1,6 @@
 #if MONOGAME
+using System;
+using System.Collections.Generic;
 using System.Reflection;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Content;
@@ -6,16 +8,70 @@ using Microsoft.Xna.Framework.Graphics;
 
 namespace NonsensicalVideoGenerator
 {
+    public class AspectRatio
+    {
+        public int width;
+        public int height;
+        public Vector2 drawOffset;
+        public Point preferredResolution;
+        public AspectRatio()
+        {
+            width = 4;
+            height = 3;
+            drawOffset = new Vector2(0, 0);
+            preferredResolution = new Point(320, 240);
+        }
+        public AspectRatio(int width, int height, Vector2 drawOffset, Point preferredResolution)
+        {
+            this.width = width;
+            this.height = height;
+            this.drawOffset = drawOffset;
+            this.preferredResolution = preferredResolution;
+        }
+        public readonly static List<AspectRatio> All = new()
+        {
+            // Square
+            new AspectRatio(1, 1, new Vector2(0, 40), new Point(320, 320)),
+            // Television
+            new AspectRatio(4, 3, new Vector2(0, 0), new Point(320, 240)), // Default
+            new AspectRatio(5, 4, new Vector2(0, 8), new Point(320, 256)),
+            // Mobile
+            //new AspectRatio(9, 16, new Vector2(0, 164), new Point(320, 569)),
+            //new AspectRatio(9, 20, new Vector2(0, 235), new Point(320, 720)), // Pixel 7a
+            // Widescreen
+            new AspectRatio(16, 9, new Vector2(53, 0), new Point(427, 240)),
+            new AspectRatio(16, 10, new Vector2(32, 0), new Point(384, 240)),
+            // Ultrawide
+            new AspectRatio(64, 27, new Vector2(124, 0), new Point(569, 240)), // Consumer ultrawide (21:9)
+            //new AspectRatio(32, 9, new Vector2(266, 0), new Point(853, 240)), // Super ultrawide
+        };
+    }
     /// <summary>
     /// This class stores repeated graphical functions for ease of use and cleanliness.
     /// </summary>
     public static class GlobalGraphics
     {
-        public static int width = int.Parse(SaveData.saveValues["ScreenWidth"], System.Globalization.CultureInfo.InvariantCulture);
-        public static int height = int.Parse(SaveData.saveValues["ScreenHeight"], System.Globalization.CultureInfo.InvariantCulture);
-        public static int scale = int.Parse(SaveData.saveValues["ScreenScale"], System.Globalization.CultureInfo.InvariantCulture);
-        public static int scaledWidth = (int)(width * scale);
-        public static int scaledHeight = (int)(height * scale);
+        public static int scale = (int)Math.Round(double.Parse(SaveData.saveValues["ScreenScale"], System.Globalization.CultureInfo.InvariantCulture));
+        public static Vector2 drawOffset = new(0, 0);
+        public static Point preferredResolution = new(320, 240);
+        public static bool fullScreen = false;
+        public static int scaledWidth = new AspectRatio().preferredResolution.X * scale;
+        public static int scaledHeight = new AspectRatio().preferredResolution.Y * scale;
+        public static void SetAspectRatio(AspectRatio aspectRatio)
+        {
+            drawOffset = aspectRatio.drawOffset;
+            preferredResolution = new Point(aspectRatio.preferredResolution.X * scale, aspectRatio.preferredResolution.Y * scale);
+            UserInterface.instance.Resize(preferredResolution.X, preferredResolution.Y);
+        }
+        public static AspectRatio GetAspectRatio()
+        {
+            foreach (AspectRatio aspectRatio in AspectRatio.All)
+            {
+                if (aspectRatio.drawOffset == drawOffset && aspectRatio.preferredResolution == new Point(preferredResolution.X / scale, preferredResolution.Y / scale))
+                    return aspectRatio;
+            }
+            return new AspectRatio();
+        }
         public static int Scale(int value)
         {
             return (int)(value * scale);

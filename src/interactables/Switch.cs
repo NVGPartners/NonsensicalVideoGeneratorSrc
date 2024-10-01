@@ -27,18 +27,18 @@ namespace NonsensicalVideoGenerator
             Position = defaultPosition;
             Callback = defaultCallback;
             SwitchState = defaultSwitchState;
-        }
-        public bool Update(GameTime gameTime, bool handleInput, string internalName)
-        {
             // Calculate bounds
             bounds = new((int)Position.X, (int)Position.Y, 25, 15);
+        }
+        public bool Update(GameTime gameTime, bool handleInput, string internalName, Vector2 mousePosition)
+        {
             Rectangle scaledBounds = new((int)(bounds.X * GlobalGraphics.scale), (int)(bounds.Y * GlobalGraphics.scale), (int)(bounds.Width * GlobalGraphics.scale), (int)(bounds.Height * GlobalGraphics.scale));
             if (handleInput)
             {
                 Accessibility.CompatAccessibility(scaledBounds, L.T(0, "Accessibility:InteractableSwitch", L.T(0, "Interactable:"+internalName+"Title"), L.T(0, "Interactable:"+internalName+"Tooltip"), SwitchState ? L.T(0, "Accessibility:InteractableSwitchOn") : L.T(0, "Accessibility:InteractableSwitchOff")));
                 int mouseButtonFlags = 0;
                 // Check if the mouse is hovering over the button.
-                if (scaledBounds.Contains(MouseInput.MouseState.Position))
+                if (scaledBounds.Contains(mousePosition))
                 {
                     // Bitwise operations determine which mouse buttons are pressed.
                     mouseButtonFlags |= 1;
@@ -74,7 +74,7 @@ namespace NonsensicalVideoGenerator
             }
             return false;
         }
-        public void Draw(GameTime gameTime, SpriteBatch spriteBatch, string internalName)
+        public void Draw(GameTime gameTime, SpriteBatch spriteBatch, string internalName, Vector2 mousePosition)
         {
             // Draw the sides
             Texture2D switchGraphic = GlobalContent.GetTexture("InteractiveSwitch");
@@ -92,10 +92,14 @@ namespace NonsensicalVideoGenerator
                 localizedTitle = Name;
             else
                 localizedTitle = L.T(0, "Interactable:"+internalName+"Title");
-            if(internalName.Contains("ViewLocalizationOptions"))
+            SpriteFont spriteFont = L.FontLarge();
+            if(internalName.Contains("ViewLocalizationOptions") || internalName.Contains("SelectLanguageOptionsPage"))
+            {
                 localizedTitle = L.T(0, "Interactable:"+internalName+"Title", L.cyclerLocale.localizedName);
-            GlobalContent.DrawString(spriteBatch, L.FontLarge(), localizedTitle, new Vector2(GlobalGraphics.Scale(bounds.X + 29 + 1), GlobalGraphics.Scale(bounds.Y + 2 + 1)), Color.Black, internalName.Contains("ViewLocalizationOptions"));
-            GlobalContent.DrawString(spriteBatch, L.FontLarge(), localizedTitle, new Vector2(GlobalGraphics.Scale(bounds.X + 29), GlobalGraphics.Scale(bounds.Y + 2)), Color.White, internalName.Contains("ViewLocalizationOptions"));
+                spriteFont = GlobalContent.GetFont(L.cyclerLocale.fontLarge);
+            }
+            GlobalContent.DrawString(spriteBatch, spriteFont, localizedTitle, new Vector2(GlobalGraphics.Scale(bounds.X + 29 + 1), GlobalGraphics.Scale(bounds.Y + 2 + 1)), Color.Black);
+            GlobalContent.DrawString(spriteBatch, spriteFont, localizedTitle, new Vector2(GlobalGraphics.Scale(bounds.X + 29), GlobalGraphics.Scale(bounds.Y + 2)), Color.White);
             // If hovering, draw tooltip
             if (State >= 1 && Tooltip != "")
             {

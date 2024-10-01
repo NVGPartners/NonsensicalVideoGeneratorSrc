@@ -18,9 +18,9 @@ namespace NonsensicalVideoGenerator
     {
         public string Name { get; set; } = "PageOptions";
         public string Tooltip { get; } = "Change application settings.";
+        private readonly ScrollView scrollView = new();
         private readonly InteractableController actionController = new();
         private readonly InteractableController actionController2 = new();
-        private readonly InteractableController controller = new();
         public bool viewingLocalizations = false;
         private int scrollOffset = 0;
         private int maxScrollOffset = 0;
@@ -237,8 +237,11 @@ namespace NonsensicalVideoGenerator
                             if (MouseInput.MouseState.X >= GlobalGraphics.Scale(138) && MouseInput.MouseState.X < GlobalGraphics.Scale(inRange)
                                 && MouseInput.MouseState.Y >= GlobalGraphics.Scale(59 + ((i-offsetpl) * 16) - scrollOffset) && MouseInput.MouseState.Y < GlobalGraphics.Scale(70 + ((i-offsetpl) * 16) - scrollOffset))
                             {
-                                GlobalContent.GetSound("Option").Play(int.Parse(SaveData.saveValues["SoundEffectVolume"], CultureInfo.InvariantCulture) / 100f, 0f, 0f);
                                 L.LoadLocale(L.locales[i+1].name);
+                                Global.generator.progressText = "";
+                                Global.generator.failureReason = "";
+                                // switch back to options page
+                                LocaleAction(2, "");
                                 return true;
                             }
                         }
@@ -247,9 +250,9 @@ namespace NonsensicalVideoGenerator
             }
             else
             {
-                if(actionController.Update(gameTime, handleInput))
+                if(scrollView.Update(gameTime, handleInput))
                     return true;
-                if(controller.Update(gameTime, handleInput))
+                if(actionController.Update(gameTime, handleInput))
                     return true;
             }
             return false;
@@ -279,10 +282,10 @@ namespace NonsensicalVideoGenerator
                 {
                     spriteBatch.End();
                     // Mask to specific area
-                    spriteBatch.GraphicsDevice.ScissorRectangle = new Rectangle(GlobalGraphics.Scale(135), GlobalGraphics.Scale(56), GlobalGraphics.Scale(293), GlobalGraphics.Scale(236)); 
+                    spriteBatch.GraphicsDevice.ScissorRectangle = new Rectangle((int)GlobalGraphics.Scale(GlobalGraphics.drawOffset.X+135), (int)GlobalGraphics.Scale(GlobalGraphics.drawOffset.Y+56), GlobalGraphics.Scale(293), GlobalGraphics.Scale(GlobalGraphics.preferredResolution.Y-56));
                     RasterizerState rasterizerState = new RasterizerState();
                     rasterizerState.ScissorTestEnable = true;
-                    spriteBatch.Begin(SpriteSortMode.Deferred, BlendState.AlphaBlend, SamplerState.PointClamp, null, rasterizerState, null, Matrix.CreateTranslation(GlobalGraphics.Scale(Global.drawOffset.X)+GlobalGraphics.Scale(cntscr.offset.X / GlobalGraphics.scale), GlobalGraphics.Scale(Global.drawOffset.Y)+GlobalGraphics.Scale((cntscr.offset.Y / GlobalGraphics.scale) + -scrollOffset), 0));
+                    spriteBatch.Begin(SpriteSortMode.Deferred, BlendState.AlphaBlend, SamplerState.PointClamp, null, rasterizerState, null, Matrix.CreateTranslation(GlobalGraphics.Scale(GlobalGraphics.drawOffset.X)+GlobalGraphics.Scale(cntscr.offset.X / GlobalGraphics.scale), GlobalGraphics.Scale(GlobalGraphics.drawOffset.Y)+GlobalGraphics.Scale((cntscr.offset.Y / GlobalGraphics.scale) + -scrollOffset), 0));
                 }
                 int plcount = L.locales.Count - 1;
                 int offsetpl = 0;
@@ -321,7 +324,7 @@ namespace NonsensicalVideoGenerator
                 }
                 // End offset
                 spriteBatch.End();
-                spriteBatch.Begin(SpriteSortMode.Deferred, BlendState.AlphaBlend, SamplerState.PointClamp, null, null, null, Matrix.CreateTranslation(GlobalGraphics.Scale(Global.drawOffset.X), GlobalGraphics.Scale(Global.drawOffset.Y), 0));
+                spriteBatch.Begin(SpriteSortMode.Deferred, BlendState.AlphaBlend, SamplerState.PointClamp, null, null, null, Matrix.CreateTranslation(GlobalGraphics.Scale(GlobalGraphics.drawOffset.X), GlobalGraphics.Scale(GlobalGraphics.drawOffset.Y), 0));
                 if (internalTooltip != "")
                 {
                     Global.tooltip = internalTooltip;
@@ -330,7 +333,7 @@ namespace NonsensicalVideoGenerator
             else
             {
                 actionController.Draw(gameTime, spriteBatch);
-                controller.Draw(gameTime, spriteBatch);
+                scrollView.Draw(gameTime, spriteBatch);
             }
         }
         public bool LocaleAction(int i, string n)
@@ -354,7 +357,7 @@ namespace NonsensicalVideoGenerator
             // Clear all controllers
             actionController.Clear();
             actionController2.Clear();
-            controller.Clear();
+            scrollView.Controller.Clear();
             // Add dials
             actionController.Add("ActionReset", new ActionButton("Reset to default parameters.", new Vector2(112, 206), (int i, string n) => {
                 switch(i)
@@ -369,15 +372,16 @@ namespace NonsensicalVideoGenerator
                         SaveData.saveValues["MuteMusicWhileTabbedOut"] = "true";
                         SaveData.saveValues["VideoPlaybackScale"] = "2";
                         SaveData.saveValues["SkipPhotosensitiveWarningScreen"] = "false";
+                        SaveData.saveValues["DisableHolidays"] = "false";
                         SaveData.Save();
-                        controller.interactables["MusicVolume"].Tooltip = SaveData.saveValues["MusicVolume"];
-                        controller.interactables["SFXVolume"].Tooltip = SaveData.saveValues["SoundEffectVolume"];
-                        controller.interactables["VideoVolume"].Tooltip = SaveData.saveValues["VideoVolume"];
-                        ((Switch)controller.interactables["MotionDisable"]).SwitchState = SaveData.saveValues["DisableMotion"] == "true";
-                        ((Switch)controller.interactables["EnableDiscordRPC"]).SwitchState = SaveData.saveValues["EnableDiscordRPC"] == "true";
-                        ((Switch)controller.interactables["MuteMusicWhileTabbedOut"]).SwitchState = SaveData.saveValues["MuteMusicWhileTabbedOut"] == "true";
-                        controller.interactables["VideoPlaybackScale"].Tooltip = SaveData.saveValues["VideoPlaybackScale"];
-                        ((Switch)controller.interactables["SkipPhotosensitiveWarningScreen"]).SwitchState = SaveData.saveValues["SkipPhotosensitiveWarningScreen"] == "true";
+                        scrollView.Controller.interactables["MusicVolume"].Tooltip = SaveData.saveValues["MusicVolume"];
+                        scrollView.Controller.interactables["SFXVolume"].Tooltip = SaveData.saveValues["SoundEffectVolume"];
+                        scrollView.Controller.interactables["VideoVolume"].Tooltip = SaveData.saveValues["VideoVolume"];
+                        ((Switch)scrollView.Controller.interactables["MotionDisable"]).SwitchState = SaveData.saveValues["DisableMotion"] == "true";
+                        ((Switch)scrollView.Controller.interactables["EnableDiscordRPC"]).SwitchState = SaveData.saveValues["EnableDiscordRPC"] == "true";
+                        ((Switch)scrollView.Controller.interactables["MuteMusicWhileTabbedOut"]).SwitchState = SaveData.saveValues["MuteMusicWhileTabbedOut"] == "true";
+                        scrollView.Controller.interactables["VideoPlaybackScale"].Tooltip = SaveData.saveValues["VideoPlaybackScale"];
+                        ((Switch)scrollView.Controller.interactables["SkipPhotosensitiveWarningScreen"]).SwitchState = SaveData.saveValues["SkipPhotosensitiveWarningScreen"] == "true";
                         return true;
                 }
                 return false;
@@ -396,7 +400,7 @@ namespace NonsensicalVideoGenerator
                 return false;
             }, ThemeManager.LoadLayeredContent<Texture2D>("graphics/actions/reset")));
             actionController2.Add("ActionOptions", new ActionButton("View localizations to select a different language.", new Vector2(112, 221), LocaleAction, ThemeManager.LoadLayeredContent<Texture2D>("graphics/actions/options")));
-            controller.Add("SkipPhotosensitiveWarningScreen", new Switch("Skip Intro", "Load the menu immediately when starting.", new Vector2(139, 60+19*8), (int i, string n) => {
+            scrollView.Controller.Add("SkipPhotosensitiveWarningScreen", new Switch("Skip Intro", "Load the menu immediately when starting.", new Vector2(139, 60-(8*3)+(19*12)+(10*1)+(9*1)), (int i, string n) => {
                 bool switchState = (i & 256) != 0;
                 if((i & 2) != 0)
                 {
@@ -407,34 +411,7 @@ namespace NonsensicalVideoGenerator
                 }
                 return switchState;
             }, SaveData.saveValues["SkipPhotosensitiveWarningScreen"] == "true"));
-            controller.Add("VideoPlaybackScale", new TextEntry("Video Playback Resolution", "The screen scale multiplier for video playback.", SaveData.saveValues["VideoPlaybackScale"], new Vector2(139, 60+19*7), 24, 3, 1, (int i, string n) => {
-                int oldValue = int.Parse(SaveData.saveValues["VideoPlaybackScale"], CultureInfo.InvariantCulture);
-                // Range: 1-4
-                if(int.Parse(controller.interactables["VideoPlaybackScale"].Tooltip, CultureInfo.InvariantCulture) < 1)
-                    controller.interactables["VideoPlaybackScale"].Tooltip = "1";
-                if(int.Parse(controller.interactables["VideoPlaybackScale"].Tooltip, CultureInfo.InvariantCulture) > 4)
-                    controller.interactables["VideoPlaybackScale"].Tooltip = "4";
-                SaveData.saveValues["VideoPlaybackScale"] = controller.interactables["VideoPlaybackScale"].Tooltip;
-                if(oldValue != int.Parse(SaveData.saveValues["VideoPlaybackScale"], CultureInfo.InvariantCulture))
-                    SaveData.Save();
-                return false;
-            }));
-            controller.Add("MuteMusicWhileTabbedOut", new Switch("Mute Music While Inactive", "Don't play music while " + Global.productNameShort + " is in the background.", new Vector2(139, 60+19*6), (int i, string n) => {
-                bool switchState = (i & 256) != 0;
-                if((i & 2) != 0)
-                {
-                    string oldValue = SaveData.saveValues["MuteMusicWhileTabbedOut"];
-                    SaveData.saveValues["MuteMusicWhileTabbedOut"] = switchState.ToString().ToLower();
-                    if(oldValue != SaveData.saveValues["MuteMusicWhileTabbedOut"])
-                        SaveData.Save();
-                    if(switchState)
-                        DiscordRPC.Initialize();
-                    else
-                        DiscordRPC.Shutdown();
-                }
-                return switchState;
-            }, SaveData.saveValues["MuteMusicWhileTabbedOut"] == "true"));
-            controller.Add("EnableDiscordRPC", new Switch("Enable Discord RPC", "Tell others that you're using " + Global.productNameShort + ".", new Vector2(139, 60+19*5), (int i, string n) => {
+            scrollView.Controller.Add("EnableDiscordRPC", new Switch("Enable Discord RPC", "Tell others that you're using " + Global.productNameShort + ".", new Vector2(139, 60-(8*3)+(19*11)+(10*1)+(9*1)), (int i, string n) => {
                 bool switchState = (i & 256) != 0;
                 if((i & 2) != 0)
                 {
@@ -449,7 +426,23 @@ namespace NonsensicalVideoGenerator
                 }
                 return switchState;
             }, SaveData.saveValues["EnableDiscordRPC"] == "true"));
-            controller.Add("MotionDisable", new Switch("Disable Motion", "Turns off screen tweening and other elements.", new Vector2(139, 60+19*4), (int i, string n) => {
+            scrollView.Controller.Add("DisableHolidays", new Switch("Disable Holidays", "Disables special themes during holidays.", new Vector2(139, 60-(8*3)+(19*10)+(10*1)+(9*1)), (int i, string n) => {
+                bool switchState = (i & 256) != 0;
+                if((i & 2) != 0)
+                {
+                    string oldValue = SaveData.saveValues["DisableHolidays"];
+                    SaveData.saveValues["DisableHolidays"] = switchState.ToString().ToLower();
+                    if(oldValue != SaveData.saveValues["DisableHolidays"])
+                        SaveData.Save();
+                    HolidayManager.CheckHolidays();
+                    if(HolidayManager.CurrentHoliday != null && HolidayManager.CurrentHoliday.Theme != null)
+                        ThemeManager.ApplyTheme(HolidayManager.CurrentHoliday.Theme);
+                    else
+                        ThemeManager.ApplyTheme(DefaultThemes.Nonsensical);
+                }
+                return switchState;
+            }, SaveData.saveValues["DisableHolidays"] == "true"));
+            scrollView.Controller.Add("MotionDisable", new Switch("Disable Motion", "Turns off screen tweening and other elements.", new Vector2(139, 60-(8*3)+(19*9)+(10*1)+(9*1)), (int i, string n) => {
                 bool switchState = (i & 256) != 0;
                 if((i & 2) != 0)
                 {
@@ -460,14 +453,54 @@ namespace NonsensicalVideoGenerator
                 }
                 return switchState;
             }, SaveData.saveValues["DisableMotion"] == "true"));
-            controller.Add("Scale", new TextEntry("Screen Resolution", "The screen scale multiplier for the UI. Restarts when set.", SaveData.saveValues["ScreenScale"], new Vector2(139, 60+19*3), 24, 3, 1, (int i, string n) => {
+            scrollView.Controller.Add("Preferences", new Label("Preferences:", new Vector2(139, 60-(8*2)+(19*8)+(10*1)+(9*1))));
+            scrollView.Controller.Add("MuteMusicWhileTabbedOut", new Switch("Mute Music While Inactive", "Don't play music while " + Global.productNameShort + " is in the background.", new Vector2(139, 60-(8*2)+(19*7)+(10*1)+(9*1)), (int i, string n) => {
+                bool switchState = (i & 256) != 0;
+                if((i & 2) != 0)
+                {
+                    string oldValue = SaveData.saveValues["MuteMusicWhileTabbedOut"];
+                    SaveData.saveValues["MuteMusicWhileTabbedOut"] = switchState.ToString().ToLower();
+                    if(oldValue != SaveData.saveValues["MuteMusicWhileTabbedOut"])
+                        SaveData.Save();
+                    if(switchState)
+                        DiscordRPC.Initialize();
+                    else
+                        DiscordRPC.Shutdown();
+                }
+                return switchState;
+            }, SaveData.saveValues["MuteMusicWhileTabbedOut"] == "true"));
+            scrollView.Controller.Add("VideoPlaybackScale", new TextEntry("Video Playback Resolution", "The screen scale multiplier for video playback.", SaveData.saveValues["VideoPlaybackScale"], new Vector2(139, 60-(8*2)+(19*6)+(10*1)+(9*1)), 24, 3, 1, (int i, string n) => {
+                int oldValue = int.Parse(SaveData.saveValues["VideoPlaybackScale"], CultureInfo.InvariantCulture);
+                // Range: 1-4
+                if(int.Parse(scrollView.Controller.interactables["VideoPlaybackScale"].Tooltip, CultureInfo.InvariantCulture) < 1)
+                    scrollView.Controller.interactables["VideoPlaybackScale"].Tooltip = "1";
+                if(int.Parse(scrollView.Controller.interactables["VideoPlaybackScale"].Tooltip, CultureInfo.InvariantCulture) > 4)
+                    scrollView.Controller.interactables["VideoPlaybackScale"].Tooltip = "4";
+                SaveData.saveValues["VideoPlaybackScale"] = scrollView.Controller.interactables["VideoPlaybackScale"].Tooltip;
+                if(oldValue != int.Parse(SaveData.saveValues["VideoPlaybackScale"], CultureInfo.InvariantCulture))
+                    SaveData.Save();
+                return false;
+            }));
+            scrollView.Controller.Add("VideoVolume", new TextEntry("Media Playback Volume", "In-app media volume level, from 0-100.", SaveData.saveValues["VideoVolume"], new Vector2(139, 60-(8*2)+(19*5)+(10*1)+(9*1)), 24, 3, 1, (int i, string n) => {
+                string oldValue = SaveData.saveValues["VideoVolume"];
+                if(int.Parse(scrollView.Controller.interactables["VideoVolume"].Tooltip, CultureInfo.InvariantCulture) < 0)
+                    scrollView.Controller.interactables["VideoVolume"].Tooltip = "0";
+                if(int.Parse(scrollView.Controller.interactables["VideoVolume"].Tooltip, CultureInfo.InvariantCulture) > 100)
+                    scrollView.Controller.interactables["VideoVolume"].Tooltip = "100";
+                SaveData.saveValues["VideoVolume"] = scrollView.Controller.interactables["VideoVolume"].Tooltip;
+                if(oldValue != SaveData.saveValues["VideoVolume"])
+                    SaveData.Save();
+                return false;
+            }));
+            scrollView.Controller.Add("MediaOptions", new Label("Media Options:", new Vector2(139, 60-(8*1)+(19*4)+(10*1)+(9*1))));
+            scrollView.Controller.Add("Scale", new TextEntry("Screen Resolution", "The screen scale multiplier for the UI. Restarts when set.", SaveData.saveValues["ScreenScale"], new Vector2(139, 60-(8*1)+(19*3)+(10*1)+(9*1)), 24, 3, 1, (int i, string n) => {
                 int oldValue = int.Parse(SaveData.saveValues["ScreenScale"], CultureInfo.InvariantCulture);
                 // Range: 1-4
-                if(int.Parse(controller.interactables["Scale"].Tooltip, CultureInfo.InvariantCulture) < 1)
-                    controller.interactables["Scale"].Tooltip = "1";
-                if(int.Parse(controller.interactables["Scale"].Tooltip, CultureInfo.InvariantCulture) > 4)
-                    controller.interactables["Scale"].Tooltip = "4";
-                SaveData.saveValues["ScreenScale"] = controller.interactables["Scale"].Tooltip;
+                if(int.Parse(scrollView.Controller.interactables["Scale"].Tooltip, CultureInfo.InvariantCulture) < 1)
+                    scrollView.Controller.interactables["Scale"].Tooltip = "1";
+                if(int.Parse(scrollView.Controller.interactables["Scale"].Tooltip, CultureInfo.InvariantCulture) > 4)
+                    scrollView.Controller.interactables["Scale"].Tooltip = "4";
+                SaveData.saveValues["ScreenScale"] = scrollView.Controller.interactables["Scale"].Tooltip;
                 if(oldValue != int.Parse(SaveData.saveValues["ScreenScale"], CultureInfo.InvariantCulture))
                 {
                     SaveData.Save();
@@ -487,41 +520,35 @@ namespace NonsensicalVideoGenerator
                 }
                 return false;
             }));
-            controller.Add("VideoVolume", new TextEntry("Media Playback Volume", "In-app media volume level, from 0-100.", SaveData.saveValues["VideoVolume"], new Vector2(139, 60+19*2), 24, 3, 1, (int i, string n) => {
-                string oldValue = SaveData.saveValues["VideoVolume"];
-                if(int.Parse(controller.interactables["VideoVolume"].Tooltip, CultureInfo.InvariantCulture) < 0)
-                    controller.interactables["VideoVolume"].Tooltip = "0";
-                if(int.Parse(controller.interactables["VideoVolume"].Tooltip, CultureInfo.InvariantCulture) > 100)
-                    controller.interactables["VideoVolume"].Tooltip = "100";
-                SaveData.saveValues["VideoVolume"] = controller.interactables["VideoVolume"].Tooltip;
-                if(oldValue != SaveData.saveValues["VideoVolume"])
-                    SaveData.Save();
-                return false;
-            }));
-            controller.Add("SFXVolume", new TextEntry("Sound Effect Volume", "Sound effect volume level, from 0-100.", SaveData.saveValues["SoundEffectVolume"], new Vector2(139, 60+19), 24, 3, 1, (int i, string n) => {
+            scrollView.Controller.Add("SFXVolume", new TextEntry("Sound Effect Volume", "Sound effect volume level, from 0-100.", SaveData.saveValues["SoundEffectVolume"], new Vector2(139, 60-(8*1)+(19*2)+(10*1)+(9*1)), 24, 3, 1, (int i, string n) => {
                 string oldValue = SaveData.saveValues["SoundEffectVolume"];
-                if(int.Parse(controller.interactables["SFXVolume"].Tooltip, CultureInfo.InvariantCulture) < 0)
-                    controller.interactables["SFXVolume"].Tooltip = "0";
-                if(int.Parse(controller.interactables["SFXVolume"].Tooltip, CultureInfo.InvariantCulture) > 100)
-                    controller.interactables["SFXVolume"].Tooltip = "100";
-                SaveData.saveValues["SoundEffectVolume"] = controller.interactables["SFXVolume"].Tooltip;
+                if(int.Parse(scrollView.Controller.interactables["SFXVolume"].Tooltip, CultureInfo.InvariantCulture) < 0)
+                    scrollView.Controller.interactables["SFXVolume"].Tooltip = "0";
+                if(int.Parse(scrollView.Controller.interactables["SFXVolume"].Tooltip, CultureInfo.InvariantCulture) > 100)
+                    scrollView.Controller.interactables["SFXVolume"].Tooltip = "100";
+                SaveData.saveValues["SoundEffectVolume"] = scrollView.Controller.interactables["SFXVolume"].Tooltip;
                 if(oldValue != SaveData.saveValues["SoundEffectVolume"])
                     SaveData.Save();
                 return false;
             }));
-            controller.Add("MusicVolume", new TextEntry("Music Volume", "Background music volume level, from 0-100.", SaveData.saveValues["MusicVolume"], new Vector2(139, 60), 24, 3, 1, (int i, string n) => {
+            scrollView.Controller.Add("MusicVolume", new TextEntry("Music Volume", "Background music volume level, from 0-100.", SaveData.saveValues["MusicVolume"], new Vector2(139, 60-(8*1)+(19*1)+(10*1)+(9*1)), 24, 3, 1, (int i, string n) => {
                 string oldValue = SaveData.saveValues["MusicVolume"];
-                if(int.Parse(controller.interactables["MusicVolume"].Tooltip, CultureInfo.InvariantCulture) < 0)
-                    controller.interactables["MusicVolume"].Tooltip = "0";
-                if(int.Parse(controller.interactables["MusicVolume"].Tooltip, CultureInfo.InvariantCulture) > 100)
-                    controller.interactables["MusicVolume"].Tooltip = "100";
-                SaveData.saveValues["MusicVolume"] = controller.interactables["MusicVolume"].Tooltip;
+                if(int.Parse(scrollView.Controller.interactables["MusicVolume"].Tooltip, CultureInfo.InvariantCulture) < 0)
+                    scrollView.Controller.interactables["MusicVolume"].Tooltip = "0";
+                if(int.Parse(scrollView.Controller.interactables["MusicVolume"].Tooltip, CultureInfo.InvariantCulture) > 100)
+                    scrollView.Controller.interactables["MusicVolume"].Tooltip = "100";
+                SaveData.saveValues["MusicVolume"] = scrollView.Controller.interactables["MusicVolume"].Tooltip;
                 if(oldValue != SaveData.saveValues["MusicVolume"])
                     SaveData.Save();
                 return false;
             }));
+            scrollView.Controller.Add("InterfaceOptions", new Label("Interface Options:", new Vector2(139, 60-(8*0)+(19*0)+(10*1)+(9*1))));
+            scrollView.Controller.Add("SelectLanguageOptionsPage", new Button("Change language", "Visit the locale selection to change NVG's language.", new Vector2(219, 60-(8*0)+(19*0)+(10*1)+(9*0)), LocaleAction));
             // Interactable
-            controller.LoadContent(contentManager, graphicsDevice);
+            actionController.LoadContent(contentManager, graphicsDevice);
+            actionController2.LoadContent(contentManager, graphicsDevice);
+            scrollView.LoadContent(contentManager, graphicsDevice);
+            scrollView.MaxScrollOffset = 16*4;
         }
     }
 }

@@ -67,6 +67,7 @@ namespace NonsensicalVideoGenerator
         Magick,
         YtDlp,
         Download,
+        Vocoder,
     }
     public class Command
     {
@@ -88,6 +89,8 @@ namespace NonsensicalVideoGenerator
                         return Global.useSystemMagick ? "magick" : Path.Combine(Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location) ?? ".", "magick.exe");
                     case CommandType.YtDlp:
                         return Global.useSystemYtDlp ? "yt-dlp" : Path.Combine(Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location) ?? ".", "yt-dlp.exe");
+                    case CommandType.Vocoder:
+                        return Path.Combine(Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location) ?? ".", "vocoder.exe");
                     default:
                         return customCommand;
                 }
@@ -107,6 +110,9 @@ namespace NonsensicalVideoGenerator
                         break;
                     case "yt-dlp":
                         type = CommandType.YtDlp;
+                        break;
+                    case "vocoder":
+                        type = CommandType.Vocoder;
                         break;
                     default:
                         type = CommandType.Custom;
@@ -433,6 +439,12 @@ namespace NonsensicalVideoGenerator
             if(!ValidateInput(args)) return;
             PluginHandler.commands.Add(new Command(CommandType.Magick, ReplacePlaceholders(args), jobDirectory));
         }
+        // RunVocoder for lua
+        public static void RunVocoder(string args)
+        {
+            if(!ValidateInput(args)) return;
+            PluginHandler.commands.Add(new Command(CommandType.Vocoder, ReplacePlaceholders(args), jobDirectory));
+        }
         // FolderCreate for lua
         public static void FolderCreate(string path)
         {
@@ -520,22 +532,17 @@ namespace NonsensicalVideoGenerator
         // FFmpeg installed for lua
         public static bool FFmpegInstalled()
         {
-            return Global.useSystemFFmpeg || File.Exists(Path.Combine(Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location) ?? ".", "ffmpeg.exe"));
+            return UpdateManager.ffmpegInstalled || File.Exists(Path.Combine(Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location) ?? ".", "ffmpeg.exe"));
         }
         // FFprobe installed for lua
         public static bool FFprobeInstalled()
         {
-            return Global.useSystemFFprobe || File.Exists(Path.Combine(Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location) ?? ".", "ffprobe.exe"));
+            return UpdateManager.ffprobeInstalled || File.Exists(Path.Combine(Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location) ?? ".", "ffprobe.exe"));
         }
         // Magick installed for lua
         public static bool MagickInstalled()
         {
-            return Global.useSystemMagick || File.Exists(Path.Combine(Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location) ?? ".", "magick.exe"));
-        }
-        // Frei0r installed for lua
-        public static bool Frei0rInstalled()
-        {
-            return Global.useSystemFrei0r || Directory.Exists(Path.Combine(Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location) ?? ".", "frei0r-1"));
+            return UpdateManager.imagemagickInstalled || File.Exists(Path.Combine(Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location) ?? ".", "magick.exe"));
         }
         // GetRandomLibraryFile for lua
         public static string GetRandomLibraryFile(string rootType = "video", string subType = "materials")
@@ -804,6 +811,7 @@ namespace NonsensicalVideoGenerator
                             functions["runFFmpeg"] = (Action<string>)RunFFmpeg;
                             functions["runFFprobe"] = (Action<string>)RunFFprobe;
                             functions["runMagick"] = (Action<string>)RunMagick;
+                            functions["runVocoder"] = (Action<string>)RunVocoder;
                             functions["randomDouble"] = (Func<double, double, double>)RandomDouble;
                             functions["randomInt"] = (Func<int, int, int>)RandomInt;
                             functions["randomBool"] = (Func<bool>)RandomBool;
@@ -819,7 +827,6 @@ namespace NonsensicalVideoGenerator
                             functions["ffmpegInstalled"] = (Func<bool>)FFmpegInstalled;
                             functions["ffprobeInstalled"] = (Func<bool>)FFprobeInstalled;
                             functions["magickInstalled"] = (Func<bool>)MagickInstalled;
-                            functions["frei0rInstalled"] = (Func<bool>)Frei0rInstalled;
                             functions["libraryHasFile"] = (Func<string, string, string, bool>)LibraryHasFile;
                             // Requires permission
                             functions["addToLibrary"] = (Action<string, string, string>)AddToLibrary;
@@ -895,11 +902,7 @@ namespace NonsensicalVideoGenerator
                     }
                     catch(SyntaxErrorException e)
                     {
-                        if(workshopId != "" && rootPath.Contains("user"))
-                        {
-                            string achievement = "ACHIEVEMENT_LUA_ERROR";
-                            Achievements.Award(achievement);
-                        }
+                        Achievements.Award("ACHIEVEMENT_LUA_ERROR");
                         throw e;
                     }
                     // Call plugin with query argument.
@@ -1733,6 +1736,7 @@ namespace NonsensicalVideoGenerator
             }
             catch (SyntaxErrorException e)
             {
+                Achievements.Award("ACHIEVEMENT_LUA_ERROR");
                 ConsoleOutput.WriteLine(e.DecoratedMessage, Color.Red);
                 Global.generator.progressText = L.T(0, "Addons:StatusFailLoadAddons");
                 GlobalContent.GetSound("Error").Play(int.Parse(SaveData.saveValues["SoundEffectVolume"], CultureInfo.InvariantCulture) / 100f, 0f, 0f);

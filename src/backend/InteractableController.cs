@@ -2,6 +2,7 @@
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Content;
 using Microsoft.Xna.Framework.Graphics;
+using Microsoft.Xna.Framework.Input;
 using System.Collections.Generic;
 
 namespace NonsensicalVideoGenerator
@@ -13,6 +14,8 @@ namespace NonsensicalVideoGenerator
     {
         // The list of interactables to manage.
         public Dictionary<string, IInteractable> interactables = new();
+        public Vector2 mousePosition = new();
+        public bool overrideMousePosition = false;
         public bool Update(GameTime gameTime, bool handleInput)
         {
             bool returnValue = false;
@@ -24,12 +27,14 @@ namespace NonsensicalVideoGenerator
                     names.Add(interactable.Value.Name + "Input");
                 }
             }
+            if (!overrideMousePosition)
+                mousePosition = new Vector2(MouseInput.MouseState.X, MouseInput.MouseState.Y);
             try
             {
                 // Update all interactables.
                 foreach (KeyValuePair<string, IInteractable> interactable in interactables)
                 {
-                    if(interactable.Value.Update(gameTime, handleInput, interactable.Key))
+                    if(interactable.Value.Update(gameTime, handleInput, interactable.Key, mousePosition))
                         returnValue = true;
                 }
             }
@@ -38,10 +43,12 @@ namespace NonsensicalVideoGenerator
         }
         public void Draw(GameTime gameTime, SpriteBatch spriteBatch)
         {
+            if (!overrideMousePosition)
+                mousePosition = new Vector2(MouseInput.MouseState.X, MouseInput.MouseState.Y);
             // Draw all interactables.
             foreach (KeyValuePair<string, IInteractable> interactable in interactables)
             {
-                interactable.Value.Draw(gameTime, spriteBatch, interactable.Key);
+                interactable.Value.Draw(gameTime, spriteBatch, interactable.Key, mousePosition);
             }
         }
         public void LoadContent(ContentManager contentManager, GraphicsDevice graphicsDevice)

@@ -23,7 +23,7 @@ with.
     Spacing is a float value, measured in pixels. Modify this value to change
     the amount of spacing in between characters.
     -->
-    <Spacing>-1</Spacing>
+    <Spacing>-0.5</Spacing>
 
     <!--
     UseKerning controls the layout of the font. If this value is true, kerning information

@@ -1,5 +1,4 @@
-﻿#if MONOGAME
-using System;
+﻿using System;
 using System.Linq;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
@@ -11,6 +10,7 @@ using System.IO;
 using System.Text;
 using System.Windows.Forms;
 using System.Globalization;
+using System.Collections.Generic;
 
 namespace NonsensicalVideoGenerator
 {
@@ -33,7 +33,6 @@ namespace NonsensicalVideoGenerator
         private MusicState _musicState = MusicState.Paused;
         private int _musicActive = 2;
         public int music = 2;
-        public Vector2 preferredResolution = new(320, 240);
         public UserInterface()
         {
             ConsoleOutput.WriteLine("Creating new UserInterface instance...", Color.Transparent);
@@ -47,7 +46,41 @@ namespace NonsensicalVideoGenerator
             _graphics.PreferredBackBufferWidth = width;
             _graphics.PreferredBackBufferHeight = height;
             _graphics.ApplyChanges();
-            preferredResolution = new Vector2(width, height);
+            GlobalGraphics.preferredResolution = new Point(width, height);
+        }
+        public AspectRatio GetClosestHardwareAspectRatio()
+        {
+            // Get the aspect ratio of the screen as a fraction (4:3, 16:9, etc).
+            double aspectRatioDouble = GraphicsAdapter.DefaultAdapter.CurrentDisplayMode.AspectRatio;
+            (int, int) aspectRatioFraction = Global.ConvertToFraction(aspectRatioDouble);
+            // Find the closest aspect ratio to the screen's aspect ratio.
+            AspectRatio closestAspectRatio = AspectRatio.All.OrderBy(x => Math.Abs(x.width / (double)x.height - aspectRatioFraction.Item1 / (double)aspectRatioFraction.Item2)).First();
+            return closestAspectRatio;
+        }
+        public void ToggleFullscreen()
+        {
+            GlobalGraphics.fullScreen = !GlobalGraphics.fullScreen;
+            AspectRatio aspectRatio = new();
+            // Borderless
+            Window.IsBorderless = GlobalGraphics.fullScreen;
+            _graphics.HardwareModeSwitch = GlobalGraphics.fullScreen;
+            if(GlobalGraphics.fullScreen)
+            {
+                // Set preferred resolution to screen resolution.
+                aspectRatio.preferredResolution = new Point(GraphicsAdapter.DefaultAdapter.CurrentDisplayMode.Width / GlobalGraphics.scale, GraphicsAdapter.DefaultAdapter.CurrentDisplayMode.Height / GlobalGraphics.scale);
+                // Calculate draw offset into center of screen.
+                aspectRatio.drawOffset = new Vector2((aspectRatio.preferredResolution.X - (GlobalGraphics.scaledWidth / GlobalGraphics.scale)) / 2, (aspectRatio.preferredResolution.Y - (GlobalGraphics.scaledHeight / GlobalGraphics.scale)) / 2);
+            }
+            GlobalGraphics.SetAspectRatio(aspectRatio);
+            _graphics.ApplyChanges();
+            Form? windowForm = (Form)Form.FromHandle(Window.Handle);
+            if(windowForm != null)
+            {
+                // Hide taskbar.
+                windowForm.TopMost = GlobalGraphics.fullScreen;
+                // Place window in center of screen.
+                windowForm.Location = GlobalGraphics.fullScreen ? new System.Drawing.Point(0, 0) : new System.Drawing.Point(Screen.PrimaryScreen.WorkingArea.Width / 2 - windowForm.Width / 2, Screen.PrimaryScreen.WorkingArea.Height / 2 - windowForm.Height / 2);
+            }
         }
         // Drag and drop support.
         private void DragEnter(object? sender, DragEventArgs e)
@@ -92,20 +125,18 @@ namespace NonsensicalVideoGenerator
             GraphicsDevice.SamplerStates[0] = SamplerState.PointClamp;
             // Set screen resolution.
             ConsoleOutput.WriteLine("Setting screen resolution...", Color.Transparent);
-            int scale = int.Parse(SaveData.saveValues["ScreenScale"], CultureInfo.InvariantCulture);
-            Resize(
-                int.Parse(SaveData.saveValues["ScreenWidth"], CultureInfo.InvariantCulture) * scale,
-                int.Parse(SaveData.saveValues["ScreenHeight"], CultureInfo.InvariantCulture) * scale
-            );
+            GlobalGraphics.scale = int.Parse(SaveData.saveValues["ScreenScale"], CultureInfo.InvariantCulture);
+            GlobalGraphics.SetAspectRatio(new AspectRatio());
+            Resize(GlobalGraphics.scaledWidth, GlobalGraphics.scaledHeight);
             ConsoleOutput.WriteLine("Screen resolution set.", Color.Transparent);
             ScreenManager.LoadScreens();
             ConsoleOutput.WriteLine("Initialization complete.", Color.Transparent);
             LibraryData.SequentialName();
             // Show blog if new version.
-            if(SaveData.saveValues["LastVersion"] != BlogData.LastVersion)
+            if(SaveData.saveValues["LastVersion"] != Global.productVersion)
             {
                 Pagination.SetPage(4);
-                SaveData.saveValues["LastVersion"] = BlogData.LastVersion;
+                SaveData.saveValues["LastVersion"] = Global.productVersion;
                 SaveData.Save();
             }
 #if WINDOWSDX
@@ -132,20 +163,20 @@ namespace NonsensicalVideoGenerator
             GlobalContent.UnloadContent();
             base.UnloadContent();
         }
-        public void FindMusic(bool all = false)
+        public void FindMusic()
         {
-            if(music < (all ? 0 : 2))
+            if(music < 0)
             {
-                music = Global.generator.globalRandom.Next((all ? 0 : 2), (all ? 11 : GlobalContent.GetSongCount() - 1));
+                music = Global.generator.globalRandom.Next(0, 11);
             }
             else
             {
                 music++;
             }
             // Make sure music is in range.
-            if(music < (all ? 0 : 2) || music >= (all ? 11 : GlobalContent.GetSongCount()))
+            if(music < 2 || music >= 11)
             {
-                music = (all ? 0 : 2);
+                music = 0;
             }
             _musicState = MusicState.Playing;
             try
@@ -154,7 +185,7 @@ namespace NonsensicalVideoGenerator
             }
             catch
             {
-                music = (all ? 0 : 2);
+                music = 0;
                 //ConsoleOutput.WriteLine("Failed to play music: " + ex.Message, Color.Red);
             }
         }
@@ -261,16 +292,21 @@ namespace NonsensicalVideoGenerator
                 _spriteBatch.Begin(SpriteSortMode.Deferred,
                     BlendState.AlphaBlend,
                     SamplerState.PointClamp,
-                    null, null, null, Matrix.CreateTranslation(GlobalGraphics.Scale(Global.drawOffset.X), GlobalGraphics.Scale(Global.drawOffset.Y), 0));
+                    null, null, null, Matrix.CreateTranslation(GlobalGraphics.Scale(GlobalGraphics.drawOffset.X), GlobalGraphics.Scale(GlobalGraphics.drawOffset.Y), 0));
                 ScreenManager.Draw(gameTime, _spriteBatch);
+                _spriteBatch.End();
+                _spriteBatch.Begin(SpriteSortMode.Deferred,
+                    BlendState.AlphaBlend,
+                    SamplerState.PointClamp,
+                    null, null, null, Matrix.CreateTranslation(0, 0, 0));
                 // Debug pause indicator
                 if(Debug.paused)
                 {
                     SpriteFont font = L.FontLarge();
                     string debugPaused = "Debug Paused";
                     Vector2 debugPausedSize = font.MeasureString(debugPaused);
-                    GlobalContent.DrawString(_spriteBatch, font, debugPaused, new Vector2(_graphics.PreferredBackBufferWidth-GlobalGraphics.Scale(8-1)-debugPausedSize.X, GlobalGraphics.Scale(8+1)), Color.Black);
-                    GlobalContent.DrawString(_spriteBatch, font, debugPaused, new Vector2(_graphics.PreferredBackBufferWidth-GlobalGraphics.Scale(8)-debugPausedSize.X, GlobalGraphics.Scale(8)), ThemeManager.GetColor("VideoPlayerProgressBar"));
+                    GlobalContent.DrawString(_spriteBatch, font, debugPaused, new Vector2(GlobalGraphics.preferredResolution.X-GlobalGraphics.Scale(8-1)-debugPausedSize.X, GlobalGraphics.Scale(8+1)), Color.Black);
+                    GlobalContent.DrawString(_spriteBatch, font, debugPaused, new Vector2(GlobalGraphics.preferredResolution.X-GlobalGraphics.Scale(8)-debugPausedSize.X, GlobalGraphics.Scale(8)), ThemeManager.GetColor("VideoPlayerProgressBar"));
                 }
                 _spriteBatch.End();
             }
@@ -297,11 +333,12 @@ namespace NonsensicalVideoGenerator
                 DiscordRPC.Shutdown();
             }
         }
-        protected override void OnExiting(object sender, EventArgs args)
+        protected override void OnExiting(object sender, ExitingEventArgs args)
         {
             base.OnExiting(sender, args);
             if(!Global.exiting)
             {
+                args.Cancel = true;
                 if(SteamManager.initialized)
                     SteamManager.Shutdown();
                 DiscordRPC.Shutdown();
@@ -309,4 +346,3 @@ namespace NonsensicalVideoGenerator
         }
     }
 }
-#endif

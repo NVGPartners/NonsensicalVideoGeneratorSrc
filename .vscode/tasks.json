@@ -6,10 +6,10 @@
         {
             "label": "watch",
             "type": "shell",
-            "command": "${workspaceFolder}\\bin\\x64\\debug\\net6.0-windows\\NonsensicalVideoGenerator.exe",
+            "command": "${workspaceFolder}\\bin\\x64\\debug\\net8.0-windows\\NonsensicalVideoGenerator.exe",
             "options":
             {
-                "cwd": "${workspaceFolder}\\bin\\x64\\debug\\net6.0-windows",
+                "cwd": "${workspaceFolder}\\bin\\x64\\debug\\net8.0-windows",
             }
         },
         {
@@ -24,21 +24,6 @@
                 "/p:Configuration=Debug",
                 "/p:Platform=x64",
                 "/p:DefineConstants=WINDOWSDX MONOGAME DEBUG KIWIFRUITDEV",
-            ],
-            "problemMatcher": "$msCompile"
-        },
-        {
-            "label": "buildgl",
-            "command": "dotnet",
-            "type": "process",
-            "args": [
-                "build",
-                "${workspaceFolder}\\NonsensicalVideoGenerator.csproj",
-                "/property:GenerateFullPaths=true",
-                "/consoleloggerparameters:NoSummary",
-                "/p:Configuration=Debug",
-                "/p:Platform=x64",
-                "/p:DefineConstants=DESKTOPGL MONOGAME DEBUG KIWIFRUITDEV",
             ],
             "problemMatcher": "$msCompile"
         },
@@ -58,35 +43,11 @@
             "problemMatcher": "$msCompile"
         },
         {
-            "label": "publishgl",
-            "command": "dotnet",
-            "type": "process",
-            "args": [
-                "build",
-                "${workspaceFolder}\\NonsensicalVideoGenerator.csproj",
-                "/property:GenerateFullPaths=true",
-                "/consoleloggerparameters:NoSummary",
-                "/p:Configuration=Release",
-                "/p:Platform=x64",
-                "/p:DefineConstants=DESKTOPGL MONOGAME RELEASE KIWIFRUITDEV",
-            ],
-            "problemMatcher": "$msCompile"
-        },
-        {
             "label": "upload",
             "command": "${workspaceFolder}\\publish.bat",
             "type": "process",
             "args": [
                 "${workspaceFolder}\\steamcmd.vdf",
-            ],
-            "problemMatcher": "$msCompile"
-        },
-        {
-            "label": "uploadgl",
-            "command": "${workspaceFolder}\\publish.bat",
-            "type": "process",
-            "args": [
-                "${workspaceFolder}\\steamcmdgl.vdf",
             ],
             "problemMatcher": "$msCompile"
         },
@@ -104,33 +65,7 @@
             "problemMatcher": "$msCompile"
         },
         {
-            "label": "restoregl",
-            "command": "dotnet",
-            "type": "process",
-            "args": [
-                "restore",
-                "${workspaceFolder}\\NonsensicalVideoGenerator.csproj",
-                "/property:GenerateFullPaths=true",
-                "/consoleloggerparameters:NoSummary",
-                "/p:Platform=x64",
-            ],
-            "problemMatcher": "$msCompile"
-        },
-        {
             "label": "clean",
-            "command": "dotnet",
-            "type": "process",
-            "args": [
-                "clean",
-                "${workspaceFolder}\\NonsensicalVideoGenerator.csproj",
-                "/property:GenerateFullPaths=true",
-                "/consoleloggerparameters:NoSummary",
-                "/p:Platform=x64",
-            ],
-            "problemMatcher": "$msCompile"
-        },
-        {
-            "label": "cleangl",
             "command": "dotnet",
             "type": "process",
             "args": [

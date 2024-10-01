@@ -3,16 +3,11 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Xml;
 
-#if MONOGAME
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Audio;
 using Microsoft.Xna.Framework.Content;
 using Microsoft.Xna.Framework.Graphics;
 using Microsoft.Xna.Framework.Media;
-#else
-using System.Drawing;
-using System.Windows.Forms;
-#endif
 
 namespace NonsensicalVideoGenerator
 {
@@ -88,12 +83,8 @@ namespace NonsensicalVideoGenerator
             // Load default fonts.
             int scale = int.Parse(SaveData.saveValues["ScreenScale"], System.Globalization.CultureInfo.InvariantCulture);
             AddFont("Munro", ThemeManager.LoadLayeredContent<SpriteFont>("fonts/munro-x"+scale), new Vector2(0, 0));
-            AddFont("MunroNarrow", ThemeManager.LoadLayeredContent<SpriteFont>("fonts/munro-narrow-x"+scale), new Vector2(0, 0));
             AddFont("MunroSmall", ThemeManager.LoadLayeredContent<SpriteFont>("fonts/munro-small-x"+scale), new Vector2(0, 0));
-            AddFont("LanaPixel", ThemeManager.LoadLayeredContent<SpriteFont>("fonts/lanapixel-x"+scale), new Vector2(0, -scale/2));
             AddFont("NotoSans", ThemeManager.LoadLayeredContent<SpriteFont>("fonts/notosans-x"+scale), new Vector2(-scale/2, -scale*2f));
-            AddSong($"BugCrusher", ThemeManager.LoadLayeredContent<Song>($"music/bugcrusher"));
-            AddSong($"Mystery", ThemeManager.LoadLayeredContent<Song>($"music/mystery"));
             // Fallback (multi-language support) system font.
             //AddFont("Arial", UserInterface.instance.Content.Load<SpriteFont>("Arial"));
             // Load default songs.
@@ -185,6 +176,8 @@ namespace NonsensicalVideoGenerator
             AddTexture("InteractiveSwitchOff", ThemeManager.LoadLayeredContent<Texture2D>("graphics/interactiveswitchoff"));
             AddTexture("InteractiveTextEntrySide", ThemeManager.LoadLayeredContent<Texture2D>("graphics/interactivetextentryside"));
             AddTexture("InteractiveTextEntryInner", ThemeManager.LoadLayeredContent<Texture2D>("graphics/interactivetextentryinner"));
+            AddTexture("PluginPage", ThemeManager.LoadLayeredContent<Texture2D>("graphics/pluginpage"));
+            AddTexture("ScrollHandle", ThemeManager.LoadLayeredContent<Texture2D>("graphics/scrollhandle"));
 #endif
         }
         public static void UnloadContent()
@@ -305,6 +298,9 @@ namespace NonsensicalVideoGenerator
         }
         public static Song GetSongByIndex(int index)
         {
+            // MUST BE IN RANGE!
+            if (index < 0 || index >= songs.Count)
+                index = 0;
             return songs.Values.ElementAt(index);
         }
         public static XmlDocument GetXml(string name)
@@ -329,10 +325,8 @@ namespace NonsensicalVideoGenerator
             }
             spriteBatch.DrawString(spriteFont, text, position, color, rotation, origin, scale, effects, layerDepth);
         }
-        public static void DrawString(SpriteBatch spriteBatch, SpriteFont spriteFont, string text, Vector2 position, Color color, bool cycler = false)
+        public static void DrawString(SpriteBatch spriteBatch, SpriteFont spriteFont, string text, Vector2 position, Color color)
         {
-            if(cycler)
-                spriteFont = GetFont(L.cyclerLocale.fontLarge);
             // Offset text if font has an offset.
             if (fontOffsets.ContainsKey(spriteFont))
             {

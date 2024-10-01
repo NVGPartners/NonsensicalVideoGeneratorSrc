@@ -28,25 +28,15 @@ namespace NonsensicalVideoGenerator
             Position = defaultPosition;
             Callback = defaultCallback;
         }
-        public virtual bool Update(GameTime gameTime, bool handleInput, string internalName)
+        public virtual bool Update(GameTime gameTime, bool handleInput, string internalName, Vector2 mousePosition)
         {
-            // Localize title
-            string localizedTitle;
-            if(internalName.StartsWith("NoLocalization:"))
-                localizedTitle = Name;
-            else
-                localizedTitle = L.T(0, "Interactable:"+internalName+"Title", PluginHandler.GetPluginListFilter());
-            // Calculate bounds
-            textSize = (L.FontLarge().MeasureString(localizedTitle) / GlobalGraphics.scale) - new Vector2(GlobalGraphics.Scale(1), 0);
-            textPosition = new(Position.X - textSize.X / 2, Position.Y - textSize.Y / 2);
-            bounds = new((int)textPosition.X-4, (int)textPosition.Y-4, (int)textSize.X+8, 15);
             Rectangle scaledBounds = new((int)(bounds.X * GlobalGraphics.scale), (int)(bounds.Y * GlobalGraphics.scale), (int)((bounds.Width + 3) * GlobalGraphics.scale), (int)(bounds.Height * GlobalGraphics.scale));
             if (handleInput)
             {
                 int mouseButton = 0;
                 // Check if the mouse is hovering over the button.
                 Accessibility.CompatAccessibility(scaledBounds, L.T(0, "Accessibility:InteractableButton", L.T(0, "Interactable:"+internalName+"Title"), L.T(0, "Interactable:"+internalName+"Tooltip")));
-                if (scaledBounds.Contains(MouseInput.MouseState.Position))
+                if (scaledBounds.Contains(mousePosition))
                 {
                     // Check if the mouse is clicking on the button.
                     if (MouseInput.LastMouseState.LeftButton == ButtonState.Released && MouseInput.MouseState.LeftButton == ButtonState.Pressed)
@@ -77,8 +67,23 @@ namespace NonsensicalVideoGenerator
             }
             return false;
         }
-        public virtual void Draw(GameTime gameTime, SpriteBatch spriteBatch, string internalName)
+        public virtual void Draw(GameTime gameTime, SpriteBatch spriteBatch, string internalName, Vector2 mousePosition)
         {
+            // Localize title
+            string localizedTitle;
+            if(internalName.StartsWith("NoLocalization:"))
+                localizedTitle = Name;
+            else
+                localizedTitle = L.T(0, "Interactable:"+internalName+"Title", PluginHandler.GetPluginListFilter());
+            SpriteFont spriteFont = L.FontLarge();
+            if(internalName.Contains("ViewLocalizationOptions") || internalName.Contains("SelectLanguageOptionsPage"))
+            {
+                spriteFont = GlobalContent.GetFont(L.cyclerLocale.fontLarge);
+            }
+            // Calculate bounds
+            textSize = (spriteFont.MeasureString(localizedTitle) / GlobalGraphics.scale) - new Vector2(GlobalGraphics.Scale(1), 0);
+            textPosition = new(Position.X - textSize.X / 2, Position.Y - textSize.Y / 2);
+            bounds = new((int)textPosition.X-4, (int)textPosition.Y-4, (int)textSize.X+8, 15);
             // Draw the sides
             Texture2D side = GlobalContent.GetTexture("InteractiveButtonSide");
             Texture2D inner = GlobalContent.GetTexture("InteractiveButtonInner");
@@ -91,13 +96,8 @@ namespace NonsensicalVideoGenerator
             spriteBatch.Draw(side, new Rectangle(GlobalGraphics.Scale(bounds.X + bounds.Width - 1 + side.Width/2), GlobalGraphics.Scale(bounds.Y - 1 + side.Height/2), GlobalGraphics.Scale(side.Width), GlobalGraphics.Scale(side.Height)), null, Color.White, MathHelper.ToRadians(180), new Vector2(side.Width/2, side.Height/2), SpriteEffects.None, 0);
             spriteBatch.Draw(inner, new Rectangle(GlobalGraphics.Scale(bounds.X+3), GlobalGraphics.Scale(bounds.Y), GlobalGraphics.Scale(bounds.Width-3), GlobalGraphics.Scale(inner.Height)), Color.White);
             // Text & shadow
-            string localizedTitle;
-            if(internalName.StartsWith("NoLocalization:"))
-                localizedTitle = Name;
-            else
-                localizedTitle = L.T(0, "Interactable:"+internalName+"Title", PluginHandler.GetPluginListFilter());
-            GlobalContent.DrawString(spriteBatch, L.FontLarge(), localizedTitle, new Vector2(GlobalGraphics.Scale(textPosition.X + 1), GlobalGraphics.Scale(textPosition.Y - 3 + 1)), Color.Black);
-            GlobalContent.DrawString(spriteBatch, L.FontLarge(), localizedTitle, new Vector2(GlobalGraphics.Scale(textPosition.X), GlobalGraphics.Scale(textPosition.Y-3)), Color.White);
+            GlobalContent.DrawString(spriteBatch, spriteFont, localizedTitle, new Vector2(GlobalGraphics.Scale(textPosition.X + 1), GlobalGraphics.Scale(textPosition.Y - 3 + 1)), Color.Black);
+            GlobalContent.DrawString(spriteBatch, spriteFont, localizedTitle, new Vector2(GlobalGraphics.Scale(textPosition.X), GlobalGraphics.Scale(textPosition.Y-3)), Color.White);
             // If hovering, draw tooltip
             if (State >= 1 && Tooltip != "")
             {

@@ -51,7 +51,7 @@ namespace NonsensicalVideoGenerator
         /// The title of the screen. This is displayed on the header bar.
         /// </summary>
         public string title { get; } = "Misclick";
-        public int layer { get; set; } = 98;
+        public int layer { get; set; } = 100;
         public int currentPlacement { get; set; } = -1;
         public ScreenType screenType { get; set; } = ScreenType.Drawn;
         private float hueColor = 0;

@@ -44,6 +44,14 @@ namespace NonsensicalVideoGenerator
             this.intro = intro;
         }
     }
+    public enum RollReason
+    {
+        NoRoll,
+        TransitionEffectChance100Percent,
+        EffectChance100Percent,
+        TransitionEffect,
+        Effect,
+    }
     public class Generator
     {
         public static string temporaryDirectory = @".\temp";
@@ -51,7 +59,7 @@ namespace NonsensicalVideoGenerator
         public BackgroundWorker? vidThreadWorker { get; set; }
         public float progress { get; set; } = 0;
         public ProgressState progressState { get; set; } = ProgressState.Idle;
-        public string progressText { get; set; } = "Idle";
+        public string progressText { get; set; } = "";
         public string failureReason { get; set; } = "";
         public bool generatorActive = false;
         public bool forceConcatenate = false;
@@ -59,8 +67,9 @@ namespace NonsensicalVideoGenerator
         public BackgroundWorker? killWorker { get; set; }
         public int timeout = 0;
         public string tempOutput = Path.Combine(Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location) ?? ".", "library", "video", "renders", "temp.mp4");
-        public static string oldExportParams = "-c:v libx264 -crf 18 -preset veryfast -ar 32000 -shortest -avoid_negative_ts make_zero -fflags +genpts";
-        public static string betterExportParams = "-vcodec libx264 -crf 28 -preset ultrafast -ar 32000 -shortest -avoid_negative_ts make_zero -fflags +genpts";
+        public static string oldExportParams = "-c:v libx264 -crf 18 -preset veryfast -ar 32000 -shortest -fflags +genpts";
+        public static string betterExportParams = "-vcodec libx264 -crf 28 -preset ultrafast -ac 2 -c:a aac -b:a 160k -reset_timestamps 1 -shortest -fflags +genpts";
+        public bool audioSync = true;
         public static string exportParams = betterExportParams;
         public void KillChildProcesses()
         {
@@ -254,7 +263,35 @@ namespace NonsensicalVideoGenerator
                     if(numberOfPlugins > 0)
                     {
                         // Roll for effect
-                        if(RandomInt(0, 100) < (thisClip.rolledForTransition ? int.Parse(SaveData.saveValues["TransitionEffectChance"], CultureInfo.InvariantCulture) : int.Parse(SaveData.saveValues["EffectChance"], CultureInfo.InvariantCulture)))
+                        RollReason rollReason = RollReason.NoRoll;
+                        int roll = RandomInt(0, 100);
+                        if(thisClip.rolledForTransition && int.Parse(SaveData.saveValues["TransitionEffectChance"], CultureInfo.InvariantCulture) == 100)
+                            rollReason = RollReason.TransitionEffectChance100Percent;
+                        else if(!thisClip.rolledForTransition && int.Parse(SaveData.saveValues["EffectChance"], CultureInfo.InvariantCulture) == 100)
+                            rollReason = RollReason.EffectChance100Percent;
+                        else if(thisClip.rolledForTransition && roll < int.Parse(SaveData.saveValues["TransitionEffectChance"], CultureInfo.InvariantCulture))
+                            rollReason = RollReason.TransitionEffect;
+                        else if(!thisClip.rolledForTransition && roll < int.Parse(SaveData.saveValues["EffectChance"], CultureInfo.InvariantCulture))
+                            rollReason = RollReason.Effect;
+                        switch(rollReason)
+                        {
+                            case RollReason.TransitionEffectChance100Percent:
+                                ConsoleOutput.WriteLine("Clip " + i + ": Transition effect chance is 100%", Color.Gray);
+                                break;
+                            case RollReason.EffectChance100Percent:
+                                ConsoleOutput.WriteLine("Clip " + i + ": Effect chance is 100%", Color.Gray);
+                                break;
+                            case RollReason.TransitionEffect:
+                                ConsoleOutput.WriteLine("Clip " + i + ": Rolled for transition effect.", Color.Gray);
+                                break;
+                            case RollReason.Effect:
+                                ConsoleOutput.WriteLine("Clip " + i + ": Rolled for effect.", Color.Gray);
+                                break;
+                            default:
+                                ConsoleOutput.WriteLine("Clip " + i + ": No effect rolled.", Color.Gray);
+                                break;
+                        }
+                        if(rollReason != RollReason.NoRoll)
                         {
                             progressText = L.T(0, thisClip.rolledForTransition ? "Generate:StatusApplyTransitionEffect" : "Generate:StatusApplyEffect", (i + 1).ToString(CultureInfo.InvariantCulture), maxClips.ToString(CultureInfo.InvariantCulture));
                             // We rolled for an effect, let's pick one.
@@ -330,6 +367,7 @@ namespace NonsensicalVideoGenerator
             }
             catch(Exception ex)
             {
+                Achievements.Award("ACHIEVEMENT_LUA_ERROR");
                 ConsoleOutput.WriteLine(ex.Message, Color.Red);
                 ConsoleOutput.WriteLine("Failed to apply effect to clip " + i + ".", Color.Red);
             }
@@ -401,8 +439,8 @@ namespace NonsensicalVideoGenerator
                     {
                         Clip thisClip = new Clip(
                             i + ".mp4",
-                            RandomInt(0, 100) < int.Parse(SaveData.saveValues["OverlayChance"], CultureInfo.InvariantCulture),
-                            RandomInt(0, 100) < int.Parse(SaveData.saveValues["TransitionChance"], CultureInfo.InvariantCulture),
+                            LibraryData.GetFileCount(DefaultLibraryTypes.Overlay) > 0 && RandomInt(0, 100) < int.Parse(SaveData.saveValues["OverlayChance"], CultureInfo.InvariantCulture),
+                            LibraryData.GetFileCount(DefaultLibraryTypes.Transition) > 0 && RandomInt(0, 100) < int.Parse(SaveData.saveValues["TransitionChance"], CultureInfo.InvariantCulture),
                             false
                         );
                         timeout = int.Parse(SaveData.saveValues["TimeOut"], CultureInfo.InvariantCulture);
@@ -912,6 +950,7 @@ namespace NonsensicalVideoGenerator
                         + "\" -ss " + startTime
                         + " -to " + endTime
                         + (SaveData.saveValues["ConstrainAspectRatio"] == "true" ? " -vf scale=" + SaveData.saveValues["VideoWidth"] + "x" + SaveData.saveValues["VideoHeight"] + ",setsar=1:1,fps=fps=30" : " -vf \"scale=(iw*sar)*min(" + SaveData.saveValues["VideoWidth"] + "/(iw*sar)\\," + SaveData.saveValues["VideoHeight"] + "/ih):ih*min(" + SaveData.saveValues["VideoWidth"] + "/(iw*sar)\\," + SaveData.saveValues["VideoHeight"] + "/ih),pad=" + SaveData.saveValues["VideoWidth"] + ":" + SaveData.saveValues["VideoHeight"] + ":(" + SaveData.saveValues["VideoWidth"] + "-iw*min(" + SaveData.saveValues["VideoWidth"] + "/iw\\," + SaveData.saveValues["VideoHeight"] + "/ih))/2:(" + SaveData.saveValues["VideoHeight"] + "-ih*min(" + SaveData.saveValues["VideoWidth"] + "/iw\\," + SaveData.saveValues["VideoHeight"] + "/ih))/2,setsar=1:1,fps=fps=30\"")
+                        + (Global.generator.audioSync == true ? " -af aresample=async=1000" : "")
                         + " "+exportParams
                         + " -y"
                         + " \"" + output + "\"";
@@ -1013,6 +1052,7 @@ namespace NonsensicalVideoGenerator
                 startInfo.FileName = Global.useSystemFFmpeg ? "ffmpeg" : @".\ffmpeg.exe";
                 startInfo.Arguments = "-i \"" + video + "\" " + appendNoAudio
                         + (SaveData.saveValues["ConstrainAspectRatio"] == "true" ? " -vf scale=" + SaveData.saveValues["VideoWidth"] + "x" + SaveData.saveValues["VideoHeight"] + ",setsar=1:1,fps=fps=30" : " -vf \"scale=(iw*sar)*min(" + SaveData.saveValues["VideoWidth"] + "/(iw*sar)\\," + SaveData.saveValues["VideoHeight"] + "/ih):ih*min(" + SaveData.saveValues["VideoWidth"] + "/(iw*sar)\\," + SaveData.saveValues["VideoHeight"] + "/ih),pad=" + SaveData.saveValues["VideoWidth"] + ":" + SaveData.saveValues["VideoHeight"] + ":(" + SaveData.saveValues["VideoWidth"] + "-iw*min(" + SaveData.saveValues["VideoWidth"] + "/iw\\," + SaveData.saveValues["VideoHeight"] + "/ih))/2:(" + SaveData.saveValues["VideoHeight"] + "-ih*min(" + SaveData.saveValues["VideoWidth"] + "/iw\\," + SaveData.saveValues["VideoHeight"] + "/ih))/2,setsar=1:1,fps=fps=30\"")
+                        + (Global.generator.audioSync == true ? " -af aresample=async=1000" : "")
                         + " "+exportParams
                         + " -y"
                         + " \"" + output + "\"";
@@ -1112,7 +1152,7 @@ namespace NonsensicalVideoGenerator
                         startInfo2.WindowStyle = ProcessWindowStyle.Hidden;
                         startInfo2.FileName = Global.useSystemFFmpeg ? "ffmpeg" : @".\ffmpeg.exe";
                         startInfo2.Arguments = "-i \"" + Path.Combine(temporaryDirectory, thisClip.name) + "\" " + appendNoAudio
-                                + " -af apad"
+                                + (Global.generator.audioSync == true ? " -af \"aresample=async=1000\"" : "")
                                 + (SaveData.saveValues["ConstrainAspectRatio"] == "true" ? " -vf scale=" + SaveData.saveValues["VideoWidth"] + "x" + SaveData.saveValues["VideoHeight"] + ",setsar=1:1,fps=fps=30" : " -vf \"scale=(iw*sar)*min(" + SaveData.saveValues["VideoWidth"] + "/(iw*sar)\\," + SaveData.saveValues["VideoHeight"] + "/ih):ih*min(" + SaveData.saveValues["VideoWidth"] + "/(iw*sar)\\," + SaveData.saveValues["VideoHeight"] + "/ih),pad=" + SaveData.saveValues["VideoWidth"] + ":" + SaveData.saveValues["VideoHeight"] + ":(" + SaveData.saveValues["VideoWidth"] + "-iw*min(" + SaveData.saveValues["VideoWidth"] + "/iw\\," + SaveData.saveValues["VideoHeight"] + "/ih))/2:(" + SaveData.saveValues["VideoHeight"] + "-ih*min(" + SaveData.saveValues["VideoWidth"] + "/iw\\," + SaveData.saveValues["VideoHeight"] + "/ih))/2,setsar=1:1,fps=fps=30\"")
                                 + " "+exportParams
                                 + " -y"
@@ -1209,7 +1249,10 @@ namespace NonsensicalVideoGenerator
             {
                 concat += "[" + i + ":v:0][" + i + ":a:0]";
             }
-            concat += "concat=n=" + clips2.Count + ":v=1:a=1[outv][outa];[outv]scale=" + SaveData.saveValues["VideoWidth"] + "x" + SaveData.saveValues["VideoHeight"] + ",setsar=1:1,fps=fps=30[outv]\""
+            concat += "concat=n=" + clips2.Count + ":v=1:a=1[outv][outa];"
+                    + "[outv]scale=" + SaveData.saveValues["VideoWidth"] + "x" + SaveData.saveValues["VideoHeight"] + ",setsar=1:1,fps=fps=30[outv]"
+                    + (Global.generator.audioSync == true ? ";[outa]aresample=async=1000[outa]" : "")
+                    + "\""
                     + " -map \"[outv]\""
                     + " -map \"[outa]\""
                     + " "+exportParams
@@ -1267,7 +1310,10 @@ namespace NonsensicalVideoGenerator
                 {
                     concat2 += "[" + i + ":v:0][" + i + ":a:0]";
                 }
-                concat2 += "concat=n=" + clips3.Count + ":v=1:a=1[outv][outa];[outv]scale=" + SaveData.saveValues["VideoWidth"] + "x" + SaveData.saveValues["VideoHeight"] + ",setsar=1:1,fps=fps=30[outv]\""
+                concat2 += "concat=n=" + clips3.Count + ":v=1:a=1[outv][outa];"
+                        + "[outv]scale=" + SaveData.saveValues["VideoWidth"] + "x" + SaveData.saveValues["VideoHeight"] + ",setsar=1:1,fps=fps=30[outv]"
+                        + (Global.generator.audioSync == true ? ";[outa]aresample=async=1000[outa]" : "")
+                        + "\""
                         + " -map \"[outv]\""
                         + " -map \"[outa]\""
                         + " "+exportParams
@@ -1317,7 +1363,11 @@ namespace NonsensicalVideoGenerator
                 startInfo.FileName = Global.useSystemFFmpeg ? "ffmpeg" : @".\ffmpeg.exe";
                 startInfo.Arguments = "-i \"" + video
                         + "\" -i \"" + overlay
-                        + "\" -filter_complex \"[1:v]colorkey=0x00FF00:0.3:0.2,scale=" + SaveData.saveValues["VideoWidth"] + "x" + SaveData.saveValues["VideoHeight"] + ",setsar=1:1,fps=fps=30[outv];[0:v][outv]overlay=shortest=1[finalv];[0:a][1:a]amix=inputs=2:duration=shortest[outa]\""
+                        + "\" -filter_complex \""
+                        + "[1:v]colorkey=0x00FF00:0.3:0.2,scale=" + SaveData.saveValues["VideoWidth"] + "x" + SaveData.saveValues["VideoHeight"] + ",setsar=1:1,fps=fps=30[outv];"
+                        + "[0:v][outv]overlay=shortest=1[finalv];"
+                        + "[0:a][1:a]amix=inputs=2:duration=shortest" + (Global.generator.audioSync == true ? ",aresample=async=1000" : "") + "[outa]"
+                        + "\""
                         + " -map \"[finalv]\""
                         + " -map \"[outa]\""
                         + " "+exportParams

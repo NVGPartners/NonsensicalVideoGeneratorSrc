@@ -99,6 +99,12 @@ namespace NonsensicalVideoGenerator
                 switch(curtab)
                 {
                     case Tab.Generate:
+                        if(Global.generator.generatorActive)
+                        {
+                            presence.Assets.SmallImageKey = "rendering";
+                            presence.Assets.SmallImageText = "Rendering";
+                            break;
+                        }
                         presence.Assets.SmallImageKey = "generate";
                         presence.Assets.SmallImageText = "Generate Tab";
                         break;

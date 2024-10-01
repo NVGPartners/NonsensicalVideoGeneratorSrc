@@ -296,7 +296,7 @@ namespace NonsensicalVideoGenerator
                         {
                             if (i+offset<9)
                             {
-                                key = L.T(0, "Accessibility:Cursor"); //(i+offset+1).ToString();
+                                key = "[ ]"; //(i+offset+1).ToString();
                             }
                             else
                             {

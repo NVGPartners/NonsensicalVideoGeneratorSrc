@@ -40,10 +40,10 @@ function StartGeneration(options, pluginSettings, functions)
     -- Apply effect
     if vibratoOrChorus then
         -- Vibrato effect
-        functions.runFFmpeg("-i \"" .. options.inputVideo .. "\" -af chorus=\"0.7:0.9:55:0.4:0.25:2\" -preset veryfast -y \"" .. options.outputVideo .. "\"")
+        functions.runFFmpeg("-i \"" .. options.inputVideo .. "\" -af chorus=\"0.7:0.9:55:0.4:0.25:2\",aresample=async=1000 -vcodec libx264 -crf 28 -preset ultrafast -ac 2 -c:a aac -b:a 160k -reset_timestamps 1 -shortest -fflags +genpts -y \"" .. options.outputVideo .. "\"")
     else
         -- Chorus effect
-        functions.runFFmpeg("-i \"" .. options.inputVideo .. "\" -af vibrato=f=6.5:d=0.5 -preset veryfast -y \"" .. options.outputVideo .. "\"")
+        functions.runFFmpeg("-i \"" .. options.inputVideo .. "\" -af \"vibrato=f=6.5:d=0.5,aresample=async=1000\" -vcodec libx264 -crf 28 -preset ultrafast -ac 2 -c:a aac -b:a 160k -reset_timestamps 1 -shortest -fflags +genpts -y \"" .. options.outputVideo .. "\"")
     end
     return true
 end

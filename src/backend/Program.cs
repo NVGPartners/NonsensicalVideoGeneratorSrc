@@ -4,9 +4,6 @@ using System.IO;
 using System.Linq;
 using System.Reflection;
 using Microsoft.Xna.Framework;
-#if !MONOGAME
-using System.Windows.Forms;
-#endif
 using Steamworks;
 
 namespace NonsensicalVideoGenerator
@@ -57,6 +54,11 @@ namespace NonsensicalVideoGenerator
                 }
             }
             Global.generator.globalRandom = new Random(Global.randomSeed);
+            if(!Global.parameters.Contains("-nofrei0r"))
+            {
+                // Set FREI0R_PATH environment variable.
+                Environment.SetEnvironmentVariable("FREI0R_PATH", Path.Combine(Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location) ?? ".", "frei0r-1"));
+            }
             SaveData.Load();
             if(Global.parameters.Contains("-v"))
             {

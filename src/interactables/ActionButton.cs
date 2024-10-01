@@ -18,7 +18,7 @@ namespace NonsensicalVideoGenerator
         {
             Icon = icon;
         }
-        public override bool Update(GameTime gameTime, bool handleInput, string internalName)
+        public override bool Update(GameTime gameTime, bool handleInput, string internalName, Vector2 mousePosition)
         {
             if (handleInput)
             {
@@ -28,7 +28,7 @@ namespace NonsensicalVideoGenerator
                 int mouseButton = 0;
                 // Check if the mouse is hovering over the button.
                 Accessibility.CompatAccessibility(scaledBounds, L.T(0, "Accessibility:InteractableActionButton", Tooltip));
-                if (scaledBounds.Contains(MouseInput.MouseState.Position))
+                if (scaledBounds.Contains(mousePosition))
                 {
                     // Check if the mouse is clicking on the button.
                     if (MouseInput.LastMouseState.LeftButton == ButtonState.Released && MouseInput.MouseState.LeftButton == ButtonState.Pressed)
@@ -59,7 +59,7 @@ namespace NonsensicalVideoGenerator
             }
             return false;
         }
-        public override void Draw(GameTime gameTime, SpriteBatch spriteBatch, string internalName)
+        public override void Draw(GameTime gameTime, SpriteBatch spriteBatch, string internalName, Vector2 mousePosition)
         {
             // Draw the button
             Texture2D actionButton = GlobalContent.GetTexture("ActionButton");

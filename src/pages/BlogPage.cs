@@ -45,9 +45,10 @@ namespace NonsensicalVideoGenerator
             int subtitleHeight = 85;
             for(int i = 0; i < BlogData.Subtitle.Count; i++)
             {
-                Vector2 subtitleSize = font.MeasureString(BlogData.Subtitle[i]);
-                GlobalContent.DrawString(spriteBatch, font, BlogData.Subtitle[i], new Vector2(GlobalGraphics.Scale(273+1) - subtitleSize.X / 2, GlobalGraphics.Scale(subtitleHeight+1)), Color.Black);
-                GlobalContent.DrawString(spriteBatch, font, BlogData.Subtitle[i], new Vector2(GlobalGraphics.Scale(273) - subtitleSize.X / 2, GlobalGraphics.Scale(subtitleHeight)), Color.White);
+                string subtitle = BlogData.Subtitle[i].Replace("%s", Global.productVersion);
+                Vector2 subtitleSize = font.MeasureString(subtitle);
+                GlobalContent.DrawString(spriteBatch, font, subtitle, new Vector2(GlobalGraphics.Scale(273+1) - subtitleSize.X / 2, GlobalGraphics.Scale(subtitleHeight+1)), Color.Black);
+                GlobalContent.DrawString(spriteBatch, font, subtitle, new Vector2(GlobalGraphics.Scale(273) - subtitleSize.X / 2, GlobalGraphics.Scale(subtitleHeight)), Color.White);
                 subtitleHeight += increment;
             }
             // Draw description

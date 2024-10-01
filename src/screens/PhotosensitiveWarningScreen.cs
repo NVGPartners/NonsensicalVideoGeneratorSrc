@@ -148,8 +148,6 @@ namespace NonsensicalVideoGenerator
                 for (int i = 0; i < warningText.Count; i++)
                 {
                     string text = warningText[i];
-                    if(text != " ")
-                        text = text;
                     Vector2 textSize = fontMunro.MeasureString(text);
                     GlobalContent.DrawString(spriteBatch, fontMunro, text, new Vector2(GlobalGraphics.scaledWidth / 2 - textSize.X / 2, GlobalGraphics.Scale(24 + i * 16)), Color.White);
                 }
