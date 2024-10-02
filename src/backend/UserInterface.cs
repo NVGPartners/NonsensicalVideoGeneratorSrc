@@ -316,6 +316,8 @@ namespace NonsensicalVideoGenerator
         {
             if(!Global.exiting)
             {
+                Global.generator.progressText = L.T(0, "Content:StatusExiting");
+                Global.generator.failureReason = L.T(0, "Content:StatusExiting");
                 e.Cancel = true;
                 Global.exiting = true;
                 // Exit page is always the last
@@ -335,14 +337,15 @@ namespace NonsensicalVideoGenerator
         }
         protected override void OnExiting(object sender, ExitingEventArgs args)
         {
-            base.OnExiting(sender, args);
-            if(!Global.exiting)
+            if(Global.exiting)
             {
                 args.Cancel = true;
-                if(SteamManager.initialized)
-                    SteamManager.Shutdown();
-                DiscordRPC.Shutdown();
+                return;
             }
+            base.OnExiting(sender, args);
+            if(SteamManager.initialized)
+                SteamManager.Shutdown();
+            DiscordRPC.Shutdown();
         }
     }
 }

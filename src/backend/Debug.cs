@@ -30,6 +30,8 @@ namespace NonsensicalVideoGenerator
                     ConsoleOutput.WriteLine("Release Debug Mode (!!!)", debugColor);
                     Global.productVersion = Global.fileVersionInfo.ProductVersion+" (RELEASE; DEBUG MODE)";
                 }
+                if(UserInterface.instance != null)
+                    UserInterface.instance.Window.Title = Global.productName+" "+Global.productVersion;
             }
             debugModePermanent = true;
             debugMode = enable;

@@ -81,6 +81,7 @@ namespace NonsensicalVideoGenerator
                 exitOpacity += Global.exitOpacityIncrease;
                 if(exitOpacity >= 1)
                 {
+                    Global.exiting = false;
                     if(!Global.fakeExit)
                     {
                         try
@@ -92,7 +93,6 @@ namespace NonsensicalVideoGenerator
                     }
                     else
                     {
-                        Global.exiting = false;
                         if(Global.exitFunc())
                         {
                             Global.readyTime = gameTime.TotalGameTime.TotalMilliseconds;

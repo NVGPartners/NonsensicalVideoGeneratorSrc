@@ -27,6 +27,7 @@ function Query(localeName, localizationTokens)
 end
 
 -- Temp files
+local carrierresult = "carrier.wav"
 local modulator = "modulator.wav"
 local vocoded = "vocoded.wav"
 
@@ -45,14 +46,16 @@ function StartGeneration(options, pluginSettings, functions)
         return false
     end
     -- Apply effect
-    functions.runFFmpeg("-i \"" .. options.inputVideo .. "\" -vn -acodec pcm_s16le -ar 44100 -ac 1 -y \"" .. modulator .. "\"")
+    functions.runFFmpeg("-i \"" .. carrier .. "\" -vn -acodec pcm_s16le -ar 44100 -ac 1 -y \"" .. carrierresult .. "\"")
     return true
 end
 
 function PostCommand(commandindex, outputresult, errorresult, options, pluginSettings, functions)
     if commandindex == 1 then
-        functions.runVocoder("-b 1024 \"" .. modulator .. "\" \"" .. carrier .. "\" \"" .. vocoded .. "\"")
+        functions.runFFmpeg("-i \"" .. options.inputVideo .. "\" -vn -acodec pcm_s16le -ar 44100 -ac 1 -y \"" .. modulator .. "\"")
     elseif commandindex == 2 then
+        functions.runVocoder("-b 1024 \"" .. modulator .. "\" \"" .. carrierresult .. "\" \"" .. vocoded .. "\"")
+    elseif commandindex == 3 then
         functions.runFFmpeg("-i \"" .. options.inputVideo .. "\" -i \"" .. vocoded .. "\" -filter:v \"frei0r=filter_name=glow\" -map 0:v -map 1:a -vcodec libx264 -crf 28 -preset ultrafast -ac 2 -c:a aac -b:a 160k -reset_timestamps 1 -shortest -fflags +genpts -y \"" .. options.outputVideo .. "\"")
         success = true
     end

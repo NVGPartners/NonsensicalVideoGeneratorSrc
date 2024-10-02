@@ -1,5 +1,6 @@
 <Project Sdk="Microsoft.NET.Sdk">
   <PropertyGroup>
+    <Version>1.0.2.1</Version>
     <OutputType>WinExe</OutputType>
     <RollForward>Major</RollForward>
     <PublishReadyToRun>false</PublishReadyToRun>
@@ -27,7 +28,6 @@ Noto Sans licensed under SIL OFL</AssemblyTrademark>
     <IncludeSourceRevisionInInformationalVersion>false</IncludeSourceRevisionInInformationalVersion>
     <RepositoryUrl>https://github.com/KiwifruitDev/NonsensicalVideoGeneratorSrc.git</RepositoryUrl>
     <RepositoryBranch>steam</RepositoryBranch>
-    <Version>1.0.2.0</Version>
     <ApplicationHighDpiMode>true</ApplicationHighDpiMode>
   </PropertyGroup>
   <PropertyGroup>

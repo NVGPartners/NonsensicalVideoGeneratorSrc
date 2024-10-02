@@ -15,11 +15,11 @@ namespace NonsensicalVideoGenerator
     /// </summary>
     public static class BlogData
     {
-        public static string Title { get; set; } = "Milestone 6";
+        public static string Title { get; set; } = "Milestone 6 Hotfix 1";
         public static List<string> Subtitle { get; set; } = new List<string>()
         {
             "v%s",
-            "September 30",
+            "October 1",
             "Major Update"
         };
         public static List<string> Description { get; set; } = new List<string>()
@@ -32,6 +32,6 @@ namespace NonsensicalVideoGenerator
             " ",
             "See full changelog on Steam.",
         };
-        public static string Url { get; set; } = "https://store.steampowered.com/news/app/2516360/view/6692998230489468030";
+        public static string Url { get; set; } = "https://store.steampowered.com/news/app/2516360/view/4695656140431567186";
     }
 }

@@ -300,7 +300,7 @@ namespace NonsensicalVideoGenerator
                         if (MouseInput.MouseState.X >= GlobalGraphics.Scale(269) && MouseInput.MouseState.X < GlobalGraphics.Scale(290)
                             && MouseInput.MouseState.Y >= GlobalGraphics.Scale(59 + ((i-offsetpl) * 16) - scrollOffset) && MouseInput.MouseState.Y < GlobalGraphics.Scale(70 + ((i-offsetpl) * 16) - scrollOffset))
                         {
-                            internalTooltip = Global.canRender ?"Click to toggle addon." : "Loading...";
+                            internalTooltip = L.T(0, Global.canRender ? "Addons:SwitchToggleAddon" : "Addons:Loading");
                         }
                         int inRange = 254;
                         if(!Global.canRender)
@@ -315,19 +315,19 @@ namespace NonsensicalVideoGenerator
                             // Otherwise, tooltip should be "Open plugin directory."
                             if (PluginHandler.plugins[i].workshopId != ""
                                 && PluginHandler.plugins[i].rootPath.Contains("workshop"))
-                                internalTooltip = "Open workshop page.";
+                                internalTooltip = L.T(0, "Addons:ButtonOpenWorkshop");
                             else if(PluginHandler.plugins[i].workshopId != ""
                                 && PluginHandler.plugins[i].workshopId != "stock")
-                                internalTooltip = "Open in code editor.";
+                                internalTooltip = L.T(0, "Addons:ButtonOpenCodeEditor");
                             else
-                                internalTooltip = "Open stock directory.";
+                                internalTooltip = L.T(0, "Addons:ButtonOpenStockDirectory");
                         }
                         if(Global.canRender)
                         {
                             if (MouseInput.MouseState.X >= GlobalGraphics.Scale(256) && MouseInput.MouseState.X < GlobalGraphics.Scale(267)
                                 && MouseInput.MouseState.Y >= GlobalGraphics.Scale(59 + ((i-offsetpl) * 16) - scrollOffset) && MouseInput.MouseState.Y < GlobalGraphics.Scale(70 + ((i-offsetpl) * 16) - scrollOffset))
                             {
-                                internalTooltip = "Edit settings.";
+                                internalTooltip = L.T(0, "Addons:ButtonEditSettings");
                             }
                         }
                     }
@@ -335,7 +335,7 @@ namespace NonsensicalVideoGenerator
                     if (MouseInput.MouseState.X >= GlobalGraphics.Scale(138) && MouseInput.MouseState.X < GlobalGraphics.Scale(290)
                         && MouseInput.MouseState.Y >= GlobalGraphics.Scale(59 + ((plcount-offsetpl) * 16) - scrollOffset) && MouseInput.MouseState.Y < GlobalGraphics.Scale(70 + ((plcount-offsetpl) * 16) - scrollOffset))
                     {
-                        internalTooltip = "Create or reload addons.";
+                        internalTooltip = L.T(0, "Addons:ButtonCreateOrReload");
                     }
                     if(maxScrollOffset > 0)
                     {

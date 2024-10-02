@@ -1,81 +1,15 @@
-Milestone 6 (v1.0.2.0)
+Milestone 6 Hotfix 1 (v1.0.2.1)
 
-A brand new quality-of-life update is now available for Nonsensical Video Generator! Here are the changes in this update:
+Here are the changes in this update:
 
-[h3]Front-facing Changes[/h3]
 [list]
-[*]Added scrolling to the Generate and Options tabs.
-[*]Added an option to disable holidays in preparation for the upcoming KiwifruitDev Birthday and Halloween holiday themes.
-[*]Added an icon to Discord rich presence for the rendering screen.
-[*]Added reasons for why a transition and/or effect was rolled in Console.
-[*]Added unique achievement icons to each achievement.
-[*]Added more spacing to the Initial Setup window to accomodate for different locales.
-[*]Added an action button to reload addons in the Addons tab.
-[*]Downloading media from the Discord CDN is now fixed.
-[list]
-[*]Addons are still not allowed to download from Discord as its URLs are not permanent.
-[/list]
-[*]Rearranged and added categories to options for scrolling support.
-[*]Improved how the background music is looped.
-[*]The "Well That Happened" achievement will now be granted on any Lua error and not just syntax errors.
-[*]The scrolling background now takes up more screen space to accomodate for an experimental fullscreen option.
-[*]Updated the look of various action buttons to make them stand out more.
-[*]Changed the default Time Out value to 60 seconds.
-[*]Misclick circles now appear over the border overlay.
-[*]Removed the Bug Crusher and Mystery music tracks because they were unused.
-[list]
-[*]These tracks are still available in the Soundtrack.
-[/list]
-[*]Removed the default "Idle" text from the header.
-[/list]
-[h3]Effects[/h3]
-[list]
-[*]Added the Vocoder effect, which comes with default carriers.
-[*]The Rave effect now supports the ability to revert to its old behavior, visit its options in the Addons tab to enable this.
-[*]There is now a Rave audio library to separate its music from the Dance music, you can choose which library to use in the Rave options.
-[*]Added new FFmpeg parameters to base generation code, stock and official Workshop effects, and other internal FFmpeg commands.
-[list]
-[*]This should solve an issue with delayed audio in renders with a significant amount of clips.
-[/list]
-[*]Added support for frei0r filters.
-[list]
-[*]When updating FFmpeg in NVG, these frei0r filters will also be automatically downloaded.
-[*]Due to a limitation with FFmpeg, the FREI0R_FILTERS environment variable will be set to NVG's frei0r-1 directory when NVG starts.
-[*]You can revert this behavior by using the "-nofrei0r" launch option.
-[/list]
-[*]Changed required FFmpeg version to "7.0.2-full_build-www.gyan.dev"
-[list]
-[*]NVG will prompt you to update FFmpeg if you have an older version.
-[/list]
-[*]Fixed an issue where the Distort effect would not function if ImageMagick is not installed.
-[/list]
-[h3]Under the Hood[/h3]
-[list]
-[*]Added the Zerius Vocoder tool by Emanuel Borsboom for use in the new Vocoder effect.
-[*]Upgraded NVG to use .NET 8.0 and MonoGame v3.8.2.1105.
-[list]
-[*]Steam should automatically install the .NET 8.0 Desktop Runtime if you don't have it already.
-[/list]
-[*]Updated NuGet packages MonoGame.Extended (v4.0.2), DiscordRichPresence (v1.2.1.24), Newtonsoft.Json (v13.0.3), System.Speech (v8.0.0), and WindowsAPICodePack (v8.0.4).
-[*]Updated yt-dlp to 2024.09.27.
-[*]Removed the Munro Narrow and LanaPixel fonts.
-[/list]
-[h3]Localization[/h3]
-[list]
-[*]Added localization tokens for the new Rave options.
-[*]Added localization tokens for the new option categories.
-[*]Added a tooltip for the localization options switch in the first boot screen.
-[*]Shortened the text for the switches that sets the disable/delete max unique clips options.
-[*]Changed "Insert" to "Use" for the intro and outro buttons to take up less space.
-[*]When changing a locale, the header text is now reset.
-[*]Removed unused localization tokens.
+[*]Added "See ya!" text to the status header when exiting.
+[*]Added localization tokens for the various button tooltips in the Addons tab.
+[*]Fixed a bug where the Vocoder effect would not apply if the carrier audio clip is not mono.
+[*]Fixed a bug where NVG would skip the exit animation and close immediately.
+[*]Fixed a bug where changing the screen resolution would not cause NVG to restart.
+[*]Fixed a bug where the window title would not update when debug mode is enabled.
 [*]Updated the localization files.
-[/list]
-[h3]Debug[/h3]
-[list]
-[*]The audio delay fix can be disabled in the Debug menu (Ctrl+F3).
-[*]An experimental fullscreen option has been added to the Debug menu.
-[*]Removed the mouse position from the Debug menu.
 [/list]
 
 Let me know if you have any issues with this update.
