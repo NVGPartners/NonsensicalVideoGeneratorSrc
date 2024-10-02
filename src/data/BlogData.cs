@@ -20,17 +20,17 @@ namespace NonsensicalVideoGenerator
         {
             "v%s",
             "October 1",
-            "Major Update"
+            "Small Update"
         };
         public static List<string> Description { get; set; } = new List<string>()
         {
-            " ",
-            " ",
-            " ",
-            " ",
-            " ",
-            " ",
-            "See full changelog on Steam.",
+            "- Added header text when exiting.",
+            "- Fixed a Vocoder stereo audio bug.",
+            "- Fixed the exit animation not playing.",
+            "- Fixed no restart on resolution set.",
+            "- Fixed the window title not updating.",
+            "- Updated the localization files.",
+            "See the full changelog on Steam.",
         };
         public static string Url { get; set; } = "https://store.steampowered.com/news/app/2516360/view/4695656140431567186";
     }
