@@ -31,7 +31,7 @@ namespace NonsensicalVideoGenerator
                     Global.productVersion = Global.fileVersionInfo.ProductVersion+" (RELEASE; DEBUG MODE)";
                 }
                 if(UserInterface.instance != null)
-                    UserInterface.instance.Window.Title = Global.productName+" "+Global.productVersion;
+                    UserInterface.instance.Window.Title = Global.productName+" v"+Global.productVersion;
             }
             debugModePermanent = true;
             debugMode = enable;
@@ -56,8 +56,11 @@ namespace NonsensicalVideoGenerator
                 ScreenManager.PushNavigation("Content");
                 ScreenManager.GetScreen<ContentScreen>("Content")?.Show();
                 ScreenManager.GetScreen<ContentScreen>("Content").offset = new Vector2(0, 0);
-                ScreenManager.GetScreen<VideoScreen>("Video")?.Hide();
-                ScreenManager.GetScreen<VideoScreen>("Video").offset = new Vector2(GlobalGraphics.Scale(-124), 0);
+                if(SaveData.saveValues["UseExternalVideoPlayer"] == "false")
+                {
+                    ScreenManager.GetScreen<VideoScreen>("Video")?.Hide();
+                    ScreenManager.GetScreen<VideoScreen>("Video").offset = new Vector2(GlobalGraphics.Scale(-124), 0);
+                }
                 ScreenManager.GetScreen<SocialScreen>("Socials")?.Hide();
                 ScreenManager.GetScreen<SocialScreen>("Socials").offset = new Vector2(0, GlobalGraphics.Scale(240));
                 ScreenManager.GetScreen<MenuScreen>("Menu")?.Hide();
@@ -73,8 +76,11 @@ namespace NonsensicalVideoGenerator
                 ScreenManager.PushNavigation("Content");
                 ScreenManager.GetScreen<ContentScreen>("Content").Show();
                 ScreenManager.GetScreen<ContentScreen>("Content").offset = new Vector2(0, 0);
-                ScreenManager.GetScreen<VideoScreen>("Video")?.Show();
-                ScreenManager.GetScreen<VideoScreen>("Video").offset = new Vector2(0, 0);
+                if(SaveData.saveValues["UseExternalVideoPlayer"] == "false")
+                {
+                    ScreenManager.GetScreen<VideoScreen>("Video")?.Show();
+                    ScreenManager.GetScreen<VideoScreen>("Video").offset = new Vector2(0, 0);
+                }
                 ScreenManager.PushNavigation("Socials");
                 ScreenManager.GetScreen<SocialScreen>("Socials")?.Show();
                 ScreenManager.GetScreen<SocialScreen>("Socials").offset = new Vector2(0, 0);

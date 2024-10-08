@@ -607,7 +607,7 @@ namespace NonsensicalVideoGenerator
                                 FramePlayer.canPlayBgMusic = true;
                                 ScreenManager.PushNavigation("Menu");
                                 ScreenManager.GetScreen<MenuScreen>("Menu")?.Show();
-                                if(FramePlayer.audio != null)
+                                if(FramePlayer.audio != null && SaveData.saveValues["UseExternalVideoPlayer"] == "false")
                                 {
                                     ScreenManager.PushNavigation("Video");
                                     ScreenManager.GetScreen<VideoScreen>("Video")?.Show();
@@ -660,7 +660,7 @@ namespace NonsensicalVideoGenerator
                             FramePlayer.canPlayBgMusic = true;
                             ScreenManager.PushNavigation("Menu");
                             ScreenManager.GetScreen<MenuScreen>("Menu")?.Show();
-                            if(FramePlayer.audio != null)
+                            if(FramePlayer.audio != null && SaveData.saveValues["UseExternalVideoPlayer"] == "false")
                             {
                                 ScreenManager.PushNavigation("Video");
                                 ScreenManager.GetScreen<VideoScreen>("Video")?.Show();

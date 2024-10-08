@@ -31,8 +31,7 @@ namespace NonsensicalVideoGenerator
         private SpriteBatch? _spriteBatch;
         private WindowState _windowState = WindowState.Unfocused;
         private MusicState _musicState = MusicState.Paused;
-        private int _musicActive = 2;
-        public int music = 2;
+        public int music = 0;
         public UserInterface()
         {
             ConsoleOutput.WriteLine("Creating new UserInterface instance...", Color.Transparent);
@@ -165,27 +164,14 @@ namespace NonsensicalVideoGenerator
         }
         public void FindMusic()
         {
-            if(music < 0)
-            {
-                music = Global.generator.globalRandom.Next(0, 11);
-            }
-            else
-            {
-                music++;
-            }
-            // Make sure music is in range.
-            if(music < 2 || music >= 11)
-            {
-                music = 0;
-            }
+            music = ThemeManager.GetNextSongIndex(music);
             _musicState = MusicState.Playing;
             try
             {
-                MediaPlayer.Play(GlobalContent.GetSongByIndex(music));
+                MediaPlayer.Play(GlobalContent.GetSong(music));
             }
             catch
             {
-                music = 0;
                 //ConsoleOutput.WriteLine("Failed to play music: " + ex.Message, Color.Red);
             }
         }
@@ -211,21 +197,6 @@ namespace NonsensicalVideoGenerator
             // Play music after 500ms.
             if(gameTime.TotalGameTime.TotalMilliseconds > Global.readyTime + Global.waitReady && Global.ready)
             {
-                // Exchange music if it's not the same as the active music.
-                if(_musicActive != music)
-                {
-                    _musicActive = music;
-                    try
-                    {
-                        MediaPlayer.Play(GlobalContent.GetSongByIndex(_musicActive));
-                    }
-                    catch
-                    {
-                        _musicActive = 2;
-                        //ConsoleOutput.WriteLine("Failed to play music: " + ex.Message, Color.Red);
-                    }
-                    MediaPlayer.Volume = 0f;
-                }
                 if(Global.exiting)
                 {
                     if(MediaPlayer.Volume > 0.01f)

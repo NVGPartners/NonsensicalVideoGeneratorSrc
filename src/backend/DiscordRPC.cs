@@ -18,7 +18,8 @@ namespace NonsensicalVideoGenerator
     {
         private static DiscordRpcClient? client;
         public static DateTime timestamp;
-        private static string? curstate;
+        private static string curstate = "";
+        public static string state = "";
         public static Tab prevtab = Tab.Generate;
         public static Tab curtab = Tab.Generate;
         public static Tab ToTab(string name)
@@ -58,13 +59,13 @@ namespace NonsensicalVideoGenerator
         }
         public static void Update()
         {
+            if(client == null)
+                return;
             try
             {
-                if(client == null)
-                    return;
-                if(Global.generator.progressText != curstate)
+                if(state != curstate)
                 {
-                    curstate = Global.generator.progressText;
+                    curstate = state;
                     UpdatePresence();
                 }
                 if(curtab != prevtab)
@@ -81,10 +82,10 @@ namespace NonsensicalVideoGenerator
         }
         public static void UpdatePresence()
         {
+            if(client == null)
+                return;
             try
             {
-                if(client == null)
-                    return;
                 RichPresence presence = new RichPresence()
                 {
                     Details = Global.videoTitle + ".mp4",
@@ -102,35 +103,35 @@ namespace NonsensicalVideoGenerator
                         if(Global.generator.generatorActive)
                         {
                             presence.Assets.SmallImageKey = "rendering";
-                            presence.Assets.SmallImageText = "Rendering";
+                            presence.Assets.SmallImageText = L.T(0, "DiscordRPC:Tab", L.T(0, "Rendering:Title"));
                             break;
                         }
                         presence.Assets.SmallImageKey = "generate";
-                        presence.Assets.SmallImageText = "Generate Tab";
+                        presence.Assets.SmallImageText = L.T(0, "DiscordRPC:Tab", L.T(0, "Generate:Title"));
                         break;
                     case Tab.Library:
                         presence.Assets.SmallImageKey = "library";
-                        presence.Assets.SmallImageText = "Library Tab";
+                        presence.Assets.SmallImageText = L.T(0, "DiscordRPC:Tab", L.T(0, "Library:Title"));
                         break;
                     case Tab.Addons:
                         presence.Assets.SmallImageKey = "effects";
-                        presence.Assets.SmallImageText = "Addons Tab";
+                        presence.Assets.SmallImageText = L.T(0, "DiscordRPC:Tab", L.T(0, "Addons:Title"));
                         break;
                     case Tab.Options:
                         presence.Assets.SmallImageKey = "options";
-                        presence.Assets.SmallImageText = "Options Tab";
+                        presence.Assets.SmallImageText = L.T(0, "DiscordRPC:Tab", L.T(0, "Options:Title"));
                         break;
                     case Tab.Locales:
                         presence.Assets.SmallImageKey = "locales";
-                        presence.Assets.SmallImageText = "Locales Tab";
+                        presence.Assets.SmallImageText = L.T(0, "DiscordRPC:Tab", L.T(0, "Locales:Title"));
                         break;
                     case Tab.Blog:
                         presence.Assets.SmallImageKey = "blog";
-                        presence.Assets.SmallImageText = "Blog Tab";
+                        presence.Assets.SmallImageText = L.T(0, "DiscordRPC:Tab", L.T(0, "Blog:Title"));
                         break;
                     case Tab.Game:
                         presence.Assets.SmallImageKey = "game";
-                        presence.Assets.SmallImageText = "Game Tab";
+                        presence.Assets.SmallImageText = L.T(0, "DiscordRPC:Tab", L.T(0, "Game:Title"));
                         break;
                 }
                 client.SetPresence(presence);
@@ -142,10 +143,10 @@ namespace NonsensicalVideoGenerator
         }
         public static void Shutdown()
         {
+            if(client == null)
+                return;
             try
             {
-                if(client == null)
-                    return;
                 client.Dispose();
             }
             catch(Exception e)

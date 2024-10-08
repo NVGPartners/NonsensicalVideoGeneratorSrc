@@ -87,11 +87,22 @@ namespace NonsensicalVideoGenerator
             spriteBatch.Draw(switchGraphic, new Rectangle(GlobalGraphics.Scale(bounds.X), GlobalGraphics.Scale(bounds.Y), GlobalGraphics.Scale(switchGraphic.Width), GlobalGraphics.Scale(switchGraphic.Height)), Color.White);
             spriteBatch.Draw(SwitchState ? onGraphic : offGraphic, new Rectangle(GlobalGraphics.Scale(bounds.X + 4), GlobalGraphics.Scale(bounds.Y + 3), GlobalGraphics.Scale(SwitchState ? onGraphic.Width : offGraphic.Width), GlobalGraphics.Scale(SwitchState ? onGraphic.Height : offGraphic.Height)), Color.White);
             // Text & shadow
+            // Localize title
             string localizedTitle;
             if(internalName.StartsWith("NoLocalization:"))
+            {
                 localizedTitle = Name;
+            }
             else
-                localizedTitle = L.T(0, "Interactable:"+internalName+"Title");
+            {
+                string token = "Interactable:"+internalName+"Title";
+                // check if the token exists
+                string localized = L.T(0, token, PluginHandler.GetPluginListFilter());
+                if (localized != token)
+                    localizedTitle = localized;
+                else
+                    localizedTitle = ""; // no title
+            }
             SpriteFont spriteFont = L.FontLarge();
             if(internalName.Contains("ViewLocalizationOptions") || internalName.Contains("SelectLanguageOptionsPage"))
             {
@@ -104,9 +115,19 @@ namespace NonsensicalVideoGenerator
             if (State >= 1 && Tooltip != "")
             {
                 if(internalName.StartsWith("NoLocalization:"))
+                {
                     Global.tooltip = Tooltip;
+                }
                 else
-                    Global.tooltip = L.T(0, "Interactable:"+internalName+"Tooltip");
+                {
+                    string token = "Interactable:"+internalName+"Tooltip";
+                    // check if the token exists
+                    string localized = L.T(0, token);
+                    if (localized != token)
+                        Global.tooltip = localized;
+                    else
+                        Global.tooltip = ""; // no tooltip
+                }
             }
         }
         public void LoadContent(ContentManager contentManager, GraphicsDevice graphicsDevice, string internalName)

@@ -68,7 +68,7 @@ namespace NonsensicalVideoGenerator
         public int timeout = 0;
         public string tempOutput = Path.Combine(Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location) ?? ".", "library", "video", "renders", "temp.mp4");
         public static string oldExportParams = "-c:v libx264 -crf 18 -preset veryfast -ar 32000 -shortest -fflags +genpts";
-        public static string betterExportParams = "-vcodec libx264 -crf 28 -preset ultrafast -ac 2 -c:a aac -b:a 160k -reset_timestamps 1 -shortest -fflags +genpts";
+        public static string betterExportParams = "-vcodec libx264 -crf 28 -preset ultrafast -ac 2 -c:a aac -b:a 160k -ar 44100 -map_metadata -1 -reset_timestamps 1 -shortest -fflags +genpts";
         public bool audioSync = true;
         public static string exportParams = betterExportParams;
         public void KillChildProcesses()
@@ -380,6 +380,8 @@ namespace NonsensicalVideoGenerator
             generatorActive = true; // first time use
             progress = 0;
             progressState = ProgressState.Parsing;
+
+            DiscordRPC.UpdatePresence();
 
             // Load library.
             progressText = L.T(0, "Generate:StatusLibraryParse");

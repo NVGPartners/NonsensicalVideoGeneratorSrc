@@ -54,18 +54,14 @@ namespace NonsensicalVideoGenerator
     public static class GlobalContent
     {
         private static Dictionary<string, SoundEffect> sounds = new Dictionary<string, SoundEffect>();
-#if MONOGAME
         private static Dictionary<string, Texture2D> textures = new Dictionary<string, Texture2D>();
         private static Dictionary<string, SpriteFont> fonts = new Dictionary<string, SpriteFont>();
         private static Dictionary<SpriteFont, Vector2> fontOffsets = new Dictionary<SpriteFont, Vector2>();
-        private static Dictionary<string, Song> songs = new Dictionary<string, Song>();
-        private static Dictionary<string, XmlDocument> xmls = new Dictionary<string, XmlDocument>();
+        private static List<Song> songs = new List<Song>();
         public static void LoadDefaultContent(ContentManager contentManager, GraphicsDevice graphicsDevice)
-#else
-        private static ContentManager contentManager;
-        public static void LoadDefaultContent()
-#endif
         {
+            // Dispose all existing content.
+            UnloadContent();
             // Load default sounds.
             AddSound("AddSource", ThemeManager.LoadLayeredContent<SoundEffect>("sound/addsource"));
             AddSound("Back", ThemeManager.LoadLayeredContent<SoundEffect>("sound/back"));
@@ -85,8 +81,6 @@ namespace NonsensicalVideoGenerator
             AddFont("Munro", ThemeManager.LoadLayeredContent<SpriteFont>("fonts/munro-x"+scale), new Vector2(0, 0));
             AddFont("MunroSmall", ThemeManager.LoadLayeredContent<SpriteFont>("fonts/munro-small-x"+scale), new Vector2(0, 0));
             AddFont("NotoSans", ThemeManager.LoadLayeredContent<SpriteFont>("fonts/notosans-x"+scale), new Vector2(-scale/2, -scale*2f));
-            // Fallback (multi-language support) system font.
-            //AddFont("Arial", UserInterface.instance.Content.Load<SpriteFont>("Arial"));
             // Load default songs.
             for(int i = 1; i < ThemeManager.GetSongCount()+1; i++)
             {
@@ -101,7 +95,7 @@ namespace NonsensicalVideoGenerator
                 }
                 if(song != null)
                 {
-                    AddSong($"Theme{i}", song);
+                    songs.Add(song);
                 }
             }
             // Create pixel shape.
@@ -182,18 +176,26 @@ namespace NonsensicalVideoGenerator
         }
         public static void UnloadContent()
         {
-            foreach(string key in sounds.Keys)
+            foreach(SoundEffect sound in sounds.Values)
             {
-                sounds[key].Dispose();
+                sound.Dispose();
             }
-            foreach(string key in textures.Keys)
+            foreach(Texture2D texture in textures.Values)
             {
-                textures[key].Dispose();
+                texture.Dispose();
             }
-            foreach(string key in songs.Keys)
+            foreach(SpriteFont font in fonts.Values)
             {
-                songs[key].Dispose();
+                fontOffsets.Remove(font);
             }
+            foreach(Song song in songs)
+            {
+                song.Dispose();
+            }
+            sounds.Clear();
+            textures.Clear();
+            fonts.Clear();
+            songs.Clear();
         }
         public static bool AddTexture(string name, Texture2D texture)
         {
@@ -235,81 +237,25 @@ namespace NonsensicalVideoGenerator
             }
             return true;
         }
-        public static bool AddSong(string name, Song song)
-        {
-            if (songs.ContainsKey(name))
-            {
-                songs[name].Dispose();
-                songs[name] = song;
-            }
-            else
-            {
-                songs.Add(name, song);
-            }
-            return true;
-        }
-        public static bool AddXml(string name, XmlDocument xml)
-        {
-            if (xmls.ContainsKey(name))
-            {
-                xmls[name] = xml;
-            }
-            else
-            {
-                xmls.Add(name, xml);
-            }
-            return true;
-        }
         public static SoundEffect GetSound(string name)
         {
             return sounds[name];
-        }
-        public static int GetSoundCount()
-        {
-            return sounds.Count;
         }
         public static Texture2D GetTexture(string name)
         {
             return textures[name];
         }
-        public static int GetTextureCount()
-        {
-            return textures.Count;
-        }
         public static SpriteFont GetFont(string name)
         {
             return fonts[name];
         }
-        public static int GetFontCount()
+        public static Song GetSong(int index)
         {
-            return fonts.Count;
+            return songs[index];
         }
         public static bool CheckFont(string name)
         {
             return fonts.ContainsKey(name);
-        }
-        public static Song GetSong(string name)
-        {
-            return songs[name];
-        }
-        public static int GetSongCount()
-        {
-            return songs.Count;
-        }
-        public static Song GetSongByIndex(int index)
-        {
-            // MUST BE IN RANGE!
-            if (index < 0 || index >= songs.Count)
-                index = 0;
-            return songs.Values.ElementAt(index);
-        }
-        public static XmlDocument GetXml(string name)
-        {
-            return xmls[name];
-        }
-        public static int GetXmlCount()
-        {
-            return xmls.Count;
         }
         public static void DrawString(SpriteBatch spriteBatch, SpriteFont spriteFont, string text, Vector2 position, Color color, float rotation, Vector2 origin, float scale, SpriteEffects effects, float layerDepth)
         {

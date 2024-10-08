@@ -7,94 +7,66 @@
     -- If you need help, feel free to join the NVG Discord server:
     -- https://discord.gg/8ppmspR6Wh
 
--- [[ Localization ]]
-    -- This table is used to store the localization for your addon.
-    -- The key is the locale name, and the value is a table containing the localization tokens.
-    -- If a locale is not found, it will default to "english".
+    -- Please edit this file in a code editor such as VS Code for syntax highlighting.
 
-    -- Supporting multiple languages is not required, but the option is available if you wish to do so.
-
-    -- Please keep this format consistent to ensure community contributions are possible.
-    -- "Addons:Custom%filenameraw%Option1" - Replace "%filenameraw%" if you decide to change the filename.
-local customLocalization = {
-    ["english"] = {
-        ["Addons:Custom%filenameraw%Option1"] = "%prettyname%",
-        ["Addons:Custom%filenameraw%Option2"] = "This is %filename%.",
-        ["Addons:Custom%filenameraw%Option3"] = "This effect will perform a",
-        ["Addons:Custom%filenameraw%Option4"] = "speed up/down on the clip.",
-        ["Addons:Custom%filenameraw%Option5"] = "Out of 100, chance for which type to apply."
-    },
-}
-
--- This function tells the program what to display in the menu
--- alongside which user-customizable options to display.
+-- This function tells the program what to display in the menu, alongside which user-customizable options to display.
 function Query(localeName, localizationTokens)
-    -- Get the localization table for the current locale.
-    -- Otherwise, default to english.
-    local localization = customLocalization[localeName] or customLocalization["english"]
-
-    -- Community-contributed localization tokens are added, if available.
-    -- Please preserve localization in order to support multiple languages,
-    -- even if you don't plan on translating the addon yourself.
-    for k, v in pairs(localizationTokens) do
-        localization[k] = v
-    end
-
     -- Return the queried settings.
     return {
         -- Set up settings for this addon.
         ["settings"] = {
             -- This determines the type of addon this is.
             -- Only these values are allowed:
-            -- effect: An effect that gets applied at random.
-            -- postrendereffect: An effect that gets applied after rendering.
-            -- theme: A theme for the software. Only Query() is called.
+            --   effect             An effect that gets applied at random.
+            --   postrendereffect   An effect that gets applied after rendering.
+            --   theme              A theme for the software. Only Query() is called.
             {
                 ["name"] = "Addon Type",
                 ["value"] = "effect",
                 ["type"] = "label"
             },
             -- This is what the user will see in the addons tab.
-            -- "Display Name" is always hidden from the settings menu.
+            -- Do not append "Effect", "Theme", or "Post-Render Effect" as this is done automatically and would support localization.
+            -- "Display Name" and "Addon Type" are not shown on the settings menu.
             {
                 ["name"] = "Display Name",
-                ["value"] = localization["Addons:Custom%filenameraw%Option1"],
+                ["value"] = "%prettyname%",
                 ["type"] = "label"
             },
-            -- Description is what the user will see once entering the addon settings.
-            -- This is also the default description when publishing to the Workshop.
+            -- Description is a short blurb about the addon, use extra labels for more information.
             {
                 ["name"] = "Description",
-                ["value"] = localization["Addons:Custom%filenameraw%Option2"],
+                ["value"] = "This is %filename%.",
                 ["type"] = "label"
             },
             -- Labels can be used to display text to the user in the settings menu.
-            -- They are not customizable.
+            -- They cannot have tooltips.
+            -- All labels are added to the Steam Workshop description, separated by newlines.
             {
                 ["name"] = "Label1",
-                ["value"] = localization["Addons:Custom%filenameraw%Option3"],
+                ["value"] = "This effect will perform a",
                 ["type"] = "label"
             },
             {
                 ["name"] = "Label2",
-                ["value"] = localization["Addons:Custom%filenameraw%Option4"],
+                ["value"] = "speed up/down on the clip.",
                 ["type"] = "label"
             },
             -- Here is where we can add user-customizable options.
             -- These are the types of options that can be added:
-            -- int: Only accept integers.
-            -- float: Only accept decimals.
-            -- alphabetic: Only accept letters.
-            -- alphanumeric: Only accept letters and numbers.
-            -- string: Only accept letters, numbers, and spaces.
-            -- bool: Only accept 1 or 0. (displayed as a switch)
-            -- label: Display text to the user. (see labels above)
-            -- any: Accept anything.
+            --   int            Only accept integers.
+            --   float          Only accept decimals.
+            --   alphabetic     Only accept letters.
+            --   alphanumeric   Only accept letters and numbers.
+            --   string         Only accept letters, numbers, and spaces.
+            --   bool           Only accept 1 or 0. (displayed as a switch)
+            --   label          Read-only text for the user. (see labels above)
+            --   any            Accept any text.
             -- This example option will be a number between 1 and 100.
-            -- Tooltip will be displayed once the user hovers over the option.
+            -- Tooltips will be displayed once the user hovers over the option.
             {
                 ["name"] = "Chance Roll",
-                ["tooltip"] = localization["Addons:Custom%filenameraw%Option5"],
+                ["tooltip"] = "Out of 100, chance for which type to apply.",
                 ["value"] = "50",
                 ["type"] = "int"
             }
@@ -111,7 +83,7 @@ function Query(localeName, localizationTokens)
             -- The "tooltip" is what the user will see once they hover over the library.
             -- The "path" is the internal directory name of the library.
             -- The "type" is the type of media that the library will accept.
-            -- This can be "video" or "audio".
+            -- This can be "video", "audio", or "image".
             {
                 ["name"] = "Example",
                 ["tooltip"] = "This is an example library.",

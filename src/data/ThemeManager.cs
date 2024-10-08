@@ -99,7 +99,8 @@ namespace NonsensicalVideoGenerator
         public static Theme Spooky = new Theme("Spooky", "Trick or treat!", "themes/halloween/", 1, 5, new Dictionary<string, Color>() {
             {"VideoPlayerProgressBar", new Color(60, 0, 128, 255)},
         }, true);
-        public static Theme Holiday = new Theme("Holiday", "Merry Christmas!", "themes/holiday/", 6, 8, new Dictionary<string, Color>() {}, true);
+        public static Theme Holiday = new Theme("Holiday", "Merry Christmas!", "themes/holiday/", 6, 8, new Dictionary<string, Color>() {
+        }, true);
         public static List<Theme> themes = new List<Theme>()
         {
             Nonsensical,
@@ -286,6 +287,15 @@ namespace NonsensicalVideoGenerator
         public static int GetSongCount()
         {
             return activeTheme.songCount;
+        }
+        public static int GetNextSongIndex(int currentSong)
+        {
+            int songCount = GetSongCount();
+            if(currentSong >= songCount - 1)
+            {
+                return 0;
+            }
+            return currentSong + 1;
         }
         public static void ApplyTheme(Theme theme)
         {

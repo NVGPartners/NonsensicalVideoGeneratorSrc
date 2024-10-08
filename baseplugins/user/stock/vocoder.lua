@@ -56,7 +56,7 @@ function PostCommand(commandindex, outputresult, errorresult, options, pluginSet
     elseif commandindex == 2 then
         functions.runVocoder("-b 1024 \"" .. modulator .. "\" \"" .. carrierresult .. "\" \"" .. vocoded .. "\"")
     elseif commandindex == 3 then
-        functions.runFFmpeg("-i \"" .. options.inputVideo .. "\" -i \"" .. vocoded .. "\" -filter:v \"frei0r=filter_name=glow\" -map 0:v -map 1:a -vcodec libx264 -crf 28 -preset ultrafast -ac 2 -c:a aac -b:a 160k -reset_timestamps 1 -shortest -fflags +genpts -y \"" .. options.outputVideo .. "\"")
+        functions.runFFmpeg("-i \"" .. options.inputVideo .. "\" -i \"" .. vocoded .. "\" -map 0:v -map 1:a -vcodec libx264 -crf 28 -preset ultrafast -ac 2 -c:a aac -b:a 160k -reset_timestamps 1 -shortest -fflags +genpts -y \"" .. options.outputVideo .. "\"")
         success = true
     end
 end

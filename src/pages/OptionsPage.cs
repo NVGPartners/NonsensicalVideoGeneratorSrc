@@ -373,6 +373,7 @@ namespace NonsensicalVideoGenerator
                         SaveData.saveValues["VideoPlaybackScale"] = "2";
                         SaveData.saveValues["SkipPhotosensitiveWarningScreen"] = "false";
                         SaveData.saveValues["DisableHolidays"] = "false";
+                        SaveData.saveValues["UseExternalVideoPlayer"] = "false";
                         SaveData.Save();
                         scrollView.Controller.interactables["MusicVolume"].Tooltip = SaveData.saveValues["MusicVolume"];
                         scrollView.Controller.interactables["SFXVolume"].Tooltip = SaveData.saveValues["SoundEffectVolume"];
@@ -382,6 +383,8 @@ namespace NonsensicalVideoGenerator
                         ((Switch)scrollView.Controller.interactables["MuteMusicWhileTabbedOut"]).SwitchState = SaveData.saveValues["MuteMusicWhileTabbedOut"] == "true";
                         scrollView.Controller.interactables["VideoPlaybackScale"].Tooltip = SaveData.saveValues["VideoPlaybackScale"];
                         ((Switch)scrollView.Controller.interactables["SkipPhotosensitiveWarningScreen"]).SwitchState = SaveData.saveValues["SkipPhotosensitiveWarningScreen"] == "true";
+                        ((Switch)scrollView.Controller.interactables["DisableHolidays"]).SwitchState = SaveData.saveValues["DisableHolidays"] == "true";
+                        ((Switch)scrollView.Controller.interactables["UseExternalVideoPlayer"]).SwitchState = SaveData.saveValues["UseExternalVideoPlayer"] == "true";
                         return true;
                 }
                 return false;
@@ -400,7 +403,7 @@ namespace NonsensicalVideoGenerator
                 return false;
             }, ThemeManager.LoadLayeredContent<Texture2D>("graphics/actions/reset")));
             actionController2.Add("ActionOptions", new ActionButton("View localizations to select a different language.", new Vector2(112, 221), LocaleAction, ThemeManager.LoadLayeredContent<Texture2D>("graphics/actions/options")));
-            scrollView.Controller.Add("SkipPhotosensitiveWarningScreen", new Switch("Skip Intro", "Load the menu immediately when starting.", new Vector2(139, 60-(8*3)+(19*12)+(10*1)+(9*1)), (int i, string n) => {
+            scrollView.Controller.Add("SkipPhotosensitiveWarningScreen", new Switch("Skip Intro", "Load the menu immediately when starting.", new Vector2(139, 60-(8*3)+(19*13)+(10*1)+(9*1)), (int i, string n) => {
                 bool switchState = (i & 256) != 0;
                 if((i & 2) != 0)
                 {
@@ -411,7 +414,7 @@ namespace NonsensicalVideoGenerator
                 }
                 return switchState;
             }, SaveData.saveValues["SkipPhotosensitiveWarningScreen"] == "true"));
-            scrollView.Controller.Add("EnableDiscordRPC", new Switch("Enable Discord RPC", "Tell others that you're using " + Global.productNameShort + ".", new Vector2(139, 60-(8*3)+(19*11)+(10*1)+(9*1)), (int i, string n) => {
+            scrollView.Controller.Add("EnableDiscordRPC", new Switch("Enable Discord RPC", "Tell others that you're using " + Global.productNameShort + ".", new Vector2(139, 60-(8*3)+(19*12)+(10*1)+(9*1)), (int i, string n) => {
                 bool switchState = (i & 256) != 0;
                 if((i & 2) != 0)
                 {
@@ -426,7 +429,7 @@ namespace NonsensicalVideoGenerator
                 }
                 return switchState;
             }, SaveData.saveValues["EnableDiscordRPC"] == "true"));
-            scrollView.Controller.Add("DisableHolidays", new Switch("Disable Holidays", "Disables special themes during holidays.", new Vector2(139, 60-(8*3)+(19*10)+(10*1)+(9*1)), (int i, string n) => {
+            scrollView.Controller.Add("DisableHolidays", new Switch("Disable Holidays", "Disables special themes during holidays.", new Vector2(139, 60-(8*3)+(19*11)+(10*1)+(9*1)), (int i, string n) => {
                 bool switchState = (i & 256) != 0;
                 if((i & 2) != 0)
                 {
@@ -442,7 +445,7 @@ namespace NonsensicalVideoGenerator
                 }
                 return switchState;
             }, SaveData.saveValues["DisableHolidays"] == "true"));
-            scrollView.Controller.Add("MotionDisable", new Switch("Disable Motion", "Turns off screen tweening and other elements.", new Vector2(139, 60-(8*3)+(19*9)+(10*1)+(9*1)), (int i, string n) => {
+            scrollView.Controller.Add("MotionDisable", new Switch("Disable Motion", "Turns off screen tweening and other elements.", new Vector2(139, 60-(8*3)+(19*10)+(10*1)+(9*1)), (int i, string n) => {
                 bool switchState = (i & 256) != 0;
                 if((i & 2) != 0)
                 {
@@ -453,7 +456,20 @@ namespace NonsensicalVideoGenerator
                 }
                 return switchState;
             }, SaveData.saveValues["DisableMotion"] == "true"));
-            scrollView.Controller.Add("Preferences", new Label("Preferences:", new Vector2(139, 60-(8*2)+(19*8)+(10*1)+(9*1))));
+            scrollView.Controller.Add("Preferences", new Label("Preferences:", new Vector2(139, 60-(8*2)+(19*9)+(10*1)+(9*1))));
+            scrollView.Controller.Add("UseExternalVideoPlayer", new Switch("Use External Media Player", "Open media using their default programs instead of extracting frames.", new Vector2(139, 60-(8*2)+(19*8)+(10*1)+(9*1)), (int i, string n) => {
+                bool switchState = (i & 256) != 0;
+                if((i & 2) != 0)
+                {
+                    string oldValue = SaveData.saveValues["UseExternalVideoPlayer"];
+                    SaveData.saveValues["UseExternalVideoPlayer"] = switchState.ToString().ToLower();
+                    if(oldValue != SaveData.saveValues["UseExternalVideoPlayer"])
+                        SaveData.Save();
+                    if(switchState)
+                        FramePlayer.Stop();
+                }
+                return switchState;
+            }, SaveData.saveValues["UseExternalVideoPlayer"] == "true"));
             scrollView.Controller.Add("MuteMusicWhileTabbedOut", new Switch("Mute Music While Inactive", "Don't play music while " + Global.productNameShort + " is in the background.", new Vector2(139, 60-(8*2)+(19*7)+(10*1)+(9*1)), (int i, string n) => {
                 bool switchState = (i & 256) != 0;
                 if((i & 2) != 0)

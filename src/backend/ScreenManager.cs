@@ -232,7 +232,8 @@ namespace NonsensicalVideoGenerator
                     {
                         GetScreen<ContentScreen>("Content")?.Hide();
                         GetScreen<HeaderScreen>("Header")?.Hide();
-                        GetScreen<VideoScreen>("Video")?.Hide();
+                        if(SaveData.saveValues["UseExternalVideoPlayer"] == "false")
+                            GetScreen<VideoScreen>("Video")?.Hide();
                         GetScreen<MenuScreen>("Menu")?.Hide();
                         GetScreen<SocialScreen>("Socials")?.Hide();
                     }
@@ -245,7 +246,8 @@ namespace NonsensicalVideoGenerator
                         PushNavigation("Socials");
                         GetScreen<ContentScreen>("Content")?.Show();
                         GetScreen<HeaderScreen>("Header")?.Show();
-                        GetScreen<VideoScreen>("Video")?.Show();
+                        if(SaveData.saveValues["UseExternalVideoPlayer"] == "false")
+                            GetScreen<VideoScreen>("Video")?.Show();
                         GetScreen<MenuScreen>("Menu")?.Show();
                         GetScreen<SocialScreen>("Socials")?.Show();
                     }

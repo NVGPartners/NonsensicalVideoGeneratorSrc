@@ -15,23 +15,23 @@ namespace NonsensicalVideoGenerator
     /// </summary>
     public static class BlogData
     {
-        public static string Title { get; set; } = "Milestone 6 Hotfix 1";
+        public static string Title { get; set; } = "Milestone 6 Hotfix 2";
         public static List<string> Subtitle { get; set; } = new List<string>()
         {
             "v%s",
-            "October 1",
+            "October 7",
             "Small Update"
         };
         public static List<string> Description { get; set; } = new List<string>()
         {
-            "- Added header text when exiting.",
-            "- Fixed a Vocoder stereo audio bug.",
-            "- Fixed the exit animation not playing.",
-            "- Fixed no restart on resolution set.",
-            "- Fixed the window title not updating.",
+            "- Added external media player option.",
+            "- Various holiday changes.",
+            "- Updated the default addon templates.",
+            "- Fixed frei0r not being detected.",
+            "- Removed glow from vocoder effect.",
             "- Updated the localization files.",
             "See the full changelog on Steam.",
         };
-        public static string Url { get; set; } = "https://store.steampowered.com/news/app/2516360/view/4695656140431567186";
+        public static string Url { get; set; } = "https://store.steampowered.com/news/app/2516360/view/4695656140453239013";
     }
 }

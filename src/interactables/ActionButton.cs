@@ -73,9 +73,19 @@ namespace NonsensicalVideoGenerator
             if (State >= 1 && Tooltip != "")
             {
                 if(internalName.StartsWith("NoLocalization:"))
+                {
                     Global.tooltip = Tooltip;
+                }
                 else
-                    Global.tooltip = L.T(0, "Interactable:"+internalName+"Tooltip");
+                {
+                    string token = "Interactable:"+internalName+"Tooltip";
+                    // check if the token exists
+                    string localized = L.T(0, token);
+                    if (localized != token)
+                        Global.tooltip = localized;
+                    else
+                        Global.tooltip = ""; // no tooltip
+                }
             }
         }
         public override void LoadContent(ContentManager contentManager, GraphicsDevice graphicsDevice, string internalName)

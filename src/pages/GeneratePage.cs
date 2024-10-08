@@ -1,4 +1,3 @@
-#if MONOGAME
 using System;
 using System.Collections.Generic;
 using System.IO;
@@ -554,4 +553,3 @@ namespace NonsensicalVideoGenerator
         }
     }
 }
-#endif

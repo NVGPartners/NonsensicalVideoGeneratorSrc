@@ -310,17 +310,21 @@ namespace NonsensicalVideoGenerator
                         if (MouseInput.MouseState.X >= GlobalGraphics.Scale(138) && MouseInput.MouseState.X < GlobalGraphics.Scale(inRange)
                             && MouseInput.MouseState.Y >= GlobalGraphics.Scale(59 + ((i-offsetpl) * 16) - scrollOffset) && MouseInput.MouseState.Y < GlobalGraphics.Scale(70 + ((i-offsetpl) * 16) - scrollOffset))
                         {
-                            // Is this a workshop plugin?
-                            // If so, tooltip should be "Open workshop page."
-                            // Otherwise, tooltip should be "Open plugin directory."
-                            if (PluginHandler.plugins[i].workshopId != ""
-                                && PluginHandler.plugins[i].rootPath.Contains("workshop"))
-                                internalTooltip = L.T(0, "Addons:ButtonOpenWorkshop");
-                            else if(PluginHandler.plugins[i].workshopId != ""
-                                && PluginHandler.plugins[i].workshopId != "stock")
-                                internalTooltip = L.T(0, "Addons:ButtonOpenCodeEditor");
-                            else
-                                internalTooltip = L.T(0, "Addons:ButtonOpenStockDirectory");
+                            try
+                            {
+                                // Is this a workshop plugin?
+                                // If so, tooltip should be "Open workshop page."
+                                // Otherwise, tooltip should be "Open plugin directory."
+                                if (PluginHandler.plugins[i].workshopId != ""
+                                    && PluginHandler.plugins[i].rootPath.Contains("workshop"))
+                                    internalTooltip = L.T(0, "Addons:ButtonOpenWorkshop");
+                                else if(PluginHandler.plugins[i].workshopId != ""
+                                    && PluginHandler.plugins[i].workshopId != "stock")
+                                    internalTooltip = L.T(0, "Addons:ButtonOpenCodeEditor");
+                                else
+                                    internalTooltip = L.T(0, "Addons:ButtonOpenStockDirectory");
+                            }
+                            catch {}
                         }
                         if(Global.canRender)
                         {

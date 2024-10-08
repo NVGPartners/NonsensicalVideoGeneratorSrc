@@ -1725,7 +1725,12 @@ namespace NonsensicalVideoGenerator
                             ScreenManager.GetScreen<ContentScreen>("Content")?.Hide();
                             ScreenManager.GetScreen<MenuScreen>("Menu")?.Hide();
                             if(FramePlayer.audio != null)
-                                ScreenManager.GetScreen<VideoScreen>("Video")?.Hide();
+                            {
+                                if(SaveData.saveValues["UseExternalVideoPlayer"] == "false")
+                                {
+                                    ScreenManager.GetScreen<VideoScreen>("Video")?.Hide();
+                                }
+                            }
                             ScreenManager.GetScreen<BackgroundScreen>("Background")?.Hide();
                             ScreenManager.GetScreen<SocialScreen>("Socials")?.Hide();
                             GlobalContent.GetSound("Prompt").Play(int.Parse(SaveData.saveValues["SoundEffectVolume"], CultureInfo.InvariantCulture) / 100f, 0f, 0f);

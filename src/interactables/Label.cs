@@ -57,11 +57,22 @@ namespace NonsensicalVideoGenerator
         {
             // Text & shadow, that's it
             SpriteFont drawFont = L.FontLarge();
+            // Localize title
             string localizedTitle;
             if(internalName.StartsWith("NoLocalization:"))
+            {
                 localizedTitle = Name;
+            }
             else
-                localizedTitle = L.T(0, "Interactable:"+internalName+"Title");
+            {
+                string token = "Interactable:"+internalName+"Title";
+                // check if the token exists
+                string localized = L.T(0, token, PluginHandler.GetPluginListFilter());
+                if (localized != token)
+                    localizedTitle = localized;
+                else
+                    localizedTitle = ""; // no title
+            }
             // Draw underline
             Texture2D pixel = GlobalContent.GetTexture("Pixel");
             Vector2 size = drawFont.MeasureString(localizedTitle);

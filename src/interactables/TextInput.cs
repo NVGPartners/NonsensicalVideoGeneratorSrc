@@ -238,20 +238,41 @@ namespace NonsensicalVideoGenerator
                 GlobalContent.DrawString(spriteBatch, L.FontLarge(), ":", new Vector2(cursorX + GlobalGraphics.Scale(bounds.X + 4), GlobalGraphics.Scale(bounds.Y - 1)), Color.White);
             }
             // Label
+            // Localize title
             string localizedTitle;
             if(internalName.StartsWith("NoLocalization:"))
+            {
                 localizedTitle = Name;
+            }
             else
-                localizedTitle = L.T(0, "Interactable:"+internalName+"Title");
+            {
+                string token = "Interactable:"+internalName+"Title";
+                // check if the token exists
+                string localized = L.T(0, token, PluginHandler.GetPluginListFilter());
+                if (localized != token)
+                    localizedTitle = localized;
+                else
+                    localizedTitle = ""; // no title
+            }
             GlobalContent.DrawString(spriteBatch, L.FontLarge(), localizedTitle, new Vector2(GlobalGraphics.Scale(bounds.X + bounds.Width + 7 + 1), GlobalGraphics.Scale(bounds.Y + 2 + 1)), Color.Black);
             GlobalContent.DrawString(spriteBatch, L.FontLarge(), localizedTitle, new Vector2(GlobalGraphics.Scale(bounds.X + bounds.Width + 7), GlobalGraphics.Scale(bounds.Y + 2)), Color.White);
             // Tooltip
             if (scaledBounds2.Contains(mousePosition) && hiddenToolTip != "")
             {
                 if(internalName.StartsWith("NoLocalization:"))
-                    Global.tooltip = hiddenToolTip;
+                {
+                    Global.tooltip = Tooltip;
+                }
                 else
-                    Global.tooltip = L.T(0, "Interactable:"+internalName+"Tooltip");
+                {
+                    string token = "Interactable:"+internalName+"Tooltip";
+                    // check if the token exists
+                    string localized = L.T(0, token);
+                    if (localized != token)
+                        Global.tooltip = localized;
+                    else
+                        Global.tooltip = ""; // no tooltip
+                }
             }
         }
         public void LoadContent(ContentManager contentManager, GraphicsDevice graphicsDevice, string internalName)

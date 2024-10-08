@@ -242,12 +242,15 @@ namespace NonsensicalVideoGenerator
                             GlobalContent.GetSound("Select").Play(int.Parse(SaveData.saveValues["SoundEffectVolume"], CultureInfo.InvariantCulture) / 100f, 0f, 0f);
                             if(HolidayManager.CurrentHoliday == null)
                             {
-                                // wrap around to the first holiday
-                                HolidayManager.SetHoliday(HolidayManager.Holidays[HolidayManager.Holidays.Count - 1]);
+                                // set the first holiday
+                                Holiday holiday = HolidayManager.Holidays[0];
+                                ThemeManager.ApplyTheme(holiday.Theme);
+                                HolidayManager.SetHoliday(holiday);
+                                return true;
                             }
                             for(int i = 0; i < HolidayManager.Holidays.Count; i++)
                             {
-                                if(HolidayManager.CurrentHoliday == HolidayManager.Holidays[i])
+                                if(HolidayManager.CurrentHoliday.InternalName == HolidayManager.Holidays[i].InternalName)
                                 {
                                     if(i + 1 < HolidayManager.Holidays.Count)
                                     {
@@ -320,7 +323,7 @@ namespace NonsensicalVideoGenerator
                 DrawButton(spriteBatch, 6, 33+(8*6), "Speed Boost: x" + Debug.debugSpeedBoost);
                 DrawButton(spriteBatch, 6, 33+(8*7), "Draw Offset: " + GlobalGraphics.drawOffset.X.ToString(CultureInfo.InvariantCulture) + ", " + GlobalGraphics.drawOffset.Y.ToString(CultureInfo.InvariantCulture));
                 DrawButton(spriteBatch, 6, 33+(8*8), "Export Params: " + (Generator.exportParams.StartsWith("-vcodec") ? "better" : (Generator.exportParams.StartsWith("-af") ? "better (audio sync)" : "old")));
-                DrawButton(spriteBatch, 6, 33+(8*9), "Music: " + GlobalContent.GetSongByIndex(UserInterface.instance.music).Name);
+                DrawButton(spriteBatch, 6, 33+(8*9), "Music: #" + (UserInterface.instance.music+1));
                 DrawButton(spriteBatch, 6, 33+(8*10), "Show Tutorial Window");
                 DrawButton(spriteBatch, 6, 33+(8*11), "Theme: " + ThemeManager.activeTheme.name);
                 DrawButton(spriteBatch, 6, 33+(8*12), "Save");

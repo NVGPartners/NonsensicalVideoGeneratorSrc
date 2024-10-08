@@ -60,7 +60,8 @@ namespace NonsensicalVideoGenerator
             {"PluginListFilterFlags", "7"},
             {"LastVersion", ""},
             {"Locale", "fixme"},
-            {"DisableHolidays", "false"}
+            {"DisableHolidays", "false"},
+            {"UseExternalVideoPlayer", "false"}
         };
         public static string saveFileName = "Options.json";
         public static bool Save()

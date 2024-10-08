@@ -43,7 +43,7 @@ namespace NonsensicalVideoGenerator
             dummyLocale
         };
         public static int localeIndex = 0; // set when locales are loaded.
-        public static string invalid { get; set; } = "[%1]";
+        public static string invalid { get; set; } = "%1";
         public static string defaultLocale { get; set; } = "english";
         public static string localeFolder { get; set; } = "locales";
         public static int maxVersion { get; set; } = 0;

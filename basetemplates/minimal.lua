@@ -1,5 +1,23 @@
 function Query(localeName, localizationTokens)
-    return {}
+    return {
+        ["settings"] = {
+            {
+                ["name"] = "Addon Type",
+                ["value"] = "effect",
+                ["type"] = "label"
+            },
+            {
+                ["name"] = "Display Name",
+                ["value"] = "%prettyname%",
+                ["type"] = "label"
+            },
+            {
+                ["name"] = "Description",
+                ["value"] = "Speeds up the video by 2x.",
+                ["type"] = "label"
+            }
+        }
+    }
 end
 
 function StartGeneration(options, pluginSettings, functions)

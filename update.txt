@@ -1,14 +1,26 @@
-Milestone 6 Hotfix 1 (v1.0.2.1)
+Milestone 6 Hotfix 2 (v1.0.2.2)
 
 Here are the changes in this update:
 
 [list]
-[*]Added "See ya!" text to the status header when exiting.
-[*]Added localization tokens for the various button tooltips in the Addons tab.
-[*]Fixed a bug where the Vocoder effect would not apply if the carrier audio clip is not mono.
-[*]Fixed a bug where NVG would skip the exit animation and close immediately.
-[*]Fixed a bug where changing the screen resolution would not cause NVG to restart.
-[*]Fixed a bug where the window title would not update when debug mode is enabled.
+[*]Added a new option to open media files in an external media player.
+[*]Added more holiday graphics.
+[*]Added status text that is displayed when holidays are active.
+[*]Added localization tokens for Discord rich presence.
+[*]Updated the default addon templates to be more concise.
+[*]Fixed a bug that removed the "v" version prefix in the window title when enabling Debug mode.
+[*]Fixed a bug that prevented the background music from changing.
+[*]Fixed a bug where the audio rate in generated videos was inconsistent between renders.
+[*]Fixed a bug where the metadata in materials were kept when rendering.
+[*]Fixed a bug that prevented frei0r from being detected.
+[*]Fixed a bug where Discord rich presence is not updated when starting to render.
+[*]Fixed a bug where you couldn't change the music and holiday in the Debug menu.
+[*]Fixed a crash when reloading Workshop addons through the action button.
+[*]Temporarily disabled showing the current status text through Discord rich presence.
+[*]Removed brackets that were apended to text when localization tokens were not found.
+[*]Removed blank localization tokens, now interactables with missing localization will be automatically blank.
+[*]Removed the glow effect from the vocoder effect.
+[*]Removed the latam (Español-Latinoamérica) locale because there are no maintainers.
 [*]Updated the localization files.
 [/list]
 

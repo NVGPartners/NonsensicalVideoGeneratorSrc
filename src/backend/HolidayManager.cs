@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.Globalization;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Content;
 using Microsoft.Xna.Framework.Graphics;
@@ -32,6 +33,8 @@ namespace NonsensicalVideoGenerator
         public Theme Theme { get; set; } = DefaultThemes.Nonsensical;
         public SimpleDateTime Start { get; set; } = new SimpleDateTime();
         public SimpleDateTime End { get; set; } = new SimpleDateTime();
+        public int StartYear { get; set; } = 0;
+        public string StatusText { get; set; } = "";
         public bool CheckDate()
         {
             if(!Enabled)
@@ -43,7 +46,25 @@ namespace NonsensicalVideoGenerator
                 return true;
             return false;
         }
-        public Holiday(string internalName = "", string name = "", int priority = 0, bool enabled = false, Theme? theme = null, SimpleDateTime? start = null, SimpleDateTime? end = null)
+        public string GetStatusText()
+        {
+            if(StatusText == "")
+                return "";
+            // ignore StartYear if it's not set
+            if(StartYear == 0)
+                return L.T(0, StatusText);
+            // get years since StartYear to display in status text
+            int years = DateTime.Now.Year - StartYear;
+            // st, nd, rd, th
+            bool st = years % 10 == 1 && years % 100 != 11;
+            bool nd = years % 10 == 2 && years % 100 != 12;
+            bool rd = years % 10 == 3 && years % 100 != 13;
+            string suffix = st ? "St" : nd ? "Nd" : rd ? "Rd" : "Th";
+            string yearsLocalized = L.T(0, "Holidays:OrdinalSuffix" + suffix.ToString(CultureInfo.InvariantCulture), years.ToString(CultureInfo.InvariantCulture));
+            // combine status text with years
+            return L.T(0, StatusText, yearsLocalized);
+        }
+        public Holiday(string internalName = "", string name = "", int priority = 0, bool enabled = false, Theme? theme = null, SimpleDateTime? start = null, SimpleDateTime? end = null, string statusText = "")
         {
             InternalName = internalName;
             Name = name;
@@ -52,6 +73,7 @@ namespace NonsensicalVideoGenerator
             Theme = theme;
             Start = start;
             End = end;
+            StatusText = statusText;
         }
     }
     public static class HolidayManager
@@ -59,13 +81,24 @@ namespace NonsensicalVideoGenerator
         public static Holiday? CurrentHoliday { get; set; } = null;
         public static List<Holiday> Holidays { get; set; } = new List<Holiday>()
         {
+            new Holiday("newyearseve", "New Year's Eve")
+            {
+                Enabled = true,
+                Priority = 1,
+                Theme = DefaultThemes.Holiday,
+                Start = new SimpleDateTime(12, 31, 0, 0, 0),
+                End = new SimpleDateTime(12, 31, 23, 59, 59),
+                StatusText = "Holidays:StatusNewYears"
+            },
             new Holiday("anniversary", "Nonsensical Anniversary")
             {
                 Enabled = true,
                 Priority = 1,
                 Theme = DefaultThemes.Anniversary,
                 Start = new SimpleDateTime(7, 23, 0, 0, 0),
-                End = new SimpleDateTime(7, 23, 23, 59, 59)
+                End = new SimpleDateTime(7, 23, 23, 59, 59),
+                StartYear = 2023,
+                StatusText = "Holidays:StatusAnniversary"
             },
             new Holiday("birthday", "KiwifruitDev's Birthday")
             {
@@ -73,7 +106,9 @@ namespace NonsensicalVideoGenerator
                 Priority = 2,
                 Theme = DefaultThemes.Birthday,
                 Start = new SimpleDateTime(10, 14, 0, 0, 0),
-                End = new SimpleDateTime(10, 14, 23, 59, 59)
+                End = new SimpleDateTime(10, 14, 23, 59, 59),
+                StartYear = 2003,
+                StatusText = "Holidays:StatusBirthday"
             },
             new Holiday("halloween", "Halloween")
             {
@@ -81,7 +116,8 @@ namespace NonsensicalVideoGenerator
                 Priority = 1,
                 Theme = DefaultThemes.Spooky,
                 Start = new SimpleDateTime(10, 15, 12, 0, 0),
-                End = new SimpleDateTime(10, 31, 23, 59, 59)
+                End = new SimpleDateTime(10, 31, 23, 59, 59),
+                StatusText = "Holidays:StatusHalloween"
             },
             new Holiday("christmas", "Christmas")
             {
@@ -89,7 +125,17 @@ namespace NonsensicalVideoGenerator
                 Priority = 1,
                 Theme = DefaultThemes.Holiday,
                 Start = new SimpleDateTime(12, 1, 0, 0, 0),
-                End = new SimpleDateTime(12, 25, 23, 59, 59)
+                End = new SimpleDateTime(12, 25, 23, 59, 59),
+                StatusText = "Holidays:StatusChristmas"
+            },
+            new Holiday("newyearsday", "New Year's Day")
+            {
+                Enabled = true,
+                Priority = 1,
+                Theme = DefaultThemes.Holiday,
+                Start = new SimpleDateTime(1, 1, 0, 0, 0),
+                End = new SimpleDateTime(1, 1, 23, 59, 59),
+                StatusText = "Holidays:StatusNewYears"
             }
         };
         public static void SetHoliday(Holiday? holiday = null)
@@ -100,9 +146,27 @@ namespace NonsensicalVideoGenerator
             ConsoleOutput.WriteLine($"Holiday: {(holiday != null ? holiday.Name : "None")}", Color.Yellow);
             DefaultThemes.defaultTheme = holiday != null ? holiday.Theme : DefaultThemes.Nonsensical;
             ThemeManager.activeTheme = holiday != null ? holiday.Theme : DefaultThemes.Nonsensical;
+            Global.generator.progressText = holiday != null ? holiday.GetStatusText() : "";
         }
         public static void CheckHolidays()
         {
+            // Check for holiday command line parameter.
+            if(Global.parameters.Contains("-holiday"))
+            {
+                int index = Global.parameters.IndexOf("-holiday");
+                if(index + 1 < Global.parameters.Count)
+                {
+                    string holiday = Global.parameters[index + 1];
+                    foreach(Holiday h in Holidays)
+                    {
+                        if(h.InternalName == holiday.ToLower())
+                        {
+                            SetHoliday(h);
+                            return;
+                        }
+                    }
+                }
+            }
             // Respect priority.
             Holiday? newHoliday = new();
             foreach(Holiday holiday in Holidays)

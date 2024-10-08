@@ -57,7 +57,7 @@ namespace NonsensicalVideoGenerator
             if(!Global.parameters.Contains("-nofrei0r"))
             {
                 // Set FREI0R_PATH environment variable.
-                Environment.SetEnvironmentVariable("FREI0R_PATH", Path.Combine(Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location) ?? ".", "frei0r-1"));
+                Environment.SetEnvironmentVariable("FREI0R_PATH", Path.Combine(Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location) ?? ".", "frei0r-1"), EnvironmentVariableTarget.User);
             }
             SaveData.Load();
             if(Global.parameters.Contains("-v"))
@@ -120,22 +120,6 @@ namespace NonsensicalVideoGenerator
             if(Global.parameters.Contains("-intro"))
                 SaveData.saveValues["FirstBoot"] = "true";
             HolidayManager.CheckHolidays();
-            if(Global.parameters.Contains("-holiday"))
-            {
-                int index = Global.parameters.IndexOf("-holiday");
-                if(index + 1 < Global.parameters.Count)
-                {
-                    string holiday = Global.parameters[index + 1];
-                    foreach(Holiday h in HolidayManager.Holidays)
-                    {
-                        if(h.InternalName == holiday.ToLower())
-                        {
-                            HolidayManager.SetHoliday(h);
-                            break;
-                        }
-                    }
-                }
-            }
 #if MONOGAME
             using (var game = new UserInterface())
                 game.Run();
