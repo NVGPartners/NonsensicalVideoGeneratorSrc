@@ -261,7 +261,7 @@ namespace NonsensicalVideoGenerator
             {
                 if(internalName.StartsWith("NoLocalization:"))
                 {
-                    Global.tooltip = Tooltip;
+                    Global.tooltip = hiddenToolTip;
                 }
                 else
                 {

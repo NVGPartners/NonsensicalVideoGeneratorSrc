@@ -69,7 +69,7 @@ namespace NonsensicalVideoGenerator
             ParseBlog();
             controller.LoadContent(contentManager, graphicsDevice);
             actionController.Clear();
-            actionController.Add("ActionDiscord", new ActionButton("Join our Discord server!", new Vector2(112, 191), (int i, string n) => {
+            actionController.Add("ActionDiscord", new ActionButton("Join our Discord server!", new Vector2(112, 191+15), (int i, string n) => {
                 switch(i)
                 {
                     case 2: // left click
@@ -87,24 +87,6 @@ namespace NonsensicalVideoGenerator
                 }
                 return false;
             }, ThemeManager.LoadLayeredContent<Texture2D>("graphics/actions/discord")));
-            actionController.Add("ActionSteam", new ActionButton("View the Steam Workshop!", new Vector2(112, 191+15), (int i, string n) => {
-                switch(i)
-                {
-                    case 2: // left click
-                        if(Global.ready)
-                        {
-                            GlobalContent.GetSound("Select").Play(int.Parse(SaveData.saveValues["SoundEffectVolume"], System.Globalization.CultureInfo.InvariantCulture) / 100f, 0f, 0f);
-                            ProcessStartInfo psi = new()
-                            {
-                                FileName = "https://steamcommunity.com/app/2516360/workshop/",
-                                UseShellExecute = true
-                            };
-                            Process.Start(psi);
-                        }
-                        return true;
-                }
-                return false;
-            }, ThemeManager.LoadLayeredContent<Texture2D>("graphics/actions/steam")));
             actionController.Add("ActionGitHub", new ActionButton("View the issue tracker on GitHub!", new Vector2(112, 191+(15*2)), (int i, string n) => {
                 switch(i)
                 {

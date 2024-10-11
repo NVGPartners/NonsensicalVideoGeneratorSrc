@@ -1042,6 +1042,24 @@ namespace NonsensicalVideoGenerator
             controllerPluginCreation.Clear();
             GlobalContent.AddTexture("PluginEntryBlank", ThemeManager.LoadLayeredContent<Texture2D>("graphics/pluginentryblank"));
             GlobalContent.AddTexture("PluginEntry", ThemeManager.LoadLayeredContent<Texture2D>("graphics/pluginentry"));
+            actionController.Add("ActionSteam", new ActionButton("View the Steam Workshop!", new Vector2(112, 161), (int i, string n) => {
+                switch(i)
+                {
+                    case 2: // left click
+                        if(Global.ready)
+                        {
+                            GlobalContent.GetSound("Select").Play(int.Parse(SaveData.saveValues["SoundEffectVolume"], System.Globalization.CultureInfo.InvariantCulture) / 100f, 0f, 0f);
+                            ProcessStartInfo psi = new()
+                            {
+                                FileName = "https://steamcommunity.com/app/2516360/workshop/",
+                                UseShellExecute = true
+                            };
+                            Process.Start(psi);
+                        }
+                        return true;
+                }
+                return false;
+            }, ThemeManager.LoadLayeredContent<Texture2D>("graphics/actions/steam")));
             actionController.Add("ReloadPlugins", new ActionButton("Force reload all addons.", new Vector2(112, 176), (int i, string n) => {
                 switch(i)
                 {

@@ -7,7 +7,7 @@
             "request": "launch",
             "preLaunchTask": "build",
             "program": "${workspaceFolder}/bin/x64/debug/net8.0-windows/NonsensicalVideoGenerator.dll",
-            "args": ["-nopath", "-holiday", "birthday"],
+            "args": ["-nopath"],
             "cwd": "${workspaceFolder}/bin/x64/debug/net8.0-windows",
             "console": "internalConsole",
             "stopAtEntry": false

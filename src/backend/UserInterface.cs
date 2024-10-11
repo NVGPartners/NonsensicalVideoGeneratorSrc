@@ -304,6 +304,7 @@ namespace NonsensicalVideoGenerator
                 if(SteamManager.initialized)
                     SteamManager.Shutdown();
                 DiscordRPC.Shutdown();
+                ConsoleOutput.WriteLine("Exiting gracefully...", Color.Transparent);
             }
         }
         protected override void OnExiting(object sender, ExitingEventArgs args)

@@ -564,7 +564,7 @@ namespace NonsensicalVideoGenerator
             actionController.LoadContent(contentManager, graphicsDevice);
             actionController2.LoadContent(contentManager, graphicsDevice);
             scrollView.LoadContent(contentManager, graphicsDevice);
-            scrollView.MaxScrollOffset = 16*4;
+            scrollView.MaxScrollOffset = 16*6;
         }
     }
 }
