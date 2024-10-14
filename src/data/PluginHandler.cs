@@ -757,7 +757,7 @@ namespace NonsensicalVideoGenerator
         {
             // Create .\temp\job_%time%\
             string oldVideo = video;
-            string jobPath = Path.Join(@".\temp\", "job_" + DateTime.Now.ToString("HHmmssfff", CultureInfo.InvariantCulture));
+            string jobPath = Path.Join(@".\temp\", "job_" + DateTime.UtcNow.ToString("HHmmssfff", CultureInfo.InvariantCulture));
             // Delete job path if it already exists
             if (Directory.Exists(jobPath))
             {

@@ -54,6 +54,7 @@ namespace NonsensicalVideoGenerator
         public static int waitReady = int.MaxValue;
         public static bool selectLanguage = false;
         public static bool disableConsents = true;
+        public static readonly int currentYear = DateTime.UtcNow.Year;
         
         // Aspect ratio functions
         public static (int, int) ConvertToFraction(double aspectRatio, double tolerance = 0.01)

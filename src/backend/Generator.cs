@@ -403,7 +403,7 @@ namespace NonsensicalVideoGenerator
             if(Global.randomSeed != 0)
             {
                 progressText = L.T(0, "Generate:StatusSeed");
-                int seed = DateTime.Now.Millisecond;
+                int seed = DateTime.UtcNow.Millisecond;
                 // Convert ProjectTitle to int seed
                 /*
                 string seedString = Global.videoTitle;

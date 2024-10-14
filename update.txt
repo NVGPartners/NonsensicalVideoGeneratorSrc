@@ -1,26 +1,13 @@
-Milestone 6 Hotfix 2 (v1.0.2.2)
+Milestone 6 Hotfix 3 (v1.0.2.3)
 
 Here are the changes in this update:
 
 [list]
-[*]Added a new option to open media files in an external media player.
-[*]Added more holiday graphics.
-[*]Added status text that is displayed when holidays are active.
-[*]Added localization tokens for Discord rich presence.
-[*]Updated the default addon templates to be more concise.
-[*]Fixed a bug that removed the "v" version prefix in the window title when enabling Debug mode.
-[*]Fixed a bug that prevented the background music from changing.
-[*]Fixed a bug where the audio rate in generated videos was inconsistent between renders.
-[*]Fixed a bug where the metadata in materials were kept when rendering.
-[*]Fixed a bug that prevented frei0r from being detected.
-[*]Fixed a bug where Discord rich presence is not updated when starting to render.
-[*]Fixed a bug where you couldn't change the music and holiday in the Debug menu.
-[*]Fixed a crash when reloading Workshop addons through the action button.
-[*]Temporarily disabled showing the current status text through Discord rich presence.
-[*]Removed brackets that were apended to text when localization tokens were not found.
-[*]Removed blank localization tokens, now interactables with missing localization will be automatically blank.
-[*]Removed the glow effect from the vocoder effect.
-[*]Removed the latam (Español-Latinoamérica) locale because there are no maintainers.
+[*]Added a printout when NVG is exited gracefully.
+[*]Holidays now accommodate for time zone differences.
+[*]Moved the Steam Workshop action button from the Blog tab to the Addons tab.
+[*]Fixed a bug where the tooltips in addon settings weren't shown.
+[*]Fixed a bug where the Skip Intro toggle in Options couldn't be reached by scrolling.
 [*]Updated the localization files.
 [/list]
 

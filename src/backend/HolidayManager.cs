@@ -9,12 +9,17 @@ namespace NonsensicalVideoGenerator
 {
     public class SimpleDateTime
     {
+        private static int OffsetPST = -8;
+        private static int OffsetPDT = -7;
+        private static SimpleDateTime? FirstSundayNovember = null;
+        private static SimpleDateTime? SecondSundayMarch = null;
         public int Month { get; set; } = 0;
         public int Day { get; set; } = 0;
         public int Hour { get; set; } = 0;
         public int Minute { get; set; } = 0;
         public int Second { get; set; } = 0;
-        public SimpleDateTime(int month = 1, int day = 1, int hour = 0, int minute = 0, int second = 0)
+        public int Offset { get; set; } = 0;
+        public SimpleDateTime(int month = 1, int day = 1, int hour = 0, int minute = 0, int second = 0, int offset = 0, bool skipDST = false)
         {
             // Clamp values.
             Month = Math.Clamp(month, 1, 12);
@@ -22,6 +27,47 @@ namespace NonsensicalVideoGenerator
             Hour = Math.Clamp(hour, 0, 23);
             Minute = Math.Clamp(minute, 0, 59);
             Second = Math.Clamp(second, 0, 59);
+            if(offset != 0)
+            {
+                Offset = OffsetPST;
+                skipDST = true;
+            }
+            if(!skipDST)
+            {
+                // Check to see if daylight savings date needs to be calculated.
+                if(FirstSundayNovember == null || SecondSundayMarch == null)
+                {
+                    // Get calendar year so we can determine the first sundays of november and march.
+                    int year = Global.currentYear;
+                    // Get the first sunday of november.
+                    DateTime firstSundayNovemberDateTime = new DateTime(year, 11, 1);
+                    while(firstSundayNovemberDateTime.DayOfWeek != DayOfWeek.Sunday)
+                        firstSundayNovemberDateTime = firstSundayNovemberDateTime.AddDays(1);
+                    // Get the second sunday of march.
+                    DateTime secondSundayMarchDateTime = new DateTime(year, 3, 1);
+                    while(secondSundayMarchDateTime.DayOfWeek != DayOfWeek.Sunday)
+                        secondSundayMarchDateTime = secondSundayMarchDateTime.AddDays(1);
+                    secondSundayMarchDateTime = secondSundayMarchDateTime.AddDays(7);
+                    // Convert to SimpleDateTime.
+                    FirstSundayNovember = new SimpleDateTime(firstSundayNovemberDateTime.Month, firstSundayNovemberDateTime.Day, 0, 0, 0, 0, true);
+                    SecondSundayMarch = new SimpleDateTime(secondSundayMarchDateTime.Month, secondSundayMarchDateTime.Day, 0, 0, 0, 0, true);
+                }
+                // Check to see if this month/day is after the first sunday of november or march.
+                if(month == FirstSundayNovember.Month)
+                {
+                    if(day < FirstSundayNovember.Day)
+                        Offset = OffsetPDT;
+                }
+                else if(month == SecondSundayMarch.Month)
+                {
+                    if(day >= SecondSundayMarch.Day)
+                        Offset = OffsetPDT;
+                }
+                else if(month > SecondSundayMarch.Month && month < FirstSundayNovember.Month)
+                {
+                    Offset = OffsetPDT;
+                }
+            }
         }
     }
     public class Holiday
@@ -39,9 +85,12 @@ namespace NonsensicalVideoGenerator
         {
             if(!Enabled)
                 return false;
-            DateTime now = DateTime.Now;
+            DateTime now = DateTime.UtcNow;
             DateTime start = new DateTime(now.Year, Start.Month, Start.Day, Start.Hour, Start.Minute, Start.Second);
             DateTime end = new DateTime(now.Year, End.Month, End.Day, End.Hour, End.Minute, End.Second);
+            // add offset
+            SimpleDateTime nowSimple = new SimpleDateTime(now.Month, now.Day, now.Hour, now.Minute, now.Second);
+            now = now.AddHours(nowSimple.Offset);
             if(now >= start && now <= end)
                 return true;
             return false;
@@ -54,7 +103,7 @@ namespace NonsensicalVideoGenerator
             if(StartYear == 0)
                 return L.T(0, StatusText);
             // get years since StartYear to display in status text
-            int years = DateTime.Now.Year - StartYear;
+            int years = Global.currentYear - StartYear;
             // st, nd, rd, th
             bool st = years % 10 == 1 && years % 100 != 11;
             bool nd = years % 10 == 2 && years % 100 != 12;
