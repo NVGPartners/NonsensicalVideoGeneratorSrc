@@ -24,12 +24,12 @@ namespace NonsensicalVideoGenerator
         };
         public static List<string> Description { get; set; } = new List<string>()
         {
-            "- Added a save print when rendering.",
+            "- Added custom overlay color support.",
             "- Updated yt-dlp to 2024.10.07.",
             "- Fixed bug: -seed option now persists.",
             "- Fixed bug: Videos w/o audio will play.",
             "- Fixed crash from Library thumbnails.",
-            " ",
+            "- Updated the localization files.",
             "See the full changelog on Steam.",
         };
         public static string Url { get; set; } = "https://store.steampowered.com/news/app/2516360/view/4529024222444677670";

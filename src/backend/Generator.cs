@@ -553,6 +553,50 @@ namespace NonsensicalVideoGenerator
                                 {
                                     progressText = L.T(0, "Generate:StatusApplyOverlay", (i + 1).ToString(CultureInfo.InvariantCulture), maxClips.ToString(CultureInfo.InvariantCulture));
                                     ConsoleOutput.WriteLine("Rolled for overlay, adding overlay to clip " + i + ".", Color.Gray);
+                                    // Get base name of overlay
+                                    string overlayName = Path.GetFileNameWithoutExtension(overlayPath);
+                                    // Interpret __color_00FF00, __similarity_030, and __blend_020 if they're specified in any order
+                                    string chromaKeyColor = "00FF00";
+                                    string chromaKeySimularity = "0.3";
+                                    string chromaKeyBlend = "0.2";
+                                    bool overlayChanged = false;
+                                    string[] overlayNameSplit = overlayName.Split("__");
+                                    foreach (string s in overlayNameSplit)
+                                    {
+                                        if (s.Contains("color_"))
+                                        {
+                                            string hexCode = s.Substring(s.IndexOf("color_") + 6, 6);
+                                            // Check if it's valid hexedecimal
+                                            if (hexCode.Length == 6 && Regex.IsMatch(hexCode, @"\A\b[0-9a-fA-F]+\b\Z"))
+                                                chromaKeyColor = hexCode;
+                                            overlayChanged = true;
+                                        }
+                                        if (s.Contains("similarity_"))
+                                        {
+                                            string simularity = s.Substring(s.IndexOf("similarity_") + 11, 3);
+                                            // Convert from 000 to 0.00
+                                            if (simularity.Length == 3 && Regex.IsMatch(simularity, @"\A\b[0-9]+\b\Z"))
+                                                chromaKeySimularity = (float.Parse(simularity, CultureInfo.InvariantCulture) / 100).ToString(CultureInfo.InvariantCulture);
+                                            // Trim leading zero at 4th character
+                                            if (chromaKeySimularity.Length == 4 && chromaKeySimularity[2] == '0' && chromaKeySimularity[3] == '0')
+                                                chromaKeySimularity = chromaKeySimularity.Substring(0, 2);
+                                            overlayChanged = true;
+                                        }
+                                        if (s.Contains("blend_"))
+                                        {
+                                            string blend = s.Substring(s.IndexOf("blend_") + 6, 3);
+                                            // Convert from 000 to 0.00
+                                            if (blend.Length == 3 && Regex.IsMatch(blend, @"\A\b[0-9]+\b\Z"))
+                                                chromaKeyBlend = (float.Parse(blend, CultureInfo.InvariantCulture) / 100).ToString(CultureInfo.InvariantCulture);
+                                            // Trim leading zero at 4th character
+                                            if (chromaKeyBlend.Length == 4 && chromaKeyBlend[2] == '0' && chromaKeyBlend[3] == '0')
+                                                chromaKeyBlend = chromaKeyBlend.Substring(0, 2);
+                                            overlayChanged = true;
+                                        }
+                                    }
+                                    // If the overlay has changed, print out the new values
+                                    if (overlayChanged)
+                                        ConsoleOutput.WriteLine("Overlay has chroma key values: color=" + chromaKeyColor + ", simularity=" + chromaKeySimularity + ", blend=" + chromaKeyBlend, Color.Gray);
                                     // We snip the clip here in case it was a transition
                                     if(!bool.Parse(SaveData.saveValues["PlayOverlayInFull"]))
                                     {
@@ -566,7 +610,7 @@ namespace NonsensicalVideoGenerator
                                         if (endOfOverlay > overlayDuration)
                                             endOfOverlay = overlayDuration;
                                         FFprobe_ClipVideo(overlayPath, startOfOverlay, endOfOverlay, Path.Combine(temporaryDirectory, i + "_tempoverlay.mp4"));
-                                        OverlayVideo(Path.Combine(temporaryDirectory, thisClip.name), Path.Combine(temporaryDirectory, i + "_tempoverlay.mp4"));
+                                        OverlayVideo(Path.Combine(temporaryDirectory, thisClip.name), Path.Combine(temporaryDirectory, i + "_tempoverlay.mp4"), chromaKeyColor, chromaKeySimularity, chromaKeyBlend);
                                     }
                                     else
                                     {
@@ -1362,7 +1406,7 @@ namespace NonsensicalVideoGenerator
                 LibraryData.calledMedia.Clear();
             }
         }
-        public static void OverlayVideo(string video, string overlay)
+        public static void OverlayVideo(string video, string overlay, string chromaKeyColor = "00FF00", string chromaKeySimularity = "0.3", string chromaKeyBlend = "0.2")
         {
             try
             {
@@ -1374,7 +1418,7 @@ namespace NonsensicalVideoGenerator
                 startInfo.Arguments = "-i \"" + video
                         + "\" -i \"" + overlay
                         + "\" -filter_complex \""
-                        + "[1:v]colorkey=0x00FF00:0.3:0.2,scale=" + SaveData.saveValues["VideoWidth"] + "x" + SaveData.saveValues["VideoHeight"] + ",setsar=1:1,fps=fps=30[outv];"
+                        + "[1:v]colorkey=0x" + chromaKeyColor + ":" + chromaKeySimularity + ":" + chromaKeyBlend + ",scale=" + SaveData.saveValues["VideoWidth"] + "x" + SaveData.saveValues["VideoHeight"] + ",setsar=1:1,fps=fps=30[outv];"
                         + "[0:v][outv]overlay=shortest=1[finalv];"
                         + "[0:a][1:a]amix=inputs=2:duration=shortest" + (Global.generator.audioSync == true ? ",aresample=async=1000" : "") + "[outa]"
                         + "\""

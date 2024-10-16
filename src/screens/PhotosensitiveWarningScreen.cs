@@ -126,7 +126,7 @@ namespace NonsensicalVideoGenerator
             "Intro:Continue",
             " "
         };
-        private int tips = 12;
+        private int tips = 15;
         public void Show()
         {
         }
