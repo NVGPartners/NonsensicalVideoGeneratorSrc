@@ -286,8 +286,11 @@ namespace NonsensicalVideoGenerator
                                 GlobalContent.GetSound("Prompt").Play(int.Parse(SaveData.saveValues["SoundEffectVolume"], System.Globalization.CultureInfo.InvariantCulture) / 100f, 0f, 0f);
                             }
                             // Seed random generator
-                            Global.randomSeed = Global.generator.globalRandom.Next();
-                            Global.generator.globalRandom = new Random(Global.randomSeed);
+                            if(Global.randomSeed != 0 && !Global.parameters.Contains("-seed"))
+                            {
+                                Global.randomSeed = Global.generator.globalRandom.Next();
+                                Global.generator.globalRandom = new Random(Global.randomSeed);
+                            }
                         }
                         else
                         {

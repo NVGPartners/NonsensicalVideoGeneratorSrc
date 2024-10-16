@@ -1,14 +1,19 @@
-Milestone 6 Hotfix 3 (v1.0.2.3)
+Milestone 6 Hotfix 4 (v1.0.2.4)
 
 Here are the changes in this update:
 
 [list]
-[*]Added a printout when NVG is exited gracefully.
-[*]Holidays now accommodate for time zone differences.
-[*]Moved the Steam Workshop action button from the Blog tab to the Addons tab.
-[*]Fixed a bug where the tooltips in addon settings weren't shown.
-[*]Fixed a bug where the Skip Intro toggle in Options couldn't be reached by scrolling.
-[*]Updated the localization files.
+[*]Added a printout for the current save data when starting generation.
+[*]Updated yt-dlp to 2024.10.07.
+[list]
+[*]This fixes a bug where downloaded YouTube videos would not have audio.
+[/list]
+[*]Fixed a bug where the -seed launch option would not persist without restarting NVG.
+[*]Fixed a bug where videos that don't contain audio could not be played in-app.
+[list]
+[*]These videos may still not be supported with generation, be cautious.
+[/list]
+[*]Fixed a crash caused by the Library thumbnail previews.
 [/list]
 
 Let me know if you have any issues with this update.

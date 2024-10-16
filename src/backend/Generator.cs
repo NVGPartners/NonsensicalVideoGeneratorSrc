@@ -400,7 +400,7 @@ namespace NonsensicalVideoGenerator
             }
 
             // Set global random with seed.
-            if(Global.randomSeed != 0)
+            if(Global.randomSeed != 0 && !Global.parameters.Contains("-seed"))
             {
                 progressText = L.T(0, "Generate:StatusSeed");
                 int seed = DateTime.UtcNow.Millisecond;
@@ -824,6 +824,14 @@ namespace NonsensicalVideoGenerator
                 timeoutWorker.RunWorkerAsync();
                 vidThreadWorker.RunWorkerAsync();
                 ConsoleOutput.WriteLine("Generation started.", Color.Green);
+                // Print out current save data
+                ConsoleOutput.WriteLine("Save data:", Color.Transparent);
+                ConsoleOutput.WriteLine("{", Color.Transparent);
+                foreach(KeyValuePair<string, string> kvp in SaveData.saveValues)
+                {
+                    ConsoleOutput.WriteLine("  \"" + kvp.Key + "\": \"" + kvp.Value + "\"", Color.Transparent);
+                }
+                ConsoleOutput.WriteLine("}", Color.Transparent);
             }
             catch(Exception ex)
             {

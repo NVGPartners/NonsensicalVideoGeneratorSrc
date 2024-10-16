@@ -77,7 +77,7 @@ namespace NonsensicalVideoGenerator
                     FileName = "ffmpeg",
                     // 100x78 letterboxed
                     // fastest method
-                    Arguments = "-i \""+currentPath+"\" -vf scale=" + w + ":" + h + ":force_original_aspect_ratio=decrease,pad=" + w + ":" + h + ":(ow-iw)/2:(oh-ih)/2 -r " + fps + " -y .\\temp\\extracted\\frames\\%d.bmp -vn -acodec pcm_s16le -ar 44100 -ac 2 -f wav -y .\\temp\\extracted\\audio.wav",
+                    Arguments = "-i \""+currentPath+"\" -vf scale=" + w + ":" + h + ":force_original_aspect_ratio=decrease,pad=" + w + ":" + h + ":(ow-iw)/2:(oh-ih)/2 -r " + fps + " -y .\\temp\\extracted\\frames\\%d.bmp",
                     UseShellExecute = false,
                     RedirectStandardError = true,
                     CreateNoWindow = true
@@ -99,6 +99,62 @@ namespace NonsensicalVideoGenerator
                 process.WaitForExit();
                 if(worker.CancellationPending || !processing)
                     return;
+                // Extract audio
+                startInfo = new()
+                {
+                    FileName = "ffmpeg",
+                    Arguments = "-i \"" + currentPath + "\" -vn -acodec pcm_s16le -ar 44100 -ac 2 -f wav -y .\\temp\\extracted\\audio.wav",
+                    UseShellExecute = false,
+                    RedirectStandardError = true,
+                    CreateNoWindow = true
+                };
+                process = new()
+                {
+                    StartInfo = startInfo
+                };
+                process.ErrorDataReceived += (sender, args) => {
+                    if(args.Data != null)
+                        ConsoleOutput.WriteLine(args.Data, Color.Transparent);
+                };
+                if(worker.CancellationPending || !processing)
+                    return;
+                process.Start();
+                if(worker.CancellationPending || !processing)
+                    return;
+                process.BeginErrorReadLine();
+                if(worker.CancellationPending || !processing)
+                    return;
+                process.WaitForExit();
+                // Write blank audio if it doesn't exist
+                if(!File.Exists(".\\temp\\extracted\\audio.wav"))
+                {
+                    ConsoleOutput.WriteLine("Failed to extract audio, using blank audio.", Color.Red);
+                    startInfo = new()
+                    {
+                        FileName = "ffmpeg",
+                        Arguments = "-f lavfi -i anullsrc=channel_layout=stereo:sample_rate=44100 -t 1 -acodec pcm_s16le -ar 44100 -ac 2 -f wav -y .\\temp\\extracted\\audio.wav",
+                        UseShellExecute = false,
+                        RedirectStandardError = true,
+                        CreateNoWindow = true
+                    };
+                    process = new()
+                    {
+                        StartInfo = startInfo
+                    };
+                    process.ErrorDataReceived += (sender, args) => {
+                        if(args.Data != null)
+                            ConsoleOutput.WriteLine(args.Data, Color.Transparent);
+                    };
+                    if(worker.CancellationPending || !processing)
+                        return;
+                    process.Start();
+                    if(worker.CancellationPending || !processing)
+                        return;
+                    process.BeginErrorReadLine();
+                    if(worker.CancellationPending || !processing)
+                        return;
+                    process.WaitForExit();
+                }
                 // Load frames
                 audioFrame = null;
                 frames.Clear();
@@ -297,6 +353,10 @@ namespace NonsensicalVideoGenerator
                 if(audioConvertWorker.CancellationPending || !processing)
                     return;
                 process.WaitForExit();
+                if(!File.Exists(".\\temp\\extracted\\audio.wav"))
+                {
+                    throw new Exception("Failed to convert audio.");
+                }
                 // Unload audio
                 if(audio != null)
                 {

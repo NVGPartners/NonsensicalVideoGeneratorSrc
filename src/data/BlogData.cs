@@ -15,23 +15,23 @@ namespace NonsensicalVideoGenerator
     /// </summary>
     public static class BlogData
     {
-        public static string Title { get; set; } = "Milestone 6 Hotfix 3";
+        public static string Title { get; set; } = "Milestone 6 Hotfix 4";
         public static List<string> Subtitle { get; set; } = new List<string>()
         {
             "v%s",
-            "October 13",
+            "October 15",
             "Small Update"
         };
         public static List<string> Description { get; set; } = new List<string>()
         {
-            "- Added a printout when NVG exits.",
-            "- Time zones now apply to holidays.",
-            "- Workshop button moved to Addons tab.",
-            "- Fixed tooltips in addon settings.",
-            "- Skip Intro is now shown in Options.",
-            "- Updated the localization files.",
+            "- Added a save print when rendering.",
+            "- Updated yt-dlp to 2024.10.07.",
+            "- Fixed bug: -seed option now persists.",
+            "- Fixed bug: Videos w/o audio will play.",
+            "- Fixed crash from Library thumbnails.",
+            " ",
             "See the full changelog on Steam.",
         };
-        public static string Url { get; set; } = "https://store.steampowered.com/news/app/2516360/view/4536905158758868306";
+        public static string Url { get; set; } = "https://store.steampowered.com/news/app/2516360/view/4529024222444677670";
     }
 }

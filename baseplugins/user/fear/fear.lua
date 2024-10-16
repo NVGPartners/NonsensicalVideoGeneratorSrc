@@ -47,7 +47,7 @@ function Query(localeName, localizationTokens)
         },
         ["libraries"] = {
             {
-                ["name"] = "fear",
+                ["name"] = "Fear",
                 ["tooltip"] = "Fearful clips.",
                 ["path"] = "fear",
                 ["type"] = "video"

@@ -495,6 +495,10 @@ namespace NonsensicalVideoGenerator
                                         }
                                     }
                                     texture.SetData(colorData);
+                                    // Dispose
+                                    bitmap.Dispose();
+                                    scaledBitmap.Dispose();
+                                    graphics.Dispose();
 #endif
                                     break;
                                 }
@@ -579,23 +583,30 @@ namespace NonsensicalVideoGenerator
         }
         public void ChangeVideos(GraphicsDevice graphicsDevice)
         {
-            // Cancel previous thread
-            if (loadVideosThread != null)
+            try
             {
-                loadVideosThread.CancelAsync();
-                loadVideosThread.Dispose();
+                // Cancel previous thread
+                if (loadVideosThread != null)
+                {
+                    loadVideosThread.CancelAsync();
+                    loadVideosThread.Dispose();
+                }
+                // Clear video players
+                foreach (Texture2D texture in videoPlayers.Values)
+                {
+                    texture.Dispose();
+                }
+                videoPlayers.Clear();
+                // Start new thread
+                loadVideosThread = new BackgroundWorker();
+                loadVideosThread.DoWork += LoadVideosThread;
+                loadVideosThread.WorkerSupportsCancellation = true;
+                loadVideosThread.RunWorkerAsync(new object[] { graphicsDevice, page });
             }
-            // Clear video players
-            foreach (Texture2D texture in videoPlayers.Values)
+            catch(Exception e)
             {
-                texture.Dispose();
+                ConsoleOutput.WriteLine("Error changing videos: " + e.Message, Color.Red);
             }
-            videoPlayers.Clear();
-            // Start new thread
-            loadVideosThread = new BackgroundWorker();
-            loadVideosThread.DoWork += LoadVideosThread;
-            loadVideosThread.WorkerSupportsCancellation = true;
-            loadVideosThread.RunWorkerAsync(new object[] { graphicsDevice, page });
         }
         private void TextInput(object? sender, TextInputEventArgs e)
         {
