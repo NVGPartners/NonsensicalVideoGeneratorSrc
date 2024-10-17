@@ -15,7 +15,7 @@ namespace NonsensicalVideoGenerator
     /// </summary>
     public static class BlogData
     {
-        public static string Title { get; set; } = "Milestone 6 Hotfix 5";
+        public static string Title { get; set; } = "Milestone 6 Hotfix 6";
         public static List<string> Subtitle { get; set; } = new List<string>()
         {
             "v%s",
@@ -24,14 +24,14 @@ namespace NonsensicalVideoGenerator
         };
         public static List<string> Description { get; set; } = new List<string>()
         {
-            "- Added Russian locale.",
-            "- Added saltyash to the in-app credits.",
-            "- Moved the \"Add Outro\" option.",
-            "- Increased the score spacing in the Game tab.",
-            "- Fixed a bug: TTS for help instructions.",
-            "- Updated the localization files.",
+            "- Fixed bug: Generate tab scrolling.",
+            "- ",
+            "- ",
+            "- ",
+            "- ",
+            "- ",
             "See the full changelog on Steam.",
         };
-        public static string Url { get; set; } = "https://store.steampowered.com/news/app/2516360/view/4529024222449598544";
+        public static string Url { get; set; } = "https://store.steampowered.com/news/app/2516360/view/4529024222449668136";
     }
 }

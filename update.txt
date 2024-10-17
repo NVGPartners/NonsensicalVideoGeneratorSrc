@@ -1,14 +1,9 @@
-Milestone 6 Hotfix 5 (v1.0.2.5)
+Milestone 6 Hotfix 6 (v1.0.2.6)
 
 Here are the changes in this update:
 
 [list]
-[*]Added Russian locale (thank you saltyash!).
-[*]Added saltyash to the in-app credits.
-[*]Moved the "Add Outro" option to below the "Add Intro" option.
-[*]Increased the spacing between the high score/score and score amount text in the Game tab.
-[*]Fixed a bug where accessibility text to speech would speak the localization tokens for help instructions.
-[*]Updated the localization files.
+[*]Fixed a bug where the Generate tab was a bit cut off when scrolling.
 [/list]
 
 Let me know if you have any issues with this update.
