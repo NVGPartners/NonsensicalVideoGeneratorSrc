@@ -442,7 +442,7 @@ namespace NonsensicalVideoGenerator
                     SaveData.Save();
                 return false;
             }));
-            scrollView.Controller.Add("Height", new TextEntry("Output Resolution", "Height: how tall the result is.", SaveData.saveValues["VideoHeight"], new Vector2(170, 60-(8*2)+(19*8)+(10*1)+(9*1)), 24, 4, 1, (int i, string n) => {
+            scrollView.Controller.Add("Height", new TextEntry("Output Resolution", "Height: how tall the result is.", SaveData.saveValues["VideoHeight"], new Vector2(170, 60-(8*2)+(19*7)+(10*1)+(9*1)), 24, 4, 1, (int i, string n) => {
                 string oldValue = SaveData.saveValues["VideoHeight"];
                 // minimum must be 240
                 if(int.Parse(scrollView.Controller.interactables["Height"].Tooltip, CultureInfo.InvariantCulture) < 128)

@@ -4,6 +4,7 @@ Here are the changes in this update:
 
 [list]
 [*]Fixed a bug where the Generate tab was a bit cut off when scrolling.
+[*]Fixed a bug where the Height option was overlapping text in the Generate tab.
 [/list]
 
 Let me know if you have any issues with this update.

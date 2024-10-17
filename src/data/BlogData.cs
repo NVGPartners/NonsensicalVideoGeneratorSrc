@@ -25,11 +25,11 @@ namespace NonsensicalVideoGenerator
         public static List<string> Description { get; set; } = new List<string>()
         {
             "- Fixed bug: Generate tab scrolling.",
-            "- ",
-            "- ",
-            "- ",
-            "- ",
-            "- ",
+            "- Fixed bug: Height option overlapping.",
+            " ",
+            " ",
+            " ",
+            " ",
             "See the full changelog on Steam.",
         };
         public static string Url { get; set; } = "https://store.steampowered.com/news/app/2516360/view/4529024222449668136";
