@@ -15,7 +15,7 @@ namespace NonsensicalVideoGenerator
     /// </summary>
     public static class BlogData
     {
-        public static string Title { get; set; } = "Milestone 6 Hotfix 6";
+        public static string Title { get; set; } = "Milestone 6 Hotfix 7";
         public static List<string> Subtitle { get; set; } = new List<string>()
         {
             "v%s",
@@ -24,14 +24,15 @@ namespace NonsensicalVideoGenerator
         };
         public static List<string> Description { get; set; } = new List<string>()
         {
-            "- Fixed bug: Generate tab scrolling.",
-            "- Fixed bug: Height option overlapping.",
+            "- Added localization tokens for Vocoder.",
+            "- Updated the localization files.",
+            " ",
             " ",
             " ",
             " ",
             " ",
             "See the full changelog on Steam.",
         };
-        public static string Url { get; set; } = "https://store.steampowered.com/news/app/2516360/view/4529024222449668136";
+        public static string Url { get; set; } = "https://store.steampowered.com/news/app/2516360/view/4529024222449708379";
     }
 }

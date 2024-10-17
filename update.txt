@@ -1,10 +1,10 @@
-Milestone 6 Hotfix 6 (v1.0.2.6)
+Milestone 6 Hotfix 7 (v1.0.2.7)
 
 Here are the changes in this update:
 
 [list]
-[*]Fixed a bug where the Generate tab was a bit cut off when scrolling.
-[*]Fixed a bug where the Height option was overlapping text in the Generate tab.
+[*]Added missing localization tokens for the Vocoder effect.
+[*]Updated the localization files.
 [/list]
 
 Let me know if you have any issues with this update.
