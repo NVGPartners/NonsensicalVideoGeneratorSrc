@@ -1,28 +1,13 @@
-Milestone 6 Hotfix 4 (v1.0.2.4)
+Milestone 6 Hotfix 5 (v1.0.2.5)
 
 Here are the changes in this update:
 
 [list]
-[*]Added a printout for the current save data when starting generation.
-[*]Added support for custom chroma key colors for overlays.
-[list]
-[*]Add "__color_RRGGBB" to the end of your overlay's file name to specify a custom chroma key color in hexadecimal.
-[*]Example: "MyOverlay__color_0000FF.mp4" for blue.
-[*]Other options are available, if specified in any order: "__similarity_000" and "__blend_000". These interpret 000 as decimal, 0.00.
-[*]See the [url=https://ffmpeg.org/ffmpeg-filters.html#colorkey]FFmpeg documentation for colorkey[/url] for more information.
-[*]By default, overlays use "__color_00FF00__similarity_030__blend_020" for green, 0.3 similarity, and 0.2 blend.
-[/list]
-[*]Added new tips for overlay settings to the intro screen.
-[*]Updated yt-dlp to 2024.10.07.
-[list]
-[*]This fixes a bug where downloaded YouTube videos would not have audio.
-[/list]
-[*]Fixed a bug where the -seed launch option would not persist without restarting NVG.
-[*]Fixed a bug where videos that don't contain audio could not be played in-app.
-[list]
-[*]These videos may still not be supported with generation, be cautious.
-[/list]
-[*]Fixed a crash caused by the Library thumbnail previews.
+[*]Added Russian locale (thank you saltyash!).
+[*]Added saltyash to the in-app credits.
+[*]Moved the "Add Outro" option to below the "Add Intro" option.
+[*]Increased the spacing between the high score/score and score amount text in the Game tab.
+[*]Fixed a bug where accessibility text to speech would speak the localization tokens for help instructions.
 [*]Updated the localization files.
 [/list]
 

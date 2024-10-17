@@ -65,7 +65,7 @@ namespace NonsensicalVideoGenerator
                     string ttshelp = "";
                     foreach(string str in help)
                     {
-                        ttshelp += str + "; ";
+                        ttshelp += L.T(0, str) + "; ";
                     }
                     if(enableTts)
                         synth.SpeakAsync(ttshelp);

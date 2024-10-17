@@ -15,23 +15,23 @@ namespace NonsensicalVideoGenerator
     /// </summary>
     public static class BlogData
     {
-        public static string Title { get; set; } = "Milestone 6 Hotfix 4";
+        public static string Title { get; set; } = "Milestone 6 Hotfix 5";
         public static List<string> Subtitle { get; set; } = new List<string>()
         {
             "v%s",
-            "October 15",
+            "October 17",
             "Small Update"
         };
         public static List<string> Description { get; set; } = new List<string>()
         {
-            "- Added custom overlay color support.",
-            "- Updated yt-dlp to 2024.10.07.",
-            "- Fixed bug: -seed option now persists.",
-            "- Fixed bug: Videos w/o audio will play.",
-            "- Fixed crash from Library thumbnails.",
+            "- Added Russian locale.",
+            "- Added saltyash to the in-app credits.",
+            "- Moved the \"Add Outro\" option.",
+            "- Increased the score spacing in the Game tab.",
+            "- Fixed a bug: TTS for help instructions.",
             "- Updated the localization files.",
             "See the full changelog on Steam.",
         };
-        public static string Url { get; set; } = "https://store.steampowered.com/news/app/2516360/view/4529024222444677670";
+        public static string Url { get; set; } = "https://store.steampowered.com/news/app/2516360/view/4529024222449598544";
     }
 }

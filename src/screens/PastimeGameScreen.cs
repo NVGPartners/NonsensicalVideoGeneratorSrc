@@ -511,16 +511,16 @@ namespace NonsensicalVideoGenerator
                 }
                 textSize = font.MeasureString(scoreText);
                 // Center horizontally
-                GlobalContent.DrawString(spriteBatch, font, scoreText, new Vector2(GlobalGraphics.Scale(160) - (textSize.X / 2) + GlobalGraphics.Scale(1), GlobalGraphics.Scale(240) - textSize.Y - GlobalGraphics.Scale(16) + GlobalGraphics.Scale(1)), Color.Black);
-                GlobalContent.DrawString(spriteBatch, font, scoreText, new Vector2(GlobalGraphics.Scale(160) - (textSize.X / 2), GlobalGraphics.Scale(240) - textSize.Y - GlobalGraphics.Scale(16)), Color.White);
+                GlobalContent.DrawString(spriteBatch, font, scoreText, new Vector2(GlobalGraphics.Scale(160) - (textSize.X / 2) + GlobalGraphics.Scale(1), GlobalGraphics.Scale(240) - textSize.Y - GlobalGraphics.Scale(24) + GlobalGraphics.Scale(1)), Color.Black);
+                GlobalContent.DrawString(spriteBatch, font, scoreText, new Vector2(GlobalGraphics.Scale(160) - (textSize.X / 2), GlobalGraphics.Scale(240) - textSize.Y - GlobalGraphics.Scale(24)), Color.White);
             }
             else if(highScore < 2147483647)
             {
                 // Draw high score text
                 textSize = font.MeasureString(L.T(0, "Game:HighScore"));
                 // Center horizontally
-                GlobalContent.DrawString(spriteBatch, font, L.T(0, "Game:HighScore"), new Vector2(GlobalGraphics.Scale(160) - (textSize.X / 2) + GlobalGraphics.Scale(1), GlobalGraphics.Scale(240) - textSize.Y - GlobalGraphics.Scale(16) + GlobalGraphics.Scale(1)), Color.Black);
-                GlobalContent.DrawString(spriteBatch, font, L.T(0, "Game:HighScore"), new Vector2(GlobalGraphics.Scale(160) - (textSize.X / 2), GlobalGraphics.Scale(240) - textSize.Y - GlobalGraphics.Scale(16)), Color.White);
+                GlobalContent.DrawString(spriteBatch, font, L.T(0, "Game:HighScore"), new Vector2(GlobalGraphics.Scale(160) - (textSize.X / 2) + GlobalGraphics.Scale(1), GlobalGraphics.Scale(240) - textSize.Y - GlobalGraphics.Scale(24) + GlobalGraphics.Scale(1)), Color.Black);
+                GlobalContent.DrawString(spriteBatch, font, L.T(0, "Game:HighScore"), new Vector2(GlobalGraphics.Scale(160) - (textSize.X / 2), GlobalGraphics.Scale(240) - textSize.Y - GlobalGraphics.Scale(24)), Color.White);
                 // Draw high score
                 textSize = font.MeasureString(highScore.ToString(CultureInfo.InvariantCulture));
                 // Center horizontally
