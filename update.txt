@@ -4,6 +4,11 @@ Here are the changes in this update:
 
 [list]
 [*]Added missing localization tokens for the Vocoder effect.
+[*]The Library tab's video thumbnails are now exported using FFmpeg.
+[list]
+[*]This fixes a bug where if File Explorer doesn't have a thumbnail for a specific video, you will see a media player icon instead.
+[/list]
+[*]Added welcome text as the default status outside of holidays.
 [*]Updated the localization files.
 [/list]
 

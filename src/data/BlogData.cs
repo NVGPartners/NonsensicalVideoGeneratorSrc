@@ -19,16 +19,15 @@ namespace NonsensicalVideoGenerator
         public static List<string> Subtitle { get; set; } = new List<string>()
         {
             "v%s",
-            "October 17",
+            "October 19",
             "Small Update"
         };
         public static List<string> Description { get; set; } = new List<string>()
         {
             "- Added localization tokens for Vocoder.",
+            "- Video thumbnails are now exported.",
+            "- Added welcome text outside of holidays.",
             "- Updated the localization files.",
-            " ",
-            " ",
-            " ",
             " ",
             " ",
             "See the full changelog on Steam.",

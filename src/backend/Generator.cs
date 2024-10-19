@@ -1468,7 +1468,7 @@ namespace NonsensicalVideoGenerator
                 }
             }
         }
-        public static Process GenerateTempAudioWaveformImage(string audio, string output, int width = 29, int height = 23)
+        public static Process GenerateThumbnail(string media, string output, LibraryRootType rootType = LibraryRootType.Video, int width = 29, int height = 23)
         {
             int texScale = int.Parse(SaveData.saveValues["VideoPlaybackScale"], CultureInfo.InvariantCulture);
             int texWidth = width * texScale;
@@ -1476,16 +1476,17 @@ namespace NonsensicalVideoGenerator
             Process process = new Process();
             try
             {
+                Dictionary<LibraryRootType, string> rootTypeFilters = new()
+                {
+                    {LibraryRootType.Video, "-filter_complex \"[0:v]thumbnail,scale=" + texWidth + ":" + texHeight + "[thumb]\" -map \"[thumb]\" -frames:v 1"},
+                    {LibraryRootType.Audio, "-filter_complex \"[0:a]aformat=channel_layouts=mono,showwavespic=s=" + texWidth + "x" + texHeight + ":colors=white[thumb]\" -map \"[thumb]\" -frames:v 1"},
+                    {LibraryRootType.Image, ""},
+                };
                 ProcessStartInfo startInfo = new ProcessStartInfo
                 {
                     WindowStyle = ProcessWindowStyle.Hidden,
                     FileName = Global.useSystemFFmpeg ? "ffmpeg" : @".\ffmpeg.exe",
-                    Arguments = "-i \"" + audio + "\""
-                        + " -filter_complex"
-                        + " \"aformat=channel_layouts=mono,showwavespic=s=" + texWidth + "x" + texHeight + ":colors=white;\""
-                        + " -frames:v 1"
-                        + " -y"
-                        + " \"" + output + "\"",
+                    Arguments =  "-i \"" + media + "\" " + rootTypeFilters[rootType] + " -y \"" + output + "\"",
                     UseShellExecute = false,
                     RedirectStandardError = true,
                     WorkingDirectory = Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location) ?? ".",

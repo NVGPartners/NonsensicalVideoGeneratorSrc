@@ -166,12 +166,12 @@ namespace NonsensicalVideoGenerator
             downloading = false;
             if(success)
             {
-                GlobalContent.GetSound("RenderComplete").Play(int.Parse(SaveData.saveValues["SoundEffectVolume"], System.Globalization.CultureInfo.InvariantCulture) / 100f, 0f, 0f);
+                GlobalContent.GetSound("RenderComplete").Play(int.Parse(SaveData.saveValues["SoundEffectVolume"], CultureInfo.InvariantCulture) / 100f, 0f, 0f);
                 Global.generator.progressText = L.T(0, "Library:StatusDownloadedClip");
             }
             else
             {
-                GlobalContent.GetSound("Error").Play(int.Parse(SaveData.saveValues["SoundEffectVolume"], System.Globalization.CultureInfo.InvariantCulture) / 100f, 0f, 0f);
+                GlobalContent.GetSound("Error").Play(int.Parse(SaveData.saveValues["SoundEffectVolume"], CultureInfo.InvariantCulture) / 100f, 0f, 0f);
                 Global.generator.progressText = L.T(0, "Library:StatusFailDownloadClip");
             }
         }
@@ -450,111 +450,55 @@ namespace NonsensicalVideoGenerator
                         int position = a + (b * 3) + (12 * page);
                         if(libraryFileCache[currentLibraryType].Count > position)
                         {
-                            int texScale = int.Parse(SaveData.saveValues["VideoPlaybackScale"], System.Globalization.CultureInfo.InvariantCulture);
+                            LibraryFile libraryFile = libraryFileCache[currentLibraryType][position];
+                            if(libraryFile.Path == null)
+                                continue;
+                            int texScale = int.Parse(SaveData.saveValues["VideoPlaybackScale"], CultureInfo.InvariantCulture);
                             int texWidth = 29 * texScale;
                             int texHeight = 23 * texScale;
                             Texture2D texture = new Texture2D(graphicsDevice, texWidth, texHeight);
-                            LibraryFile libraryFile = libraryFileCache[currentLibraryType][position];
-                            switch(currentRootType)
+                            // Generate video thumbnail using ffmpeg
+                            string tempBmp = Path.Combine(Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location) ?? ".", "temp", "thumb.bmp");
+                            Process bmpProcess = Generator.GenerateThumbnail(libraryFile.Path, tempBmp, currentRootType);
+                            // Defer until process is done
+                            while (!bmpProcess.HasExited)
                             {
-                                case LibraryRootType.Video:
+                                System.Threading.Thread.Sleep(100);
+                                // Check to make sure we're still on the same page
+                                if (currentPage != page)
+                                    return;
+                            }
+                            // Check to make sure we're still on the same page
+                            if (currentPage != page)
+                                return;
+                            // Cancelled?
+                            if (loadVideosThread != null && loadVideosThread.CancellationPending)
+                                return;
+                            // Load bitmap
+                            System.Drawing.Bitmap bitmap = new System.Drawing.Bitmap(tempBmp);
+                            // Convert bitmap to color data
+                            Color[] colorData = new Color[texWidth * texHeight];
+                            for (int i = 0; i < texWidth; i++)
+                            {
+                                for (int j = 0; j < texHeight; j++)
                                 {
-#if WINDOWSDX
-                                    // Get thumbnail of video using shell
-                                    ShellFile shellFile = ShellFile.FromFilePath(libraryFile.Path);
-                                    BitmapSource bitmapSource = shellFile.Thumbnail.BitmapSource;
-                                    // Check to make sure we're still on the same page
-                                    if (currentPage != page)
-                                        return;
-                                    // Cancelled?
-                                    if (loadVideosThread != null && loadVideosThread.CancellationPending)
-                                        return;
-                                    // Convert bitmap to texture
-                                    System.Drawing.Bitmap bitmap = new System.Drawing.Bitmap(bitmapSource.PixelWidth, bitmapSource.PixelHeight, System.Drawing.Imaging.PixelFormat.Format32bppArgb);
-                                    BitmapData data = bitmap.LockBits(new System.Drawing.Rectangle(System.Drawing.Point.Empty, bitmap.Size), ImageLockMode.WriteOnly, System.Drawing.Imaging.PixelFormat.Format32bppArgb);
-                                    bitmapSource.CopyPixels(System.Windows.Int32Rect.Empty, data.Scan0, data.Height * data.Stride, data.Stride);
-                                    bitmap.UnlockBits(data);
-                                    // Scale bitmap to 29x23
-                                    System.Drawing.Bitmap scaledBitmap = new System.Drawing.Bitmap(texWidth, texHeight);
-                                    System.Drawing.Graphics graphics = System.Drawing.Graphics.FromImage(scaledBitmap);
-                                    graphics.DrawImage(bitmap, new System.Drawing.Rectangle(0, 0, texWidth, texHeight));
-                                    // Check to make sure we're still on the same page
-                                    if (currentPage != page)
-                                        return;
-                                    // Cancelled?
-                                    if (loadVideosThread != null && loadVideosThread.CancellationPending)
-                                        return;
-                                    // Convert bitmap to color data
-                                    Color[] colorData = new Color[texWidth * texHeight];
-                                    for (int i = 0; i < texWidth; i++)
-                                    {
-                                        for (int j = 0; j < texHeight; j++)
-                                        {
-                                            System.Drawing.Color color = scaledBitmap.GetPixel(i, j);
-                                            colorData[i + (j * texWidth)] = new Color(color.R, color.G, color.B, color.A);
-                                        }
-                                    }
-                                    texture.SetData(colorData);
-                                    // Dispose
-                                    bitmap.Dispose();
-                                    scaledBitmap.Dispose();
-                                    graphics.Dispose();
-#endif
-                                    break;
-                                }
-                                case LibraryRootType.Audio:
-                                {
-#if WINDOWSDX
-                                    // Generate audio waveform using ffmpeg
-                                    string tempBmp = Path.Combine(Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location) ?? ".", "temp", "wave.bmp");
-                                    Process bmpProcess = Generator.GenerateTempAudioWaveformImage(libraryFile.Path, tempBmp);
-                                    // Defer until process is done
-                                    while (!bmpProcess.HasExited)
-                                    {
-                                        System.Threading.Thread.Sleep(100);
-                                        // Check to make sure we're still on the same page
-                                        if (currentPage != page)
-                                            return;
-                                    }
-                                    // Check to make sure we're still on the same page
-                                    if (currentPage != page)
-                                        return;
-                                    // Cancelled?
-                                    if (loadVideosThread != null && loadVideosThread.CancellationPending)
-                                        return;
-                                    // Load bitmap
-                                    System.Drawing.Bitmap bitmap = new System.Drawing.Bitmap(tempBmp);
-                                    // Convert bitmap to color data
-                                    Color[] colorData = new Color[texWidth * texHeight];
-                                    for (int i = 0; i < texWidth; i++)
-                                    {
-                                        for (int j = 0; j < texHeight; j++)
-                                        {
-                                            System.Drawing.Color color = bitmap.GetPixel(i, j);
-                                            // Black is translucent
-                                            if (color.R == 0 && color.G == 0 && color.B == 0)
-                                                color = System.Drawing.Color.FromArgb(192, 0, 0, 0);
-                                            colorData[i + (j * texWidth)] = new Color(color.R, color.G, color.B, color.A);
-                                        }
-                                    }
-                                    texture.SetData(colorData);
-                                    // Check to make sure we're still on the same page
-                                    if (currentPage != page)
-                                        return;
-                                    // Cancelled?
-                                    if (loadVideosThread != null && loadVideosThread.CancellationPending)
-                                        return;
-                                    // Delete temp file
-                                    bitmap.Dispose();
-                                    File.Delete(tempBmp);
-#endif
-                                    break;
-                                }
-                                case LibraryRootType.Image:
-                                {
-                                    break;
+                                    System.Drawing.Color color = bitmap.GetPixel(i, j);
+                                    // Black is translucent
+                                    if (color.R == 0 && color.G == 0 && color.B == 0)
+                                        color = System.Drawing.Color.FromArgb(192, 0, 0, 0);
+                                    colorData[i + (j * texWidth)] = new Color(color.R, color.G, color.B, color.A);
                                 }
                             }
+                            texture.SetData(colorData);
+                            // Check to make sure we're still on the same page
+                            if (currentPage != page)
+                                return;
+                            // Cancelled?
+                            if (loadVideosThread != null && loadVideosThread.CancellationPending)
+                                return;
+                            // Delete temp file
+                            bitmap.Dispose();
+                            File.Delete(tempBmp);
                             // Check to make sure we're still on the same page
                             if (currentPage != page)
                                 return;
@@ -629,12 +573,12 @@ namespace NonsensicalVideoGenerator
                         {
                             downloading = false;
                             Global.generator.progressText = L.T(0, "Library:StatusFailDownloadClip");
-                            GlobalContent.GetSound("Error").Play(int.Parse(SaveData.saveValues["SoundEffectVolume"], System.Globalization.CultureInfo.InvariantCulture) / 100f, 0f, 0f);
+                            GlobalContent.GetSound("Error").Play(int.Parse(SaveData.saveValues["SoundEffectVolume"], CultureInfo.InvariantCulture) / 100f, 0f, 0f);
                         }
                     }
                     else
                     {
-                        GlobalContent.GetSound("Error").Play(int.Parse(SaveData.saveValues["SoundEffectVolume"], System.Globalization.CultureInfo.InvariantCulture) / 100f, 0f, 0f);
+                        GlobalContent.GetSound("Error").Play(int.Parse(SaveData.saveValues["SoundEffectVolume"], CultureInfo.InvariantCulture) / 100f, 0f, 0f);
                     }
                 }
             }
@@ -695,7 +639,7 @@ namespace NonsensicalVideoGenerator
                 LibraryType? oldLibraryType = libraryFile.Type;
                 // Get library type
                 string libraryName = libraryTypes[currentRootType][organizeType];
-                LibraryType libraryType = DefaultLibraryTypes.All;
+                LibraryType libraryType = DefaultLibraryTypes.Video;
                 foreach(KeyValuePair<LibraryType, string> kvPair in LibraryData.libraryNames)
                 {
                     if(kvPair.Value == libraryName)
@@ -774,11 +718,11 @@ namespace NonsensicalVideoGenerator
                 demandChange = true;
                 if(!success)
                 {
-                    GlobalContent.GetSound("Error").Play(int.Parse(SaveData.saveValues["SoundEffectVolume"], System.Globalization.CultureInfo.InvariantCulture) / 100f, 0f, 0f);
+                    GlobalContent.GetSound("Error").Play(int.Parse(SaveData.saveValues["SoundEffectVolume"], CultureInfo.InvariantCulture) / 100f, 0f, 0f);
                 }
                 else
                 {
-                    GlobalContent.GetSound("AddSource").Play(int.Parse(SaveData.saveValues["SoundEffectVolume"], System.Globalization.CultureInfo.InvariantCulture) / 100f, 0f, 0f);
+                    GlobalContent.GetSound("AddSource").Play(int.Parse(SaveData.saveValues["SoundEffectVolume"], CultureInfo.InvariantCulture) / 100f, 0f, 0f);
                 }
                 Global.dragDropFiles.Clear();
             }
@@ -885,7 +829,7 @@ namespace NonsensicalVideoGenerator
                                         if((Global.imageLibraryAvailableInternal && right) || (!Global.imageLibraryAvailable && left))
                                         {
                                             demandChange = true;
-                                            GlobalContent.GetSound("Select").Play(int.Parse(SaveData.saveValues["SoundEffectVolume"], System.Globalization.CultureInfo.InvariantCulture) / 100f, 0f, 0f);
+                                            GlobalContent.GetSound("Select").Play(int.Parse(SaveData.saveValues["SoundEffectVolume"], CultureInfo.InvariantCulture) / 100f, 0f, 0f);
                                         }
                                         if(!Global.imageLibraryAvailable || Global.imageLibraryAvailableInternal && right)
                                         {
@@ -968,7 +912,7 @@ namespace NonsensicalVideoGenerator
                                             currentLibraryType = DefaultLibraryTypes.SFX;
                                         }
                                         demandChange = true;
-                                        GlobalContent.GetSound("Select").Play(int.Parse(SaveData.saveValues["SoundEffectVolume"], System.Globalization.CultureInfo.InvariantCulture) / 100f, 0f, 0f);
+                                        GlobalContent.GetSound("Select").Play(int.Parse(SaveData.saveValues["SoundEffectVolume"], CultureInfo.InvariantCulture) / 100f, 0f, 0f);
                                         return true;
 #if WINDOWSDX
                                     case "HeaderButton":
@@ -981,17 +925,17 @@ namespace NonsensicalVideoGenerator
                                                 if(!downloading)
                                                 {
                                                     selectedFlags ^= 4;
-                                                    GlobalContent.GetSound("Option").Play(int.Parse(SaveData.saveValues["SoundEffectVolume"], System.Globalization.CultureInfo.InvariantCulture) / 100f, 0f, 0f);
+                                                    GlobalContent.GetSound("Option").Play(int.Parse(SaveData.saveValues["SoundEffectVolume"], CultureInfo.InvariantCulture) / 100f, 0f, 0f);
                                                 }
                                                 else
                                                 {
-                                                    GlobalContent.GetSound("Error").Play(int.Parse(SaveData.saveValues["SoundEffectVolume"], System.Globalization.CultureInfo.InvariantCulture) / 100f, 0f, 0f);
+                                                    GlobalContent.GetSound("Error").Play(int.Parse(SaveData.saveValues["SoundEffectVolume"], CultureInfo.InvariantCulture) / 100f, 0f, 0f);
                                                 }
                                             }
                                         }
                                         else
                                         {
-                                            GlobalContent.GetSound("Error").Play(int.Parse(SaveData.saveValues["SoundEffectVolume"], System.Globalization.CultureInfo.InvariantCulture) / 100f, 0f, 0f);
+                                            GlobalContent.GetSound("Error").Play(int.Parse(SaveData.saveValues["SoundEffectVolume"], CultureInfo.InvariantCulture) / 100f, 0f, 0f);
                                         }
                                         return true;
 #endif
@@ -1004,16 +948,16 @@ namespace NonsensicalVideoGenerator
                                             {
                                                 page--;
                                                 demandChange = true;
-                                                GlobalContent.GetSound("Option").Play(int.Parse(SaveData.saveValues["SoundEffectVolume"], System.Globalization.CultureInfo.InvariantCulture) / 100f, 0f, 0f);
+                                                GlobalContent.GetSound("Option").Play(int.Parse(SaveData.saveValues["SoundEffectVolume"], CultureInfo.InvariantCulture) / 100f, 0f, 0f);
                                             }
                                             else
                                             {
-                                                GlobalContent.GetSound("Error").Play(int.Parse(SaveData.saveValues["SoundEffectVolume"], System.Globalization.CultureInfo.InvariantCulture) / 100f, 0f, 0f);
+                                                GlobalContent.GetSound("Error").Play(int.Parse(SaveData.saveValues["SoundEffectVolume"], CultureInfo.InvariantCulture) / 100f, 0f, 0f);
                                             }
                                         }
                                         else
                                         {
-                                            GlobalContent.GetSound("Error").Play(int.Parse(SaveData.saveValues["SoundEffectVolume"], System.Globalization.CultureInfo.InvariantCulture) / 100f, 0f, 0f);
+                                            GlobalContent.GetSound("Error").Play(int.Parse(SaveData.saveValues["SoundEffectVolume"], CultureInfo.InvariantCulture) / 100f, 0f, 0f);
                                         }
                                         return true;
                                     case "PageRightButton":
@@ -1029,16 +973,16 @@ namespace NonsensicalVideoGenerator
                                             {
                                                 page++;
                                                 demandChange = true;
-                                                GlobalContent.GetSound("Option").Play(int.Parse(SaveData.saveValues["SoundEffectVolume"], System.Globalization.CultureInfo.InvariantCulture) / 100f, 0f, 0f);
+                                                GlobalContent.GetSound("Option").Play(int.Parse(SaveData.saveValues["SoundEffectVolume"], CultureInfo.InvariantCulture) / 100f, 0f, 0f);
                                             }
                                             else
                                             {
-                                                GlobalContent.GetSound("Error").Play(int.Parse(SaveData.saveValues["SoundEffectVolume"], System.Globalization.CultureInfo.InvariantCulture) / 100f, 0f, 0f);
+                                                GlobalContent.GetSound("Error").Play(int.Parse(SaveData.saveValues["SoundEffectVolume"], CultureInfo.InvariantCulture) / 100f, 0f, 0f);
                                             }
                                         }
                                         else
                                         {
-                                            GlobalContent.GetSound("Error").Play(int.Parse(SaveData.saveValues["SoundEffectVolume"], System.Globalization.CultureInfo.InvariantCulture) / 100f, 0f, 0f);
+                                            GlobalContent.GetSound("Error").Play(int.Parse(SaveData.saveValues["SoundEffectVolume"], CultureInfo.InvariantCulture) / 100f, 0f, 0f);
                                         }
                                         return true;
                                     default:
@@ -1051,7 +995,7 @@ namespace NonsensicalVideoGenerator
                                             int index = libraryTypes[currentRootType].IndexOf(rect.Key.Substring(currentRootType.ToString().Length, rect.Key.Length - currentRootType.ToString().Length - 6));
                                             if(index == -1)
                                             {
-                                                GlobalContent.GetSound("Error").Play(int.Parse(SaveData.saveValues["SoundEffectVolume"], System.Globalization.CultureInfo.InvariantCulture) / 100f, 0f, 0f);
+                                                GlobalContent.GetSound("Error").Play(int.Parse(SaveData.saveValues["SoundEffectVolume"], CultureInfo.InvariantCulture) / 100f, 0f, 0f);
                                             }
                                             else
                                             {
@@ -1064,7 +1008,7 @@ namespace NonsensicalVideoGenerator
                                                 selectedFlags |= 8 << index;
                                                 selectedFlags &= ~4;
                                                 demandChange = true;
-                                                GlobalContent.GetSound("Option").Play(int.Parse(SaveData.saveValues["SoundEffectVolume"], System.Globalization.CultureInfo.InvariantCulture) / 100f, 0f, 0f);
+                                                GlobalContent.GetSound("Option").Play(int.Parse(SaveData.saveValues["SoundEffectVolume"], CultureInfo.InvariantCulture) / 100f, 0f, 0f);
                                                 // Reset page
                                                 page = 0;
                                                 // Get subtype
@@ -1143,11 +1087,11 @@ namespace NonsensicalVideoGenerator
                                                 };
                                                 Process.Start(startInfo);
                                             }
-                                            GlobalContent.GetSound("Select").Play(int.Parse(SaveData.saveValues["SoundEffectVolume"], System.Globalization.CultureInfo.InvariantCulture) / 100f, 0f, 0f);
+                                            GlobalContent.GetSound("Select").Play(int.Parse(SaveData.saveValues["SoundEffectVolume"], CultureInfo.InvariantCulture) / 100f, 0f, 0f);
                                         }
                                         else
                                         {
-                                            GlobalContent.GetSound("Error").Play(int.Parse(SaveData.saveValues["SoundEffectVolume"], System.Globalization.CultureInfo.InvariantCulture) / 100f, 0f, 0f);
+                                            GlobalContent.GetSound("Error").Play(int.Parse(SaveData.saveValues["SoundEffectVolume"], CultureInfo.InvariantCulture) / 100f, 0f, 0f);
                                         }
                                         return true;
                                     }
@@ -1165,7 +1109,7 @@ namespace NonsensicalVideoGenerator
                                         LibraryData.Unload(file);
                                         libraryFileCache[currentLibraryType].RemoveAt(position);
                                         demandChange = true;
-                                        GlobalContent.GetSound("Option").Play(int.Parse(SaveData.saveValues["SoundEffectVolume"], System.Globalization.CultureInfo.InvariantCulture) / 100f, 0f, 0f);
+                                        GlobalContent.GetSound("Option").Play(int.Parse(SaveData.saveValues["SoundEffectVolume"], CultureInfo.InvariantCulture) / 100f, 0f, 0f);
                                         return true;
                                     }
                                     else
@@ -1196,7 +1140,7 @@ namespace NonsensicalVideoGenerator
                                                         }
                                                         organizing = false;
                                                         Global.mask.Disable();
-                                                        GlobalContent.GetSound("Option").Play(int.Parse(SaveData.saveValues["SoundEffectVolume"], System.Globalization.CultureInfo.InvariantCulture) / 100f, 0f, 0f);
+                                                        GlobalContent.GetSound("Option").Play(int.Parse(SaveData.saveValues["SoundEffectVolume"], CultureInfo.InvariantCulture) / 100f, 0f, 0f);
                                                         return true;
                                                     }
                                                     return false;
@@ -1225,7 +1169,7 @@ namespace NonsensicalVideoGenerator
                                                     organizeFile = -1;
                                                     organizeType = -1;
                                                     Global.mask.Disable();
-                                                    GlobalContent.GetSound("Back").Play(int.Parse(SaveData.saveValues["SoundEffectVolume"], System.Globalization.CultureInfo.InvariantCulture) / 100f, 0f, 0f);
+                                                    GlobalContent.GetSound("Back").Play(int.Parse(SaveData.saveValues["SoundEffectVolume"], CultureInfo.InvariantCulture) / 100f, 0f, 0f);
                                                     return true;
                                                 }
                                                 return false;
@@ -1247,7 +1191,7 @@ namespace NonsensicalVideoGenerator
                                             Global.mask.color = new Color(0, 0, 0, 128);
                                             Global.mask.Enable();
                                             organizing = true;
-                                            GlobalContent.GetSound("Option").Play(int.Parse(SaveData.saveValues["SoundEffectVolume"], System.Globalization.CultureInfo.InvariantCulture) / 100f, 0f, 0f);
+                                            GlobalContent.GetSound("Option").Play(int.Parse(SaveData.saveValues["SoundEffectVolume"], CultureInfo.InvariantCulture) / 100f, 0f, 0f);
                                             return true;
                                         }
                                         else
@@ -1261,7 +1205,7 @@ namespace NonsensicalVideoGenerator
                                     if(deleteConfirmPos == position)
                                     {
                                         deleteConfirmPos = -1;
-                                        GlobalContent.GetSound("Back").Play(int.Parse(SaveData.saveValues["SoundEffectVolume"], System.Globalization.CultureInfo.InvariantCulture) / 100f, 0f, 0f);
+                                        GlobalContent.GetSound("Back").Play(int.Parse(SaveData.saveValues["SoundEffectVolume"], CultureInfo.InvariantCulture) / 100f, 0f, 0f);
                                         return true;
                                     }
                                     else
@@ -1277,13 +1221,13 @@ namespace NonsensicalVideoGenerator
                                                 LibraryData.Unload(file);
                                                 libraryFileCache[currentLibraryType].RemoveAt(position);
                                                 demandChange = true;
-                                                GlobalContent.GetSound("Option").Play(int.Parse(SaveData.saveValues["SoundEffectVolume"], System.Globalization.CultureInfo.InvariantCulture) / 100f, 0f, 0f);
+                                                GlobalContent.GetSound("Option").Play(int.Parse(SaveData.saveValues["SoundEffectVolume"], CultureInfo.InvariantCulture) / 100f, 0f, 0f);
                                             }
                                             else
                                             {
                                                 // Delete confirm
                                                 deleteConfirmPos = position;
-                                                GlobalContent.GetSound("Prompt").Play(int.Parse(SaveData.saveValues["SoundEffectVolume"], System.Globalization.CultureInfo.InvariantCulture) / 100f, 0f, 0f);
+                                                GlobalContent.GetSound("Prompt").Play(int.Parse(SaveData.saveValues["SoundEffectVolume"], CultureInfo.InvariantCulture) / 100f, 0f, 0f);
                                             }
                                             return true;
                                         }
@@ -1303,7 +1247,7 @@ namespace NonsensicalVideoGenerator
                                             // Toggle video
                                             LibraryFile file = libraryFileCache[currentLibraryType][position];
                                             LibraryData.SetEnabled(file, !file.Enabled);
-                                            GlobalContent.GetSound("Option").Play(int.Parse(SaveData.saveValues["SoundEffectVolume"], System.Globalization.CultureInfo.InvariantCulture) / 100f, 0f, 0f);
+                                            GlobalContent.GetSound("Option").Play(int.Parse(SaveData.saveValues["SoundEffectVolume"], CultureInfo.InvariantCulture) / 100f, 0f, 0f);
                                             return true;
                                         }
                                         else
@@ -1328,7 +1272,7 @@ namespace NonsensicalVideoGenerator
                                                     UseShellExecute = true,
                                                 };
                                                 Process.Start(startInfo);
-                                                GlobalContent.GetSound("Option").Play(int.Parse(SaveData.saveValues["SoundEffectVolume"], System.Globalization.CultureInfo.InvariantCulture) / 100f, 0f, 0f);
+                                                GlobalContent.GetSound("Option").Play(int.Parse(SaveData.saveValues["SoundEffectVolume"], CultureInfo.InvariantCulture) / 100f, 0f, 0f);
                                                 return true;
                                             }
                                         }
@@ -1336,7 +1280,7 @@ namespace NonsensicalVideoGenerator
                                     else if(left && currentLibraryType != DefaultLibraryTypes.Render && currentLibraryType != DefaultLibraryTypes.NoImages)
                                     {
                                         // Add button: Open file dialog with filters from library type
-                                        GlobalContent.GetSound("Option").Play(int.Parse(SaveData.saveValues["SoundEffectVolume"], System.Globalization.CultureInfo.InvariantCulture) / 100f, 0f, 0f);
+                                        GlobalContent.GetSound("Option").Play(int.Parse(SaveData.saveValues["SoundEffectVolume"], CultureInfo.InvariantCulture) / 100f, 0f, 0f);
 #if WINDOWSDX
                                         if(!currentLibraryType.Special)
                                         {
@@ -1370,11 +1314,11 @@ namespace NonsensicalVideoGenerator
                                                 demandChange = true;
                                                 if(!success)
                                                 {
-                                                    GlobalContent.GetSound("Error").Play(int.Parse(SaveData.saveValues["SoundEffectVolume"], System.Globalization.CultureInfo.InvariantCulture) / 100f, 0f, 0f);
+                                                    GlobalContent.GetSound("Error").Play(int.Parse(SaveData.saveValues["SoundEffectVolume"], CultureInfo.InvariantCulture) / 100f, 0f, 0f);
                                                 }
                                                 else
                                                 {
-                                                    GlobalContent.GetSound("AddSource").Play(int.Parse(SaveData.saveValues["SoundEffectVolume"], System.Globalization.CultureInfo.InvariantCulture) / 100f, 0f, 0f);
+                                                    GlobalContent.GetSound("AddSource").Play(int.Parse(SaveData.saveValues["SoundEffectVolume"], CultureInfo.InvariantCulture) / 100f, 0f, 0f);
                                                 }
                                             }
                                         }

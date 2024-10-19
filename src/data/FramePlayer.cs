@@ -410,7 +410,7 @@ namespace NonsensicalVideoGenerator
                 process.WaitForExit();
 #endif
                 canPlayBgMusic = false;
-                Process waveProcess = Generator.GenerateTempAudioWaveformImage(currentPath, ".\\temp\\extracted\\audio.bmp", 100, 78);
+                Process waveProcess = Generator.GenerateThumbnail(currentPath, ".\\temp\\extracted\\audio.bmp", LibraryRootType.Audio, 100, 78);
                 // Defer until the process is finished
                 while(!waveProcess.HasExited)
                 {

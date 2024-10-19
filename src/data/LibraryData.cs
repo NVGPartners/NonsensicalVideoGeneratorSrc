@@ -20,13 +20,9 @@ namespace NonsensicalVideoGenerator
     public enum LibraryRootType
     {
         /// <summary>
-        /// All files.
-        /// </summary>
-        All = 0,
-        /// <summary>
         /// Video files.
         /// </summary>
-        Video,
+        Video = 1,
         /// <summary>
         /// Audio files.
         /// </summary>
@@ -39,9 +35,9 @@ namespace NonsensicalVideoGenerator
     public enum LibraryFileType
     {
         /// <summary>
-        /// All files.
+        /// Invalid type.
         /// </summary>
-        All = 0,
+        None = 0,
         /// <summary>
         /// Sound effects.
         /// </summary>
@@ -122,15 +118,13 @@ namespace NonsensicalVideoGenerator
     {
         public static Dictionary<LibraryRootType, int> defaultCounts = new()
         {
-            { LibraryRootType.All, 13 },
             { LibraryRootType.Video, 6 },
             { LibraryRootType.Audio, 2 },
             { LibraryRootType.Image, 0 },
         };
-        public static LibraryType All { get; } = new LibraryType(LibraryRootType.All, LibraryFileType.All, true);
-        public static LibraryType Video { get; } = new LibraryType(LibraryRootType.Video, LibraryFileType.All, true);
-        public static LibraryType Audio { get; } = new LibraryType(LibraryRootType.Audio, LibraryFileType.All, true);
-        public static LibraryType Image { get; } = new LibraryType(LibraryRootType.Image, LibraryFileType.All, true);
+        public static LibraryType Video { get; } = new LibraryType(LibraryRootType.Video, LibraryFileType.None, true);
+        public static LibraryType Audio { get; } = new LibraryType(LibraryRootType.Audio, LibraryFileType.None, true);
+        public static LibraryType Image { get; } = new LibraryType(LibraryRootType.Image, LibraryFileType.None, true);
         public static LibraryType SFX { get; } = new LibraryType(LibraryRootType.Audio, LibraryFileType.SFX, "Random sound effects.");
         public static LibraryType Music { get; } = new LibraryType(LibraryRootType.Audio, LibraryFileType.Music, "Random dance music.");
         public static LibraryType Render { get; } = new LibraryType(LibraryRootType.Video, LibraryFileType.Render, "Generated videos.");
@@ -142,7 +136,6 @@ namespace NonsensicalVideoGenerator
         public static LibraryType NoImages { get; } = new LibraryType(LibraryRootType.Image, LibraryFileType.NoImages, "No image libraries available.");
         public static List<LibraryType> AllTypes { get; } = new List<LibraryType>()
         {
-            All,
             Video,
             Audio,
             Image,
@@ -177,7 +170,6 @@ namespace NonsensicalVideoGenerator
         public static string libraryRootPath { get; set; } = @".\library";
         public static Dictionary<LibraryType, string> libraryPaths { get; } = new Dictionary<LibraryType, string>()
         {
-            { DefaultLibraryTypes.All, @"" },
             { DefaultLibraryTypes.Video, @"video" },
             { DefaultLibraryTypes.Audio, @"audio" },
             { DefaultLibraryTypes.Image, @"image" },
@@ -193,7 +185,6 @@ namespace NonsensicalVideoGenerator
         };
         public static Dictionary<LibraryType, string[]> libraryFileTypes { get; } = new Dictionary<LibraryType, string[]>()
         {
-            { DefaultLibraryTypes.All, new string[] { ".mp4", ".webm", ".mov", ".avi", ".mkv", ".wmv", ".wav", ".mp3", ".ogg", ".m4a", ".flac" } },
             { DefaultLibraryTypes.Video, new string[] { ".mp4", ".webm", ".mov", ".avi", ".mkv", ".wmv" } },
             { DefaultLibraryTypes.Audio, new string[] { ".wav", ".mp3", ".ogg", ".m4a", ".flac" } },
             { DefaultLibraryTypes.Image, new string[] { ".png", ".jpg", ".jpeg", ".bmp" } },
@@ -209,7 +200,6 @@ namespace NonsensicalVideoGenerator
         };
         public static Dictionary<LibraryType, string> libraryNames { get; } = new Dictionary<LibraryType, string>()
         {
-            { DefaultLibraryTypes.All, "All" },
             { DefaultLibraryTypes.Video, "Video" },
             { DefaultLibraryTypes.Audio, "Audio" },
             { DefaultLibraryTypes.Image, "Image" },
@@ -494,7 +484,7 @@ namespace NonsensicalVideoGenerator
             {
                 if(pair.Key.Special)
                     continue;
-                if(pair.Key.RootType == type || type == LibraryRootType.All)
+                if(pair.Key.RootType == type)
                 {
                     names.Add(pair.Value);
                 }

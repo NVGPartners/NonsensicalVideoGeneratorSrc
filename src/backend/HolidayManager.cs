@@ -98,7 +98,7 @@ namespace NonsensicalVideoGenerator
         public string GetStatusText()
         {
             if(StatusText == "")
-                return "";
+                return L.T(0, "Content:StatusWelcome");
             // ignore StartYear if it's not set
             if(StartYear == 0)
                 return L.T(0, StatusText);
@@ -134,7 +134,7 @@ namespace NonsensicalVideoGenerator
             {
                 Enabled = true,
                 Priority = 1,
-                Theme = DefaultThemes.Holiday,
+                Theme = DefaultThemes.Nonsensical,
                 Start = new SimpleDateTime(12, 31, 0, 0, 0),
                 End = new SimpleDateTime(12, 31, 23, 59, 59),
                 StatusText = "Holidays:StatusNewYears"
@@ -181,7 +181,7 @@ namespace NonsensicalVideoGenerator
             {
                 Enabled = true,
                 Priority = 1,
-                Theme = DefaultThemes.Holiday,
+                Theme = DefaultThemes.Nonsensical,
                 Start = new SimpleDateTime(1, 1, 0, 0, 0),
                 End = new SimpleDateTime(1, 1, 23, 59, 59),
                 StatusText = "Holidays:StatusNewYears"
@@ -195,7 +195,7 @@ namespace NonsensicalVideoGenerator
             ConsoleOutput.WriteLine($"Holiday: {(holiday != null ? holiday.Name : "None")}", Color.Yellow);
             DefaultThemes.defaultTheme = holiday != null ? holiday.Theme : DefaultThemes.Nonsensical;
             ThemeManager.activeTheme = holiday != null ? holiday.Theme : DefaultThemes.Nonsensical;
-            Global.generator.progressText = holiday != null ? holiday.GetStatusText() : "";
+            Global.generator.progressText = holiday != null ? holiday.GetStatusText() : L.T(0, "Content:StatusWelcome");
         }
         public static void CheckHolidays()
         {

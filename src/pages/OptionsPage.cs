@@ -238,7 +238,7 @@ namespace NonsensicalVideoGenerator
                                 && MouseInput.MouseState.Y >= GlobalGraphics.Scale(59 + ((i-offsetpl) * 16) - scrollOffset) && MouseInput.MouseState.Y < GlobalGraphics.Scale(70 + ((i-offsetpl) * 16) - scrollOffset))
                             {
                                 L.LoadLocale(L.locales[i+1].name);
-                                Global.generator.progressText = "";
+                                Global.generator.progressText = HolidayManager.CurrentHoliday != null ? HolidayManager.CurrentHoliday.GetStatusText() : L.T(0, "Content:StatusWelcome");
                                 Global.generator.failureReason = "";
                                 // switch back to options page
                                 LocaleAction(2, "");
