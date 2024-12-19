@@ -15,23 +15,23 @@ namespace NonsensicalVideoGenerator
     /// </summary>
     public static class BlogData
     {
-        public static string Title { get; set; } = "Milestone 6 Hotfix 7";
+        public static string Title { get; set; } = "Milestone 6 Hotfix 8";
         public static List<string> Subtitle { get; set; } = new List<string>()
         {
             "v%s",
-            "October 19",
+            "December 19",
             "Small Update"
         };
         public static List<string> Description { get; set; } = new List<string>()
         {
-            "- Added localization tokens for Vocoder.",
-            "- Video thumbnails are now exported.",
-            "- Added welcome text outside of holidays.",
-            "- Updated the localization files.",
-            " ",
-            " ",
+            "- Updated bundled yt-dlp to 2024.12.13.",
+            "- Updated FFmpeg requirement to 7.1.",
+            "- Added a frei0r log to console.txt.",
+            "- Added a launch option to open console.txt.",
+            "- Updated the Steam Workshop page.",
+            "- Updated the Steam Store page.",
             "See the full changelog on Steam.",
         };
-        public static string Url { get; set; } = "https://store.steampowered.com/news/app/2516360/view/4529024222449708379";
+        public static string Url { get; set; } = "https://store.steampowered.com/news/app/2516360/view/499434332763455513";
     }
 }

@@ -1,19 +1,34 @@
-Milestone 6 Hotfix 7 (v1.0.2.7)
+Milestone 6 Hotfix 8 (v1.0.2.8)
 
 Here are the changes in this update:
 
 [list]
-[*]Added missing localization tokens for the Vocoder effect.
-[*]The Library tab's video thumbnails are now exported using FFmpeg.
+[*]Software Changes:
 [list]
-[*]This fixes a bug where if File Explorer doesn't have a thumbnail for a specific video, you will see a media player icon instead.
+[*]Updated bundled yt-dlp to 2024.12.13.
+[list]
+[*]This fixes an issue where downloading from YouTube caused a blank window to pop-up and the video not having audio.
 [/list]
-[*]Added welcome text as the default status outside of holidays.
-[*]Updated the localization files.
+[*]Updated FFmpeg requirement to 7.1.
+[*]Added more verbose logging for the "FREI0R_PATH" environment variable in console.txt.
+[list]
+[*]Sadly this doesn't yet fix the issue where you are unable to use frei0r, I hope to continue investigating this.
+[/list]
+[/list]
+[*]Steamworks Changes:
+[list]
+[*]Added a new launch option to directly open console.txt.
+[*]Workshop tags now shows the addon type filter first in the list.
+[/list]
+[*]Store Page Changes:
+[list]
+[*]New descriptions that better reflect and describe how NVG works and its appeal.
+[*]Adjusted system requirements to emphasize using an SSD and better comparison between minimal vs recommended processors.
+[/list]
 [/list]
 
-Let me know if you have any issues with this update.
-Also, please help translate NVG into your language on [url=https://github.com/KiwifruitDev/NonsensicalVideoGenerator/wiki/Localization]GitHub[/url]!
-Happy generating!
+I'll be busy during the holidays so while I may be slow to respond, please let me know if you have any issues with this update.
+Also, consider translating NVG into your language on [url=https://github.com/KiwifruitDev/NonsensicalVideoGenerator/wiki/Localization]GitHub[/url]!
+Happy generating! [url=https://store.steampowered.com/app/2516360/Nonsensical_Video_Generator/][img]{STEAM_CLAN_IMAGE}/44378200/d86bcae4b4c7eae888eba3c4c8336c7d62b8dd05.png[/img][/url]
 
 [url=https://store.steampowered.com/app/2516360/Nonsensical_Video_Generator/][img]{STEAM_CLAN_IMAGE}/44378200/ff687f086ff77748ead1a7a7f33a8fbcfdb6a772.png[/img][/url] [url=https://steamcommunity.com/id/KiwifruitDev][img]{STEAM_CLAN_IMAGE}/44378200/a9f98b6b95b65dddf1d44f23bef423f6d6b2cb57.png[/img][/url]

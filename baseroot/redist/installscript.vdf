@@ -2,10 +2,10 @@
 {
 	"Run Process"
 	{
-		"windowsdesktop-runtime-8.0.8-win-x64"
+		"windowsdesktop-runtime-8.0.11-win-x64"
 		{
 			"HasRunKey"		"HKEY_LOCAL_MACHINE\\Software\\Valve\\Steam\\Apps\\2516360"
-			"process 1"		"%INSTALLDIR%\\redist\\windowsdesktop-runtime-8.0.8-win-x64.exe"
+			"process 1"		"%INSTALLDIR%\\redist\\windowsdesktop-runtime-8.0.11-win-x64.exe"
 			"command 1"		"/install /quiet /norestart"
 			"NoCleanUp"		"1"
 			"Requirement_OS"

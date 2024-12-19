@@ -58,6 +58,7 @@ namespace NonsensicalVideoGenerator
             {
                 // Set FREI0R_PATH environment variable.
                 Environment.SetEnvironmentVariable("FREI0R_PATH", Path.Combine(Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location) ?? ".", "frei0r-1"), EnvironmentVariableTarget.User);
+                ConsoleOutput.WriteLine("FREI0R_PATH: " + Environment.GetEnvironmentVariable("FREI0R_PATH", EnvironmentVariableTarget.User), Color.Transparent);
             }
             SaveData.Load();
             if(Global.parameters.Contains("-v"))

@@ -38,7 +38,7 @@ namespace NonsensicalVideoGenerator
         private bool check = false;
         private bool extracting = false;
         private bool downloading = false;
-        private string zip = "ffmpeg-7.0.2-full_build.7z";
+        private string zip = "ffmpeg-7.1-full_build.7z";
         private string frie0r = "frei0r-v2.3.3_win64.zip";
         private int totalDownloads = 2;
         private int downloads = 0;
