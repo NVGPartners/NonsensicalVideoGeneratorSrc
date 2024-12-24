@@ -71,6 +71,7 @@ namespace NonsensicalVideoGenerator
             {
                 drawnScreens[i].LoadContent(contentManager, graphicsDevice);
             }
+            GlobalContent.AddTexture("Cursor", ThemeManager.LoadLayeredContent<Texture2D>("graphics/cursor"));
         }
         public static void PushNavigation(string name)
         {
@@ -209,6 +210,17 @@ namespace NonsensicalVideoGenerator
                     }
                 }
             }
+            // F11 or Alt+Enter will toggle fullscreen
+            if(keyboardState.IsKeyDown(Keys.F11) && lastKeyboardState.IsKeyUp(Keys.F11)
+                || keyboardState.IsKeyDown(Keys.LeftAlt) && keyboardState.IsKeyDown(Keys.Enter) && lastKeyboardState.IsKeyUp(Keys.Enter))
+            {
+                UserInterface.instance.ToggleFullscreen();
+            }
+            // Alt+F4 will close the game
+            if(keyboardState.IsKeyDown(Keys.LeftAlt) && keyboardState.IsKeyDown(Keys.F4))
+            {
+                UserInterface.instance.ExitGracefully();
+            }
             // Toggle debug mode
             // CTRL+F3 will toggle debug mode
             if(keyboardState.IsKeyDown(Keys.LeftControl) && keyboardState.IsKeyDown(Keys.F3)
@@ -299,6 +311,8 @@ namespace NonsensicalVideoGenerator
                 }
             }
             Accessibility.PostDraw(gameTime, spriteBatch);
+            if(UserInterface.instance != null && !UserInterface.instance.IsMouseVisible)
+                spriteBatch.Draw(GlobalContent.GetTexture("Cursor"), new Rectangle(MouseInput.MouseState.Position.X - GlobalGraphics.Scale(4), MouseInput.MouseState.Position.Y - GlobalGraphics.Scale(4), GlobalGraphics.Scale(16), GlobalGraphics.Scale(16)), Color.White);
         }
     }
 }

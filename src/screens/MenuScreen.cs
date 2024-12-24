@@ -232,6 +232,7 @@ namespace NonsensicalVideoGenerator
             GlobalContent.AddTexture("MenuSelected", ThemeManager.LoadLayeredContent<Texture2D>("graphics/menuselected"));
             GlobalContent.AddTexture("MenuSelected2", ThemeManager.LoadLayeredContent<Texture2D>("graphics/menuselected2"));
             GlobalContent.AddTexture("MenuSelected3", ThemeManager.LoadLayeredContent<Texture2D>("graphics/menuselected3"));
+            /*
             if(!Global.canRender)
             {
                 if(Global.pluginsLoaded)
@@ -239,6 +240,7 @@ namespace NonsensicalVideoGenerator
                 else
                     Hide();
             }
+            */
         }
     }
 }

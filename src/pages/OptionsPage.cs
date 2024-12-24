@@ -238,6 +238,10 @@ namespace NonsensicalVideoGenerator
                                 && MouseInput.MouseState.Y >= GlobalGraphics.Scale(59 + ((i-offsetpl) * 16) - scrollOffset) && MouseInput.MouseState.Y < GlobalGraphics.Scale(70 + ((i-offsetpl) * 16) - scrollOffset))
                             {
                                 L.LoadLocale(L.locales[i+1].name);
+                                if(SteamManager.initialized)
+                                    PluginHandler.LoadWorkshop();
+                                else
+                                    PluginHandler.LoadPluginsThreaded();
                                 Global.generator.progressText = HolidayManager.CurrentHoliday != null ? HolidayManager.CurrentHoliday.GetStatusText() : L.T(0, "Content:StatusWelcome");
                                 Global.generator.failureReason = "";
                                 // switch back to options page
@@ -403,7 +407,7 @@ namespace NonsensicalVideoGenerator
                 return false;
             }, ThemeManager.LoadLayeredContent<Texture2D>("graphics/actions/reset")));
             actionController2.Add("ActionOptions", new ActionButton("View localizations to select a different language.", new Vector2(112, 221), LocaleAction, ThemeManager.LoadLayeredContent<Texture2D>("graphics/actions/options")));
-            scrollView.Controller.Add("SkipPhotosensitiveWarningScreen", new Switch("Skip Intro", "Load the menu immediately when starting.", new Vector2(139, 60-(8*3)+(19*13)+(10*1)+(9*1)), (int i, string n) => {
+            scrollView.Controller.Add("SkipPhotosensitiveWarningScreen", new Switch("Skip Intro", "Load the menu immediately when starting.", new Vector2(139, 60-(8*3)+(19*17)+(10*1)+(9*1)), (int i, string n) => {
                 bool switchState = (i & 256) != 0;
                 if((i & 2) != 0)
                 {
@@ -414,7 +418,7 @@ namespace NonsensicalVideoGenerator
                 }
                 return switchState;
             }, SaveData.saveValues["SkipPhotosensitiveWarningScreen"] == "true"));
-            scrollView.Controller.Add("EnableDiscordRPC", new Switch("Enable Discord RPC", "Tell others that you're using " + Global.productNameShort + ".", new Vector2(139, 60-(8*3)+(19*12)+(10*1)+(9*1)), (int i, string n) => {
+            scrollView.Controller.Add("EnableDiscordRPC", new Switch("Enable Discord RPC", "Tell others that you're using " + Global.productNameShort + ".", new Vector2(139, 60-(8*3)+(19*16)+(10*1)+(9*1)), (int i, string n) => {
                 bool switchState = (i & 256) != 0;
                 if((i & 2) != 0)
                 {
@@ -429,7 +433,7 @@ namespace NonsensicalVideoGenerator
                 }
                 return switchState;
             }, SaveData.saveValues["EnableDiscordRPC"] == "true"));
-            scrollView.Controller.Add("DisableHolidays", new Switch("Disable Holidays", "Disables special themes during holidays.", new Vector2(139, 60-(8*3)+(19*11)+(10*1)+(9*1)), (int i, string n) => {
+            scrollView.Controller.Add("DisableHolidays", new Switch("Disable Holidays", "Disables special themes during holidays.", new Vector2(139, 60-(8*3)+(19*15)+(10*1)+(9*1)), (int i, string n) => {
                 bool switchState = (i & 256) != 0;
                 if((i & 2) != 0)
                 {
@@ -445,7 +449,7 @@ namespace NonsensicalVideoGenerator
                 }
                 return switchState;
             }, SaveData.saveValues["DisableHolidays"] == "true"));
-            scrollView.Controller.Add("MotionDisable", new Switch("Disable Motion", "Turns off screen tweening and other elements.", new Vector2(139, 60-(8*3)+(19*10)+(10*1)+(9*1)), (int i, string n) => {
+            scrollView.Controller.Add("MotionDisable", new Switch("Disable Motion", "Turns off screen tweening and other elements.", new Vector2(139, 60-(8*3)+(19*14)+(10*1)+(9*1)), (int i, string n) => {
                 bool switchState = (i & 256) != 0;
                 if((i & 2) != 0)
                 {
@@ -456,8 +460,8 @@ namespace NonsensicalVideoGenerator
                 }
                 return switchState;
             }, SaveData.saveValues["DisableMotion"] == "true"));
-            scrollView.Controller.Add("Preferences", new Label("Preferences:", new Vector2(139, 60-(8*2)+(19*9)+(10*1)+(9*1))));
-            scrollView.Controller.Add("UseExternalVideoPlayer", new Switch("Use External Media Player", "Open media using their default programs instead of extracting frames.", new Vector2(139, 60-(8*2)+(19*8)+(10*1)+(9*1)), (int i, string n) => {
+            scrollView.Controller.Add("Preferences", new Label("Preferences:", new Vector2(139, 60-(8*2)+(19*13)+(10*1)+(9*1))));
+            scrollView.Controller.Add("UseExternalVideoPlayer", new Switch("Use External Media Player", "Open media using their default programs instead of extracting frames.", new Vector2(139, 60-(8*2)+(19*12)+(10*1)+(9*1)), (int i, string n) => {
                 bool switchState = (i & 256) != 0;
                 if((i & 2) != 0)
                 {
@@ -470,7 +474,7 @@ namespace NonsensicalVideoGenerator
                 }
                 return switchState;
             }, SaveData.saveValues["UseExternalVideoPlayer"] == "true"));
-            scrollView.Controller.Add("MuteMusicWhileTabbedOut", new Switch("Mute Music While Inactive", "Don't play music while " + Global.productNameShort + " is in the background.", new Vector2(139, 60-(8*2)+(19*7)+(10*1)+(9*1)), (int i, string n) => {
+            scrollView.Controller.Add("MuteMusicWhileTabbedOut", new Switch("Mute Music While Inactive", "Don't play music while " + Global.productNameShort + " is in the background.", new Vector2(139, 60-(8*2)+(19*11)+(10*1)+(9*1)), (int i, string n) => {
                 bool switchState = (i & 256) != 0;
                 if((i & 2) != 0)
                 {
@@ -485,7 +489,7 @@ namespace NonsensicalVideoGenerator
                 }
                 return switchState;
             }, SaveData.saveValues["MuteMusicWhileTabbedOut"] == "true"));
-            scrollView.Controller.Add("VideoPlaybackScale", new TextEntry("Video Playback Resolution", "The screen scale multiplier for video playback.", SaveData.saveValues["VideoPlaybackScale"], new Vector2(139, 60-(8*2)+(19*6)+(10*1)+(9*1)), 24, 3, 1, (int i, string n) => {
+            scrollView.Controller.Add("VideoPlaybackScale", new TextEntry("Video Playback Resolution", "The screen scale multiplier for video playback.", SaveData.saveValues["VideoPlaybackScale"], new Vector2(139, 60-(8*2)+(19*10)+(10*1)+(9*1)), 24, 3, 1, (int i, string n) => {
                 int oldValue = int.Parse(SaveData.saveValues["VideoPlaybackScale"], CultureInfo.InvariantCulture);
                 // Range: 1-4
                 if(int.Parse(scrollView.Controller.interactables["VideoPlaybackScale"].Tooltip, CultureInfo.InvariantCulture) < 1)
@@ -497,7 +501,7 @@ namespace NonsensicalVideoGenerator
                     SaveData.Save();
                 return false;
             }));
-            scrollView.Controller.Add("VideoVolume", new TextEntry("Media Playback Volume", "In-app media volume level, from 0-100.", SaveData.saveValues["VideoVolume"], new Vector2(139, 60-(8*2)+(19*5)+(10*1)+(9*1)), 24, 3, 1, (int i, string n) => {
+            scrollView.Controller.Add("VideoVolume", new TextEntry("Media Playback Volume", "In-app media volume level, from 0-100.", SaveData.saveValues["VideoVolume"], new Vector2(139, 60-(8*2)+(19*9)+(10*1)+(9*1)), 24, 3, 1, (int i, string n) => {
                 string oldValue = SaveData.saveValues["VideoVolume"];
                 if(int.Parse(scrollView.Controller.interactables["VideoVolume"].Tooltip, CultureInfo.InvariantCulture) < 0)
                     scrollView.Controller.interactables["VideoVolume"].Tooltip = "0";
@@ -508,7 +512,59 @@ namespace NonsensicalVideoGenerator
                     SaveData.Save();
                 return false;
             }));
-            scrollView.Controller.Add("MediaOptions", new Label("Media Options:", new Vector2(139, 60-(8*1)+(19*4)+(10*1)+(9*1))));
+            scrollView.Controller.Add("MediaOptions", new Label("Media Options:", new Vector2(139, 60-(8*1)+(19*8)+(10*1)+(9*1))));
+            scrollView.Controller.Add("UseNativeCursor", new Switch("UseNativeCursor", "a", new Vector2(139, 60-(8*1)+(19*7)+(10*1)+(9*1)), (int i, string n) => {
+                bool switchState = (i & 256) != 0;
+                if((i & 2) != 0)
+                {
+                    string oldValue = SaveData.saveValues["UseNativeCursor"];
+                    SaveData.saveValues["UseNativeCursor"] = switchState.ToString().ToLower();
+                    if(oldValue != SaveData.saveValues["UseNativeCursor"])
+                        SaveData.Save();
+                    if (UserInterface.instance != null)
+                        UserInterface.instance.SetNativeCursor(switchState);
+                }
+                return switchState;
+            }, SaveData.saveValues["UseNativeCursor"] == "true"));
+            scrollView.Controller.Add("MatchAspectRatio", new Switch("MatchAspectRatio", "a", new Vector2(139, 60-(8*1)+(19*6)+(10*1)+(9*1)), (int i, string n) => {
+                bool switchState = (i & 256) != 0;
+                if((i & 2) != 0)
+                {
+                    string oldValue = SaveData.saveValues["MatchAspectRatio"];
+                    SaveData.saveValues["MatchAspectRatio"] = switchState.ToString().ToLower();
+                    if(oldValue != SaveData.saveValues["MatchAspectRatio"])
+                        SaveData.Save();
+                    if(GlobalGraphics.fullScreen)
+                        GlobalContent.GetSound("Error").Play(int.Parse(SaveData.saveValues["SoundEffectVolume"], CultureInfo.InvariantCulture) / 100f, 0f, 0f);
+                    else
+                        GlobalGraphics.SetAspectRatio(switchState ? GlobalGraphics.FindMatchingAspectRatio() : new AspectRatio());
+                }
+                return switchState;
+            }, SaveData.saveValues["MatchAspectRatio"] == "true"));
+            scrollView.Controller.Add("AlwaysOnTop", new Switch("AlwaysOnTop", "a", new Vector2(139, 60-(8*1)+(19*5)+(10*1)+(9*1)), (int i, string n) => {
+                bool switchState = (i & 256) != 0;
+                if((i & 2) != 0)
+                {
+                    string oldValue = SaveData.saveValues["AlwaysOnTop"];
+                    SaveData.saveValues["AlwaysOnTop"] = switchState.ToString().ToLower();
+                    if(oldValue != SaveData.saveValues["AlwaysOnTop"])
+                        SaveData.Save();
+                    UserInterface.instance.SetAlwaysOnTop(switchState);
+                }
+                return switchState;
+            }, SaveData.saveValues["AlwaysOnTop"] == "true"));
+            scrollView.Controller.Add("Fullscreen", new Switch("Fullscreen", "a", new Vector2(139, 60-(8*1)+(19*4)+(10*1)+(9*1)), (int i, string n) => {
+                bool switchState = (i & 256) != 0;
+                if((i & 2) != 0)
+                {
+                    string oldValue = SaveData.saveValues["Fullscreen"];
+                    SaveData.saveValues["Fullscreen"] = switchState.ToString().ToLower();
+                    if(oldValue != SaveData.saveValues["Fullscreen"])
+                        SaveData.Save();
+                    UserInterface.instance.SetFullscreen(switchState);
+                }
+                return switchState;
+            }, SaveData.saveValues["Fullscreen"] == "true"));
             scrollView.Controller.Add("Scale", new TextEntry("Screen Resolution", "The screen scale multiplier for the UI. Restarts when set.", SaveData.saveValues["ScreenScale"], new Vector2(139, 60-(8*1)+(19*3)+(10*1)+(9*1)), 24, 3, 1, (int i, string n) => {
                 int oldValue = int.Parse(SaveData.saveValues["ScreenScale"], CultureInfo.InvariantCulture);
                 // Range: 1-4
@@ -564,7 +620,7 @@ namespace NonsensicalVideoGenerator
             actionController.LoadContent(contentManager, graphicsDevice);
             actionController2.LoadContent(contentManager, graphicsDevice);
             scrollView.LoadContent(contentManager, graphicsDevice);
-            scrollView.MaxScrollOffset = 16*6;
+            scrollView.MaxScrollOffset = 16*10;
         }
     }
 }

@@ -587,11 +587,9 @@ namespace NonsensicalVideoGenerator
                         credits.Add(key, newCredits[key]);
                     }
                     credits.Add("End", new List<string>());
-                    // Get first key (after start key)
+                    // Get first key
                     foreach (string key in credits.Keys)
                     {
-                        if(key == "Start")
-                            continue;
                         currentCreditKey = key;
                         break;
                     }

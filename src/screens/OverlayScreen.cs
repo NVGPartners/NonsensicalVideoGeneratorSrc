@@ -40,8 +40,14 @@ namespace NonsensicalVideoGenerator
             // Draw tooltip.
             if(Global.tooltip != "" && tooltipVisible && Global.ready)
             {
+                SpriteFont spriteFont = L.FontSmall();
+                if(Global.tooltipIsCycler)
+                {
+                    spriteFont = GlobalContent.GetFont(L.cyclerLocale.fontLarge);
+                    Global.tooltipIsCycler = false;
+                }
                 string tooltip = Global.tooltip;
-                Vector2 tooltipSize = L.FontSmall().MeasureString(tooltip);
+                Vector2 tooltipSize = spriteFont.MeasureString(tooltip);
                 // Position is relative to mouse position but tries to avoid going off screen
                 Vector2 position = new(MouseInput.MouseState.Position.X + 16, MouseInput.MouseState.Position.Y + 16);
                 // Make sure it doesn't go off the right side of the screen
@@ -52,7 +58,7 @@ namespace NonsensicalVideoGenerator
                     position.Y = GlobalGraphics.scaledHeight - tooltipSize.Y - GlobalGraphics.Scale(2); 
                 spriteBatch.Draw(GlobalContent.GetTexture("Pixel"), new Rectangle((int)position.X, (int)position.Y, (int)tooltipSize.X + GlobalGraphics.Scale(2), (int)tooltipSize.Y - GlobalGraphics.Scale(2)), ThemeManager.GetColor("BackgroundTooltip"));
                 // White text
-                GlobalContent.DrawString(spriteBatch, L.FontSmall(), tooltip, new Vector2(position.X + GlobalGraphics.Scale(2), position.Y - GlobalGraphics.Scale(2)), Color.White);
+                GlobalContent.DrawString(spriteBatch, spriteFont, tooltip, new Vector2(position.X + GlobalGraphics.Scale(2), position.Y - GlobalGraphics.Scale(2)), Color.White);
             }
             // Draw mask.
             Global.mask.Draw(gameTime, spriteBatch);

@@ -58,12 +58,18 @@ namespace NonsensicalVideoGenerator
         }
         public void ToggleFullscreen()
         {
-            GlobalGraphics.fullScreen = !GlobalGraphics.fullScreen;
+            SetFullscreen(!GlobalGraphics.fullScreen);
+        }
+        public void SetFullscreen(bool fullscreen)
+        {
             AspectRatio aspectRatio = new();
+            if(SaveData.saveValues["MatchAspectRatio"] == "true")
+                aspectRatio = GlobalGraphics.FindMatchingAspectRatio();
+            GlobalGraphics.fullScreen = fullscreen;
             // Borderless
-            Window.IsBorderless = GlobalGraphics.fullScreen;
-            _graphics.HardwareModeSwitch = GlobalGraphics.fullScreen;
-            if(GlobalGraphics.fullScreen)
+            Window.IsBorderless = fullscreen;
+            _graphics.HardwareModeSwitch = fullscreen;
+            if(fullscreen)
             {
                 // Set preferred resolution to screen resolution.
                 aspectRatio.preferredResolution = new Point(GraphicsAdapter.DefaultAdapter.CurrentDisplayMode.Width / GlobalGraphics.scale, GraphicsAdapter.DefaultAdapter.CurrentDisplayMode.Height / GlobalGraphics.scale);
@@ -72,14 +78,38 @@ namespace NonsensicalVideoGenerator
             }
             GlobalGraphics.SetAspectRatio(aspectRatio);
             _graphics.ApplyChanges();
-            Form? windowForm = (Form)Form.FromHandle(Window.Handle);
+            Form? windowForm = (Form)Control.FromHandle(Window.Handle);
             if(windowForm != null)
             {
-                // Hide taskbar.
-                windowForm.TopMost = GlobalGraphics.fullScreen;
                 // Place window in center of screen.
-                windowForm.Location = GlobalGraphics.fullScreen ? new System.Drawing.Point(0, 0) : new System.Drawing.Point(Screen.PrimaryScreen.WorkingArea.Width / 2 - windowForm.Width / 2, Screen.PrimaryScreen.WorkingArea.Height / 2 - windowForm.Height / 2);
+                if(fullscreen)
+                    windowForm.Location = new System.Drawing.Point(0, 0);
+                else
+                    CenterToScreen();
             }
+            if(!fullscreen)
+                GlobalGraphics.SetAspectRatio(SaveData.saveValues["MatchAspectRatio"] == "true" ? GlobalGraphics.FindMatchingAspectRatio() : new AspectRatio());
+        }
+        public void CenterToScreen()
+        {
+            Form? windowForm = (Form)Control.FromHandle(Window.Handle);
+            if(windowForm != null)
+            {
+                // Place window in center of screen.
+                windowForm.Location = new System.Drawing.Point(Screen.PrimaryScreen.WorkingArea.Width / 2 - windowForm.Width / 2, Screen.PrimaryScreen.WorkingArea.Height / 2 - windowForm.Height / 2);
+            }
+        }
+        public void SetAlwaysOnTop(bool alwaysOnTop)
+        {
+            Form? windowForm = (Form)Control.FromHandle(Window.Handle);
+            if(windowForm != null)
+            {
+                windowForm.TopMost = alwaysOnTop;
+            }
+        }
+        public void SetNativeCursor(bool useNativeCursor)
+        {
+            IsMouseVisible = useNativeCursor;
         }
         // Drag and drop support.
         private void DragEnter(object? sender, DragEventArgs e)
@@ -128,6 +158,7 @@ namespace NonsensicalVideoGenerator
             GlobalGraphics.SetAspectRatio(new AspectRatio());
             Resize(GlobalGraphics.scaledWidth, GlobalGraphics.scaledHeight);
             ConsoleOutput.WriteLine("Screen resolution set.", Color.Transparent);
+            ConsoleOutput.WriteLine("Detected system: " + (Architecture.IsRunningThroughProton() ? ("Proton " + Architecture.translatorVersion) : Architecture.IsRunningThroughWine() ? ("Wine " + Architecture.translatorVersion) : "Native"), Color.Transparent);
             ScreenManager.LoadScreens();
             ConsoleOutput.WriteLine("Initialization complete.", Color.Transparent);
             LibraryData.SequentialName();
@@ -143,6 +174,19 @@ namespace NonsensicalVideoGenerator
             Form _GameForm = (Form)Form.FromHandle(Window.Handle);
             _GameForm.Closing += ClosingForm;
 #endif
+            // match aspect ratio
+            AspectRatio aspectRatio = new();
+            if(SaveData.saveValues["MatchAspectRatio"] == "true")
+                aspectRatio = GlobalGraphics.FindMatchingAspectRatio();
+            GlobalGraphics.SetAspectRatio(aspectRatio);
+            // fullscreen
+            if(bool.Parse(SaveData.saveValues["Fullscreen"]))
+                SetFullscreen(true);
+            // always on top
+            if(bool.Parse(SaveData.saveValues["AlwaysOnTop"]))
+                SetAlwaysOnTop(true);
+            // hide cursor
+                SetNativeCursor(bool.Parse(SaveData.saveValues["UseNativeCursor"]));
             base.Initialize();
         }
         protected override void LoadContent()
@@ -285,11 +329,15 @@ namespace NonsensicalVideoGenerator
         }
         private void ClosingForm(object? sender, System.ComponentModel.CancelEventArgs e)
         {
+            ExitGracefully();
+            e.Cancel = true;
+        }
+        public void ExitGracefully()
+        {
             if(!Global.exiting)
             {
                 Global.generator.progressText = L.T(0, "Content:StatusExiting");
                 Global.generator.failureReason = L.T(0, "Content:StatusExiting");
-                e.Cancel = true;
                 Global.exiting = true;
                 // Exit page is always the last
                 Global.exitOpacityIncrease = 0.0075f;

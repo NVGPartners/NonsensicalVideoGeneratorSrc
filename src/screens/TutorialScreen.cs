@@ -136,6 +136,7 @@ namespace NonsensicalVideoGenerator
                 }
             }
             showing = true;
+            controller.overrideMousePosition = true;
         }
         public void Hide()
         {
@@ -151,6 +152,7 @@ namespace NonsensicalVideoGenerator
                 offset = new(0, GlobalGraphics.Scale(240));
             }
             hiding = true;
+            controller.overrideMousePosition = false;
         }
         public bool Toggle(bool useBool = false, bool toggleTo = false)
         {
@@ -199,10 +201,6 @@ namespace NonsensicalVideoGenerator
             tween.Update((float)gameTime.ElapsedGameTime.TotalSeconds);
             if(hiding || screenType == ScreenType.Hidden)
                 return false;
-            // Store mouse state
-            MouseState mouseState = MouseInput.MouseState;
-            // Repeat for last mouse state
-            MouseState lastMouseState = MouseInput.LastMouseState;
             bool returned = false;
             if(Accessibility.selectedDisambiguationOption != -1
                 && Accessibility.disambiguationOptions.Count > Accessibility.selectedDisambiguationOption)
@@ -246,17 +244,11 @@ namespace NonsensicalVideoGenerator
             }
             else
             {
-                // Offset mouse position
-                MouseState offsetMouseState = new MouseState((int)mouseState.X - (int)offset.X, mouseState.Y - (int)offset.Y, mouseState.ScrollWheelValue, mouseState.LeftButton, mouseState.MiddleButton, mouseState.RightButton, mouseState.XButton1, mouseState.XButton2);
-                MouseInput._mouseState = offsetMouseState;
-                MouseState offsetLastMouseState = new MouseState((int)mouseState.X - (int)offset.X, lastMouseState.Y - (int)offset.Y, lastMouseState.ScrollWheelValue, lastMouseState.LeftButton, lastMouseState.MiddleButton, lastMouseState.RightButton, lastMouseState.XButton1, lastMouseState.XButton2);
-                MouseInput.LastMouseState = offsetLastMouseState;
                 // Update controller
+                //MouseState offsetMouseState = new MouseState((int)mouseState.X - (int)offset.X, mouseState.Y - (int)offset.Y, mouseState.ScrollWheelValue, mouseState.LeftButton, mouseState.MiddleButton, mouseState.RightButton, mouseState.XButton1, mouseState.XButton2);
+                controller.mousePosition = new Vector2(MouseInput.MouseState.X - offset.X, MouseInput.MouseState.Y - offset.Y);
                 if(controller.Update(gameTime, handleInput))
                     returned = true;
-                // Revert
-                MouseInput._mouseState = mouseState;
-                MouseInput.LastMouseState = lastMouseState;
             }
             return returned;
         }

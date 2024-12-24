@@ -30,20 +30,22 @@ namespace NonsensicalVideoGenerator
         }
         public readonly static List<AspectRatio> All = new()
         {
-            // Square
-            new AspectRatio(1, 1, new Vector2(0, 40), new Point(320, 320)),
             // Television
-            new AspectRatio(4, 3, new Vector2(0, 0), new Point(320, 240)), // Default
-            new AspectRatio(5, 4, new Vector2(0, 8), new Point(320, 256)),
+            new AspectRatio(4, 3, new Vector2(0, 0), new Point(320, 240)), // Standard Television
+            new AspectRatio(5, 4, new Vector2(0, 8), new Point(320, 256)), // Standard Monitor
             // Mobile
             //new AspectRatio(9, 16, new Vector2(0, 164), new Point(320, 569)),
             //new AspectRatio(9, 20, new Vector2(0, 235), new Point(320, 720)), // Pixel 7a
+            // Tablet
+            new AspectRatio(3, 2, new Vector2(21, 0), new Point(360, 240)), // Microsoft Surface
             // Widescreen
-            new AspectRatio(16, 9, new Vector2(53, 0), new Point(427, 240)),
-            new AspectRatio(16, 10, new Vector2(32, 0), new Point(384, 240)),
+            new AspectRatio(16, 9, new Vector2(53, 0), new Point(427, 240)), // Widescreen Television
+            new AspectRatio(16, 10, new Vector2(32, 0), new Point(384, 240)), // Widescreen Monitor
             // Ultrawide
             new AspectRatio(64, 27, new Vector2(124, 0), new Point(569, 240)), // Consumer ultrawide (21:9)
             //new AspectRatio(32, 9, new Vector2(266, 0), new Point(853, 240)), // Super ultrawide
+            // Square
+            new AspectRatio(1, 1, new Vector2(0, 40), new Point(320, 320)), // Square
         };
     }
     /// <summary>
@@ -57,11 +59,34 @@ namespace NonsensicalVideoGenerator
         public static bool fullScreen = false;
         public static int scaledWidth = new AspectRatio().preferredResolution.X * scale;
         public static int scaledHeight = new AspectRatio().preferredResolution.Y * scale;
+        public static AspectRatio FindMatchingAspectRatio()
+        {
+            AspectRatio closestMatch = new AspectRatio();
+            // Get the current aspect ratio of the current screen
+            int curWidth = GraphicsAdapter.DefaultAdapter.CurrentDisplayMode.Width;
+            int curHeight = GraphicsAdapter.DefaultAdapter.CurrentDisplayMode.Height;
+            float curAspectRatio = (float)curWidth / curHeight;
+            // Get the closest match in AspectRatio.All (aspectRatio.width / aspectRatio.height)
+            float closestMatchDifference = Math.Abs(curAspectRatio - (float)closestMatch.width / closestMatch.height);
+            foreach(AspectRatio aspectRatio in AspectRatio.All)
+            {
+                float difference = Math.Abs(curAspectRatio - (float)aspectRatio.width / aspectRatio.height);
+                if(difference < closestMatchDifference)
+                {
+                    closestMatch = aspectRatio;
+                    closestMatchDifference = difference;
+                }
+            }
+            // Set the aspect ratio to the closest match
+            return new AspectRatio(closestMatch.width, closestMatch.height, closestMatch.drawOffset, new Point(closestMatch.preferredResolution.X, closestMatch.preferredResolution.Y));
+        }
         public static void SetAspectRatio(AspectRatio aspectRatio)
         {
             drawOffset = aspectRatio.drawOffset;
             preferredResolution = new Point(aspectRatio.preferredResolution.X * scale, aspectRatio.preferredResolution.Y * scale);
             UserInterface.instance.Resize(preferredResolution.X, preferredResolution.Y);
+            // center to screen
+            UserInterface.instance.CenterToScreen();
         }
         public static AspectRatio GetAspectRatio()
         {
@@ -161,6 +186,16 @@ namespace NonsensicalVideoGenerator
                     height = midLargeHeight;
             }
             return height;
+        }
+        public static int GetGCD(int a, int b)
+        {
+            while (b != 0)
+            {
+                int temp = b;
+                b = a % b;
+                a = temp;
+            }
+            return a;
         }
     }
 }

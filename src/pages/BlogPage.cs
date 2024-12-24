@@ -45,7 +45,7 @@ namespace NonsensicalVideoGenerator
             int subtitleHeight = 85;
             for(int i = 0; i < BlogData.Subtitle.Count; i++)
             {
-                string subtitle = BlogData.Subtitle[i].Replace("%s", Global.productVersion);
+                string subtitle = BlogData.Subtitle[i].Replace("%s", Global.fileVersionInfo.ProductVersion);
                 Vector2 subtitleSize = font.MeasureString(subtitle);
                 GlobalContent.DrawString(spriteBatch, font, subtitle, new Vector2(GlobalGraphics.Scale(273+1) - subtitleSize.X / 2, GlobalGraphics.Scale(subtitleHeight+1)), Color.Black);
                 GlobalContent.DrawString(spriteBatch, font, subtitle, new Vector2(GlobalGraphics.Scale(273) - subtitleSize.X / 2, GlobalGraphics.Scale(subtitleHeight)), Color.White);
@@ -110,7 +110,7 @@ namespace NonsensicalVideoGenerator
         {
             controller.Clear();
             // Add URL button
-            controller.Add("BlogURL", new Button("Read More", "View announcement event on Steam.", new Vector2(220, 60+10+19*8), (int i, string n) => {
+            controller.Add("BlogURL", new Button("Read More", "View announcement event on Steam.", new Vector2(220, 60+15+19*8), (int i, string n) => {
                 switch(i)
                 {
                     case 2:

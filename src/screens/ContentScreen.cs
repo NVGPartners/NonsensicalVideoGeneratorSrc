@@ -155,6 +155,7 @@ namespace NonsensicalVideoGenerator
             GlobalContent.AddTexture("MainWindow", ThemeManager.LoadLayeredContent<Texture2D>("graphics/mainwindow"));
             // Pagination
             Pagination.LoadContent(contentManager, graphicsDevice);
+            /*
             if(!Global.canRender)
             {
                 if(Global.pluginsLoaded)
@@ -162,6 +163,7 @@ namespace NonsensicalVideoGenerator
                 else
                     Hide();
             }
+            */
         }
     }
 }

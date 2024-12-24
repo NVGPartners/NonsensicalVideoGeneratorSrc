@@ -277,6 +277,18 @@
 /processorParam:TextureFormat=Color
 /build:graphics/actions/steam.png
 
+#begin graphics/cursor.png
+/importer:TextureImporter
+/processor:TextureProcessor
+/processorParam:ColorKeyColor=255,0,255,255
+/processorParam:ColorKeyEnabled=True
+/processorParam:GenerateMipmaps=False
+/processorParam:PremultiplyAlpha=True
+/processorParam:ResizeToPowerOfTwo=False
+/processorParam:MakeSquare=False
+/processorParam:TextureFormat=Color
+/build:graphics/cursor.png
+
 #begin graphics/debug.png
 /importer:TextureImporter
 /processor:TextureProcessor
@@ -1009,41 +1021,41 @@
 /processorParam:TextureFormat=Color
 /build:graphics/vidwindow.png
 
-#begin music/theme1.ogg
-/importer:OggImporter
+#begin music/theme1.wma
+/importer:WmaImporter
 /processor:SongProcessor
 /processorParam:Quality=Best
-/build:music/theme1.ogg
+/build:music/theme1.wma
 
-#begin music/theme2.ogg
-/importer:OggImporter
+#begin music/theme2.wma
+/importer:WmaImporter
 /processor:SongProcessor
 /processorParam:Quality=Best
-/build:music/theme2.ogg
+/build:music/theme2.wma
 
-#begin music/theme3.ogg
-/importer:OggImporter
+#begin music/theme3.wma
+/importer:WmaImporter
 /processor:SongProcessor
 /processorParam:Quality=Best
-/build:music/theme3.ogg
+/build:music/theme3.wma
 
-#begin music/theme4.ogg
-/importer:OggImporter
+#begin music/theme4.wma
+/importer:WmaImporter
 /processor:SongProcessor
 /processorParam:Quality=Best
-/build:music/theme4.ogg
+/build:music/theme4.wma
 
-#begin music/theme5.ogg
-/importer:OggImporter
+#begin music/theme5.wma
+/importer:WmaImporter
 /processor:SongProcessor
 /processorParam:Quality=Best
-/build:music/theme5.ogg
+/build:music/theme5.wma
 
-#begin music/theme6.ogg
-/importer:OggImporter
+#begin music/theme6.wma
+/importer:WmaImporter
 /processor:SongProcessor
 /processorParam:Quality=Best
-/build:music/theme6.ogg
+/build:music/theme6.wma
 
 #begin sound/addsource.wav
 /importer:WavImporter
@@ -1116,6 +1128,18 @@
 /processor:SoundEffectProcessor
 /processorParam:Quality=Best
 /build:sound/start.wav
+
+#begin themes/anniversary/graphics/cursor.png
+/importer:TextureImporter
+/processor:TextureProcessor
+/processorParam:ColorKeyColor=255,0,255,255
+/processorParam:ColorKeyEnabled=True
+/processorParam:GenerateMipmaps=False
+/processorParam:PremultiplyAlpha=True
+/processorParam:ResizeToPowerOfTwo=False
+/processorParam:MakeSquare=False
+/processorParam:TextureFormat=Color
+/build:themes/anniversary/graphics/cursor.png
 
 #begin themes/anniversary/graphics/debug.png
 /importer:TextureImporter
@@ -1236,6 +1260,18 @@
 /processorParam:MakeSquare=False
 /processorParam:TextureFormat=Color
 /build:themes/birthday/graphics/actions/enableall.png
+
+#begin themes/birthday/graphics/cursor.png
+/importer:TextureImporter
+/processor:TextureProcessor
+/processorParam:ColorKeyColor=255,0,255,255
+/processorParam:ColorKeyEnabled=True
+/processorParam:GenerateMipmaps=False
+/processorParam:PremultiplyAlpha=True
+/processorParam:ResizeToPowerOfTwo=False
+/processorParam:MakeSquare=False
+/processorParam:TextureFormat=Color
+/build:themes/birthday/graphics/cursor.png
 
 #begin themes/birthday/graphics/debug.png
 /importer:TextureImporter
@@ -1489,6 +1525,18 @@
 /processorParam:TextureFormat=Color
 /build:themes/halloween/graphics/actions/enableall.png
 
+#begin themes/halloween/graphics/cursor.png
+/importer:TextureImporter
+/processor:TextureProcessor
+/processorParam:ColorKeyColor=255,0,255,255
+/processorParam:ColorKeyEnabled=True
+/processorParam:GenerateMipmaps=False
+/processorParam:PremultiplyAlpha=True
+/processorParam:ResizeToPowerOfTwo=False
+/processorParam:MakeSquare=False
+/processorParam:TextureFormat=Color
+/build:themes/halloween/graphics/cursor.png
+
 #begin themes/halloween/graphics/debug.png
 /importer:TextureImporter
 /processor:TextureProcessor
@@ -1741,11 +1789,11 @@
 /processorParam:TextureFormat=Color
 /build:themes/halloween/graphics/tile.png
 
-#begin themes/halloween/music/theme1.ogg
-/importer:OggImporter
+#begin themes/halloween/music/theme1.wma
+/importer:WmaImporter
 /processor:SongProcessor
 /processorParam:Quality=Best
-/build:themes/halloween/music/theme1.ogg
+/build:themes/halloween/music/theme1.wma
 
 #begin themes/holiday/graphics/actions/disableall.png
 /importer:TextureImporter
@@ -1770,6 +1818,18 @@
 /processorParam:MakeSquare=False
 /processorParam:TextureFormat=Color
 /build:themes/holiday/graphics/actions/enableall.png
+
+#begin themes/holiday/graphics/cursor.png
+/importer:TextureImporter
+/processor:TextureProcessor
+/processorParam:ColorKeyColor=255,0,255,255
+/processorParam:ColorKeyEnabled=True
+/processorParam:GenerateMipmaps=False
+/processorParam:PremultiplyAlpha=True
+/processorParam:ResizeToPowerOfTwo=False
+/processorParam:MakeSquare=False
+/processorParam:TextureFormat=Color
+/build:themes/holiday/graphics/cursor.png
 
 #begin themes/holiday/graphics/debug.png
 /importer:TextureImporter

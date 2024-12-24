@@ -1,6 +1,6 @@
 <Project Sdk="Microsoft.NET.Sdk">
   <PropertyGroup>
-    <Version>1.0.2.8</Version>
+    <Version>1.0.2.9</Version>
     <OutputType>WinExe</OutputType>
     <RollForward>Major</RollForward>
     <PublishReadyToRun>false</PublishReadyToRun>
@@ -84,7 +84,7 @@ Noto Sans licensed under SIL OFL</AssemblyTrademark>
     <BaseLocales Include="$(ProjectDir)public\locales\**\*.*" />
     <BaseRoot Include="$(ProjectDir)baseroot\**\*.*" />
     <BaseLayerGraphics Include="$(ProjectDir)content\graphics\**\*.*" />
-    <BaseLayerMusic Include="$(ProjectDir)basemusic\**\*.*" />
+    <BaseLayerMusic Include="$(ProjectDir)content\music\**\*.*" />
     <BaseLayerSound Include="$(ProjectDir)content\sound\**\*.*" />
  	</ItemGroup>
 	<Target Name="CopyPlugins" AfterTargets="Build">

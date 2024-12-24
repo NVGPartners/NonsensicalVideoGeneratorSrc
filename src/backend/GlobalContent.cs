@@ -243,6 +243,9 @@ namespace NonsensicalVideoGenerator
         }
         public static Texture2D GetTexture(string name)
         {
+            // if texture doesn't exist, return a 1x1 white pixel.
+            if (!textures.ContainsKey(name))
+                return textures["Pixel"];
             return textures[name];
         }
         public static SpriteFont GetFont(string name)

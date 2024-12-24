@@ -61,7 +61,11 @@ namespace NonsensicalVideoGenerator
             {"LastVersion", ""},
             {"Locale", "fixme"},
             {"DisableHolidays", "false"},
-            {"UseExternalVideoPlayer", "false"}
+            {"UseExternalVideoPlayer", "false"},
+            {"Fullscreen", "false"},
+            {"AlwaysOnTop", "false"},
+            {"MatchAspectRatio", "false"},
+            {"UseNativeCursor", "false"},
         };
         public static string saveFileName = "Options.json";
         public static bool Save()

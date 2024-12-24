@@ -4,6 +4,7 @@ using System.IO;
 using System.Linq;
 using System.Reflection;
 using Microsoft.Xna.Framework;
+using MonoGame.Extended.ECS;
 using Steamworks;
 
 namespace NonsensicalVideoGenerator
@@ -120,6 +121,8 @@ namespace NonsensicalVideoGenerator
             L.ReloadLocales();
             if(Global.parameters.Contains("-intro"))
                 SaveData.saveValues["FirstBoot"] = "true";
+            if(Global.parameters.Contains("-fullscreen"))
+                SaveData.saveValues["Fullscreen"] = "true";
             HolidayManager.CheckHolidays();
 #if MONOGAME
             using (var game = new UserInterface())

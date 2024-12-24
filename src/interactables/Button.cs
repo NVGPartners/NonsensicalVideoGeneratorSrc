@@ -89,6 +89,8 @@ namespace NonsensicalVideoGenerator
             if(internalName.Contains("ViewLocalizationOptions") || internalName.Contains("SelectLanguageOptionsPage"))
             {
                 spriteFont = GlobalContent.GetFont(L.cyclerLocale.fontLarge);
+                if(State >= 1 && Tooltip != "")
+                    Global.tooltipIsCycler = true;
             }
             // Calculate bounds
             textSize = (spriteFont.MeasureString(localizedTitle) / GlobalGraphics.scale) - new Vector2(GlobalGraphics.Scale(1), 0);

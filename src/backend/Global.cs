@@ -48,6 +48,7 @@ namespace NonsensicalVideoGenerator
         public static Generator generator = new Generator();
         public static List<string> parameters = new List<string>();
         public static string tooltip = "";
+        public static bool tooltipIsCycler = false;
         public static bool imageLibraryAvailable = false;
         public static bool imageLibraryAvailableInternal = true;
         public static int randomSeed = 0;
