@@ -8,6 +8,7 @@ using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Content;
 using Microsoft.Xna.Framework.Graphics;
 using Microsoft.Xna.Framework.Input;
+using Microsoft.Xna.Framework.Media;
 using MonoGame.Extended.Tweening;
 
 namespace NonsensicalVideoGenerator
@@ -135,6 +136,20 @@ namespace NonsensicalVideoGenerator
                         }
                         GlobalContent.GetSound("Option").Play(int.Parse(SaveData.saveValues["SoundEffectVolume"], System.Globalization.CultureInfo.InvariantCulture) / 100f, 0f, 0f);
                     }
+                    else if(UserInterface.instance.videoPlayer.State != MediaState.Stopped)
+                    {
+                        if(UserInterface.instance.videoPlayer.State == MediaState.Paused)
+                        {
+                            UserInterface.instance.videoPlayer.Resume();
+                            Global.generator.progressText = L.T(0, "Video:StatusPlay");
+                        }
+                        else
+                        {
+                            UserInterface.instance.videoPlayer.Pause();
+                            Global.generator.progressText = L.T(0, "Video:StatusStop");
+                        }
+                        GlobalContent.GetSound("Option").Play(int.Parse(SaveData.saveValues["SoundEffectVolume"], System.Globalization.CultureInfo.InvariantCulture) / 100f, 0f, 0f);
+                    }
                     else
                     {
                         GlobalContent.GetSound("Error").Play(int.Parse(SaveData.saveValues["SoundEffectVolume"], System.Globalization.CultureInfo.InvariantCulture) / 100f, 0f, 0f);
@@ -162,8 +177,7 @@ namespace NonsensicalVideoGenerator
                             {
                                 if(FramePlayer.audioPlaying || FramePlayer.playing)
                                 {
-                                    FramePlayer.audio.Stop();
-                                    FramePlayer.currentAudioTime = 0;
+                                    FramePlayer.audio.Pause();
                                     FramePlayer.audioPlaying = false;
                                     FramePlayer.canPlayBgMusic = true;
                                     Global.generator.progressText = L.T(0, "Video:StatusStop");
@@ -177,6 +191,20 @@ namespace NonsensicalVideoGenerator
                                 }
                                 GlobalContent.GetSound("Option").Play(int.Parse(SaveData.saveValues["SoundEffectVolume"], System.Globalization.CultureInfo.InvariantCulture) / 100f, 0f, 0f);
                             }
+                            else if(UserInterface.instance.videoPlayer.State != MediaState.Stopped)
+                            {
+                                if(UserInterface.instance.videoPlayer.State == MediaState.Paused)
+                                {
+                                    UserInterface.instance.videoPlayer.Resume();
+                                    Global.generator.progressText = L.T(0, "Video:StatusPlay");
+                                }
+                                else
+                                {
+                                    UserInterface.instance.videoPlayer.Pause();
+                                    Global.generator.progressText = L.T(0, "Video:StatusStop");
+                                }
+                                GlobalContent.GetSound("Option").Play(int.Parse(SaveData.saveValues["SoundEffectVolume"], System.Globalization.CultureInfo.InvariantCulture) / 100f, 0f, 0f);
+                            }
                             else
                             {
                                 GlobalContent.GetSound("Error").Play(int.Parse(SaveData.saveValues["SoundEffectVolume"], System.Globalization.CultureInfo.InvariantCulture) / 100f, 0f, 0f);
@@ -187,6 +215,10 @@ namespace NonsensicalVideoGenerator
                     }
                     else if(MouseInput.MouseState.RightButton == ButtonState.Pressed && MouseInput.LastMouseState.RightButton == ButtonState.Released)
                     {
+                        ProcessStartInfo startInfo = new()
+                        {
+                            UseShellExecute = true
+                        };
                         if(FramePlayer.audio != null)
                         {
                             FramePlayer.currentFrame = -1;
@@ -194,14 +226,14 @@ namespace NonsensicalVideoGenerator
                             FramePlayer.currentAudioTime = 0;
                             FramePlayer.audioPlaying = false;
                             FramePlayer.canPlayBgMusic = true;
-                            Global.generator.progressText = L.T(0, "Video:StatusStop");
-                            FramePlayer.canPlayBgMusic = true;
+                            startInfo.FileName = FramePlayer.currentPath;
                         }
-                        ProcessStartInfo startInfo = new()
+                        else if(UserInterface.instance.videoPlayer.State != MediaState.Stopped)
                         {
-                            FileName = FramePlayer.currentPath,
-                            UseShellExecute = true
-                        };
+                            UserInterface.instance.videoPlayer.Stop();
+                            startInfo.FileName = UserInterface.instance.videoPath;
+                            Global.generator.progressText = L.T(0, "Video:StatusStop");
+                        }
                         try
                         {
                             Process.Start(startInfo);
@@ -232,18 +264,19 @@ namespace NonsensicalVideoGenerator
             Texture2D vidbg = GlobalContent.GetTexture("VidBG");
             spriteBatch.Draw(vidbg, new Rectangle(GlobalGraphics.Scale(0), GlobalGraphics.Scale(43), GlobalGraphics.Scale(104), GlobalGraphics.Scale(78)), Color.White);
             // Draw media
-            if(FramePlayer.frames.Count > 0)
+            if(UserInterface.instance.videoPlayer.State != MediaState.Stopped)
             {
-                int frame = FramePlayer.currentFrame >= 0 ? FramePlayer.currentFrame : 0;
-                if(frame >= FramePlayer.frames.Count)
-                    frame = 0;
-                spriteBatch.Draw(FramePlayer.frames[frame], new Rectangle(GlobalGraphics.Scale(4), GlobalGraphics.Scale(43), GlobalGraphics.Scale(100), GlobalGraphics.Scale(78)), Color.White);
-                // Red progress bar at bottom
-                if(FramePlayer.currentFrame > 0)
+                try
                 {
+                    // Title screen video
+                    Texture2D texture = UserInterface.instance.videoPlayer.GetTexture();
+                    if (texture != null)
+                        spriteBatch.Draw(texture, new Rectangle(GlobalGraphics.Scale(4), GlobalGraphics.Scale(43), GlobalGraphics.Scale(100), GlobalGraphics.Scale(78)), Color.White);
+                    // Red progress bar at bottom
                     spriteBatch.Draw(pixel, new Rectangle(GlobalGraphics.Scale(4), GlobalGraphics.Scale(118), GlobalGraphics.Scale(100), GlobalGraphics.Scale(3)), ThemeManager.GetColor("VideoPlayerProgressBarBackground"));
-                    spriteBatch.Draw(pixel, new Rectangle(GlobalGraphics.Scale(4), GlobalGraphics.Scale(118), GlobalGraphics.Scale(100) * FramePlayer.currentFrame / FramePlayer.frames.Count, GlobalGraphics.Scale(4)), ThemeManager.GetColor("VideoPlayerProgressBar"));
+                    spriteBatch.Draw(pixel, new Rectangle(GlobalGraphics.Scale(4), GlobalGraphics.Scale(118), (int)(UserInterface.instance.videoPlayer.PlayPosition.TotalMicroseconds * GlobalGraphics.Scale(100) / UserInterface.instance.video.Duration.TotalMicroseconds) % GlobalGraphics.Scale(100), GlobalGraphics.Scale(3)), ThemeManager.GetColor("VideoPlayerProgressBar"));
                 }
+                catch {}
             }
             else if(FramePlayer.audioFrame != null)
             {

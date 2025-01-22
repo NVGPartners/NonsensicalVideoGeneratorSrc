@@ -22,7 +22,7 @@ namespace NonsensicalVideoGenerator
         /// </summary>
         public string title { get; } = "Intro";
         public int layer { get; set; } = 97;
-        public ScreenType screenType { get; set; } = ScreenType.Drawn;
+        public ScreenType screenType { get; set; } = ScreenType.Hidden;
         public int currentPlacement { get; set; } = -1;
         private int overlayOpacity = 255;
         private int lastTextOpacity = 255;

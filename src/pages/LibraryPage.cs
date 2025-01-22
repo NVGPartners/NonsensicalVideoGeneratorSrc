@@ -16,6 +16,7 @@ using System.Linq;
 using System.Reflection;
 using System.Windows;
 using System.Globalization;
+using MonoGame.Extended.VideoPlayback;
 
 namespace NonsensicalVideoGenerator
 {
@@ -1075,7 +1076,28 @@ namespace NonsensicalVideoGenerator
                                                     Global.justCompletedRender = true;
                                                 }
                                                 */
-                                                FramePlayer.PlayMedia(file);
+                                                FramePlayer.Stop();
+                                                UserInterface.instance.videoPlayer.Stop();
+                                                UserInterface.instance.video.Dispose();
+                                                UserInterface.instance.videoPath = "";
+                                                if(file.Type.RootType == LibraryRootType.Video)
+                                                {
+                                                    UserInterface.instance.videoPath = file.Path;
+                                                    UserInterface.instance.video = VideoHelper.LoadFromFile(file.Path);
+                                                    UserInterface.instance.videoPlayer.IsLooped = true;
+                                                    UserInterface.instance.videoPlayer.Play(UserInterface.instance.video);
+                                                    Global.generator.progressText = L.T(0, "Video:StatusPlay");
+                                                }
+                                                else
+                                                {
+                                                    FramePlayer.PlayMedia(file);
+                                                }
+                                                if(ScreenManager.GetScreen<VideoScreen>("Video") == null
+                                                    || ScreenManager.GetScreen<VideoScreen>("Video")?.screenType == ScreenType.Hidden)
+                                                {
+                                                    ScreenManager.PushNavigation("Video");
+                                                    ScreenManager.GetScreen<VideoScreen>("Video")?.Show();
+                                                }
                                             }
                                             if(right)
                                             {

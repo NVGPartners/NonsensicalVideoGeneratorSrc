@@ -7,6 +7,7 @@ using Microsoft.Xna.Framework.Content;
 using Microsoft.Xna.Framework.Graphics;
 using Steamworks;
 using System.Globalization;
+using MonoGame.Extended.VideoPlayback;
 
 namespace NonsensicalVideoGenerator
 {
@@ -264,8 +265,21 @@ namespace NonsensicalVideoGenerator
                             LibraryFile file = new LibraryFile(Path.GetFileName(lastModifiedFile), lastModifiedFile, DefaultLibraryTypes.Render, true);
                             if(file.Path != null)
                             {
+                                FramePlayer.Stop();
                                 GlobalContent.GetSound("Select").Play(int.Parse(SaveData.saveValues["SoundEffectVolume"], CultureInfo.InvariantCulture) / 100f, 0f, 0f);
-                                FramePlayer.PlayMedia(file);
+                                UserInterface.instance.videoPlayer.Stop();
+                                UserInterface.instance.video.Dispose();
+                                UserInterface.instance.videoPath = file.Path;
+                                UserInterface.instance.video = VideoHelper.LoadFromFile(file.Path);
+                                UserInterface.instance.videoPlayer.IsLooped = true;
+                                UserInterface.instance.videoPlayer.Play(UserInterface.instance.video);
+                                Global.generator.progressText = L.T(0, "Video:StatusPlay");
+                                if(ScreenManager.GetScreen<VideoScreen>("Video") == null
+                                    || ScreenManager.GetScreen<VideoScreen>("Video")?.screenType == ScreenType.Hidden)
+                                {
+                                    ScreenManager.PushNavigation("Video");
+                                    ScreenManager.GetScreen<VideoScreen>("Video")?.Show();
+                                }
                                 return true;
                             }
                         }

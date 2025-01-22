@@ -11,6 +11,8 @@ using System.Text;
 using System.Windows.Forms;
 using System.Globalization;
 using System.Collections.Generic;
+using MonoGame.Extended.Framework.Media;
+using MonoGame.Extended.VideoPlayback;
 
 namespace NonsensicalVideoGenerator
 {
@@ -31,7 +33,11 @@ namespace NonsensicalVideoGenerator
         private SpriteBatch? _spriteBatch;
         private WindowState _windowState = WindowState.Unfocused;
         private MusicState _musicState = MusicState.Paused;
+        public MonoGame.Extended.Framework.Media.VideoPlayer videoPlayer;
+        public MonoGame.Extended.Framework.Media.Video video;
+        public string videoPath = "kiwifruitdev.mp4";
         public int music = 0;
+        public bool introFinished = false;
         public UserInterface()
         {
             ConsoleOutput.WriteLine("Creating new UserInterface instance...", Color.Transparent);
@@ -196,6 +202,19 @@ namespace NonsensicalVideoGenerator
             GlobalContent.LoadDefaultContent(Content, GraphicsDevice);
             // Load all screen content.
             ScreenManager.LoadContent(Content, GraphicsDevice);
+            videoPlayer = new MonoGame.Extended.Framework.Media.VideoPlayer(GraphicsDevice);
+            videoPlayer.Volume = float.Parse(SaveData.saveValues["VideoVolume"], CultureInfo.InvariantCulture) / 100f;
+            video = VideoHelper.LoadFromFile(videoPath);
+            if(bool.Parse(SaveData.saveValues["SkipPhotosensitiveWarningScreen"]))
+            {
+                introFinished = true;
+                ScreenManager.PushNavigation("Intro");
+                ScreenManager.GetScreen<PhotosensitiveWarningScreen>("Intro").Show();
+            }
+            else
+            {
+                videoPlayer.Play(video);
+            }
             base.LoadContent();
         }
         protected override void UnloadContent()
@@ -204,6 +223,10 @@ namespace NonsensicalVideoGenerator
                 _spriteBatch.Dispose();
             // Unload all content.
             GlobalContent.UnloadContent();
+            videoPath = "";
+            videoPlayer.Stop();
+            video.Dispose();
+            videoPlayer.Dispose();
             base.UnloadContent();
         }
         public void FindMusic()
@@ -237,63 +260,74 @@ namespace NonsensicalVideoGenerator
                     SteamManager.Update();
             }
             catch {}
-            FramePlayer.Update(gameTime);
-            // Play music after 500ms.
-            if(gameTime.TotalGameTime.TotalMilliseconds > Global.readyTime + Global.waitReady && Global.ready)
-            {
-                if(Global.exiting)
-                {
-                    if(MediaPlayer.Volume > 0.01f)
-                        MediaPlayer.Volume -= 0.01f;
-                    else
-                    {
-                        MediaPlayer.Pause();
-                        _musicState = MusicState.Paused;
-                    }
-                }
-                else
-                {
-                    if((SaveData.saveValues["MuteMusicWhileTabbedOut"] == "true" ? _windowState == WindowState.Focused : true) && _musicState == MusicState.Playing && FramePlayer.canPlayBgMusic)
-                    {
-                        // Fade in music.
-                        float vol = int.Parse(SaveData.saveValues["MusicVolume"], CultureInfo.InvariantCulture) / 100f;
-                        if(MediaPlayer.Volume < vol)
-                            MediaPlayer.Volume += 0.1f;
-                        // Clamp music if it's over the volume level.
-                        if(MediaPlayer.Volume > vol)
-                            MediaPlayer.Volume = vol;
-                    }
-                    // Loop music
-                    if(MediaPlayer.State == MediaState.Stopped)
-                    {
-                        FindMusic();
-                    }
-                    if(SaveData.saveValues["MuteMusicWhileTabbedOut"] == "true")
-                    {
-                        if(_windowState == WindowState.Focused && _musicState == MusicState.Paused && FramePlayer.canPlayBgMusic)
-                        {
-                            MediaPlayer.Resume();
-                            _musicState = MusicState.Playing;
-                        }
-                        if((_windowState == WindowState.Unfocused && _musicState == MusicState.Playing) || !FramePlayer.canPlayBgMusic)
-                        {
-                            // Fade out music.
-                            if(MediaPlayer.Volume > 0.1f)
-                                MediaPlayer.Volume -= 0.1f;
-                            else
-                            {
-                                MediaPlayer.Pause();
-                                _musicState = MusicState.Paused;
-                            }
-                        }
-                    }
-                }
-            }
             // Update window state.
             if(IsActive)
                 _windowState = WindowState.Focused;
             else
                 _windowState = WindowState.Unfocused;
+            // Title screen video
+            if(introFinished || videoPlayer.State == MediaState.Stopped || videoPlayer.PlayPosition.Seconds >= 5)
+            {
+                if(!introFinished)
+                {
+                    videoPath = "";
+                    introFinished = true;
+                    ScreenManager.PushNavigation("Intro");
+                    ScreenManager.GetScreen<PhotosensitiveWarningScreen>("Intro").Show();
+                }
+                FramePlayer.Update(gameTime);
+                // Play music after 500ms.
+                if(gameTime.TotalGameTime.TotalMilliseconds > Global.readyTime + Global.waitReady && Global.ready)
+                {
+                    if(Global.exiting)
+                    {
+                        if(MediaPlayer.Volume > 0.01f)
+                            MediaPlayer.Volume -= 0.01f;
+                        else
+                        {
+                            MediaPlayer.Pause();
+                            _musicState = MusicState.Paused;
+                        }
+                    }
+                    else
+                    {
+                        if((SaveData.saveValues["MuteMusicWhileTabbedOut"] == "true" ? _windowState == WindowState.Focused : true) && _musicState == MusicState.Playing && FramePlayer.canPlayBgMusic)
+                        {
+                            // Fade in music.
+                            float vol = int.Parse(SaveData.saveValues["MusicVolume"], CultureInfo.InvariantCulture) / 100f;
+                            if(MediaPlayer.Volume < vol)
+                                MediaPlayer.Volume += 0.1f;
+                            // Clamp music if it's over the volume level.
+                            if(MediaPlayer.Volume > vol)
+                                MediaPlayer.Volume = vol;
+                        }
+                        // Loop music
+                        if(MediaPlayer.State == MediaState.Stopped)
+                        {
+                            FindMusic();
+                        }
+                        if(SaveData.saveValues["MuteMusicWhileTabbedOut"] == "true")
+                        {
+                            if(_windowState == WindowState.Focused && _musicState == MusicState.Paused && FramePlayer.canPlayBgMusic)
+                            {
+                                MediaPlayer.Resume();
+                                _musicState = MusicState.Playing;
+                            }
+                            if((_windowState == WindowState.Unfocused && _musicState == MusicState.Playing) || !FramePlayer.canPlayBgMusic)
+                            {
+                                // Fade out music.
+                                if(MediaPlayer.Volume > 0.1f)
+                                    MediaPlayer.Volume -= 0.1f;
+                                else
+                                {
+                                    MediaPlayer.Pause();
+                                    _musicState = MusicState.Paused;
+                                }
+                            }
+                        }
+                    }
+                }
+            }
             // Update screens.
             ScreenManager.Update(gameTime);
             base.Update(gameTime);
@@ -308,6 +342,17 @@ namespace NonsensicalVideoGenerator
                     BlendState.AlphaBlend,
                     SamplerState.PointClamp,
                     null, null, null, Matrix.CreateTranslation(GlobalGraphics.Scale(GlobalGraphics.drawOffset.X), GlobalGraphics.Scale(GlobalGraphics.drawOffset.Y), 0));
+                if(!introFinished)
+                {
+                    try
+                    {
+                        // Title screen video
+                        Texture2D texture = videoPlayer.GetTexture();
+                        if (texture != null)
+                            _spriteBatch.Draw(texture, new Rectangle(0, 0, GlobalGraphics.scaledWidth, GlobalGraphics.scaledHeight), Color.White);
+                    }
+                    catch {}
+                }
                 ScreenManager.Draw(gameTime, _spriteBatch);
                 _spriteBatch.End();
                 _spriteBatch.Begin(SpriteSortMode.Deferred,
@@ -336,6 +381,8 @@ namespace NonsensicalVideoGenerator
         {
             if(!Global.exiting)
             {
+                videoPath = "";
+                videoPlayer.Stop();
                 Global.generator.progressText = L.T(0, "Content:StatusExiting");
                 Global.generator.failureReason = L.T(0, "Content:StatusExiting");
                 Global.exiting = true;

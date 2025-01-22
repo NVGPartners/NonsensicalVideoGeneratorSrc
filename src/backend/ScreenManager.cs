@@ -2,6 +2,7 @@
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
+using System.Globalization;
 using System.Linq;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Content;
@@ -209,6 +210,12 @@ namespace NonsensicalVideoGenerator
                         handleInput = false;
                     }
                 }
+            }
+            // Any key pressed will skip the intro
+            if(!UserInterface.instance.introFinished && (keyboardState.GetPressedKeys().Length > 0 || MouseInput.MouseState.LeftButton == ButtonState.Pressed))
+            {
+                UserInterface.instance.videoPlayer.Stop();
+                GlobalContent.GetSound("Hover").Play(int.Parse(SaveData.saveValues["SoundEffectVolume"], CultureInfo.InvariantCulture) / 100f, 0f, 0f);
             }
             // F11 or Alt+Enter will toggle fullscreen
             if(keyboardState.IsKeyDown(Keys.F11) && lastKeyboardState.IsKeyUp(Keys.F11)

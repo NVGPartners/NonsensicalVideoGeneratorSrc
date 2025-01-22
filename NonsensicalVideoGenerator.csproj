@@ -1,6 +1,6 @@
 <Project Sdk="Microsoft.NET.Sdk">
   <PropertyGroup>
-    <Version>1.0.2.9</Version>
+    <Version>1.0.3.0</Version>
     <OutputType>WinExe</OutputType>
     <RollForward>Major</RollForward>
     <PublishReadyToRun>false</PublishReadyToRun>
@@ -29,6 +29,7 @@ Noto Sans licensed under SIL OFL</AssemblyTrademark>
     <RepositoryUrl>https://github.com/KiwifruitDev/NonsensicalVideoGeneratorSrc.git</RepositoryUrl>
     <RepositoryBranch>steam</RepositoryBranch>
     <ApplicationHighDpiMode>true</ApplicationHighDpiMode>
+    <CLSCompliant>false</CLSCompliant>
   </PropertyGroup>
   <PropertyGroup>
     <ApplicationManifest>app.manifest</ApplicationManifest>
@@ -68,6 +69,15 @@ Noto Sans licensed under SIL OFL</AssemblyTrademark>
     </Reference>
     <Reference Include="MoonSharp">
       <HintPath>packages\MoonSharp\MoonSharp.Interpreter.dll</HintPath>
+    </Reference>
+    <Reference Include="MonoGame.Extended2">
+      <HintPath>packages\MonoGame.Extended2\MonoGame.Extended2.dll</HintPath>
+    </Reference>
+    <Reference Include="MonoGame.Extended.VideoPlayback">
+      <HintPath>packages\MonoGame.Extended.VideoPlayback\MonoGame.Extended.VideoPlayback.dll</HintPath>
+    </Reference>
+    <Reference Include="Sdcb.FFmpeg">
+      <HintPath>packages\Sdcb.FFmpeg\Sdcb.FFmpeg.dll</HintPath>
     </Reference>
   </ItemGroup>
   <ItemGroup>

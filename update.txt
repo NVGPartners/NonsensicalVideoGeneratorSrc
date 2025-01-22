@@ -1,23 +1,9 @@
-Milestone 6 Hotfix 9 (v1.0.2.9)
+Milestone 7 (v1.0.3.0)
 
 Here are the changes in this update:
 
 [list]
-[*]Added a new toggle for fullscreen mode in the options tab.
-[*]Added a new toggle to make NVG's window appear on top of other windows, including the taskbar.
-[*]Added a new toggle to make NVG's window match your screen's aspect ratio in the options tab.
-[*]Added a new custom cursor, with a toggle to disable it in the options tab.
-[*]Added a printout to console.txt that specifies if NVG is running through Proton or Wine.
-[*]Added ziahorizon to the list of moderators in the credits.
-[*]Addons are now reloaded when a new locale is chosen.
-[*]Changed format of the background music in an attempt to fix Proton support.
-[*]Changed date format in the blog tab.
-[*]Fixed the "View Workshop" button in addon settings taking you to an invalid Workshop submission.
-[*]Fixed the version info being too long in the blog tab if debug mode was enabled.
-[*]Fixed the tooltip using the wrong font when hovering over the "Select Language" button in the options tab.
-[*]Fixed a bug where the start text in the game tab for the credits was skipped.
-[*]Fixed the "Read More" button in the blog tab being obscured if the changelog is too long.
-[*]Updated the localization files.
+[*]
 [/list]
 
 I'll be busy during the holidays so while I may be slow to respond, please let me know if you have any issues with this update.

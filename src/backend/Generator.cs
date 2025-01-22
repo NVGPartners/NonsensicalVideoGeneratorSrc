@@ -12,6 +12,8 @@ using System.Text.RegularExpressions;
 using System.Reflection;
 using Steamworks;
 using Microsoft.Xna.Framework.Media;
+using MonoGame.Extended.VideoPlayback;
+
 
 #if MONOGAME
 using Microsoft.Xna.Framework;
@@ -149,7 +151,22 @@ namespace NonsensicalVideoGenerator
                         {
 #if MONOGAME
                             if (bool.Parse(SaveData.saveValues["PlayAutomatically"]))
-                                FramePlayer.PlayMedia(libraryFile);
+                            {
+                                FramePlayer.Stop();
+                                UserInterface.instance.videoPlayer.Stop();
+                                UserInterface.instance.video.Dispose();
+                                UserInterface.instance.videoPath = tempOutput;
+                                UserInterface.instance.video = VideoHelper.LoadFromFile(tempOutput);
+                                UserInterface.instance.videoPlayer.IsLooped = true;
+                                UserInterface.instance.videoPlayer.Play(UserInterface.instance.video);
+                                Global.generator.progressText = L.T(0, "Video:StatusPlay");
+                                if(ScreenManager.GetScreen<VideoScreen>("Video") == null
+                                    || ScreenManager.GetScreen<VideoScreen>("Video")?.screenType == ScreenType.Hidden)
+                                {
+                                    ScreenManager.PushNavigation("Video");
+                                    ScreenManager.GetScreen<VideoScreen>("Video")?.Show();
+                                }
+                            }
 #endif
                         }
                     }
@@ -755,7 +772,21 @@ namespace NonsensicalVideoGenerator
                         {
 #if MONOGAME
                             if (bool.Parse(SaveData.saveValues["PlayAutomatically"]))
-                                FramePlayer.PlayMedia(libraryFile);
+                            {
+                                FramePlayer.Stop();
+                                UserInterface.instance.videoPlayer.Stop();
+                                UserInterface.instance.video.Dispose();
+                                UserInterface.instance.videoPath = tempOutput;
+                                UserInterface.instance.video = VideoHelper.LoadFromFile(tempOutput);
+                                UserInterface.instance.videoPlayer.IsLooped = true;
+                                UserInterface.instance.videoPlayer.Play(UserInterface.instance.video);
+                                if(ScreenManager.GetScreen<VideoScreen>("Video") == null
+                                    || ScreenManager.GetScreen<VideoScreen>("Video")?.screenType == ScreenType.Hidden)
+                                {
+                                    ScreenManager.PushNavigation("Video");
+                                    ScreenManager.GetScreen<VideoScreen>("Video")?.Show();
+                                }
+                            }
 #endif
                         }
                     }

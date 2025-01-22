@@ -181,8 +181,8 @@ namespace NonsensicalVideoGenerator
 #if MONOGAME
                 SoundEffect snd = SoundEffect.FromStream(audioFile);
                 audio = snd.CreateInstance();
-                ScreenManager.PushNavigation("Video");
-                ScreenManager.GetScreen<VideoScreen>("Video")?.Show();
+                //ScreenManager.PushNavigation("Video");
+                //ScreenManager.GetScreen<VideoScreen>("Video")?.Show();
 #else
                 audio = new SoundPlayer(audioFile);
 #endif
@@ -309,7 +309,7 @@ namespace NonsensicalVideoGenerator
                     audio.Dispose();
                     audio = null;
 #if MONOGAME
-                    ScreenManager.GetScreen<VideoScreen>("Video")?.Hide();
+                    //ScreenManager.GetScreen<VideoScreen>("Video")?.Hide();
 #endif
                     Global.generator.progressText = L.T(0, "Video:StatusStop");
                 }
@@ -364,7 +364,7 @@ namespace NonsensicalVideoGenerator
                     audio.Dispose();
                     audio = null;
 #if MONOGAME
-                    ScreenManager.GetScreen<VideoScreen>("Video")?.Hide();
+                    //ScreenManager.GetScreen<VideoScreen>("Video")?.Hide();
 #endif
                 }
                 FileStream audioFile = File.OpenRead(".\\temp\\extracted\\audio.wav");
@@ -423,8 +423,8 @@ namespace NonsensicalVideoGenerator
                 if(SaveData.saveValues["UseExternalVideoPlayer"] == "false")
                 {
                     audio.Play();
-                    ScreenManager.PushNavigation("Video");
-                    ScreenManager.GetScreen<VideoScreen>("Video")?.Show();
+                    //ScreenManager.PushNavigation("Video");
+                    //ScreenManager.GetScreen<VideoScreen>("Video")?.Show();
                     audioPlaying = true;
                     Global.generator.progressText = L.T(0, "Video:StatusPlay");
                 }

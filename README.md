@@ -9,11 +9,12 @@ This repository provides the source code and build system for [Nonsensical Video
 Public issue tracker can be found [here](https://github.com/KiwifruitDev/NonsensicalVideoGenerator).
 
 ## Building
+The following instructions are for building **Nonsensical Video Generator** from source.
 
 - Prerequisites:
     - [Visual Studio Code](https://code.visualstudio.com/download)
         - [C# extension](https://marketplace.visualstudio.com/items?itemName=ms-dotnettools.csharp)
-    - [.NET 6.0 SDK](https://dotnet.microsoft.com/en-us/download/dotnet/6.0)
+    - [.NET 8.0 SDK](https://dotnet.microsoft.com/en-us/download/dotnet/8.0)
 - Setup:
     - Run `dotnet restore` inside of the root directory to install dependencies
     - Copy `cred.template.bat` in the root directory
@@ -39,7 +40,13 @@ Public issue tracker can be found [here](https://github.com/KiwifruitDev/Nonsens
         - Proceed to the next page
         - Create a changelog for the new build and publish it
 
-## Links:
+DLL files available in `packages` are built beforehand to prevent .NET conflicts:
+- [Steamworks.NET](https://github.com/rlabrecque/Steamworks.NET)
+- [MonoGame.Extended](https://github.com/craftworkgames/MonoGame.Extended)
+- [MonoGame.Extended2](https://github.com/hozuki/MonoGame.Extended2)
+- [MoonSharp](
+
+## Links
 <a href="https://store.steampowered.com/app/2516360/Nonsensical_Video_Generator/" target="_blank" alt="Nonsensical Video Generator Store Page" title="Steam Store Page">
   <img width="50%" src="https://i.imgur.com/Dc34oSC.png">
 </a>
@@ -51,3 +58,6 @@ Public issue tracker can be found [here](https://github.com/KiwifruitDev/Nonsens
 <a href="https://discord.gg/8ppmspR6Wh" target="_blank" alt="Nonsensical Video Generator Discord" title="Discord">
   <img width="50%" src="https://i.imgur.com/X5CC4vv.png">
 </a>
+
+## License
+Nonsensical Video Generator is licensed under the GNU General Public License v3.0. See [LICENSE](LICENSE) for more information.
