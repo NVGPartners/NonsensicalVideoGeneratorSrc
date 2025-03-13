@@ -215,6 +215,7 @@ namespace NonsensicalVideoGenerator
             if(!UserInterface.instance.introFinished && (keyboardState.GetPressedKeys().Length > 0 || MouseInput.MouseState.LeftButton == ButtonState.Pressed))
             {
                 UserInterface.instance.videoPlayer.Stop();
+                FramePlayer.canPlayBgMusic = true;
                 GlobalContent.GetSound("Hover").Play(int.Parse(SaveData.saveValues["SoundEffectVolume"], CultureInfo.InvariantCulture) / 100f, 0f, 0f);
             }
             // F11 or Alt+Enter will toggle fullscreen

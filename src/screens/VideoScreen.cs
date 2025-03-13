@@ -136,7 +136,7 @@ namespace NonsensicalVideoGenerator
                         }
                         GlobalContent.GetSound("Option").Play(int.Parse(SaveData.saveValues["SoundEffectVolume"], System.Globalization.CultureInfo.InvariantCulture) / 100f, 0f, 0f);
                     }
-                    else if(UserInterface.instance.videoPlayer.State != MediaState.Stopped)
+                    else if(UserInterface.instance.videoPlayer != null && UserInterface.instance.videoPlayer.State != MediaState.Stopped)
                     {
                         if(UserInterface.instance.videoPlayer.State == MediaState.Paused)
                         {
@@ -146,6 +146,7 @@ namespace NonsensicalVideoGenerator
                         else
                         {
                             UserInterface.instance.videoPlayer.Pause();
+                            FramePlayer.canPlayBgMusic = true;
                             Global.generator.progressText = L.T(0, "Video:StatusStop");
                         }
                         GlobalContent.GetSound("Option").Play(int.Parse(SaveData.saveValues["SoundEffectVolume"], System.Globalization.CultureInfo.InvariantCulture) / 100f, 0f, 0f);
@@ -191,16 +192,18 @@ namespace NonsensicalVideoGenerator
                                 }
                                 GlobalContent.GetSound("Option").Play(int.Parse(SaveData.saveValues["SoundEffectVolume"], System.Globalization.CultureInfo.InvariantCulture) / 100f, 0f, 0f);
                             }
-                            else if(UserInterface.instance.videoPlayer.State != MediaState.Stopped)
+                            else if(UserInterface.instance.videoPlayer != null && UserInterface.instance.videoPlayer.State != MediaState.Stopped)
                             {
                                 if(UserInterface.instance.videoPlayer.State == MediaState.Paused)
                                 {
                                     UserInterface.instance.videoPlayer.Resume();
+                                    FramePlayer.canPlayBgMusic = false;
                                     Global.generator.progressText = L.T(0, "Video:StatusPlay");
                                 }
                                 else
                                 {
                                     UserInterface.instance.videoPlayer.Pause();
+                                    FramePlayer.canPlayBgMusic = true;
                                     Global.generator.progressText = L.T(0, "Video:StatusStop");
                                 }
                                 GlobalContent.GetSound("Option").Play(int.Parse(SaveData.saveValues["SoundEffectVolume"], System.Globalization.CultureInfo.InvariantCulture) / 100f, 0f, 0f);
@@ -230,7 +233,9 @@ namespace NonsensicalVideoGenerator
                         }
                         else if(UserInterface.instance.videoPlayer.State != MediaState.Stopped)
                         {
-                            UserInterface.instance.videoPlayer.Stop();
+                            UserInterface.instance.videoPlayer.Dispose();
+                            UserInterface.instance.videoPlayer = null;
+                            FramePlayer.canPlayBgMusic = true;
                             startInfo.FileName = UserInterface.instance.videoPath;
                             Global.generator.progressText = L.T(0, "Video:StatusStop");
                         }
@@ -264,7 +269,7 @@ namespace NonsensicalVideoGenerator
             Texture2D vidbg = GlobalContent.GetTexture("VidBG");
             spriteBatch.Draw(vidbg, new Rectangle(GlobalGraphics.Scale(0), GlobalGraphics.Scale(43), GlobalGraphics.Scale(104), GlobalGraphics.Scale(78)), Color.White);
             // Draw media
-            if(UserInterface.instance.videoPlayer.State != MediaState.Stopped)
+            if(UserInterface.instance.videoPlayer != null && UserInterface.instance.videoPlayer.State != MediaState.Stopped)
             {
                 try
                 {

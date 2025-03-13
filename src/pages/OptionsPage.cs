@@ -351,6 +351,7 @@ namespace NonsensicalVideoGenerator
                     else
                         Name = "PageOptions";
                     DiscordRPC.curtab = DiscordRPC.ToTab(Name);
+                    SteamRichPresence.curtab = SteamRichPresence.ToTab(Name);
                     GlobalContent.GetSound("Select").Play(int.Parse(SaveData.saveValues["SoundEffectVolume"], CultureInfo.InvariantCulture) / 100f, 0f, 0f);
                     return true;
             }

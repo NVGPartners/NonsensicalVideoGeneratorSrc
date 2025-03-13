@@ -15,7 +15,15 @@ The following instructions are for building **Nonsensical Video Generator** from
     - [Visual Studio Code](https://code.visualstudio.com/download)
         - [C# extension](https://marketplace.visualstudio.com/items?itemName=ms-dotnettools.csharp)
     - [.NET 8.0 SDK](https://dotnet.microsoft.com/en-us/download/dotnet/8.0)
+    - [ffmpeg-release-full.7z (gyan.dev)](https://www.gyan.dev/ffmpeg/builds/)
+    - [frei0r-*-win64.7z](https://github.com/dyne/frei0r/releases)
+    - [yt-dlp.exe](https://github.com/yt-dlp/yt-dlp/releases)
+    - [vocoder-1.2-x86-win32.zip](https://borsboom.io/vocoder/)
 - Setup:
+    - Extract `ffmpeg.exe` and `ffprobe.exe` from `ffmpeg-release-full.7z` into `baseroot/`
+    - Extract all `.dll` files from `filter/` in `frei0r-*-win64.7z` into `baseroot/frei0r-1` (create the directory if it doesn't exist)
+    - Copy `yt-dlp.exe` into `baseroot/`
+    - Extract `vocoder.exe` from `vocoder-1.2-x86-win32.zip` into `baseroot/`
     - Run `dotnet restore` inside of the root directory to install dependencies
     - Copy `cred.template.bat` in the root directory
         - Paste as a new file named `cred.bat`
@@ -44,7 +52,7 @@ DLL files available in `packages` are built beforehand to prevent .NET conflicts
 - [Steamworks.NET](https://github.com/rlabrecque/Steamworks.NET)
 - [MonoGame.Extended](https://github.com/craftworkgames/MonoGame.Extended)
 - [MonoGame.Extended2](https://github.com/hozuki/MonoGame.Extended2)
-- [MoonSharp](
+- [MoonSharp](https://github.com/KiwifruitDev/moonsharp-PR-327)
 
 ## Links
 <a href="https://store.steampowered.com/app/2516360/Nonsensical_Video_Generator/" target="_blank" alt="Nonsensical Video Generator Store Page" title="Steam Store Page">

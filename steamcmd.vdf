@@ -15,10 +15,10 @@
 				"recursive" "1"
 			}
 			"InstallScript" "redist\installscript.vdf"
+			"FileExclusion" "cache\*"
 			"FileExclusion" "temp\*"
 			"FileExclusion" "*.pdb"
-			"FileExclusion" "*ffmpeg.exe*"
-			"FileExclusion" "*ffprobe.exe*"
+			"FileExclusion" "*ffplay.exe*"
 			"FileExclusion" "*console.txt*"
 			"FileExclusion" "*Options.json*"
 			"FileExclusion" "*steam_appid.txt*"

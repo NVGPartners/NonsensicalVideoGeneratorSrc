@@ -195,6 +195,7 @@ namespace NonsensicalVideoGenerator
                                 if(segment == 2)
                                     name = "PageAddons";
                                 DiscordRPC.curtab = DiscordRPC.ToTab(name);
+                                SteamRichPresence.curtab = SteamRichPresence.ToTab(name);
                                 if(segment == 5)
                                 {
                                     ScreenManager.PushNavigation("Game");

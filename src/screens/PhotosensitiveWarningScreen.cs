@@ -9,6 +9,7 @@ using Microsoft.Xna.Framework.Graphics;
 using Microsoft.Xna.Framework.Input;
 using Steamworks;
 using System.Globalization;
+using System.IO;
 
 namespace NonsensicalVideoGenerator
 {
@@ -304,6 +305,8 @@ namespace NonsensicalVideoGenerator
                                 GlobalContent.GetSound("Start").Play(int.Parse(SaveData.saveValues["SoundEffectVolume"], CultureInfo.InvariantCulture) / 100f, 0f, 0f);
                             }
                             fadingIn = true;
+                            Global.generator.CleanUp();
+                            VideoCache.ClearCache();
                         }
                         accepted = false;
                     }

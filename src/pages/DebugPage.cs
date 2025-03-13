@@ -303,6 +303,21 @@ namespace NonsensicalVideoGenerator
                             Global.generator.audioSync = !Global.generator.audioSync;
                             return true;
                         }
+                        if(MouseInput.MouseState.Y >= GlobalGraphics.Scale(33+(8*19)) && MouseInput.MouseState.Y <= GlobalGraphics.Scale(33+(8*19)+6))
+                        {
+                            // Open console.txt.
+                            string consoleLogFile = Path.Combine(Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location) ?? ".", "console.log");
+                            if(File.Exists(consoleLogFile))
+                                System.Diagnostics.Process.Start(consoleLogFile);
+                            return true;
+                        }
+                        if(MouseInput.MouseState.Y >= GlobalGraphics.Scale(33+(8*20)) && MouseInput.MouseState.Y <= GlobalGraphics.Scale(33+(8*20)+6))
+                        {
+                            // Unlock FPS.
+                            GlobalContent.GetSound("Select").Play(int.Parse(SaveData.saveValues["SoundEffectVolume"], CultureInfo.InvariantCulture) / 100f, 0f, 0f);
+                            UserInterface.instance.SetFPSUnlock(UserInterface.instance.IsFixedTimeStep);
+                            return true;
+                        }
                     }
                 }
             }
@@ -333,9 +348,8 @@ namespace NonsensicalVideoGenerator
                 DrawButton(spriteBatch, 6, 33+(8*16), (bool.Parse(SaveData.saveValues["HiddenKeepTemporaryJobFolders"]) ? "Delete" : "Keep") + " Temporary Job Folders");
                 DrawButton(spriteBatch, 6, 33+(8*17), (bool.Parse(SaveData.saveValues["HiddenVerbose"]) ? "Disable" : "Enable") + " Verbose");
                 DrawButton(spriteBatch, 6, 33+(8*18), (Global.generator.audioSync ? "Disable" : "Enable") + " Audio Sync");
-                GlobalContent.DrawString(spriteBatch, L.FontSmall(), Debug.debugBuild ? "Debug Build" : (Debug.GetDebugMode() ? "Release Build; Debug Mode" : "Release Build"), new Vector2(GlobalGraphics.Scale(6), GlobalGraphics.scaledHeight - GlobalGraphics.Scale(6*9) - GlobalGraphics.Scale(9)), Color.White);
-                GlobalContent.DrawString(spriteBatch, L.FontSmall(), "Parameters: "+String.Join(" ", Global.parameters.ToArray()), new Vector2(GlobalGraphics.Scale(6), GlobalGraphics.scaledHeight - GlobalGraphics.Scale(6*8) - GlobalGraphics.Scale(9)), Color.White);
-                GlobalContent.DrawString(spriteBatch, L.FontSmall(), "CTRL + F3: Toggle Debug Mode", new Vector2(GlobalGraphics.Scale(6), GlobalGraphics.scaledHeight - GlobalGraphics.Scale(6*7) - GlobalGraphics.Scale(9)), Color.White);
+                DrawButton(spriteBatch, 6, 33+(8*19), "Open console.txt");
+                DrawButton(spriteBatch, 6, 33+(8*20), (UserInterface.instance.IsFixedTimeStep ? "Unlock" : "Lock") + " FPS and VSync");
                 GlobalContent.DrawString(spriteBatch, L.FontSmall(), "F3: Toggle Debug Menu", new Vector2(GlobalGraphics.Scale(6), GlobalGraphics.scaledHeight - GlobalGraphics.Scale(6*6) - GlobalGraphics.Scale(9)), Color.White);
                 GlobalContent.DrawString(spriteBatch, L.FontSmall(), "F4: Toggle Main Window Tween", new Vector2(GlobalGraphics.Scale(6), GlobalGraphics.scaledHeight - GlobalGraphics.Scale(6*5) - GlobalGraphics.Scale(9)), Color.White);
                 GlobalContent.DrawString(spriteBatch, L.FontSmall(), "F6: Pause", new Vector2(GlobalGraphics.Scale(6), GlobalGraphics.scaledHeight - GlobalGraphics.Scale(6*4) - GlobalGraphics.Scale(9)), Color.White);

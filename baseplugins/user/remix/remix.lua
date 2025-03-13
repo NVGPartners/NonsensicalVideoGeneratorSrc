@@ -74,7 +74,7 @@ function PostCommand(commandindex, outputresult, errorresult, options, pluginSet
         functions.runFFmpeg("-i \"" .. options.inputVideo .. "\" -vcodec libx264 -crf 28 -preset ultrafast -ac 2 -c:a aac -b:a 160k -reset_timestamps 1 -shortest -fflags +genpts -af \"aresample=async=1000\" -ss 0 -t 0.100 -y \"" .. temp2 .. "\"")
     elseif commandindex == 1+indexoffset then
         -- Invoke-Command -ScriptBlock {&$ffmpeg -i "$temp1" -ss 0.140 -t 0.050 -y "$temp3"}
-        functions.runFFmpeg("-i \"" .. options.inputVideo .. "\" -vcodec libx264 -crf 28 -preset ultrafast -ac 2 -c:a aac -b:a 160k -reset_timestamps 1 -shortest -fflags +genpts -af \"aresample=async=1000\" -ss 0.140 -t 0.050 -y \"" .. temp3 .. "\"")
+        functions.runFFmpeg("-i \"" .. options.inputVideo .. "\" -vcodec libx264 -crf 28 -preset ultrafast -ac 2 -c:a aac -b:a 160k -reset_timestamps 1 -shortest -fflags +genpts -af \"aresample=async=1000\" -ss 0.120 -t 0.060 -y \"" .. temp3 .. "\"")
     elseif commandindex == 2+indexoffset then
         -- Invoke-Command -ScriptBlock {&$ffmpeg -i "$temp1" -ss 0 -t 0.050 -y "$temp4"}
         functions.runFFmpeg("-i \"" .. options.inputVideo .. "\" -vcodec libx264 -crf 28 -preset ultrafast -ac 2 -c:a aac -b:a 160k -reset_timestamps 1 -shortest -fflags +genpts -af \"aresample=async=1000\" -ss 0 -t 0.050 -y \"" .. temp4 .. "\"")

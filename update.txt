@@ -2,12 +2,10 @@ Milestone 7 (v1.0.3.0)
 
 Here are the changes in this update:
 
-[list]
-[*]
-[/list]
 
-I'll be busy during the holidays so while I may be slow to respond, please let me know if you have any issues with this update.
-Also, consider translating NVG into your language on [url=https://github.com/KiwifruitDev/NonsensicalVideoGenerator/wiki/Localization]GitHub[/url]!
-Happy generating! [url=https://store.steampowered.com/app/2516360/Nonsensical_Video_Generator/][img]{STEAM_CLAN_IMAGE}/44378200/d86bcae4b4c7eae888eba3c4c8336c7d62b8dd05.png[/img][/url]
+
+Let me know if you have any issues with this update.
+Also, please help translate NVG into your language on [url=https://github.com/KiwifruitDev/NonsensicalVideoGenerator/wiki/Localization]GitHub[/url]!
+Happy generating!
 
 [url=https://store.steampowered.com/app/2516360/Nonsensical_Video_Generator/][img]{STEAM_CLAN_IMAGE}/44378200/ff687f086ff77748ead1a7a7f33a8fbcfdb6a772.png[/img][/url] [url=https://steamcommunity.com/id/KiwifruitDev][img]{STEAM_CLAN_IMAGE}/44378200/a9f98b6b95b65dddf1d44f23bef423f6d6b2cb57.png[/img][/url]

@@ -28,13 +28,14 @@
         "madclown55"
     ],
     "Superstar": [
+        "thigo",
         "antho27",
         "dareturnofnobodyhasabandonedme",
         "fireafyanimations",
-        "realgoggleskun",
         "1greg7",
+        "realgoggleskun",
         "gungholizard",
-        "eddsworldfan69420",
+        "tehcartoonman22145",
         "jankespro12",
         "kraggerthemenace",
         "lindinhodebonito",
@@ -44,12 +45,12 @@
         "russellinu",
         "supercar11",
         "thebritishytper",
-        "thigo",
         "toony6125",
         "waterdeervt",
         "zappaboi"
     ],
     "SoftwareLicense": [
+        "Nonsensical Video Generator (GPL-3.0 License)",
         "MonoGame (Ms-PL)",
         "Newtonsoft.Json (MIT License)",
         "Steamworks.NET (MIT License)",
@@ -58,6 +59,7 @@
         "MonoGame.Extended (MIT License)",
         "MonoGame.Extended2 (BSD 3-Clause Clear License)",
         "MoonSharp (BSD-3-Clause License)",
+        "FFmpeg (GPL-3.0 License)",
         "yt-dlp (Unlicense)"
     ],
     "FontLicense": [
@@ -67,6 +69,7 @@
     "Attribution": [
         "Freepik (Flaticon)",
         "Pixel perfect (Flaticon)",
-        "SeyfDesigner (Flaticon)"
+        "SeyfDesigner (Flaticon)",
+        "Spitfire Audio"
     ]
 }

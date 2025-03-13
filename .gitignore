@@ -405,3 +405,7 @@ cred.bat
 thumbs.db
 *.sfk
 steamcmdoutput/
+baseroot/frei0r-1
+baseroot/ffmpeg.exe
+baseroot/ffprobe.exe
+baseroot/yt-dlp.exe

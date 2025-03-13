@@ -16,8 +16,8 @@ namespace NonsensicalVideoGenerator
     {
         public static string updateUrl = "";
         public static string updateTag = "";
-        public static string requiredFFmpegVersion = "7.1-full_build-www.gyan.dev";
-        public static string requiredFFprobeVersion = "7.1-full_build-www.gyan.dev";
+        public static string requiredFFmpegVersion = "-full_build-www.gyan.dev";
+        public static string requiredFFprobeVersion = "-full_build-www.gyan.dev";
         public static bool ffmpegInstalled = false;
         public static bool ffmpegWrongVersion = false;
         public static bool ffprobeInstalled = false;

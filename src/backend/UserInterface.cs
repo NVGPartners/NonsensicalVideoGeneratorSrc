@@ -33,8 +33,8 @@ namespace NonsensicalVideoGenerator
         private SpriteBatch? _spriteBatch;
         private WindowState _windowState = WindowState.Unfocused;
         private MusicState _musicState = MusicState.Paused;
-        public MonoGame.Extended.Framework.Media.VideoPlayer videoPlayer;
-        public MonoGame.Extended.Framework.Media.Video video;
+        public MonoGame.Extended.Framework.Media.VideoPlayer? videoPlayer;
+        public MonoGame.Extended.Framework.Media.Video? video;
         public string videoPath = "kiwifruitdev.mp4";
         public int music = 0;
         public bool introFinished = false;
@@ -45,6 +45,13 @@ namespace NonsensicalVideoGenerator
             Content.RootDirectory = "Content";
             IsMouseVisible = true;
             instance = this;
+            if(Global.parameters.Contains("-unlockfps"))
+                SetFPSUnlock(true);
+        }
+        public void SetFPSUnlock(bool unlock)
+        {
+            IsFixedTimeStep = !unlock;
+            _graphics.SynchronizeWithVerticalRetrace = !unlock;
         }
         public void Resize(int width, int height)
         {
@@ -211,9 +218,10 @@ namespace NonsensicalVideoGenerator
                 ScreenManager.PushNavigation("Intro");
                 ScreenManager.GetScreen<PhotosensitiveWarningScreen>("Intro").Show();
             }
-            else
+            else if(video != null)
             {
                 videoPlayer.Play(video);
+                FramePlayer.canPlayBgMusic = false;
             }
             base.LoadContent();
         }
@@ -223,10 +231,17 @@ namespace NonsensicalVideoGenerator
                 _spriteBatch.Dispose();
             // Unload all content.
             GlobalContent.UnloadContent();
+            if(videoPlayer != null)
+            {
+                videoPlayer.Dispose();
+                videoPlayer = null;
+            }
             videoPath = "";
-            videoPlayer.Stop();
-            video.Dispose();
-            videoPlayer.Dispose();
+            if(video != null)
+            {
+                video.Dispose();
+                FramePlayer.canPlayBgMusic = true;
+            }
             base.UnloadContent();
         }
         public void FindMusic()
@@ -254,6 +269,7 @@ namespace NonsensicalVideoGenerator
             */
             if(bool.Parse(SaveData.saveValues["EnableDiscordRPC"]))
                 DiscordRPC.Update();
+            SteamRichPresence.Update();
             try
             {
                 if(SteamManager.initialized)
@@ -266,12 +282,13 @@ namespace NonsensicalVideoGenerator
             else
                 _windowState = WindowState.Unfocused;
             // Title screen video
-            if(introFinished || videoPlayer.State == MediaState.Stopped || videoPlayer.PlayPosition.Seconds >= 5)
+            if(introFinished || videoPlayer.State == MediaState.Stopped || videoPlayer.PlayPosition.Seconds >= 6)
             {
                 if(!introFinished)
                 {
                     videoPath = "";
                     introFinished = true;
+                    video.Dispose();
                     ScreenManager.PushNavigation("Intro");
                     ScreenManager.GetScreen<PhotosensitiveWarningScreen>("Intro").Show();
                 }
@@ -382,7 +399,17 @@ namespace NonsensicalVideoGenerator
             if(!Global.exiting)
             {
                 videoPath = "";
-                videoPlayer.Stop();
+                if(videoPlayer != null)
+                {
+                    videoPlayer.Dispose();
+                    videoPlayer = null;
+                }
+                FramePlayer.canPlayBgMusic = true;
+                if(video != null)
+                {
+                    video.Dispose();
+                    video = null;
+                }
                 Global.generator.progressText = L.T(0, "Content:StatusExiting");
                 Global.generator.failureReason = L.T(0, "Content:StatusExiting");
                 Global.exiting = true;

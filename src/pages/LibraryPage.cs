@@ -1077,15 +1077,28 @@ namespace NonsensicalVideoGenerator
                                                 }
                                                 */
                                                 FramePlayer.Stop();
-                                                UserInterface.instance.videoPlayer.Stop();
-                                                UserInterface.instance.video.Dispose();
+                                                if(UserInterface.instance.videoPlayer != null)
+                                                {
+                                                    UserInterface.instance.videoPlayer.Dispose();
+                                                    UserInterface.instance.videoPlayer = null;
+                                                }
+                                                UserInterface.instance.videoPlayer = new MonoGame.Extended.Framework.Media.VideoPlayer(UserInterface.instance.GraphicsDevice);
+                                                UserInterface.instance.videoPlayer.Volume = float.Parse(SaveData.saveValues["VideoVolume"], CultureInfo.InvariantCulture) / 100f;
+                                                FramePlayer.canPlayBgMusic = true;
+                                                if(UserInterface.instance.video != null)
+                                                {
+                                                    UserInterface.instance.video.Dispose();
+                                                    UserInterface.instance.video = null;
+                                                }
                                                 UserInterface.instance.videoPath = "";
                                                 if(file.Type.RootType == LibraryRootType.Video)
                                                 {
-                                                    UserInterface.instance.videoPath = file.Path;
-                                                    UserInterface.instance.video = VideoHelper.LoadFromFile(file.Path);
+                                                    string cachePath = VideoCache.GetCachePath(file.Path);
+                                                    UserInterface.instance.videoPath = cachePath;
+                                                    UserInterface.instance.video = VideoHelper.LoadFromFile(cachePath);
                                                     UserInterface.instance.videoPlayer.IsLooped = true;
                                                     UserInterface.instance.videoPlayer.Play(UserInterface.instance.video);
+                                                    FramePlayer.canPlayBgMusic = false;
                                                     Global.generator.progressText = L.T(0, "Video:StatusPlay");
                                                 }
                                                 else
@@ -1126,6 +1139,20 @@ namespace NonsensicalVideoGenerator
                                 {
                                     if(deleteConfirmPos == position)
                                     {
+                                        // Stop all playback
+                                        FramePlayer.Stop();
+                                        if(UserInterface.instance.videoPlayer != null)
+                                        {
+                                            UserInterface.instance.videoPlayer.Dispose();
+                                            UserInterface.instance.videoPlayer = null;
+                                        }
+                                        if(UserInterface.instance.video != null)
+                                        {
+                                            UserInterface.instance.video.Dispose();
+                                            UserInterface.instance.video = null;
+                                        }
+                                        UserInterface.instance.videoPath = "";
+                                        ScreenManager.GetScreen<VideoScreen>("Video")?.Hide();
                                         // Remove video
                                         LibraryFile file = libraryFileCache[currentLibraryType][position];
                                         LibraryData.Unload(file);
@@ -1238,6 +1265,19 @@ namespace NonsensicalVideoGenerator
                                             // If holding shift, delete video immediately
                                             if (newKeyboardState.IsKeyDown(Keys.LeftShift) || newKeyboardState.IsKeyDown(Keys.RightShift))
                                             {
+                                                // Stop video playback
+                                                FramePlayer.Stop();
+                                                FramePlayer.canPlayBgMusic = true;
+                                                if(UserInterface.instance.videoPlayer != null)
+                                                {
+                                                    UserInterface.instance.videoPlayer.Dispose();
+                                                    UserInterface.instance.videoPlayer = null;
+                                                }
+                                                if(UserInterface.instance.video != null)
+                                                {
+                                                    UserInterface.instance.video.Dispose();
+                                                    UserInterface.instance.video = null;
+                                                }
                                                 // Remove video
                                                 LibraryFile file = libraryFileCache[currentLibraryType][position];
                                                 LibraryData.Unload(file);

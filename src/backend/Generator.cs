@@ -153,12 +153,25 @@ namespace NonsensicalVideoGenerator
                             if (bool.Parse(SaveData.saveValues["PlayAutomatically"]))
                             {
                                 FramePlayer.Stop();
-                                UserInterface.instance.videoPlayer.Stop();
-                                UserInterface.instance.video.Dispose();
-                                UserInterface.instance.videoPath = tempOutput;
-                                UserInterface.instance.video = VideoHelper.LoadFromFile(tempOutput);
+                                if(UserInterface.instance.videoPlayer != null)
+                                {
+                                    UserInterface.instance.videoPlayer.Dispose();
+                                    UserInterface.instance.videoPlayer = null;
+                                }
+                                UserInterface.instance.videoPlayer = new MonoGame.Extended.Framework.Media.VideoPlayer(UserInterface.instance.GraphicsDevice);
+                                UserInterface.instance.videoPlayer.Volume = float.Parse(SaveData.saveValues["VideoVolume"], CultureInfo.InvariantCulture) / 100f;
+                                FramePlayer.canPlayBgMusic = true;
+                                if(UserInterface.instance.video != null)
+                                {
+                                    UserInterface.instance.video.Dispose();
+                                    UserInterface.instance.video = null;
+                                }
+                                string cachePath = VideoCache.GetCachePath(tempOutput);
+                                UserInterface.instance.videoPath = cachePath;
+                                UserInterface.instance.video = VideoHelper.LoadFromFile(cachePath);
                                 UserInterface.instance.videoPlayer.IsLooped = true;
                                 UserInterface.instance.videoPlayer.Play(UserInterface.instance.video);
+                                FramePlayer.canPlayBgMusic = false;
                                 Global.generator.progressText = L.T(0, "Video:StatusPlay");
                                 if(ScreenManager.GetScreen<VideoScreen>("Video") == null
                                     || ScreenManager.GetScreen<VideoScreen>("Video")?.screenType == ScreenType.Hidden)
@@ -399,6 +412,7 @@ namespace NonsensicalVideoGenerator
             progressState = ProgressState.Parsing;
 
             DiscordRPC.UpdatePresence();
+            SteamRichPresence.UpdatePresence();
 
             // Load library.
             progressText = L.T(0, "Generate:StatusLibraryParse");
@@ -774,12 +788,25 @@ namespace NonsensicalVideoGenerator
                             if (bool.Parse(SaveData.saveValues["PlayAutomatically"]))
                             {
                                 FramePlayer.Stop();
-                                UserInterface.instance.videoPlayer.Stop();
-                                UserInterface.instance.video.Dispose();
-                                UserInterface.instance.videoPath = tempOutput;
-                                UserInterface.instance.video = VideoHelper.LoadFromFile(tempOutput);
+                                if(UserInterface.instance.videoPlayer != null)
+                                {
+                                    UserInterface.instance.videoPlayer.Dispose();
+                                    UserInterface.instance.videoPlayer = null;
+                                }
+                                UserInterface.instance.videoPlayer = new MonoGame.Extended.Framework.Media.VideoPlayer(UserInterface.instance.GraphicsDevice);
+                                UserInterface.instance.videoPlayer.Volume = float.Parse(SaveData.saveValues["VideoVolume"], CultureInfo.InvariantCulture) / 100f;
+                                if(UserInterface.instance.video != null)
+                                {
+                                    UserInterface.instance.video.Dispose();
+                                    UserInterface.instance.video = null;
+                                }
+                                FramePlayer.canPlayBgMusic = true;
+                                string cachePath = VideoCache.GetCachePath(tempOutput);
+                                UserInterface.instance.videoPath = cachePath;
+                                UserInterface.instance.video = VideoHelper.LoadFromFile(cachePath);
                                 UserInterface.instance.videoPlayer.IsLooped = true;
                                 UserInterface.instance.videoPlayer.Play(UserInterface.instance.video);
+                                FramePlayer.canPlayBgMusic = false;
                                 if(ScreenManager.GetScreen<VideoScreen>("Video") == null
                                     || ScreenManager.GetScreen<VideoScreen>("Video")?.screenType == ScreenType.Hidden)
                                 {
@@ -1498,6 +1525,12 @@ namespace NonsensicalVideoGenerator
                     ConsoleOutput.WriteLine("Temporary directory could not be deleted.", Color.Red);
                 }
             }
+            try
+            {
+                // Create a new temporary directory
+                Directory.CreateDirectory(temporaryDirectory);
+            }
+            catch { }
         }
         public static Process GenerateThumbnail(string media, string output, LibraryRootType rootType = LibraryRootType.Video, int width = 29, int height = 23)
         {
