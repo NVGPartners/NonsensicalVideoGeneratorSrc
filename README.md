@@ -38,7 +38,6 @@ The following instructions are for building **Nonsensical Video Generator** from
     - Press backspace to remove the prepending `>`
     - Type `task publish` to build the release version
     - After release build is finished, type `task upload`
-    - Inside of the new terminal window, type in your Steam Guard code
     - Once the build is uploaded, visit the [SteamPipe partner page](https://partner.steamgames.com/apps/builds/2516360)
     - Set current `default` branch build as live on `previous` branch
         - Preview the change and accept it
