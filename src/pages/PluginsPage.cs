@@ -680,7 +680,7 @@ namespace NonsensicalVideoGenerator
                                                     case 2:
                                                         GlobalContent.GetSound("Select").Play(int.Parse(SaveData.saveValues["SoundEffectVolume"], CultureInfo.InvariantCulture) / 100f, 0f, 0f);
                                                         ProcessStartInfo startInfo = new();
-                                                        startInfo.FileName = "https://steamcommunity.com/sharedfiles/filedetails/?id=" + (PluginHandler.plugins[settingsIndex].submittedId ?? PluginHandler.plugins[settingsIndex].workshopId);
+                                                        startInfo.FileName = "https://steamcommunity.com/sharedfiles/filedetails/?id=" + (string.IsNullOrEmpty(PluginHandler.plugins[settingsIndex].submittedId) ? PluginHandler.plugins[settingsIndex].workshopId : PluginHandler.plugins[settingsIndex].submittedId);
                                                         startInfo.UseShellExecute = true;
                                                         Process.Start(startInfo);
                                                         return true;
