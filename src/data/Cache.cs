@@ -23,8 +23,16 @@ namespace NonsensicalVideoGenerator
         }
         public static void ClearCache()
         {
-            foreach(KeyValuePair<string, string> entry in Cache)
-                File.Delete(entry.Value);
+            // Loop through all videos inside the cache path directory and delete them
+            string cache = Path.Combine(Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location) ?? ".", "cache");
+            if(Directory.Exists(cache))
+            {
+                foreach(string file in Directory.GetFiles(cache))
+                {
+                    File.Delete(file);
+                }
+            }
+            // Clear the cache dictionary
             Cache.Clear();
         }
     }
