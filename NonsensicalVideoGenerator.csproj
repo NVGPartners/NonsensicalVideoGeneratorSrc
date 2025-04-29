@@ -1,6 +1,6 @@
 <Project Sdk="Microsoft.NET.Sdk">
   <PropertyGroup>
-    <Version>1.0.3.0</Version>
+    <Version>1.7.1.0</Version>
     <OutputType>WinExe</OutputType>
     <RollForward>Major</RollForward>
     <PublishReadyToRun>false</PublishReadyToRun>
@@ -11,14 +11,18 @@
     <RootNamespace>NonsensicalVideoGenerator</RootNamespace>
     <Authors>KiwifruitDev</Authors>
     <AssemblyCopyright>Copyright © KiwifruitDev 2025</AssemblyCopyright>
-    <AssemblyTrademark>MonoGame licensed under Ms-PL
+    <AssemblyTrademark>Nonsensical Video Generator licensed under GPL-3.0
+MonoGame licensed under Ms-PL
 Newtonsoft.Json licensed under MIT
 Steamworks.NET licensed under MIT
 DiscordRichPresence licensed under MIT
 SharpCompress licensed under MIT
 MoonSharp licensed under BSD-3-Clause
+Sdcb.FFmpeg licensed under GPL-3.0
+FFmpeg licensed under GPL-3.0 License
 Munro licensed under SIL OFL
-Noto Sans licensed under SIL OFL</AssemblyTrademark>
+Noto Sans licensed under SIL OFL
+LanaPixel licensed under SIL OFL</AssemblyTrademark>
     <Platforms>x64</Platforms>
     <ProjectGuid>{afd0cba3-e90b-47c4-ba45-32937471bc75}</ProjectGuid>
     <Nullable>enable</Nullable>
@@ -26,7 +30,7 @@ Noto Sans licensed under SIL OFL</AssemblyTrademark>
     <UseWindowsForms>true</UseWindowsForms>
     <TargetFramework>net8.0-windows</TargetFramework>
     <IncludeSourceRevisionInInformationalVersion>false</IncludeSourceRevisionInInformationalVersion>
-    <RepositoryUrl>https://github.com/KiwifruitDev/NonsensicalVideoGeneratorSrc.git</RepositoryUrl>
+    <RepositoryUrl>https://github.com/NVGPartners/NonsensicalVideoGeneratorSrc.git</RepositoryUrl>
     <RepositoryBranch>steam</RepositoryBranch>
     <ApplicationHighDpiMode>true</ApplicationHighDpiMode>
     <CLSCompliant>false</CLSCompliant>

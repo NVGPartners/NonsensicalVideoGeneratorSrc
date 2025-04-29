@@ -15,24 +15,18 @@ namespace NonsensicalVideoGenerator
     /// </summary>
     public static class BlogData
     {
-        public static string Title { get; set; } = "Milestone 7";
+        public static string Title { get; set; } = "Update 7.1";
         public static List<string> Subtitle { get; set; } = new List<string>()
         {
             "v%s",
             "2025-03-13",
-            "Major Update"
+            "Minor Update"
         };
         public static List<string> Description { get; set; } = new List<string>()
         {
-            "- Videos now play more smoothly.",
-            "- New KiwifruitDev startup video.",
-            "- Updated default outro.",
-            "- Added close and fullscreen buttons.",
-            "- Steam rich presence support.",
-            "- Updated credits and licenses.",
-            "- Updated the localization files.",
+            "- TODO",
             "View more information on Steam:"
         };
-        public static string Url { get; set; } = "https://store.steampowered.com/news/app/2516360/view/587262054401835572";
+        public static string Url { get; set; } = "https://store.steampowered.com/news/app/2516360/view/";
     }
 }
