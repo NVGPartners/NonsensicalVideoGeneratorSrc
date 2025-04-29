@@ -1083,7 +1083,6 @@ namespace NonsensicalVideoGenerator
                                                     UserInterface.instance.videoPlayer = null;
                                                 }
                                                 UserInterface.instance.videoPlayer = new MonoGame.Extended.Framework.Media.VideoPlayer(UserInterface.instance.GraphicsDevice);
-                                                UserInterface.instance.videoPlayer.Volume = float.Parse(SaveData.saveValues["VideoVolume"], CultureInfo.InvariantCulture) / 100f;
                                                 FramePlayer.canPlayBgMusic = true;
                                                 if(UserInterface.instance.video != null)
                                                 {
@@ -1098,6 +1097,7 @@ namespace NonsensicalVideoGenerator
                                                     UserInterface.instance.video = VideoHelper.LoadFromFile(cachePath);
                                                     UserInterface.instance.videoPlayer.IsLooped = true;
                                                     UserInterface.instance.videoPlayer.Play(UserInterface.instance.video);
+                                                    UserInterface.instance.videoPlayer.Volume = float.Parse(SaveData.saveValues["VideoVolume"], CultureInfo.InvariantCulture) / 100f;
                                                     FramePlayer.canPlayBgMusic = false;
                                                     Global.generator.progressText = L.T(0, "Video:StatusPlay");
                                                 }

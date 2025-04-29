@@ -511,6 +511,8 @@ namespace NonsensicalVideoGenerator
                 SaveData.saveValues["VideoVolume"] = scrollView.Controller.interactables["VideoVolume"].Tooltip;
                 if(oldValue != SaveData.saveValues["VideoVolume"])
                     SaveData.Save();
+                if(UserInterface.instance.videoPlayer != null)
+                    UserInterface.instance.videoPlayer.Volume = int.Parse(SaveData.saveValues["VideoVolume"], CultureInfo.InvariantCulture) / 100f;
                 return false;
             }));
             scrollView.Controller.Add("MediaOptions", new Label("Media Options:", new Vector2(139, 60-(8*1)+(19*8)+(10*1)+(9*1))));

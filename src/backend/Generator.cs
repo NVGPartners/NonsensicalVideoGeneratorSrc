@@ -159,7 +159,6 @@ namespace NonsensicalVideoGenerator
                                     UserInterface.instance.videoPlayer = null;
                                 }
                                 UserInterface.instance.videoPlayer = new MonoGame.Extended.Framework.Media.VideoPlayer(UserInterface.instance.GraphicsDevice);
-                                UserInterface.instance.videoPlayer.Volume = float.Parse(SaveData.saveValues["VideoVolume"], CultureInfo.InvariantCulture) / 100f;
                                 FramePlayer.canPlayBgMusic = true;
                                 if(UserInterface.instance.video != null)
                                 {
@@ -171,6 +170,7 @@ namespace NonsensicalVideoGenerator
                                 UserInterface.instance.video = VideoHelper.LoadFromFile(cachePath);
                                 UserInterface.instance.videoPlayer.IsLooped = true;
                                 UserInterface.instance.videoPlayer.Play(UserInterface.instance.video);
+                                UserInterface.instance.videoPlayer.Volume = float.Parse(SaveData.saveValues["VideoVolume"], CultureInfo.InvariantCulture) / 100f;
                                 FramePlayer.canPlayBgMusic = false;
                                 Global.generator.progressText = L.T(0, "Video:StatusPlay");
                                 if(ScreenManager.GetScreen<VideoScreen>("Video") == null
@@ -794,7 +794,6 @@ namespace NonsensicalVideoGenerator
                                     UserInterface.instance.videoPlayer = null;
                                 }
                                 UserInterface.instance.videoPlayer = new MonoGame.Extended.Framework.Media.VideoPlayer(UserInterface.instance.GraphicsDevice);
-                                UserInterface.instance.videoPlayer.Volume = float.Parse(SaveData.saveValues["VideoVolume"], CultureInfo.InvariantCulture) / 100f;
                                 if(UserInterface.instance.video != null)
                                 {
                                     UserInterface.instance.video.Dispose();
@@ -806,6 +805,7 @@ namespace NonsensicalVideoGenerator
                                 UserInterface.instance.video = VideoHelper.LoadFromFile(cachePath);
                                 UserInterface.instance.videoPlayer.IsLooped = true;
                                 UserInterface.instance.videoPlayer.Play(UserInterface.instance.video);
+                                UserInterface.instance.videoPlayer.Volume = float.Parse(SaveData.saveValues["VideoVolume"], CultureInfo.InvariantCulture) / 100f;
                                 FramePlayer.canPlayBgMusic = false;
                                 if(ScreenManager.GetScreen<VideoScreen>("Video") == null
                                     || ScreenManager.GetScreen<VideoScreen>("Video")?.screenType == ScreenType.Hidden)
@@ -1542,8 +1542,8 @@ namespace NonsensicalVideoGenerator
             {
                 Dictionary<LibraryRootType, string> rootTypeFilters = new()
                 {
-                    {LibraryRootType.Video, "-filter_complex \"[0:v]thumbnail,scale=" + texWidth + ":" + texHeight + "[thumb]\" -map \"[thumb]\" -frames:v 1"},
-                    {LibraryRootType.Audio, "-filter_complex \"[0:a]aformat=channel_layouts=mono,showwavespic=s=" + texWidth + "x" + texHeight + ":colors=white[thumb]\" -map \"[thumb]\" -frames:v 1"},
+                    {LibraryRootType.Video, "-filter_complex \"[0:v]thumbnail,scale=" + texWidth + ":" + texHeight + "[thumb]\" -map \"[thumb]\" -frames:v 1 -update 1"},
+                    {LibraryRootType.Audio, "-filter_complex \"[0:a]aformat=channel_layouts=mono,showwavespic=s=" + texWidth + "x" + texHeight + ":colors=white[thumb]\" -map \"[thumb]\" -frames:v 1 -update 1"},
                     {LibraryRootType.Image, ""},
                 };
                 ProcessStartInfo startInfo = new ProcessStartInfo

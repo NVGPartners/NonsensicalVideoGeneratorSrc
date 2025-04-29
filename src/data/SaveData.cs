@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.Globalization;
 using System.IO;
 using System.Linq;
 #if MONOGAME
@@ -123,6 +124,8 @@ namespace NonsensicalVideoGenerator
                 {
                     ConsoleOutput.WriteLine("Failed to load save file.", Color.Red);
                 }
+                if(UserInterface.instance.videoPlayer != null)
+                    UserInterface.instance.videoPlayer.Volume = int.Parse(SaveData.saveValues["VideoVolume"], CultureInfo.InvariantCulture) / 100f;
                 return true;
             }
             catch(Exception e)

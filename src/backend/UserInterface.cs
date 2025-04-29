@@ -210,7 +210,6 @@ namespace NonsensicalVideoGenerator
             // Load all screen content.
             ScreenManager.LoadContent(Content, GraphicsDevice);
             videoPlayer = new MonoGame.Extended.Framework.Media.VideoPlayer(GraphicsDevice);
-            videoPlayer.Volume = float.Parse(SaveData.saveValues["VideoVolume"], CultureInfo.InvariantCulture) / 100f;
             video = VideoHelper.LoadFromFile(videoPath);
             if(bool.Parse(SaveData.saveValues["SkipPhotosensitiveWarningScreen"]))
             {
@@ -221,6 +220,7 @@ namespace NonsensicalVideoGenerator
             else if(video != null)
             {
                 videoPlayer.Play(video);
+                videoPlayer.Volume = float.Parse(SaveData.saveValues["VideoVolume"], CultureInfo.InvariantCulture) / 100f;
                 FramePlayer.canPlayBgMusic = false;
             }
             base.LoadContent();
