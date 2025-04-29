@@ -81,6 +81,7 @@ namespace NonsensicalVideoGenerator
             AddFont("Munro", ThemeManager.LoadLayeredContent<SpriteFont>("fonts/munro-x"+scale), new Vector2(0, 0));
             AddFont("MunroSmall", ThemeManager.LoadLayeredContent<SpriteFont>("fonts/munro-small-x"+scale), new Vector2(0, 0));
             AddFont("NotoSans", ThemeManager.LoadLayeredContent<SpriteFont>("fonts/notosans-x"+scale), new Vector2(-scale/2, -scale*2f));
+            AddFont("LanaPixel", ThemeManager.LoadLayeredContent<SpriteFont>("fonts/lanapixel-x"+scale), new Vector2(0, 0));
             // Load default songs.
             for(int i = 1; i < ThemeManager.GetSongCount()+1; i++)
             {

@@ -25,6 +25,34 @@
 /processorParam:TextureFormat=Color
 /build:blog/banner.png
 
+#begin fonts/lanapixel-x1.spritefont
+/importer:FontDescriptionImporter
+/processor:FontDescriptionProcessor
+/processorParam:PremultiplyAlpha=True
+/processorParam:TextureFormat=Compressed
+/build:fonts/lanapixel-x1.spritefont
+
+#begin fonts/lanapixel-x2.spritefont
+/importer:FontDescriptionImporter
+/processor:FontDescriptionProcessor
+/processorParam:PremultiplyAlpha=True
+/processorParam:TextureFormat=Compressed
+/build:fonts/lanapixel-x2.spritefont
+
+#begin fonts/lanapixel-x3.spritefont
+/importer:FontDescriptionImporter
+/processor:FontDescriptionProcessor
+/processorParam:PremultiplyAlpha=True
+/processorParam:TextureFormat=Compressed
+/build:fonts/lanapixel-x3.spritefont
+
+#begin fonts/lanapixel-x4.spritefont
+/importer:FontDescriptionImporter
+/processor:FontDescriptionProcessor
+/processorParam:PremultiplyAlpha=True
+/processorParam:TextureFormat=Compressed
+/build:fonts/lanapixel-x4.spritefont
+
 #begin fonts/munro-small-x1.spritefont
 /importer:FontDescriptionImporter
 /processor:FontDescriptionProcessor

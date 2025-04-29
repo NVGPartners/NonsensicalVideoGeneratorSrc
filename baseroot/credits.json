@@ -3,8 +3,8 @@
         "kiwifruitdev"
     ],
     "SoundDesigner": [
-        "gmm2003",
-        "bobbyiguess"
+        "gmm2003 (Sound Effects)",
+        "bobbyiguess (Music)"
     ],
     "Moderator": [
         "0zne",
@@ -15,9 +15,10 @@
         "ziahorizon"
     ],
     "Translator": [
-        "augustusproceus",
-        "mister_k_poyo",
-        "saltyash"
+        "augustusproceus (German)",
+        "mister_k_poyo (German)",
+        "saltyash (Russian)",
+        "darkyuuu_ (French)"
     ],
     "SpecialThanks": [
         "vinesauce",
@@ -59,12 +60,14 @@
         "MonoGame.Extended (MIT License)",
         "MonoGame.Extended2 (BSD 3-Clause Clear License)",
         "MoonSharp (BSD-3-Clause License)",
+        "Sdcb.FFmpeg (GPL-3.0 License)",
         "FFmpeg (GPL-3.0 License)",
         "yt-dlp (Unlicense)"
     ],
     "FontLicense": [
         "Munro (SIL Open Font License)",
-        "Noto Sans (SIL Open Font License)"
+        "Noto Sans (SIL Open Font License)",
+        "LanaPixel (SIL Open Font License)"
     ],
     "Attribution": [
         "Freepik (Flaticon)",
