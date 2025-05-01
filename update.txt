@@ -1,29 +1,32 @@
-Milestone 7 (v1.0.3.0)
+April 2025: Update v7.1
 
 Here are the changes in this update:
 
+[h3]General Changes[/h3]
 [list]
-[*]FFmpeg is now integrated into NVG for video playback, which makes previews much faster and smoother.
-[*]NVG is now open source on GitHub. You can view the source code [url=https://github.com/NVGPartners/NonsensicalVideoGeneratorSrc]here[/url].
-[*]Added a button to the top right corner of the overlay border to close NVG.
-[*]Added a button to the bottom right corner of the overlay border to make the current video fullscreen.
-[*]Added a video that plays when NVG starts, showing the KiwifruitDev logo.
-[*]Updated the default outro with the new KiwifruitDev logo.
-[*]Added support for Steam rich presence, which shows the current tab on your friends list.
-[*]Added an FPS unlock option to the debug menu (Ctrl+F3).
-[*]Added an option to open console.txt from the debug menu.
-[*]Updated credits and bundled more license files.
+[*]Updated the credits.
+[*]Changed how new update versions are identified.
+[/list]
+
+[h3]Bug Fixes[/h3]
 [list]
-[*]Moved around certain Superstar users.
-[*]Renamed eddsworldfan69420 to tehcartoonman22145.
-[*]Added licenses for Nonsensical Video Generator (GPL-3.0 License), MonoGame.Extended (MIT License), MonoGame.Extended2 (BSD 3-Clause Clear License), and FFmpeg (GPL-3.0 License).
-[*]Added attribution for Spitfire Audio.
+[*]Fixed a bug where the video playback cache folder was not properly cleared.
+[*]Fixed a bug where the "Media Playback Volume" option was ignored by videos.
+[/list]
+
+[h3]Localization Updates[/h3]
+[list]
+[*]Added back the LanaPixel font choice for locales.
+[*]Added support for the French language (Contributed by darkyuuu_).
+[*]Added support for the Slovak language (Contributed by peto444).
+[list]
+[*]Slovak is not natively supported by Steam, so you'll need to set the language in the NVG locale options.
 [/list]
 [*]Updated the localization files.
 [/list]
 
-Let me know if you have any issues with this update.
+Let me know if you have any issues with this update through the [url=https://discord.gg/8ppmspR6Wh]NVG Community Discord[/url].
 Also, please help translate NVG into your language on [url=https://github.com/KiwifruitDev/NonsensicalVideoGenerator/wiki/Localization]GitHub[/url]!
 Happy generating!
 
-[url=https://store.steampowered.com/app/2516360/Nonsensical_Video_Generator/][img]{STEAM_CLAN_IMAGE}/44378200/ff687f086ff77748ead1a7a7f33a8fbcfdb6a772.png[/img][/url] [url=https://steamcommunity.com/id/KiwifruitDev][img]{STEAM_CLAN_IMAGE}/44378200/a9f98b6b95b65dddf1d44f23bef423f6d6b2cb57.png[/img][/url]
+[url=https://store.steampowered.com/app/2516360/Nonsensical_Video_Generator/][img]{STEAM_CLAN_IMAGE}/44378200/ff687f086ff77748ead1a7a7f33a8fbcfdb6a772.png[/img][/url] [url=https://steamcommunity.com/id/KiwifruitDev][img]{STEAM_CLAN_IMAGE}/44378200/4c0156375f8a8430371fc2407e3a39caa2b54aca.png[/img][/url]
