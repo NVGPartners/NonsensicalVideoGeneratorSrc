@@ -32,12 +32,33 @@
 /processorParam:TextureFormat=Compressed
 /build:fonts/lanapixel-x1.spritefont
 
+#begin fonts/lanapixel-x1.spritefont
+/importer:FontDescriptionImporter
+/processor:FontDescriptionProcessor
+/processorParam:PremultiplyAlpha=True
+/processorParam:TextureFormat=Compressed
+/build:fonts/lanapixel-x1.spritefont
+
 #begin fonts/lanapixel-x2.spritefont
 /importer:FontDescriptionImporter
 /processor:FontDescriptionProcessor
 /processorParam:PremultiplyAlpha=True
 /processorParam:TextureFormat=Compressed
 /build:fonts/lanapixel-x2.spritefont
+
+#begin fonts/lanapixel-x2.spritefont
+/importer:FontDescriptionImporter
+/processor:FontDescriptionProcessor
+/processorParam:PremultiplyAlpha=True
+/processorParam:TextureFormat=Compressed
+/build:fonts/lanapixel-x2.spritefont
+
+#begin fonts/lanapixel-x3.spritefont
+/importer:FontDescriptionImporter
+/processor:FontDescriptionProcessor
+/processorParam:PremultiplyAlpha=True
+/processorParam:TextureFormat=Compressed
+/build:fonts/lanapixel-x3.spritefont
 
 #begin fonts/lanapixel-x3.spritefont
 /importer:FontDescriptionImporter
@@ -53,12 +74,61 @@
 /processorParam:TextureFormat=Compressed
 /build:fonts/lanapixel-x4.spritefont
 
+#begin fonts/lanapixel-x4.spritefont
+/importer:FontDescriptionImporter
+/processor:FontDescriptionProcessor
+/processorParam:PremultiplyAlpha=True
+/processorParam:TextureFormat=Compressed
+/build:fonts/lanapixel-x4.spritefont
+
+#begin fonts/lanapixelextended-x1.spritefont
+/importer:FontDescriptionImporter
+/processor:FontDescriptionProcessor
+/processorParam:PremultiplyAlpha=True
+/processorParam:TextureFormat=Compressed
+/build:fonts/lanapixelextended-x1.spritefont
+
+#begin fonts/lanapixelextended-x2.spritefont
+/importer:FontDescriptionImporter
+/processor:FontDescriptionProcessor
+/processorParam:PremultiplyAlpha=True
+/processorParam:TextureFormat=Compressed
+/build:fonts/lanapixelextended-x2.spritefont
+
+#begin fonts/lanapixelextended-x3.spritefont
+/importer:FontDescriptionImporter
+/processor:FontDescriptionProcessor
+/processorParam:PremultiplyAlpha=True
+/processorParam:TextureFormat=Compressed
+/build:fonts/lanapixelextended-x3.spritefont
+
+#begin fonts/lanapixelextended-x4.spritefont
+/importer:FontDescriptionImporter
+/processor:FontDescriptionProcessor
+/processorParam:PremultiplyAlpha=True
+/processorParam:TextureFormat=Compressed
+/build:fonts/lanapixelextended-x4.spritefont
+
 #begin fonts/munro-small-x1.spritefont
 /importer:FontDescriptionImporter
 /processor:FontDescriptionProcessor
 /processorParam:PremultiplyAlpha=True
 /processorParam:TextureFormat=Compressed
 /build:fonts/munro-small-x1.spritefont
+
+#begin fonts/munro-small-x1.spritefont
+/importer:FontDescriptionImporter
+/processor:FontDescriptionProcessor
+/processorParam:PremultiplyAlpha=True
+/processorParam:TextureFormat=Compressed
+/build:fonts/munro-small-x1.spritefont
+
+#begin fonts/munro-small-x2.spritefont
+/importer:FontDescriptionImporter
+/processor:FontDescriptionProcessor
+/processorParam:PremultiplyAlpha=True
+/processorParam:TextureFormat=Compressed
+/build:fonts/munro-small-x2.spritefont
 
 #begin fonts/munro-small-x2.spritefont
 /importer:FontDescriptionImporter
@@ -74,12 +144,33 @@
 /processorParam:TextureFormat=Compressed
 /build:fonts/munro-small-x3.spritefont
 
+#begin fonts/munro-small-x3.spritefont
+/importer:FontDescriptionImporter
+/processor:FontDescriptionProcessor
+/processorParam:PremultiplyAlpha=True
+/processorParam:TextureFormat=Compressed
+/build:fonts/munro-small-x3.spritefont
+
 #begin fonts/munro-small-x4.spritefont
 /importer:FontDescriptionImporter
 /processor:FontDescriptionProcessor
 /processorParam:PremultiplyAlpha=True
 /processorParam:TextureFormat=Compressed
 /build:fonts/munro-small-x4.spritefont
+
+#begin fonts/munro-small-x4.spritefont
+/importer:FontDescriptionImporter
+/processor:FontDescriptionProcessor
+/processorParam:PremultiplyAlpha=True
+/processorParam:TextureFormat=Compressed
+/build:fonts/munro-small-x4.spritefont
+
+#begin fonts/munro-x1.spritefont
+/importer:FontDescriptionImporter
+/processor:FontDescriptionProcessor
+/processorParam:PremultiplyAlpha=True
+/processorParam:TextureFormat=Compressed
+/build:fonts/munro-x1.spritefont
 
 #begin fonts/munro-x1.spritefont
 /importer:FontDescriptionImporter
@@ -95,12 +186,33 @@
 /processorParam:TextureFormat=Compressed
 /build:fonts/munro-x2.spritefont
 
+#begin fonts/munro-x2.spritefont
+/importer:FontDescriptionImporter
+/processor:FontDescriptionProcessor
+/processorParam:PremultiplyAlpha=True
+/processorParam:TextureFormat=Compressed
+/build:fonts/munro-x2.spritefont
+
 #begin fonts/munro-x3.spritefont
 /importer:FontDescriptionImporter
 /processor:FontDescriptionProcessor
 /processorParam:PremultiplyAlpha=True
 /processorParam:TextureFormat=Compressed
 /build:fonts/munro-x3.spritefont
+
+#begin fonts/munro-x3.spritefont
+/importer:FontDescriptionImporter
+/processor:FontDescriptionProcessor
+/processorParam:PremultiplyAlpha=True
+/processorParam:TextureFormat=Compressed
+/build:fonts/munro-x3.spritefont
+
+#begin fonts/munro-x4.spritefont
+/importer:FontDescriptionImporter
+/processor:FontDescriptionProcessor
+/processorParam:PremultiplyAlpha=True
+/processorParam:TextureFormat=Compressed
+/build:fonts/munro-x4.spritefont
 
 #begin fonts/munro-x4.spritefont
 /importer:FontDescriptionImporter
@@ -116,6 +228,20 @@
 /processorParam:TextureFormat=Compressed
 /build:fonts/notosans-x1.spritefont
 
+#begin fonts/notosans-x1.spritefont
+/importer:FontDescriptionImporter
+/processor:FontDescriptionProcessor
+/processorParam:PremultiplyAlpha=True
+/processorParam:TextureFormat=Compressed
+/build:fonts/notosans-x1.spritefont
+
+#begin fonts/notosans-x2.spritefont
+/importer:FontDescriptionImporter
+/processor:FontDescriptionProcessor
+/processorParam:PremultiplyAlpha=True
+/processorParam:TextureFormat=Compressed
+/build:fonts/notosans-x2.spritefont
+
 #begin fonts/notosans-x2.spritefont
 /importer:FontDescriptionImporter
 /processor:FontDescriptionProcessor
@@ -130,12 +256,54 @@
 /processorParam:TextureFormat=Compressed
 /build:fonts/notosans-x3.spritefont
 
+#begin fonts/notosans-x3.spritefont
+/importer:FontDescriptionImporter
+/processor:FontDescriptionProcessor
+/processorParam:PremultiplyAlpha=True
+/processorParam:TextureFormat=Compressed
+/build:fonts/notosans-x3.spritefont
+
 #begin fonts/notosans-x4.spritefont
 /importer:FontDescriptionImporter
 /processor:FontDescriptionProcessor
 /processorParam:PremultiplyAlpha=True
 /processorParam:TextureFormat=Compressed
 /build:fonts/notosans-x4.spritefont
+
+#begin fonts/notosans-x4.spritefont
+/importer:FontDescriptionImporter
+/processor:FontDescriptionProcessor
+/processorParam:PremultiplyAlpha=True
+/processorParam:TextureFormat=Compressed
+/build:fonts/notosans-x4.spritefont
+
+#begin fonts/notosansextended-x1.spritefont
+/importer:FontDescriptionImporter
+/processor:FontDescriptionProcessor
+/processorParam:PremultiplyAlpha=True
+/processorParam:TextureFormat=Compressed
+/build:fonts/notosansextended-x1.spritefont
+
+#begin fonts/notosansextended-x2.spritefont
+/importer:FontDescriptionImporter
+/processor:FontDescriptionProcessor
+/processorParam:PremultiplyAlpha=True
+/processorParam:TextureFormat=Compressed
+/build:fonts/notosansextended-x2.spritefont
+
+#begin fonts/notosansextended-x3.spritefont
+/importer:FontDescriptionImporter
+/processor:FontDescriptionProcessor
+/processorParam:PremultiplyAlpha=True
+/processorParam:TextureFormat=Compressed
+/build:fonts/notosansextended-x3.spritefont
+
+#begin fonts/notosansextended-x4.spritefont
+/importer:FontDescriptionImporter
+/processor:FontDescriptionProcessor
+/processorParam:PremultiplyAlpha=True
+/processorParam:TextureFormat=Compressed
+/build:fonts/notosansextended-x4.spritefont
 
 #begin graphics/actionbutton.png
 /importer:TextureImporter

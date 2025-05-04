@@ -34,7 +34,6 @@ LanaPixel licensed under SIL OFL</AssemblyTrademark>
     <RepositoryBranch>dev</RepositoryBranch>
     <ApplicationHighDpiMode>true</ApplicationHighDpiMode>
     <CLSCompliant>false</CLSCompliant>
-    <GenerateAssemblyInfo>false</GenerateAssemblyInfo>
     <GenerateTargetFrameworkAttribute>false</GenerateTargetFrameworkAttribute> 
   </PropertyGroup>
   <PropertyGroup>

@@ -24,7 +24,7 @@ Munro licensed under SIL OFL
 Noto Sans licensed under SIL OFL
 LanaPixel licensed under SIL OFL</AssemblyTrademark>
     <Platforms>x64</Platforms>
-    <ProjectGuid>{afd0cba3-e90b-47c4-ba45-32937471bc75}</ProjectGuid>
+    <ProjectGuid>{dddb8c0a-4f2d-4e5b-9a1c-3f7d6e0f1a2b}</ProjectGuid>
     <Nullable>enable</Nullable>
     <DefineConstants>WINDOWSDX MONOGAME</DefineConstants>
     <UseWindowsForms>true</UseWindowsForms>
@@ -34,7 +34,6 @@ LanaPixel licensed under SIL OFL</AssemblyTrademark>
     <RepositoryBranch>dev</RepositoryBranch>
     <ApplicationHighDpiMode>true</ApplicationHighDpiMode>
     <CLSCompliant>false</CLSCompliant>
-    <GenerateAssemblyInfo>false</GenerateAssemblyInfo>
     <GenerateTargetFrameworkAttribute>false</GenerateTargetFrameworkAttribute> 
   </PropertyGroup>
   <PropertyGroup>
