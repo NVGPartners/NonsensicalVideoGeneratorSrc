@@ -13,12 +13,12 @@
             }
         },
         {
-            "label": "build",
+            "label": "build_debug_windowsdx",
             "command": "dotnet",
             "type": "process",
             "args": [
                 "build",
-                "${workspaceFolder}\\NonsensicalVideoGenerator.csproj",
+                "${workspaceFolder}\\NVGWindowsDX.csproj",
                 "/property:GenerateFullPaths=true",
                 "/consoleloggerparameters:NoSummary",
                 "/p:Configuration=Debug",
@@ -28,17 +28,77 @@
             "problemMatcher": "$msCompile"
         },
         {
-            "label": "publish",
+            "label": "build_release_windowsdx",
             "command": "dotnet",
             "type": "process",
             "args": [
                 "build",
-                "${workspaceFolder}\\NonsensicalVideoGenerator.csproj",
+                "${workspaceFolder}\\NVGWindowsDX.csproj",
                 "/property:GenerateFullPaths=true",
                 "/consoleloggerparameters:NoSummary",
                 "/p:Configuration=Release",
                 "/p:Platform=x64",
                 "/p:DefineConstants=WINDOWSDX MONOGAME RELEASE KIWIFRUITDEV",
+            ],
+            "problemMatcher": "$msCompile"
+        },
+        {
+            "label": "build_debug_desktopgl",
+            "command": "dotnet",
+            "type": "process",
+            "args": [
+                "build",
+                "${workspaceFolder}\\NVGDesktopGL.csproj",
+                "/property:GenerateFullPaths=true",
+                "/consoleloggerparameters:NoSummary",
+                "/p:Configuration=Debug",
+                "/p:Platform=x64",
+                "/p:DefineConstants=DESKTOPGL MONOGAME DEBUG KIWIFRUITDEV",
+            ],
+            "problemMatcher": "$msCompile"
+        },
+        {
+            "label": "build_release_desktopgl",
+            "command": "dotnet",
+            "type": "process",
+            "args": [
+                "build",
+                "${workspaceFolder}\\DesktopGL.csproj",
+                "/property:GenerateFullPaths=true",
+                "/consoleloggerparameters:NoSummary",
+                "/p:Configuration=Release",
+                "/p:Platform=x64",
+                "/p:DefineConstants=DESKTOPGL MONOGAME RELEASE KIWIFRUITDEV",
+            ],
+            "problemMatcher": "$msCompile"
+        },
+        {
+            "label": "build_debug_exewrapper",
+            "command": "dotnet",
+            "type": "process",
+            "args": [
+                "build",
+                "${workspaceFolder}\\ExeWrapper\\ExeWrapper.csproj",
+                "/property:GenerateFullPaths=true",
+                "/consoleloggerparameters:NoSummary",
+                "/p:Configuration=Debug",
+                "/p:Platform=x64",
+                "/p:DefineConstants=DEBUG KIWIFRUITDEV",
+            ],
+            "problemMatcher": "$msCompile"
+        },
+        {
+            "label": "build_release_exewrapper",
+            "command": "dotnet",
+            "type": "process",
+            "args": [
+                "build",
+                "${workspaceFolder}\\ExeWrapper\\ExeWrapper.csproj",
+                "/property:GenerateFullPaths=true",
+                "/consoleloggerparameters:NoSummary",
+                "/p:Configuration=Release",
+                "/p:Platform=x64",
+                "/p:DefineConstants=RELEASE KIWIFRUITDEV",
             ],
             "problemMatcher": "$msCompile"
         },
@@ -52,12 +112,12 @@
             "problemMatcher": "$msCompile"
         },
         {
-            "label": "restore",
+            "label": "restore_windowsdx",
             "command": "dotnet",
             "type": "process",
             "args": [
                 "restore",
-                "${workspaceFolder}\\NonsensicalVideoGenerator.csproj",
+                "${workspaceFolder}\\NVGWindowsDX.csproj",
                 "/property:GenerateFullPaths=true",
                 "/consoleloggerparameters:NoSummary",
                 "/p:Platform=x64",
@@ -65,17 +125,69 @@
             "problemMatcher": "$msCompile"
         },
         {
-            "label": "clean",
+            "label": "restore_desktopgl",
             "command": "dotnet",
             "type": "process",
             "args": [
-                "clean",
-                "${workspaceFolder}\\NonsensicalVideoGenerator.csproj",
+                "restore",
+                "${workspaceFolder}\\NVGDesktopGL.csproj",
                 "/property:GenerateFullPaths=true",
                 "/consoleloggerparameters:NoSummary",
                 "/p:Platform=x64",
             ],
             "problemMatcher": "$msCompile"
         },
+        {
+            "label": "restore_exewrapper",
+            "command": "dotnet",
+            "type": "process",
+            "args": [
+                "restore",
+                "${workspaceFolder}\\ExeWrapper\\ExeWrapper.csproj",
+                "/property:GenerateFullPaths=true",
+                "/consoleloggerparameters:NoSummary",
+                "/p:Platform=x64",
+            ],
+            "problemMatcher": "$msCompile"
+        },
+        {
+            "label": "clean_windowsdx",
+            "command": "dotnet",
+            "type": "process",
+            "args": [
+                "clean",
+                "${workspaceFolder}\\NVGWindowsDX.csproj",
+                "/property:GenerateFullPaths=true",
+                "/consoleloggerparameters:NoSummary",
+                "/p:Platform=x64",
+            ],
+            "problemMatcher": "$msCompile"
+        },
+        {
+            "label": "clean_desktopgl",
+            "command": "dotnet",
+            "type": "process",
+            "args": [
+                "clean",
+                "${workspaceFolder}\\NVGDesktopGL.csproj",
+                "/property:GenerateFullPaths=true",
+                "/consoleloggerparameters:NoSummary",
+                "/p:Platform=x64",
+            ],
+            "problemMatcher": "$msCompile"
+        },
+        {
+            "label": "clean_exewrapper",
+            "command": "dotnet",
+            "type": "process",
+            "args": [
+                "clean",
+                "${workspaceFolder}\\ExeWrapper\\ExeWrapper.csproj",
+                "/property:GenerateFullPaths=true",
+                "/consoleloggerparameters:NoSummary",
+                "/p:Platform=x64",
+            ],
+            "problemMatcher": "$msCompile"
+        }
     ]
 }

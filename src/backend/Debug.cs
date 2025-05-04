@@ -23,12 +23,12 @@ namespace NonsensicalVideoGenerator
                 if(debugBuild)
                 {
                     ConsoleOutput.WriteLine("Debug Build (!!!)", debugColor);
-                    Global.productVersion = Global.fileVersionInfo.ProductVersion+" (DEBUG)";
+                    Global.productVersion = Global.productVersion+" (DEBUG)";
                 }
                 else
                 {
                     ConsoleOutput.WriteLine("Release Debug Mode (!!!)", debugColor);
-                    Global.productVersion = Global.fileVersionInfo.ProductVersion+" (RELEASE; DEBUG MODE)";
+                    Global.productVersion = Global.productVersion+" (RELEASE; DEBUG MODE)";
                 }
                 if(UserInterface.instance != null)
                     UserInterface.instance.Window.Title = Global.productName+" v"+Global.productVersion;

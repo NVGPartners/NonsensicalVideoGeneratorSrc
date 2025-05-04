@@ -2,27 +2,14 @@ April 2025: Update v7.1
 
 Here are the changes in this update:
 
-[h3]General Changes[/h3]
 [list]
-[*]Updated the credits.
-[*]Changed how new update versions are identified.
-[/list]
-
-[h3]Bug Fixes[/h3]
-[list]
-[*]Fixed a bug where the video playback cache folder was not properly cleared.
-[*]Fixed a bug where the "Media Playback Volume" option was ignored by videos.
-[/list]
-
-[h3]Localization Updates[/h3]
-[list]
-[*]Added back the LanaPixel font choice for locales.
-[*]Added support for the French language (Contributed by darkyuuu_).
-[*]Added support for the Slovak language (Contributed by peto444).
-[list]
-[*]Slovak is not natively supported by Steam, so you'll need to set the language in the NVG locale options.
-[/list]
-[*]Updated the localization files.
+[*]
+[*]
+[*]
+[*]
+[*]
+[*]
+[*]
 [/list]
 
 Let me know if you have any issues with this update through the [url=https://discord.gg/8ppmspR6Wh]NVG Community Discord[/url].

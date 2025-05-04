@@ -93,7 +93,7 @@ namespace NonsensicalVideoGenerator
                     ConsoleOutput.WriteLine("Save file not found. Creating new one.", Color.Yellow);
                     go = Save();
                 }
-                if(go)
+                if (go)
                 {
                     string json = File.ReadAllText(saveFileName);
                     Dictionary<string, string>? loadedValues = JsonConvert.DeserializeObject<Dictionary<string, string>>(json);
@@ -124,8 +124,11 @@ namespace NonsensicalVideoGenerator
                 {
                     ConsoleOutput.WriteLine("Failed to load save file.", Color.Red);
                 }
-                if(UserInterface.instance.videoPlayer != null)
-                    UserInterface.instance.videoPlayer.Volume = int.Parse(SaveData.saveValues["VideoVolume"], CultureInfo.InvariantCulture) / 100f;
+                if (UserInterface.instance != null)
+                {
+                    if (UserInterface.instance.videoPlayer != null)
+                        UserInterface.instance.videoPlayer.Volume = int.Parse(SaveData.saveValues["VideoVolume"], CultureInfo.InvariantCulture) / 100f;
+                }
                 return true;
             }
             catch(Exception e)

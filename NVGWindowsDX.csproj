@@ -1,0 +1,143 @@
+<Project Sdk="Microsoft.NET.Sdk">
+  <PropertyGroup>
+    <Version>1.7.2.0</Version>
+    <OutputType>WinExe</OutputType>
+    <RollForward>Major</RollForward>
+    <PublishReadyToRun>false</PublishReadyToRun>
+    <TieredCompilation>false</TieredCompilation>
+    <AssemblyName>NVGWindowsDX</AssemblyName>
+    <AssemblyProduct>NonsensicalVideoGenerator</AssemblyProduct>
+    <AssemblyTitle>Nonsensical Video Generator</AssemblyTitle>
+    <RootNamespace>NonsensicalVideoGenerator</RootNamespace>
+    <Authors>KiwifruitDev</Authors>
+    <AssemblyCopyright>Copyright © KiwifruitDev 2025</AssemblyCopyright>
+    <AssemblyTrademark>Nonsensical Video Generator licensed under GPL-3.0
+MonoGame licensed under Ms-PL
+Newtonsoft.Json licensed under MIT
+Steamworks.NET licensed under MIT
+DiscordRichPresence licensed under MIT
+SharpCompress licensed under MIT
+MoonSharp licensed under BSD-3-Clause
+Sdcb.FFmpeg licensed under GPL-3.0
+FFmpeg licensed under GPL-3.0 License
+Munro licensed under SIL OFL
+Noto Sans licensed under SIL OFL
+LanaPixel licensed under SIL OFL</AssemblyTrademark>
+    <Platforms>x64</Platforms>
+    <ProjectGuid>{afd0cba3-e90b-47c4-ba45-32937471bc75}</ProjectGuid>
+    <Nullable>enable</Nullable>
+    <DefineConstants>WINDOWSDX MONOGAME</DefineConstants>
+    <UseWindowsForms>true</UseWindowsForms>
+    <TargetFramework>net8.0-windows</TargetFramework>
+    <IncludeSourceRevisionInInformationalVersion>false</IncludeSourceRevisionInInformationalVersion>
+    <RepositoryUrl>https://github.com/NVGPartners/NonsensicalVideoGeneratorSrc.git</RepositoryUrl>
+    <RepositoryBranch>dev</RepositoryBranch>
+    <ApplicationHighDpiMode>true</ApplicationHighDpiMode>
+    <CLSCompliant>false</CLSCompliant>
+    <GenerateAssemblyInfo>false</GenerateAssemblyInfo>
+    <GenerateTargetFrameworkAttribute>false</GenerateTargetFrameworkAttribute> 
+  </PropertyGroup>
+  <PropertyGroup>
+    <ApplicationManifest>app.manifest</ApplicationManifest>
+    <ApplicationIcon>icon.ico</ApplicationIcon>
+  </PropertyGroup>
+  <ItemGroup>
+    <TrimmerRootAssembly Include="Microsoft.Xna.Framework.Content.ContentTypeReader" Visible="false" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Remove="icon.ico" />
+    <None Remove="icon.bmp" />
+  </ItemGroup>
+  <ItemGroup>
+    <EmbeddedResource Include="icon.ico">
+      <LogicalName>icon.ico</LogicalName>
+    </EmbeddedResource>
+    <EmbeddedResource Include="icon.bmp">
+      <LogicalName>icon.bmp</LogicalName>
+    </EmbeddedResource>
+  </ItemGroup>
+  <ItemGroup>
+    <Compile Remove="ExeWrapper/ExeWrapper.cs" />
+  </ItemGroup>
+  <ItemGroup>
+    <PackageReference Include="DiscordRichPresence" Version="1.2.1.24" />
+    <PackageReference Include="MonoGame.Extended" Version="4.0.2" />
+    <PackageReference Include="MonoGame.Content.Builder.Task" Version="3.8.2.1105" />
+    <PackageReference Include="MonoGame.Framework.WindowsDX" Version="3.8.2.1105" />
+    <PackageReference Include="Newtonsoft.Json" Version="13.0.3" />
+    <PackageReference Include="System.Speech" Version="8.0.0" />
+    <PackageReference Include="WindowsAPICodePack" Version="8.0.4" />
+    <PackageReference Include="SharpCompress" Version="0.37.2" />
+  </ItemGroup>
+  <ItemGroup>
+   <FrameworkReference Include="Microsoft.WindowsDesktop.App" />
+  </ItemGroup>
+  <ItemGroup>
+    <Reference Include="Steamworks.NET">
+      <HintPath>packages\Steamworks.NET\Steamworks.NET.dll</HintPath>
+    </Reference>
+    <Reference Include="MoonSharp">
+      <HintPath>packages\MoonSharp\MoonSharp.Interpreter.dll</HintPath>
+    </Reference>
+    <Reference Include="MonoGame.Extended2">
+      <HintPath>packages\MonoGame.Extended2\MonoGame.Extended2.dll</HintPath>
+    </Reference>
+    <Reference Include="MonoGame.Extended.VideoPlayback">
+      <HintPath>packages\MonoGame.Extended.VideoPlayback\MonoGame.Extended.VideoPlayback.dll</HintPath>
+    </Reference>
+    <Reference Include="Sdcb.FFmpeg">
+      <HintPath>packages\Sdcb.FFmpeg\Sdcb.FFmpeg.dll</HintPath>
+    </Reference>
+  </ItemGroup>
+  <ItemGroup>
+    <MonoGameContentReference Include="Content\Content.mgcb" />
+  </ItemGroup>
+  <Target Name="RestoreDotnetTools" BeforeTargets="Restore">
+    <Message Text="Restoring dotnet tools" Importance="High" />
+    <Exec Command="dotnet tool restore" />
+  </Target>
+	<ItemGroup>
+    <BasePlugins Include="$(ProjectDir)baseplugins\user\stock\**\*.*" />
+    <WorkshopPlugins Include="$(ProjectDir)baseplugins\user\**\*.*" />
+    <BaseTemplates Include="$(ProjectDir)basetemplates\**\*.*" />
+    <BaseLocales Include="$(ProjectDir)public\locales\**\*.*" />
+    <BaseRoot Include="$(ProjectDir)baseroot\**\*.*" />
+    <BaseLayerGraphics Include="$(ProjectDir)content\graphics\**\*.*" />
+    <BaseLayerMusic Include="$(ProjectDir)content\music\**\*.*" />
+    <BaseLayerSound Include="$(ProjectDir)content\sound\**\*.*" />
+ 	</ItemGroup>
+	<Target Name="CopyPlugins" AfterTargets="Build">
+		<MakeDir Directories="$(ProjectDir)bin\x64\Release\net8.0-windows\plugins" />
+    <MakeDir Directories="$(ProjectDir)bin\x64\Release\net8.0-windows\library" />
+    <MakeDir Directories="$(ProjectDir)bin\x64\Release\net8.0-windows\library\audio" />
+    <MakeDir Directories="$(ProjectDir)bin\x64\Release\net8.0-windows\library\video" />
+		<MakeDir Directories="$(ProjectDir)bin\x64\Debug\net8.0-windows\plugins" />
+    <MakeDir Directories="$(ProjectDir)bin\x64\Debug\net8.0-windows\library" />
+    <MakeDir Directories="$(ProjectDir)bin\x64\Debug\net8.0-windows\library\audio" />
+    <MakeDir Directories="$(ProjectDir)bin\x64\Debug\net8.0-windows\library\video" />
+    <MakeDir Directories="$(ProjectDir)bin\x64\Release\net8.0-windows\templates" />
+    <MakeDir Directories="$(ProjectDir)bin\x64\Debug\net8.0-windows\templates" />
+    <MakeDir Directories="$(ProjectDir)bin\x64\Release\net8.0-windows\locales" />
+    <MakeDir Directories="$(ProjectDir)bin\x64\Debug\net8.0-windows\locales" />
+		<Copy SourceFiles="@(BasePlugins)" DestinationFiles="$(ProjectDir)bin\x64\Release\net8.0-windows\plugins\user\stock\%(RecursiveDir)%(Filename)%(Extension)" />
+		<Copy SourceFiles="@(WorkshopPlugins)" DestinationFiles="$(ProjectDir)bin\x64\Debug\net8.0-windows\plugins\user\%(RecursiveDir)%(Filename)%(Extension)" />
+    <Copy SourceFiles="@(BaseTemplates)" DestinationFiles="$(ProjectDir)bin\x64\Release\net8.0-windows\templates\%(RecursiveDir)%(Filename)%(Extension)" />
+    <Copy SourceFiles="@(BaseTemplates)" DestinationFiles="$(ProjectDir)bin\x64\Debug\net8.0-windows\templates\%(RecursiveDir)%(Filename)%(Extension)" />
+    <Copy SourceFiles="@(BaseLocales)" DestinationFiles="$(ProjectDir)bin\x64\Release\net8.0-windows\locales\%(RecursiveDir)%(Filename)%(Extension)" />
+    <Copy SourceFiles="@(BaseLocales)" DestinationFiles="$(ProjectDir)bin\x64\Debug\net8.0-windows\locales\%(RecursiveDir)%(Filename)%(Extension)" />
+    <Copy SourceFiles="@(BaseRoot)" DestinationFiles="$(ProjectDir)bin\x64\Release\net8.0-windows\%(RecursiveDir)%(Filename)%(Extension)" />
+    <Copy SourceFiles="@(BaseRoot)" DestinationFiles="$(ProjectDir)bin\x64\Debug\net8.0-windows\%(RecursiveDir)%(Filename)%(Extension)" />
+    <Copy SourceFiles="@(BaseLayerGraphics)" DestinationFiles="$(ProjectDir)bin\x64\Release\net8.0-windows\templates\defaultlayer\graphics\%(RecursiveDir)%(Filename)%(Extension)" />
+    <Copy SourceFiles="@(BaseLayerGraphics)" DestinationFiles="$(ProjectDir)bin\x64\Debug\net8.0-windows\templates\defaultlayer\graphics\%(RecursiveDir)%(Filename)%(Extension)" />
+    <Copy SourceFiles="@(BaseLayerMusic)" DestinationFiles="$(ProjectDir)bin\x64\Release\net8.0-windows\templates\defaultlayer\music\%(RecursiveDir)%(Filename)%(Extension)" />
+    <Copy SourceFiles="@(BaseLayerMusic)" DestinationFiles="$(ProjectDir)bin\x64\Debug\net8.0-windows\templates\defaultlayer\music\%(RecursiveDir)%(Filename)%(Extension)" />
+    <Copy SourceFiles="@(BaseLayerSound)" DestinationFiles="$(ProjectDir)bin\x64\Release\net8.0-windows\templates\defaultlayer\sound\%(RecursiveDir)%(Filename)%(Extension)" />
+    <Copy SourceFiles="@(BaseLayerSound)" DestinationFiles="$(ProjectDir)bin\x64\Debug\net8.0-windows\templates\defaultlayer\sound\%(RecursiveDir)%(Filename)%(Extension)" />
+    <!-- .\packages\Steamworks.NET\steam_api64.dll -->
+    <Copy SourceFiles=".\packages\Steamworks.NET\steam_api64.dll" DestinationFiles="$(ProjectDir)bin\x64\Release\net8.0-windows\steam_api64.dll" />
+    <Copy SourceFiles=".\packages\Steamworks.NET\steam_api64.dll" DestinationFiles="$(ProjectDir)bin\x64\Debug\net8.0-windows\steam_api64.dll" />
+    <!-- .\packages\MoonSharp\MoonSharp.Interpreter.dll -->
+    <Copy SourceFiles=".\packages\MoonSharp\MoonSharp.Interpreter.dll" DestinationFiles="$(ProjectDir)bin\x64\Release\net8.0-windows\MoonSharp.Interpreter.dll" />
+    <Copy SourceFiles=".\packages\MoonSharp\MoonSharp.Interpreter.dll" DestinationFiles="$(ProjectDir)bin\x64\Debug\net8.0-windows\MoonSharp.Interpreter.dll" />
+	</Target>
+</Project>

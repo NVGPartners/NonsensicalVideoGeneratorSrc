@@ -50,8 +50,8 @@ The following instructions are for building **Nonsensical Video Generator** from
 DLL files available in `packages` are built beforehand to prevent .NET conflicts:
 - [Steamworks.NET](https://github.com/rlabrecque/Steamworks.NET)
 - [MonoGame.Extended](https://github.com/craftworkgames/MonoGame.Extended)
-- [MonoGame.Extended2](https://github.com/hozuki/MonoGame.Extended2)
-- [MoonSharp](https://github.com/KiwifruitDev/moonsharp-PR-327)
+- [MonoGame.Extended2](https://github.com/NVGPartners/MonoGame.Extended2)
+- [MoonSharp](https://github.com/NVGPartners/moonsharp-PR-327)
 
 ## Links
 <a href="https://store.steampowered.com/app/2516360/Nonsensical_Video_Generator/" target="_blank" alt="Nonsensical Video Generator Store Page" title="Steam Store Page">

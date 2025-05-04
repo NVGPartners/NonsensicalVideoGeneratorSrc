@@ -205,7 +205,7 @@ namespace NonsensicalVideoGenerator
             {
                 spriteBatch.End();
                 // Mask to specific area 
-                spriteBatch.GraphicsDevice.ScissorRectangle = new Rectangle((int)GlobalGraphics.Scale(GlobalGraphics.drawOffset.X+135), (int)GlobalGraphics.Scale(GlobalGraphics.drawOffset.Y+56), GlobalGraphics.Scale(293), GlobalGraphics.Scale(GlobalGraphics.preferredResolution.Y-56));
+                spriteBatch.GraphicsDevice.ScissorRectangle = new Rectangle((int)GlobalGraphics.Scale(GlobalGraphics.drawOffset.X+135), (int)GlobalGraphics.Scale(GlobalGraphics.drawOffset.Y+56), GlobalGraphics.Scale(293), GlobalGraphics.scaledHeight - GlobalGraphics.Scale(56));
                 RasterizerState rasterizerState = new RasterizerState
                 {
                     ScissorTestEnable = true

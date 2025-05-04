@@ -1,10 +1,8 @@
 using System;
 using System.Diagnostics;
 using System.IO;
-using System.Linq;
 using System.Reflection;
 using Microsoft.Xna.Framework;
-using MonoGame.Extended.ECS;
 using Steamworks;
 
 namespace NonsensicalVideoGenerator
@@ -124,6 +122,7 @@ namespace NonsensicalVideoGenerator
             if(Global.parameters.Contains("-fullscreen"))
                 SaveData.saveValues["Fullscreen"] = "true";
             HolidayManager.CheckHolidays();
+            Global.productVersion = (Assembly.GetExecutingAssembly().GetName().Version?.ToString() ?? "0.0.0.0") + Global.productSku;
 #if MONOGAME
             using (var game = new UserInterface())
                 game.Run();
@@ -133,6 +132,8 @@ namespace NonsensicalVideoGenerator
             Application.SetCompatibleTextRenderingDefault(false);
             Application.Run(new MainForm());
 #endif
+            // On graceful exit, save the game data
+            SaveData.Save();
         }
     }
 }

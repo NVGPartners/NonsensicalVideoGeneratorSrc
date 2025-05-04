@@ -172,6 +172,7 @@ namespace NonsensicalVideoGenerator
             Resize(GlobalGraphics.scaledWidth, GlobalGraphics.scaledHeight);
             ConsoleOutput.WriteLine("Screen resolution set.", Color.Transparent);
             ConsoleOutput.WriteLine("Detected system: " + (Architecture.IsRunningThroughProton() ? ("Proton " + Architecture.translatorVersion) : Architecture.IsRunningThroughWine() ? ("Wine " + Architecture.translatorVersion) : "Native"), Color.Transparent);
+            ConsoleOutput.WriteLine("Rendering API: " + Global.productSku, Color.Transparent);
             ScreenManager.LoadScreens();
             ConsoleOutput.WriteLine("Initialization complete.", Color.Transparent);
             LibraryData.SequentialName();
@@ -246,6 +247,10 @@ namespace NonsensicalVideoGenerator
         }
         public void FindMusic()
         {
+            music = 0;
+#if DESKTOPGL
+            _musicState = MusicState.Paused;
+#else
             music = ThemeManager.GetNextSongIndex(music);
             _musicState = MusicState.Playing;
             try
@@ -256,6 +261,7 @@ namespace NonsensicalVideoGenerator
             {
                 //ConsoleOutput.WriteLine("Failed to play music: " + ex.Message, Color.Red);
             }
+#endif
         }
         protected override void Update(GameTime gameTime)
         {

@@ -1,11 +1,11 @@
 <Project Sdk="Microsoft.NET.Sdk">
   <PropertyGroup>
-    <Version>1.7.1.0</Version>
+    <Version>1.7.2.0</Version>
     <OutputType>WinExe</OutputType>
     <RollForward>Major</RollForward>
     <PublishReadyToRun>false</PublishReadyToRun>
     <TieredCompilation>false</TieredCompilation>
-    <AssemblyName>NonsensicalVideoGenerator</AssemblyName>
+    <AssemblyName>NVGDesktopGL</AssemblyName>
     <AssemblyProduct>NonsensicalVideoGenerator</AssemblyProduct>
     <AssemblyTitle>Nonsensical Video Generator</AssemblyTitle>
     <RootNamespace>NonsensicalVideoGenerator</RootNamespace>
@@ -26,14 +26,16 @@ LanaPixel licensed under SIL OFL</AssemblyTrademark>
     <Platforms>x64</Platforms>
     <ProjectGuid>{afd0cba3-e90b-47c4-ba45-32937471bc75}</ProjectGuid>
     <Nullable>enable</Nullable>
-    <DefineConstants>WINDOWSDX MONOGAME</DefineConstants>
+    <DefineConstants>DESKTOPGL MONOGAME</DefineConstants>
     <UseWindowsForms>true</UseWindowsForms>
     <TargetFramework>net8.0-windows</TargetFramework>
     <IncludeSourceRevisionInInformationalVersion>false</IncludeSourceRevisionInInformationalVersion>
     <RepositoryUrl>https://github.com/NVGPartners/NonsensicalVideoGeneratorSrc.git</RepositoryUrl>
-    <RepositoryBranch>steam</RepositoryBranch>
+    <RepositoryBranch>dev</RepositoryBranch>
     <ApplicationHighDpiMode>true</ApplicationHighDpiMode>
     <CLSCompliant>false</CLSCompliant>
+    <GenerateAssemblyInfo>false</GenerateAssemblyInfo>
+    <GenerateTargetFrameworkAttribute>false</GenerateTargetFrameworkAttribute> 
   </PropertyGroup>
   <PropertyGroup>
     <ApplicationManifest>app.manifest</ApplicationManifest>
@@ -55,10 +57,13 @@ LanaPixel licensed under SIL OFL</AssemblyTrademark>
     </EmbeddedResource>
   </ItemGroup>
   <ItemGroup>
+    <Compile Remove="ExeWrapper/ExeWrapper.cs" />
+  </ItemGroup>
+  <ItemGroup>
     <PackageReference Include="DiscordRichPresence" Version="1.2.1.24" />
     <PackageReference Include="MonoGame.Extended" Version="4.0.2" />
     <PackageReference Include="MonoGame.Content.Builder.Task" Version="3.8.2.1105" />
-    <PackageReference Include="MonoGame.Framework.WindowsDX" Version="3.8.2.1105" />
+    <PackageReference Include="MonoGame.Framework.DesktopGL" Version="3.8.2.1105" />
     <PackageReference Include="Newtonsoft.Json" Version="13.0.3" />
     <PackageReference Include="System.Speech" Version="8.0.0" />
     <PackageReference Include="WindowsAPICodePack" Version="8.0.4" />

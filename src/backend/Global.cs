@@ -12,11 +12,14 @@ namespace NonsensicalVideoGenerator
     /// </summary>
     public static class Global
     {
-        public static Assembly assembly = Assembly.GetExecutingAssembly();
-        public static FileVersionInfo fileVersionInfo = FileVersionInfo.GetVersionInfo(assembly.Location);
-        public static string? productName = fileVersionInfo.FileDescription;
+        public static string productName = "Nonsensical Video Generator";
         public static string productNameShort = "NVG";
-        public static string? productVersion = fileVersionInfo.ProductVersion;
+        public static string productVersion = "0.0.0.0DX";
+#if DESKTOPGL
+        public static string productSku = "GL";
+#else
+        public static string productSku = "DX";
+#endif
 #if MONOGAME
         public static Mask mask = new();
 #endif

@@ -15,25 +15,25 @@ namespace NonsensicalVideoGenerator
     /// </summary>
     public static class BlogData
     {
-        public static string Title { get; set; } = "April 2025: Update v7.1";
+        public static string Title { get; set; } = "May 2025: Update v7.2";
         public static List<string> Subtitle { get; set; } = new List<string>()
         {
             "v%s",
-            "2025-04-30",
+            "2025-05-03",
             "Minor Update"
         };
         public static List<string> Description { get; set; } = new List<string>()
         {
             // "WWWWWWWWWWWWWWWWWWWWWWWWWWWW"
-            "- Updated the credits",
-            "- Changed update version identifiers",
-            "- Fixed cache video clearing bug",
-            "- Fixed media volume ignored bug",
-            "- LanaPixel font restored for locales",
-            "- Added French language (darkyuuu_)",
-            "- Added Slovak language (peto444)",
+            "- ",
+            "- ",
+            "- ",
+            "- ",
+            "- ",
+            "- ",
+            "- ",
             "View more information on Steam:"
         };
-        public static string Url { get; set; } = "https://store.steampowered.com/news/app/2516360/view/499446213320376534";
+        public static string Url { get; set; } = "https://store.steampowered.com/news/app/2516360/view/499446213320377116";
     }
 }
