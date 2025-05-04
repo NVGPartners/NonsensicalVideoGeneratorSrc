@@ -24,22 +24,6 @@ function Query()
                 ["path"] = "remix",
                 ["type"] = "audio",
             }
-        },
-        ["userconsent"] = {
-            ["consents"] = {
-                {
-                    ["flag"] = "DownloadFiles",
-                    ["params"] = {
-                        "https://github.com/KiwifruitDev/NonsensicalVideoGenerator/raw/main/addonlibraries/remix.mp3",
-                    }
-                },
-                {
-                    ["flag"] = "AddToLibrary",
-                    ["params"] = {
-                        "remix.mp3"
-                    }
-                },
-            }
         }
     }
 end

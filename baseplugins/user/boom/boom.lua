@@ -35,24 +35,6 @@ function Query()
                 ["path"] = "boom",
                 ["type"] = "video",
             }
-        },
-        ["userconsent"] = {
-            ["consents"] = {
-                {
-                    ["flag"] = "DownloadFiles",
-                    ["params"] = {
-                        "https://github.com/KiwifruitDev/NonsensicalVideoGenerator/raw/main/addonlibraries/whatthe.mp3",
-                        "https://github.com/KiwifruitDev/NonsensicalVideoGenerator/raw/main/addonlibraries/boom.mp4",
-                    }
-                },
-                {
-                    ["flag"] = "AddToLibrary",
-                    ["params"] = {
-                        "whatthe.mp3",
-                        "boom.mp4",
-                    }
-                },
-            }
         }
     }
 end

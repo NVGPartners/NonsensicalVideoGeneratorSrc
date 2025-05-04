@@ -13,6 +13,7 @@ using System.Globalization;
 using System.Collections.Generic;
 using MonoGame.Extended.Framework.Media;
 using MonoGame.Extended.VideoPlayback;
+using System.Reflection;
 
 namespace NonsensicalVideoGenerator
 {
@@ -35,7 +36,7 @@ namespace NonsensicalVideoGenerator
         private MusicState _musicState = MusicState.Paused;
         public MonoGame.Extended.Framework.Media.VideoPlayer? videoPlayer;
         public MonoGame.Extended.Framework.Media.Video? video;
-        public string videoPath = "kiwifruitdev.mp4";
+        public string videoPath = "bootmovie.mp4";
         public int music = 0;
         public bool introFinished = false;
         public UserInterface()
@@ -211,7 +212,29 @@ namespace NonsensicalVideoGenerator
             // Load all screen content.
             ScreenManager.LoadContent(Content, GraphicsDevice);
             videoPlayer = new MonoGame.Extended.Framework.Media.VideoPlayer(GraphicsDevice);
-            video = VideoHelper.LoadFromFile(videoPath);
+            if(SaveData.saveValues["ActiveTheme"] != "")
+            {
+                string basepath = Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location) ?? ".";
+                // Search inside recursively of plugins folder for {activetheme}.mp4
+                string[] files = Directory.GetFiles(Path.Combine(basepath, "plugins"), SaveData.saveValues["ActiveTheme"] + ".mp4", SearchOption.AllDirectories);
+                if(files.Length > 0)
+                {
+                    // Remove basepath from path.
+                    videoPath = files[0].Replace(basepath, "").Replace("\\", "/").TrimStart('/');
+                    ConsoleOutput.WriteLine("Found theme video: " + videoPath, Color.Transparent);
+                }
+            }
+            try
+            {
+                if(File.Exists(videoPath))
+                    video = VideoHelper.LoadFromFile(videoPath);
+                else
+                    ConsoleOutput.WriteLine("Could not load boot video: " + videoPath, Color.Red);
+            }
+            catch (Exception e)
+            {
+                ConsoleOutput.WriteLine($"Failed to load video: {e.Message}", Color.Red);
+            }
             if(bool.Parse(SaveData.saveValues["SkipPhotosensitiveWarningScreen"]))
             {
                 introFinished = true;
@@ -247,8 +270,8 @@ namespace NonsensicalVideoGenerator
         }
         public void FindMusic()
         {
-            music = 0;
 #if DESKTOPGL
+            music = 0;
             _musicState = MusicState.Paused;
 #else
             music = ThemeManager.GetNextSongIndex(music);

@@ -390,6 +390,10 @@ namespace NonsensicalVideoGenerator
                         ((Switch)scrollView.Controller.interactables["SkipPhotosensitiveWarningScreen"]).SwitchState = SaveData.saveValues["SkipPhotosensitiveWarningScreen"] == "true";
                         ((Switch)scrollView.Controller.interactables["DisableHolidays"]).SwitchState = SaveData.saveValues["DisableHolidays"] == "true";
                         ((Switch)scrollView.Controller.interactables["UseExternalVideoPlayer"]).SwitchState = SaveData.saveValues["UseExternalVideoPlayer"] == "true";
+                        if(UserInterface.instance.videoPlayer != null)
+                            UserInterface.instance.videoPlayer.Volume = int.Parse(SaveData.saveValues["VideoVolume"], CultureInfo.InvariantCulture) / 100f;
+                        if(FramePlayer.audio != null)
+                            FramePlayer.audio.Volume = float.Parse(SaveData.saveValues["VideoVolume"], CultureInfo.InvariantCulture) / 100f;
                         return true;
                 }
                 return false;
@@ -513,6 +517,8 @@ namespace NonsensicalVideoGenerator
                     SaveData.Save();
                 if(UserInterface.instance.videoPlayer != null)
                     UserInterface.instance.videoPlayer.Volume = int.Parse(SaveData.saveValues["VideoVolume"], CultureInfo.InvariantCulture) / 100f;
+                if(FramePlayer.audio != null)
+                    FramePlayer.audio.Volume = float.Parse(SaveData.saveValues["VideoVolume"], CultureInfo.InvariantCulture) / 100f;
                 return false;
             }));
             scrollView.Controller.Add("MediaOptions", new Label("Media Options:", new Vector2(139, 60-(8*1)+(19*8)+(10*1)+(9*1))));

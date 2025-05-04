@@ -40,19 +40,6 @@ namespace NonsensicalVideoGenerator
         private readonly InteractableController controller = new();
         public static void ErrorOut()
         {
-            if(ScreenManager.GetScreen<TutorialScreen>("Tutorial")?.screenType == ScreenType.Hidden)
-            {
-                FramePlayer.canPlayBgMusic = false;
-                ScreenManager.PushNavigation("Tutorial");
-                ScreenManager.GetScreen<TutorialScreen>("Tutorial")?.Show();
-                ScreenManager.GetScreen<ContentScreen>("Content")?.Hide();
-                ScreenManager.GetScreen<MenuScreen>("Menu")?.Hide();
-                if(FramePlayer.audio != null)
-                    ScreenManager.GetScreen<VideoScreen>("Video")?.Hide();
-                ScreenManager.GetScreen<BackgroundScreen>("Background")?.Hide();
-                ScreenManager.GetScreen<SocialScreen>("Socials")?.Hide();
-                GlobalContent.GetSound("Prompt").Play(int.Parse(SaveData.saveValues["SoundEffectVolume"], CultureInfo.InvariantCulture) / 100f, 0f, 0f);
-            }
         }
         private void UpdateCheckThread(object? sender, DoWorkEventArgs e)
         {
@@ -61,25 +48,17 @@ namespace NonsensicalVideoGenerator
             {
                 System.Threading.Thread.Sleep(100);
             }
-            UpdateManager.GetDependencyStatus();
-            if(!UpdateManager.ffmpegInstalled || !UpdateManager.ffprobeInstalled || Global.parameters.Contains("-forceinstall"))
+            try
             {
-                ErrorOut();
-            }
-            else
-            {
-                try
-                {
-                    if(SteamManager.initialized)
-                        PluginHandler.LoadWorkshop();
-                    else
-                        PluginHandler.LoadPluginsThreaded();
-                }
-                catch
-                {
-                    ConsoleOutput.WriteLine("Failed to load Workshop addons.");
+                if(SteamManager.initialized)
+                    PluginHandler.LoadWorkshop();
+                else
                     PluginHandler.LoadPluginsThreaded();
-                }
+            }
+            catch
+            {
+                ConsoleOutput.WriteLine("Failed to load Workshop addons.");
+                PluginHandler.LoadPluginsThreaded();
             }
         }
         private List<string> warningText = new List<string>()

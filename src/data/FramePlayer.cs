@@ -422,6 +422,7 @@ namespace NonsensicalVideoGenerator
                 audioFrameFile.Close();
                 if(SaveData.saveValues["UseExternalVideoPlayer"] == "false")
                 {
+                    audio.Volume = float.Parse(SaveData.saveValues["VideoVolume"], System.Globalization.CultureInfo.InvariantCulture) / 100f;
                     audio.Play();
                     //ScreenManager.PushNavigation("Video");
                     //ScreenManager.GetScreen<VideoScreen>("Video")?.Show();
@@ -474,6 +475,7 @@ namespace NonsensicalVideoGenerator
                 {
                     if(!audioPlaying && frames.Count == 0)
                     {
+                        audio.Volume = float.Parse(SaveData.saveValues["VideoVolume"], System.Globalization.CultureInfo.InvariantCulture) / 100f;
                         audio.Play();
                         Global.generator.progressText = L.T(0, "Video:StatusPlay");
                         canPlayBgMusic = false;
@@ -582,6 +584,7 @@ namespace NonsensicalVideoGenerator
                     Global.generator.progressText = L.T(0, "Video:StatusPlay");
                     timeStarted = gameTime.TotalGameTime.TotalSeconds;
                     canPlayBgMusic = false;
+                    audio.Volume = float.Parse(SaveData.saveValues["VideoVolume"], System.Globalization.CultureInfo.InvariantCulture) / 100f;
                     audio.Play();
                     audio.Volume = int.Parse(SaveData.saveValues["VideoVolume"], CultureInfo.InvariantCulture) / 100f;
                     currentFrame = 0;

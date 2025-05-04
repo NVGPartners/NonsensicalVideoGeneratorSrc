@@ -129,6 +129,7 @@ namespace NonsensicalVideoGenerator
                         }
                         else
                         {
+                            FramePlayer.audio.Volume = float.Parse(SaveData.saveValues["VideoVolume"], System.Globalization.CultureInfo.InvariantCulture) / 100f;
                             FramePlayer.audio.Play();
                             FramePlayer.audioPlaying = true;
                             FramePlayer.canPlayBgMusic = false;
@@ -185,6 +186,7 @@ namespace NonsensicalVideoGenerator
                                 }
                                 else
                                 {
+                                    FramePlayer.audio.Volume = float.Parse(SaveData.saveValues["VideoVolume"], System.Globalization.CultureInfo.InvariantCulture) / 100f;
                                     FramePlayer.audio.Play();
                                     FramePlayer.audioPlaying = true;
                                     FramePlayer.canPlayBgMusic = false;

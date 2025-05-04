@@ -460,7 +460,7 @@ namespace NonsensicalVideoGenerator
                             Texture2D texture = new Texture2D(graphicsDevice, texWidth, texHeight);
                             // Generate video thumbnail using ffmpeg
                             string tempBmp = Path.Combine(Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location) ?? ".", "temp", "thumb.bmp");
-                            Process bmpProcess = Generator.GenerateThumbnail(libraryFile.Path, tempBmp, currentRootType);
+                            Process bmpProcess = Generator.GenerateThumbnail(LibraryData.GetLocalizedDefaultOutro(libraryFile.Path), tempBmp, currentRootType);
                             // Defer until process is done
                             while (!bmpProcess.HasExited)
                             {
@@ -1092,7 +1092,7 @@ namespace NonsensicalVideoGenerator
                                                 UserInterface.instance.videoPath = "";
                                                 if(file.Type.RootType == LibraryRootType.Video)
                                                 {
-                                                    string cachePath = VideoCache.GetCachePath(file.Path);
+                                                    string cachePath = VideoCache.GetCachePath(LibraryData.GetLocalizedDefaultOutro(file.Path));
                                                     UserInterface.instance.videoPath = cachePath;
                                                     UserInterface.instance.video = VideoHelper.LoadFromFile(cachePath);
                                                     UserInterface.instance.videoPlayer.IsLooped = true;
@@ -1118,7 +1118,7 @@ namespace NonsensicalVideoGenerator
                                                 ProcessStartInfo startInfo = new()
                                                 {
                                                     FileName = "explorer.exe",
-                                                    Arguments = "/select, \"" + Path.GetFullPath(file.Path) + "\""
+                                                    Arguments = "/select, \"" + Path.GetFullPath(LibraryData.GetLocalizedDefaultOutro(file.Path)) + "\""
                                                 };
                                                 Process.Start(startInfo);
                                             }
@@ -1445,6 +1445,10 @@ namespace NonsensicalVideoGenerator
                                     if (file.Path != null)
                                     {
                                         tooltip = Path.GetFileName(file.Path).Replace("\\", "/");
+                                        if(LibraryData.GetLocalizedDefaultOutro(file.Path) != file.Path)
+                                        {
+                                            tooltip += "\n" + L.GetLocale().localizedName;
+                                        }
                                     }
                                 }
                                 else if(currentLibraryType != DefaultLibraryTypes.Render && currentLibraryType != DefaultLibraryTypes.NoImages)

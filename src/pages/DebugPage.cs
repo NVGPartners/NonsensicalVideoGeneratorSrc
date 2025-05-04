@@ -162,14 +162,6 @@ namespace NonsensicalVideoGenerator
                             GlobalContent.GetSound("Select").Play(int.Parse(SaveData.saveValues["SoundEffectVolume"], CultureInfo.InvariantCulture) / 100f, 0f, 0f);
                             return true;
                         }
-                        if(MouseInput.MouseState.Y >= GlobalGraphics.Scale(33+(8*10)) && MouseInput.MouseState.Y <= GlobalGraphics.Scale(33+(8*10)+6))
-                        {
-                            // Show tutorial window.
-                            Pagination.SetPage(0);
-                            PhotosensitiveWarningScreen.ErrorOut();
-                            GlobalContent.GetSound("Select").Play(int.Parse(SaveData.saveValues["SoundEffectVolume"], CultureInfo.InvariantCulture) / 100f, 0f, 0f);
-                            return true;
-                        }
                         if(MouseInput.MouseState.Y >= GlobalGraphics.Scale(33+(8*11)) && MouseInput.MouseState.Y <= GlobalGraphics.Scale(33+(8*11)+6))
                         {
                             // Cycle theme.
@@ -266,13 +258,6 @@ namespace NonsensicalVideoGenerator
                             }
                             return true;
                         }
-                        if(MouseInput.MouseState.Y >= GlobalGraphics.Scale(33+(8*14)) && MouseInput.MouseState.Y <= GlobalGraphics.Scale(33+(8*14)+6))
-                        {
-                            // Toggle addon consents.
-                            GlobalContent.GetSound("Select").Play(int.Parse(SaveData.saveValues["SoundEffectVolume"], CultureInfo.InvariantCulture) / 100f, 0f, 0f);
-                            Global.disableConsents = !Global.disableConsents;
-                            return true;
-                        }
                         if(MouseInput.MouseState.Y >= GlobalGraphics.Scale(33+(8*15)) && MouseInput.MouseState.Y <= GlobalGraphics.Scale(33+(8*15)+6))
                         {
                             // Toggle fullscreen.
@@ -339,11 +324,9 @@ namespace NonsensicalVideoGenerator
                 DrawButton(spriteBatch, 6, 33+(8*7), "Draw Offset: " + GlobalGraphics.drawOffset.X.ToString(CultureInfo.InvariantCulture) + ", " + GlobalGraphics.drawOffset.Y.ToString(CultureInfo.InvariantCulture));
                 DrawButton(spriteBatch, 6, 33+(8*8), "Export Params: " + (Generator.exportParams.StartsWith("-vcodec") ? "better" : (Generator.exportParams.StartsWith("-af") ? "better (audio sync)" : "old")));
                 DrawButton(spriteBatch, 6, 33+(8*9), "Music: #" + (UserInterface.instance.music+1));
-                DrawButton(spriteBatch, 6, 33+(8*10), "Show Tutorial Window");
                 DrawButton(spriteBatch, 6, 33+(8*11), "Theme: " + ThemeManager.activeTheme.name);
                 DrawButton(spriteBatch, 6, 33+(8*12), "Save");
                 DrawButton(spriteBatch, 6, 33+(8*13), "Holiday: " + (HolidayManager.CurrentHoliday != null ? HolidayManager.CurrentHoliday.Name : "None"));
-                DrawButton(spriteBatch, 6, 33+(8*14), (Global.disableConsents ? "Enable" : "Disable") + " Addon Consents");
                 DrawButton(spriteBatch, 6, 33+(8*15), (GlobalGraphics.fullScreen ? "Disable" : "Enable") + " Fullscreen");
                 DrawButton(spriteBatch, 6, 33+(8*16), (bool.Parse(SaveData.saveValues["HiddenKeepTemporaryJobFolders"]) ? "Delete" : "Keep") + " Temporary Job Folders");
                 DrawButton(spriteBatch, 6, 33+(8*17), (bool.Parse(SaveData.saveValues["HiddenVerbose"]) ? "Disable" : "Enable") + " Verbose");

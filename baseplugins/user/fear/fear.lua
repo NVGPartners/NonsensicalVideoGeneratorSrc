@@ -52,24 +52,8 @@ function Query(localeName, localizationTokens)
                 ["path"] = "fear",
                 ["type"] = "video"
             }
-        },
-        ["userconsent"] = {
-            ["consents"] = {
-                {
-                    ["flag"] = "DownloadFiles",
-                    ["params"] = {}
-                },
-                {
-                    ["flag"] = "AddToLibrary",
-                    ["params"] = {}
-                },
-            }
         }
     }
-    for i, v in ipairs(fear_library_defaults) do
-        table.insert(queryparams.userconsent.consents[1].params, fear_library_baseurl .. v)
-        table.insert(queryparams.userconsent.consents[2].params, v)
-    end
     return queryparams
 end
 

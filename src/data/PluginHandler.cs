@@ -325,7 +325,24 @@ namespace NonsensicalVideoGenerator
         public Dictionary<string, SettingType> settingTypes = new();
         public static Dictionary<string, string> placeholders = new();
         public Dictionary<string, Color> themeColors = new();
-        public ConsentForm? consentForm;
+        // Fix broken URLs that Workshop addons use
+        public static readonly string urlBase = "https://github.com/KiwifruitDev/NonsensicalVideoGenerator/raw/main/addonlibraries/";
+        public static Dictionary<string, string> urlMapper = new()
+        {
+            {"https://cdn.discordapp.com/attachments/1068727704209342525/1133564849629188126/church.mp3", "church.mp3"},
+            {"https://file.garden/ZtA8L_PK_QLwMwcQ/Random/hycam2.mp4", "hycam2.mp4"},
+            {"https://cdn.discordapp.com/attachments/855952505782927371/1139804688552837171/webcam.mp4", "webcam.mp4"},
+            {"https://cdn.discordapp.com/attachments/293570786495692812/1141042457593774110/2SAD4ME.mp3", "2SAD4ME.mp3"},
+            {"https://segacd32xmodel1.github.io/Websiteland/videos/Explosion.mp4", "Explosion.mp4"},
+            {"https://files.catbox.moe/3wtjqk.mp4", "3wtjqk.mp4"},
+            {"https://files.catbox.moe/eknoz9.mp4", "eknoz9.mp4"},
+            {"https://files.catbox.moe/ior05v.mp4", "ior05v.mp4"},
+            {"https://files.catbox.moe/yvch3h.mp4", "yvch3h.mp4"},
+            {"https://files.catbox.moe/lofbuv.mp4", "lofbuv.mp4"},
+            {"https://files.catbox.moe/qr3c0e.mp4", "qr3c0e.mp4"},
+            {"https://files.catbox.moe/gfhcy8.mp4", "gfhcy8.mp4"},
+            {"https://files.catbox.moe/9eu7fr.mp4", "9eu7fr.mp4"},
+        };
         public Plugin(string path, PluginType type, string rootPath, bool enabled = true)
         {
             this.path = path;
@@ -532,17 +549,17 @@ namespace NonsensicalVideoGenerator
         // FFmpeg installed for lua
         public static bool FFmpegInstalled()
         {
-            return UpdateManager.ffmpegInstalled || File.Exists(Path.Combine(Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location) ?? ".", "ffmpeg.exe"));
+            return File.Exists(Path.Combine(Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location) ?? ".", "ffmpeg.exe"));
         }
         // FFprobe installed for lua
         public static bool FFprobeInstalled()
         {
-            return UpdateManager.ffprobeInstalled || File.Exists(Path.Combine(Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location) ?? ".", "ffprobe.exe"));
+            return File.Exists(Path.Combine(Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location) ?? ".", "ffprobe.exe"));
         }
         // Magick installed for lua
         public static bool MagickInstalled()
         {
-            return UpdateManager.imagemagickInstalled || File.Exists(Path.Combine(Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location) ?? ".", "magick.exe"));
+            return File.Exists(Path.Combine(Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location) ?? ".", "magick.exe"));
         }
         // GetRandomLibraryFile for lua
         public static string GetRandomLibraryFile(string rootType = "video", string subType = "materials")
@@ -587,14 +604,6 @@ namespace NonsensicalVideoGenerator
         // AddToLibrary for lua
         public void AddToLibrary(string rootType, string subType, string path)
         {
-            // Broken beause dynamic changes (after consent form is shown) are not saved
-            /*
-            if(consentForm != null && !consentForm.CheckConsentParam(Consents.AddToLibrary, ReplacePlaceholders(path)))
-            {
-                ConsoleOutput.WriteLine("Addon attempted to add a file to the library without permission.", Color.Red);
-                return;
-            }
-            */
             if(!ValidateInput(path))
             {
                 ConsoleOutput.WriteLine("Addon attempted to add a file to the library with an invalid path.", Color.Red);
@@ -659,26 +668,20 @@ namespace NonsensicalVideoGenerator
         public void DownloadFile(string url, string rootType = "", string subType = "")
         {
             string replacedUrl = ReplacePlaceholders(url);
-            // If it contains discordapp.com, deny it
-            if(replacedUrl.Contains("discord.com") || replacedUrl.Contains("discordapp.com"))
+            // Compare with urlMapper
+            if(urlMapper.ContainsKey(replacedUrl))
             {
-                ConsoleOutput.WriteLine("Addons can't download from Discord, tell the author!", Color.Red);
-                return;
+                // Replace with urlMapper value
+                replacedUrl = urlBase + urlMapper[replacedUrl];
             }
-            if(consentForm != null && !consentForm.CheckConsentParam(Consents.DownloadFiles, replacedUrl))
+            else if(replacedUrl.Contains("discord.com") || replacedUrl.Contains("discordapp.com"))
             {
-                ConsoleOutput.WriteLine("Addon attempted to download a file without permission.", Color.Red);
+                // If it contains discordapp.com, deny it
+                ConsoleOutput.WriteLine("Addons can't download from Discord, tell the author!", Color.Red);
                 return;
             }
             if(subType == "")
                 rootType = jobDirectory;
-            /*
-            else if(consentForm != null && !consentForm.CheckConsentParam(Consents.AddToLibrary, Path.GetFileName(ReplacePlaceholders(url))))
-            {
-                ConsoleOutput.WriteLine("Addon attempted to add a file to the library without permission.", Color.Red);
-                return;
-            }
-            */
             CommandType commandType = CommandType.Download;
             // Is it a YouTube url?
             if (replacedUrl.Contains("youtube.com") || replacedUrl.Contains("youtu.be"))
@@ -691,67 +694,8 @@ namespace NonsensicalVideoGenerator
         // ExecuteProgram for lua
         public void ExecuteProgram(string program, string args)
         {
-            if(Global.disableConsents)
-            {
-                ConsoleOutput.WriteLine("Addon attempted to execute a program but consents are disabled.", Color.Red);
-                return;
-            }
-            if(consentForm != null && !consentForm.CheckConsentParam(Consents.ExecutePrograms, ReplacePlaceholders(program)))
-            {
-                ConsoleOutput.WriteLine("Addon attempted to execute a program without permission.", Color.Red);
-                return;
-            }
-            if(!ValidateInput(ReplacePlaceholders(program)))
-            {
-                ConsoleOutput.WriteLine("Addon attempted to execute a program with an invalid program name.", Color.Red);
-                return;
-            }
-            if(!ValidateInput(ReplacePlaceholders(args)))
-            {
-                ConsoleOutput.WriteLine("Addon attempted to execute a program with invalid arguments.", Color.Red);
-                return;
-            }
-            // If program is yt-dlp, allow it to be executed from cwd
-            if(program == "yt-dlp")
-            {
-                program = Path.Combine(Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location) ?? ".", "yt-dlp.exe");
-            }
-            // Execute program
-            ConsoleOutput.WriteLine($"Executing {ReplacePlaceholders(program)} {ReplacePlaceholders(args)}", Color.LightBlue);
-            ProcessStartInfo startInfo = new()
-            {
-                FileName = ReplacePlaceholders(program),
-                Arguments = ReplacePlaceholders(args),
-                WorkingDirectory = jobDirectory,
-                UseShellExecute = false,
-                RedirectStandardOutput = true,
-                RedirectStandardError = true,
-                CreateNoWindow = true,
-            };
-            Process process = new()
-            {
-                StartInfo = startInfo
-            };
-            process.Start();
-            string output = "";
-            string error = "";
-            process.OutputDataReceived += (sender, e) => {
-                if(e.Data != null)
-                {
-                    output += e.Data;
-                    ConsoleOutput.WriteLine(e.Data, Color.Transparent);
-                }
-            };
-            process.ErrorDataReceived += (sender, e) => {
-                if(e.Data != null)
-                {
-                    error += e.Data;
-                    ConsoleOutput.WriteLine(e.Data, Color.Transparent);
-                }
-            };
-            process.BeginOutputReadLine();
-            process.BeginErrorReadLine();
-            process.WaitForExit();
+            ConsoleOutput.WriteLine("Addons can no longer execute programs.", Color.Red);
+            return;
         }
         public PluginReturnValue Call(string video)
         {
@@ -1027,70 +971,9 @@ namespace NonsensicalVideoGenerator
                             //if (settingCount > 0)
                                 //ConsoleOutput.WriteLine($"Addon {Path.GetFileName(path)} added {settingCount} settings.", Color.LightBlue);
                         }
-                        DynValue luaConsentForms = luaQuery.Table.Get("userconsent");
-                        if (luaConsentForms.Type == DataType.Table)
-                        {
-                            // Parse flags table as flags
-                            Consents consentFlags = Consents.None;
-                            Dictionary<Consents, List<string>> consentSettings = new();
-                            DynValue luaConsentFlags = luaConsentForms.Table.Get("consents");
-                            if (luaConsentFlags.Type == DataType.Table)
-                            {
-                                foreach (DynValue flag in luaConsentFlags.Table.Values)
-                                {
-                                    if (flag.Type != DataType.Table)
-                                    {
-                                        continue;
-                                    }
-                                    DynValue flagString = flag.Table.Get("flag");
-                                    if (flagString.Type == DataType.String)
-                                    {
-                                        string flagStringParsed = flagString.String;
-                                        switch (flagStringParsed)
-                                        {
-                                            case "DownloadFiles":
-                                                consentFlags |= Consents.DownloadFiles;
-                                                break;
-                                            case "ExecutePrograms":
-                                                consentFlags |= Consents.ExecutePrograms;
-                                                break;
-                                            case "AddToLibrary":
-                                                consentFlags |= Consents.AddToLibrary;
-                                                break;
-                                        }
-                                        // Get parameters
-                                        DynValue luaConsentSettings = flag.Table.Get("params");
-                                        List<string> param = new();
-                                        if (luaConsentSettings.Type == DataType.Table)
-                                        {
-                                            foreach (DynValue setting in luaConsentSettings.Table.Values)
-                                            {
-                                                if (setting.Type != DataType.String)
-                                                {
-                                                    continue;
-                                                }
-                                                // param is either a url or a program name
-                                                param.Add(setting.String);
-                                            }
-                                        }
-                                        Consents singleFlag = flagStringParsed == "DownloadFiles" ? Consents.DownloadFiles : (flagStringParsed == "ExecutePrograms" ? Consents.ExecutePrograms : Consents.AddToLibrary);
-                                        consentSettings.Add(singleFlag, param);
-                                    }
-                                }
-                            }
-                            consentForm = new ConsentForm(Path.GetFileName(path), GetDisplayName(), consentFlags, workshopId ?? "", rootPath, consentSettings);
-                        }
                     }
                     return true;
             }
-        }
-        public bool CheckConsent()
-        {
-            if(Global.disableConsents)
-                return true;
-            if (consentForm == null)
-                return false;
-            return UserConsent.CheckConsentForm(consentForm);
         }
         public void GetThemeMetadata()
         {
@@ -1709,35 +1592,6 @@ namespace NonsensicalVideoGenerator
                 Global.generator.progressText = L.T(0, "Addons:StatusAddonsLoaded", plugins.Count.ToString(CultureInfo.InvariantCulture));                Global.canRender = true;
                 ThemeManager.LoadThemes();
                 LibraryData.SequentialName();
-                // Check to see if there are any plugins that need consent forms filled out.
-                if(!Global.disableConsents)
-                {
-                    foreach(Plugin plugin in plugins)
-                    {
-                        if(plugin.CheckConsent())
-                        {
-                            UserConsent.needsConsent = true;
-                            UserConsent.consentForm = plugin.consentForm;
-                            Global.generator.progressText = L.T(0, "Addons:StatusAddonConsentRequired", plugin.GetDisplayName());
-                            FramePlayer.canPlayBgMusic = false;
-                            ScreenManager.PushNavigation("Tutorial");
-                            ScreenManager.GetScreen<TutorialScreen>("Tutorial")?.Show();
-                            ScreenManager.GetScreen<ContentScreen>("Content")?.Hide();
-                            ScreenManager.GetScreen<MenuScreen>("Menu")?.Hide();
-                            if(FramePlayer.audio != null)
-                            {
-                                if(SaveData.saveValues["UseExternalVideoPlayer"] == "false")
-                                {
-                                    ScreenManager.GetScreen<VideoScreen>("Video")?.Hide();
-                                }
-                            }
-                            ScreenManager.GetScreen<BackgroundScreen>("Background")?.Hide();
-                            ScreenManager.GetScreen<SocialScreen>("Socials")?.Hide();
-                            GlobalContent.GetSound("Prompt").Play(int.Parse(SaveData.saveValues["SoundEffectVolume"], CultureInfo.InvariantCulture) / 100f, 0f, 0f);
-                            break;
-                        }
-                    }
-                }
             }
             catch (SyntaxErrorException e)
             {

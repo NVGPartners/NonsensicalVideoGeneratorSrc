@@ -14,6 +14,7 @@ using System.Diagnostics;
 using System.Linq;
 using Steamworks;
 using System.Globalization;
+using System.Reflection;
 
 namespace NonsensicalVideoGenerator
 {
@@ -426,6 +427,22 @@ namespace NonsensicalVideoGenerator
                 }
             }
         }
+        public static string GetLocalizedDefaultOutro(string path)
+        {
+            // Must be the default outro.
+            if(!path.Contains("outros") && !path.EndsWith("defaultoutro.mp4"))
+                return path;
+            // Find the default outro in the locales folder.
+            string basePath = Path.Combine(Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location) ?? ".");
+            string defaultOutroPath = Path.Combine(basePath, "locales", "defaultoutros", L.GetLocale().name + ".mp4");
+            if (File.Exists(defaultOutroPath))
+            {
+                // If the default outro is found, use it.
+                return defaultOutroPath;
+            }
+            // Otherwise, use the default outro.
+            return Path.Combine(basePath, "library", "video", "outros", "defaultoutro.mp4");
+        }
         public static List<LibraryFile> calledMedia = new();
         public static string PickRandom(LibraryType type, Random rnd)
         {
@@ -463,7 +480,8 @@ namespace NonsensicalVideoGenerator
                 {
                     calledMedia.Add(files[index]);
                 }
-                return path;
+                // Localize the default outro if this is the default outro.
+                return GetLocalizedDefaultOutro(path);
             }
             return "";
         }
@@ -581,7 +599,7 @@ namespace NonsensicalVideoGenerator
                             client.DownloadFile(downloadUrl, path);
                         }
                     }
-                    else if(UpdateManager.ytDlpInstalled)
+                    else
                     {
                         path = Path.Combine(libraryRootPath, libraryPaths[downloadType], "%(title)s.%(ext)s");
                         string ytdlp = Global.useSystemYtDlp ? "yt-dlp" : @".\yt-dlp.exe";
@@ -606,14 +624,6 @@ namespace NonsensicalVideoGenerator
                         process.BeginOutputReadLine();
                         process.BeginErrorReadLine();
                         process.WaitForExit();
-                    }
-                    else
-                    {
-                        ConsoleOutput.WriteLine("Failed to download clip: yt-dlp is not installed.", Color.Red);
-#if MONOGAME
-                        LibraryPage.Done(false);
-#endif
-                        continue;
                     }
                 }
                 catch (Exception ex)

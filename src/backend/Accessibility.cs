@@ -305,12 +305,6 @@ namespace NonsensicalVideoGenerator
                         }
                     }
                     Vector2 offsetv = new();
-                    TutorialScreen? tutorialScreen = null;
-                    tutorialScreen = ScreenManager.GetScreen<TutorialScreen>("Tutorial");
-                    if(tutorialScreen != null && tutorialScreen.screenType == ScreenType.Drawn)
-                    {
-                        offsetv = tutorialScreen.offset;
-                    }
                     // Draw box
                     spriteBatch.Draw(pixel, new Rectangle(disambiguationOptions[i].bounds.X + (int)offsetv.X, disambiguationOptions[i].bounds.Y + (int)offsetv.Y, disambiguationOptions[i].bounds.Width, disambiguationOptions[i].bounds.Height), Color.White * 0.25f);
                     // Draw

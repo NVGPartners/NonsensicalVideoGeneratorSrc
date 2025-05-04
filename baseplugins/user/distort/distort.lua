@@ -24,22 +24,6 @@ function Query()
                 ["path"] = "distort",
                 ["type"] = "audio",
             }
-        },
-        ["userconsent"] = {
-            ["consents"] = {
-                {
-                    ["flag"] = "DownloadFiles",
-                    ["params"] = {
-                        "https://github.com/KiwifruitDev/NonsensicalVideoGenerator/raw/main/addonlibraries/distort.mp3",
-                    }
-                },
-                {
-                    ["flag"] = "AddToLibrary",
-                    ["params"] = {
-                        "distort.mp3"
-                    }
-                },
-            }
         }
     }
 end

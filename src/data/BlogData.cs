@@ -15,12 +15,16 @@ namespace NonsensicalVideoGenerator
     /// </summary>
     public static class BlogData
     {
-        public static string Title { get; set; } = "May 2025: Update v7.2";
+        public static readonly int Month = 5;
+        public static readonly int Day = 3;
+        public static readonly int Year = 2025;
+        public static readonly int Tier = 1;
+        public static readonly string PostId = "499446213320377116";
         public static List<string> Subtitle { get; set; } = new List<string>()
         {
-            "v%s",
-            "2025-05-03",
-            "Minor Update"
+            "v%version%",
+            "%month%-%day%-%year%",
+            "%tier%"
         };
         public static List<string> Description { get; set; } = new List<string>()
         {
@@ -32,8 +36,8 @@ namespace NonsensicalVideoGenerator
             "- ",
             "- ",
             "- ",
-            "View more information on Steam:"
+            "%footer%"
         };
-        public static string Url { get; set; } = "https://store.steampowered.com/news/app/2516360/view/499446213320377116";
+        public static string Url { get; set; } = "https://store.steampowered.com/news/app/2516360/view/%postid%?l=%locale%";
     }
 }

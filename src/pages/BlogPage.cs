@@ -34,9 +34,10 @@ namespace NonsensicalVideoGenerator
             Texture2D banner = GlobalContent.GetTexture("BlogBanner");
             SpriteFont font = L.FontLarge();
             // Draw title
-            Vector2 titleSize = font.MeasureString(BlogData.Title);
-            GlobalContent.DrawString(spriteBatch, font, BlogData.Title, new Vector2(GlobalGraphics.Scale(220+1) - titleSize.X / 2, GlobalGraphics.Scale(59+1)), Color.Black);
-            GlobalContent.DrawString(spriteBatch, font, BlogData.Title, new Vector2(GlobalGraphics.Scale(220) - titleSize.X / 2, GlobalGraphics.Scale(59)), Color.White);
+            string title = L.T(0, "Update:Title", L.T(0, "Update:Month" + BlogData.Month.ToString(CultureInfo.InvariantCulture)), BlogData.Year.ToString(CultureInfo.InvariantCulture), "v" + Global.productVersion.Remove(0, 2).Remove(3));
+            Vector2 titleSize = font.MeasureString(title);
+            GlobalContent.DrawString(spriteBatch, font, title, new Vector2(GlobalGraphics.Scale(220+1) - titleSize.X / 2, GlobalGraphics.Scale(59+1)), Color.Black);
+            GlobalContent.DrawString(spriteBatch, font, title, new Vector2(GlobalGraphics.Scale(220) - titleSize.X / 2, GlobalGraphics.Scale(59)), Color.White);
             // Draw banner
             spriteBatch.Draw(banner, new Rectangle(GlobalGraphics.Scale(140+1), GlobalGraphics.Scale(73+1), GlobalGraphics.Scale(banner.Width), GlobalGraphics.Scale(banner.Height)), Color.Black);
             spriteBatch.Draw(banner, new Rectangle(GlobalGraphics.Scale(140), GlobalGraphics.Scale(73), GlobalGraphics.Scale(banner.Width), GlobalGraphics.Scale(banner.Height)), Color.White);
@@ -45,7 +46,7 @@ namespace NonsensicalVideoGenerator
             int subtitleHeight = 85;
             for(int i = 0; i < BlogData.Subtitle.Count; i++)
             {
-                string subtitle = BlogData.Subtitle[i].Replace("%s", Global.productVersion);
+                string subtitle = BlogData.Subtitle[i].Replace("%version%", Global.productVersion.Remove(7)).Replace("%month%", BlogData.Month.ToString("D2", CultureInfo.InvariantCulture)).Replace("%day%", BlogData.Day.ToString("D2", CultureInfo.InvariantCulture)).Replace("%year%", BlogData.Year.ToString(CultureInfo.InvariantCulture)).Replace("%tier%", L.T(0, "Update:Tier" + BlogData.Tier.ToString(CultureInfo.InvariantCulture)));
                 Vector2 subtitleSize = font.MeasureString(subtitle);
                 GlobalContent.DrawString(spriteBatch, font, subtitle, new Vector2(GlobalGraphics.Scale(273+1) - subtitleSize.X / 2, GlobalGraphics.Scale(subtitleHeight+1)), Color.Black);
                 GlobalContent.DrawString(spriteBatch, font, subtitle, new Vector2(GlobalGraphics.Scale(273) - subtitleSize.X / 2, GlobalGraphics.Scale(subtitleHeight)), Color.White);
@@ -55,9 +56,10 @@ namespace NonsensicalVideoGenerator
             int descriptionHeight = 133;
             for(int i = 0; i < BlogData.Description.Count; i++)
             {
-                Vector2 descriptionSize = font.MeasureString(BlogData.Description[i]);
-                GlobalContent.DrawString(spriteBatch, font, BlogData.Description[i], new Vector2(GlobalGraphics.Scale(220+1) - descriptionSize.X / 2, GlobalGraphics.Scale(descriptionHeight+1)), Color.Black);
-                GlobalContent.DrawString(spriteBatch, font, BlogData.Description[i], new Vector2(GlobalGraphics.Scale(220) - descriptionSize.X / 2, GlobalGraphics.Scale(descriptionHeight)), Color.White);
+                string text = BlogData.Description[i].Replace("%footer%", L.T(0, "Update:Footer"));
+                Vector2 descriptionSize = font.MeasureString(text);
+                GlobalContent.DrawString(spriteBatch, font, text, new Vector2(GlobalGraphics.Scale(220+1) - descriptionSize.X / 2, GlobalGraphics.Scale(descriptionHeight+1)), Color.Black);
+                GlobalContent.DrawString(spriteBatch, font, text, new Vector2(GlobalGraphics.Scale(220) - descriptionSize.X / 2, GlobalGraphics.Scale(descriptionHeight)), Color.White);
                 descriptionHeight += increment;
             }
             actionController.Draw(gameTime, spriteBatch);
@@ -117,7 +119,7 @@ namespace NonsensicalVideoGenerator
                         GlobalContent.GetSound("Select").Play(int.Parse(SaveData.saveValues["SoundEffectVolume"], CultureInfo.InvariantCulture) / 100f, 0f, 0f);
                         ProcessStartInfo startInfo = new()
                         {
-                            FileName = BlogData.Url,
+                            FileName = BlogData.Url.Replace("%postid%", BlogData.PostId).Replace("%locale%", L.GetLocale().name),
                             UseShellExecute = true
                         };
                         Process.Start(startInfo);
