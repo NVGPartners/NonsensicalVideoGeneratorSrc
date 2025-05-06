@@ -162,7 +162,7 @@ namespace NonsensicalVideoGenerator
                             GlobalContent.GetSound("Select").Play(int.Parse(SaveData.saveValues["SoundEffectVolume"], CultureInfo.InvariantCulture) / 100f, 0f, 0f);
                             return true;
                         }
-                        if(MouseInput.MouseState.Y >= GlobalGraphics.Scale(33+(8*11)) && MouseInput.MouseState.Y <= GlobalGraphics.Scale(33+(8*11)+6))
+                        if(MouseInput.MouseState.Y >= GlobalGraphics.Scale(33+(8*10)) && MouseInput.MouseState.Y <= GlobalGraphics.Scale(33+(8*10)+6))
                         {
                             // Cycle theme.
                             GlobalContent.GetSound("Select").Play(int.Parse(SaveData.saveValues["SoundEffectVolume"], CultureInfo.InvariantCulture) / 100f, 0f, 0f);
@@ -221,14 +221,14 @@ namespace NonsensicalVideoGenerator
                             });
                             return true;
                         }
-                        if(MouseInput.MouseState.Y >= GlobalGraphics.Scale(33+(8*12)) && MouseInput.MouseState.Y <= GlobalGraphics.Scale(33+(8*12)+6))
+                        if(MouseInput.MouseState.Y >= GlobalGraphics.Scale(33+(8*11)) && MouseInput.MouseState.Y <= GlobalGraphics.Scale(33+(8*11)+6))
                         {
                             // Save.
                             SaveData.Save();
                             GlobalContent.GetSound("Select").Play(int.Parse(SaveData.saveValues["SoundEffectVolume"], CultureInfo.InvariantCulture) / 100f, 0f, 0f);
                             return true;
                         }
-                        if(MouseInput.MouseState.Y >= GlobalGraphics.Scale(33+(8*13)) && MouseInput.MouseState.Y <= GlobalGraphics.Scale(33+(8*13)+6))
+                        if(MouseInput.MouseState.Y >= GlobalGraphics.Scale(33+(8*12)) && MouseInput.MouseState.Y <= GlobalGraphics.Scale(33+(8*12)+6))
                         {
                             // Cycle holiday.
                             GlobalContent.GetSound("Select").Play(int.Parse(SaveData.saveValues["SoundEffectVolume"], CultureInfo.InvariantCulture) / 100f, 0f, 0f);
@@ -258,14 +258,14 @@ namespace NonsensicalVideoGenerator
                             }
                             return true;
                         }
-                        if(MouseInput.MouseState.Y >= GlobalGraphics.Scale(33+(8*15)) && MouseInput.MouseState.Y <= GlobalGraphics.Scale(33+(8*15)+6))
+                        if(MouseInput.MouseState.Y >= GlobalGraphics.Scale(33+(8*13)) && MouseInput.MouseState.Y <= GlobalGraphics.Scale(33+(8*13)+6))
                         {
                             // Toggle fullscreen.
                             GlobalContent.GetSound("Select").Play(int.Parse(SaveData.saveValues["SoundEffectVolume"], CultureInfo.InvariantCulture) / 100f, 0f, 0f);
                             UserInterface.instance.ToggleFullscreen();
                             return true;
                         }
-                        if(MouseInput.MouseState.Y >= GlobalGraphics.Scale(33+(8*16)) && MouseInput.MouseState.Y <= GlobalGraphics.Scale(33+(8*16)+6))
+                        if(MouseInput.MouseState.Y >= GlobalGraphics.Scale(33+(8*14)) && MouseInput.MouseState.Y <= GlobalGraphics.Scale(33+(8*14)+6))
                         {
                             // Toggle hidden keep temporary job folders.
                             GlobalContent.GetSound("Select").Play(int.Parse(SaveData.saveValues["SoundEffectVolume"], CultureInfo.InvariantCulture) / 100f, 0f, 0f);
@@ -273,7 +273,7 @@ namespace NonsensicalVideoGenerator
                             SaveData.Save();
                             return true;
                         }
-                        if(MouseInput.MouseState.Y >= GlobalGraphics.Scale(33+(8*17)) && MouseInput.MouseState.Y <= GlobalGraphics.Scale(33+(8*17)+6))
+                        if(MouseInput.MouseState.Y >= GlobalGraphics.Scale(33+(8*15)) && MouseInput.MouseState.Y <= GlobalGraphics.Scale(33+(8*15)+6))
                         {
                             // Toggle hidden verbose.
                             GlobalContent.GetSound("Select").Play(int.Parse(SaveData.saveValues["SoundEffectVolume"], CultureInfo.InvariantCulture) / 100f, 0f, 0f);
@@ -281,14 +281,14 @@ namespace NonsensicalVideoGenerator
                             SaveData.Save();
                             return true;
                         }
-                        if(MouseInput.MouseState.Y >= GlobalGraphics.Scale(33+(8*18)) && MouseInput.MouseState.Y <= GlobalGraphics.Scale(33+(8*18)+6))
+                        if(MouseInput.MouseState.Y >= GlobalGraphics.Scale(33+(8*16)) && MouseInput.MouseState.Y <= GlobalGraphics.Scale(33+(8*16)+6))
                         {
                             // Toggle audio sync.
                             GlobalContent.GetSound("Select").Play(int.Parse(SaveData.saveValues["SoundEffectVolume"], CultureInfo.InvariantCulture) / 100f, 0f, 0f);
                             Global.generator.audioSync = !Global.generator.audioSync;
                             return true;
                         }
-                        if(MouseInput.MouseState.Y >= GlobalGraphics.Scale(33+(8*19)) && MouseInput.MouseState.Y <= GlobalGraphics.Scale(33+(8*19)+6))
+                        if(MouseInput.MouseState.Y >= GlobalGraphics.Scale(33+(8*17)) && MouseInput.MouseState.Y <= GlobalGraphics.Scale(33+(8*17)+6))
                         {
                             // Open console.txt.
                             string consoleLogFile = Path.Combine(Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location) ?? ".", "console.log");
@@ -296,7 +296,7 @@ namespace NonsensicalVideoGenerator
                                 System.Diagnostics.Process.Start(consoleLogFile);
                             return true;
                         }
-                        if(MouseInput.MouseState.Y >= GlobalGraphics.Scale(33+(8*20)) && MouseInput.MouseState.Y <= GlobalGraphics.Scale(33+(8*20)+6))
+                        if(MouseInput.MouseState.Y >= GlobalGraphics.Scale(33+(8*18)) && MouseInput.MouseState.Y <= GlobalGraphics.Scale(33+(8*18)+6))
                         {
                             // Unlock FPS.
                             GlobalContent.GetSound("Select").Play(int.Parse(SaveData.saveValues["SoundEffectVolume"], CultureInfo.InvariantCulture) / 100f, 0f, 0f);
@@ -324,15 +324,15 @@ namespace NonsensicalVideoGenerator
                 DrawButton(spriteBatch, 6, 33+(8*7), "Draw Offset: " + GlobalGraphics.drawOffset.X.ToString(CultureInfo.InvariantCulture) + ", " + GlobalGraphics.drawOffset.Y.ToString(CultureInfo.InvariantCulture));
                 DrawButton(spriteBatch, 6, 33+(8*8), "Export Params: " + (Generator.exportParams.StartsWith("-vcodec") ? "better" : (Generator.exportParams.StartsWith("-af") ? "better (audio sync)" : "old")));
                 DrawButton(spriteBatch, 6, 33+(8*9), "Music: #" + (UserInterface.instance.music+1));
-                DrawButton(spriteBatch, 6, 33+(8*11), "Theme: " + ThemeManager.activeTheme.name);
-                DrawButton(spriteBatch, 6, 33+(8*12), "Save");
-                DrawButton(spriteBatch, 6, 33+(8*13), "Holiday: " + (HolidayManager.CurrentHoliday != null ? HolidayManager.CurrentHoliday.Name : "None"));
-                DrawButton(spriteBatch, 6, 33+(8*15), (GlobalGraphics.fullScreen ? "Disable" : "Enable") + " Fullscreen");
-                DrawButton(spriteBatch, 6, 33+(8*16), (bool.Parse(SaveData.saveValues["HiddenKeepTemporaryJobFolders"]) ? "Delete" : "Keep") + " Temporary Job Folders");
-                DrawButton(spriteBatch, 6, 33+(8*17), (bool.Parse(SaveData.saveValues["HiddenVerbose"]) ? "Disable" : "Enable") + " Verbose");
-                DrawButton(spriteBatch, 6, 33+(8*18), (Global.generator.audioSync ? "Disable" : "Enable") + " Audio Sync");
-                DrawButton(spriteBatch, 6, 33+(8*19), "Open console.txt");
-                DrawButton(spriteBatch, 6, 33+(8*20), (UserInterface.instance.IsFixedTimeStep ? "Unlock" : "Lock") + " FPS and VSync");
+                DrawButton(spriteBatch, 6, 33+(8*10), "Theme: " + ThemeManager.activeTheme.name);
+                DrawButton(spriteBatch, 6, 33+(8*11), "Save");
+                DrawButton(spriteBatch, 6, 33+(8*12), "Holiday: " + (HolidayManager.CurrentHoliday != null ? HolidayManager.CurrentHoliday.Name : "None"));
+                DrawButton(spriteBatch, 6, 33+(8*13), (GlobalGraphics.fullScreen ? "Disable" : "Enable") + " Fullscreen");
+                DrawButton(spriteBatch, 6, 33+(8*14), (bool.Parse(SaveData.saveValues["HiddenKeepTemporaryJobFolders"]) ? "Delete" : "Keep") + " Temporary Job Folders");
+                DrawButton(spriteBatch, 6, 33+(8*15), (bool.Parse(SaveData.saveValues["HiddenVerbose"]) ? "Disable" : "Enable") + " Verbose");
+                DrawButton(spriteBatch, 6, 33+(8*16), (Global.generator.audioSync ? "Disable" : "Enable") + " Audio Sync");
+                DrawButton(spriteBatch, 6, 33+(8*17), "Open console.txt");
+                DrawButton(spriteBatch, 6, 33+(8*18), (UserInterface.instance.IsFixedTimeStep ? "Unlock" : "Lock") + " FPS and VSync");
                 GlobalContent.DrawString(spriteBatch, L.FontSmall(), "F3: Toggle Debug Menu", new Vector2(GlobalGraphics.Scale(6), GlobalGraphics.scaledHeight - GlobalGraphics.Scale(6*6) - GlobalGraphics.Scale(9)), Color.White);
                 GlobalContent.DrawString(spriteBatch, L.FontSmall(), "F4: Toggle Main Window Tween", new Vector2(GlobalGraphics.Scale(6), GlobalGraphics.scaledHeight - GlobalGraphics.Scale(6*5) - GlobalGraphics.Scale(9)), Color.White);
                 GlobalContent.DrawString(spriteBatch, L.FontSmall(), "F6: Pause", new Vector2(GlobalGraphics.Scale(6), GlobalGraphics.scaledHeight - GlobalGraphics.Scale(6*4) - GlobalGraphics.Scale(9)), Color.White);

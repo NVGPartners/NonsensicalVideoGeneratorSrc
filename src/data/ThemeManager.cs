@@ -238,6 +238,15 @@ namespace NonsensicalVideoGenerator
                     // If not, load from default theme
                     return contentManager.Load<T>(path);
                 }
+                // If T is Song, load as wma
+                if(typeof(T).Name == "Song")
+                {
+                    // Create valid uri
+                    string uriString = Path.Combine(Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location) ?? ".", "Content", activeTheme.prefix, path.Replace('/', Path.DirectorySeparatorChar) + ".wma");
+                    uriString = uriString.Replace('\\', '/');
+                    Uri uri = new Uri(uriString);
+                    return (T)(object)Song.FromUri(Path.GetFileNameWithoutExtension(path), uri);
+                }
                 return contentManager.Load<T>(activeTheme.prefix + path);
             }
             // Otherwise, load assets

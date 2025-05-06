@@ -155,6 +155,7 @@ namespace NonsensicalVideoGenerator
                                 FramePlayer.Stop();
                                 if(UserInterface.instance.videoPlayer != null)
                                 {
+                                    Global.videoPlaying = false;
                                     UserInterface.instance.videoPlayer.Dispose();
                                     UserInterface.instance.videoPlayer = null;
                                 }
@@ -168,8 +169,9 @@ namespace NonsensicalVideoGenerator
                                 string cachePath = VideoCache.GetCachePath(tempOutput);
                                 UserInterface.instance.videoPath = cachePath;
                                 UserInterface.instance.video = VideoHelper.LoadFromFile(cachePath);
-                                UserInterface.instance.videoPlayer.IsLooped = true;
+                                //UserInterface.instance.videoPlayer.IsLooped = true;
                                 UserInterface.instance.videoPlayer.Play(UserInterface.instance.video);
+                                Global.videoPlaying = true;
                                 UserInterface.instance.videoPlayer.Volume = float.Parse(SaveData.saveValues["VideoVolume"], CultureInfo.InvariantCulture) / 100f;
                                 FramePlayer.canPlayBgMusic = false;
                                 Global.generator.progressText = L.T(0, "Video:StatusPlay");
@@ -790,6 +792,7 @@ namespace NonsensicalVideoGenerator
                                 FramePlayer.Stop();
                                 if(UserInterface.instance.videoPlayer != null)
                                 {
+                                    Global.videoPlaying = false;
                                     UserInterface.instance.videoPlayer.Dispose();
                                     UserInterface.instance.videoPlayer = null;
                                 }
@@ -803,8 +806,9 @@ namespace NonsensicalVideoGenerator
                                 string cachePath = VideoCache.GetCachePath(tempOutput);
                                 UserInterface.instance.videoPath = cachePath;
                                 UserInterface.instance.video = VideoHelper.LoadFromFile(cachePath);
-                                UserInterface.instance.videoPlayer.IsLooped = true;
+                                //UserInterface.instance.videoPlayer.IsLooped = true;
                                 UserInterface.instance.videoPlayer.Play(UserInterface.instance.video);
+                                Global.videoPlaying = true;
                                 UserInterface.instance.videoPlayer.Volume = float.Parse(SaveData.saveValues["VideoVolume"], CultureInfo.InvariantCulture) / 100f;
                                 FramePlayer.canPlayBgMusic = false;
                                 if(ScreenManager.GetScreen<VideoScreen>("Video") == null

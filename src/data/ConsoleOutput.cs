@@ -50,7 +50,6 @@ namespace NonsensicalVideoGenerator
         {
             return scrollAmount > -1 ? scrolledOutput : output;
         }
-#if !MONOGAME
         public static ConsoleColor GetColor(Color col)
         {
             // Get closest match in terms of rgb values.
@@ -58,7 +57,7 @@ namespace NonsensicalVideoGenerator
             double closestDistance = double.MaxValue;
             foreach (ConsoleColor c in Enum.GetValues(typeof(ConsoleColor)))
             {
-                Color consoleColor = Color.FromName(c.ToString());
+                System.Drawing.Color consoleColor = System.Drawing.Color.FromName(c.ToString());
                 double distance = Math.Sqrt(Math.Pow(consoleColor.R - col.R, 2) + Math.Pow(consoleColor.G - col.G, 2) + Math.Pow(consoleColor.B - col.B, 2));
                 if (distance < closestDistance)
                 {
@@ -68,7 +67,6 @@ namespace NonsensicalVideoGenerator
             }
             return closest;
         }
-#endif
         private static void WriteLineInternal(string line, bool newLine = true, Color? color = null)
         {
             Color c = Color.White;
@@ -110,12 +108,14 @@ namespace NonsensicalVideoGenerator
             // Write to console.
             if(c != Color.Transparent)
             {
+#endif
                 ConsoleColor cc = GetColor(c);
                 Console.ForegroundColor = cc;
                 if (!newLine)
                     Console.Write(line);
                 else
                     Console.WriteLine(line);
+#if !MONOGAME
             }
 #endif
             // Remove old lines.

@@ -4,6 +4,7 @@ using System.Collections.Generic;
 using System.Diagnostics;
 using System.Globalization;
 using System.Linq;
+using System.Reflection;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Content;
 using Microsoft.Xna.Framework.Graphics;
@@ -33,13 +34,23 @@ namespace NonsensicalVideoGenerator
             Type screenType = typeof(IScreen);
             Type[] types = AppDomain.CurrentDomain.GetAssemblies()
                 .SelectMany(s => {
-                    Type[] t = new Type[0];
+                    Type[] t;
                     try
                     {
                         t = s.GetTypes();
                     }
-                    catch(Exception)
+                    catch (ReflectionTypeLoadException ex)
                     {
+                        // Log or inspect the loader exceptions for debugging
+                        foreach (var loaderException in ex.LoaderExceptions)
+                        {
+                            Console.WriteLine(loaderException.Message);
+                        }
+                        t = ex.Types.Where(type => type != null).ToArray(); // Use only successfully loaded types
+                    }
+                    catch (Exception ex)
+                    {
+                        Console.WriteLine($"Error loading types from assembly: {ex.Message}");
                         t = new Type[0];
                     }
                     return t;

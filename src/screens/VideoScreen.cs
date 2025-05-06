@@ -235,6 +235,7 @@ namespace NonsensicalVideoGenerator
                         }
                         else if(UserInterface.instance.videoPlayer.State != MediaState.Stopped)
                         {
+                            Global.videoPlaying = false;
                             UserInterface.instance.videoPlayer.Dispose();
                             UserInterface.instance.videoPlayer = null;
                             FramePlayer.canPlayBgMusic = true;

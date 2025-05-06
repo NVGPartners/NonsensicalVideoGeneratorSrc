@@ -11,6 +11,7 @@ using Microsoft.Xna.Framework.Input;
 using Microsoft.Xna.Framework.Media;
 using MonoGame.Extended.Tweening;
 using System.Globalization;
+using MonoGame.Extended.VideoPlayback;
 
 namespace NonsensicalVideoGenerator
 {
@@ -565,6 +566,28 @@ namespace NonsensicalVideoGenerator
         }
         public static void Update(GameTime gameTime)
         {
+            if(Global.videoPlaying && UserInterface.instance != null && UserInterface.instance.videoPlayer != null && UserInterface.instance.videoPath != "" && UserInterface.instance.videoPlayer.State == MediaState.Stopped)
+            {
+                Stop();
+                canPlayBgMusic = false;
+                UserInterface.instance.videoPlayer.Dispose();
+                UserInterface.instance.videoPlayer = null;
+                UserInterface.instance.videoPlayer = new MonoGame.Extended.Framework.Media.VideoPlayer(UserInterface.instance.GraphicsDevice);
+                if(UserInterface.instance.video != null)
+                {
+                    UserInterface.instance.video.Dispose();
+                    UserInterface.instance.video = null;
+                }
+                UserInterface.instance.video = VideoHelper.LoadFromFile(UserInterface.instance.videoPath);
+                UserInterface.instance.videoPlayer.Play(UserInterface.instance.video);
+                UserInterface.instance.videoPlayer.Volume = float.Parse(SaveData.saveValues["VideoVolume"], CultureInfo.InvariantCulture) / 100f;
+                if(ScreenManager.GetScreen<VideoScreen>("Video") == null
+                    || ScreenManager.GetScreen<VideoScreen>("Video")?.screenType == ScreenType.Hidden)
+                {
+                    ScreenManager.PushNavigation("Video");
+                    ScreenManager.GetScreen<VideoScreen>("Video")?.Show();
+                }
+            }
             if(SaveData.saveValues["UseExternalVideoPlayer"] == "false")
             {
                 if(audioLength > 0 && currentAudioTime < audioLength && audioPlaying)

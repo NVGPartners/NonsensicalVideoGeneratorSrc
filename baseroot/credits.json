@@ -6,20 +6,13 @@
         "gmm2003 (Sound Effects)",
         "bobbyiguess (Music)"
     ],
-    "Moderator": [
-        "0zne",
-        "brettbagel",
-        "flynnyt03",
-        "nuppington",
-        "smartent_spiral",
-        "ziahorizon"
-    ],
     "Translator": [
         "augustusproceus (German)",
         "mister_k_poyo (German)",
         "ashypepil (Russian)",
         "darkyuuu_ (French)",
-        "peto444 (Slovak)"
+        "peto444 (Slovak)",
+        "iputsday (Hungarian)"
     ],
     "SpecialThanks": [
         "vinesauce",
@@ -28,29 +21,6 @@
         "devanwolf",
         "officaldeemacias",
         "madclown55"
-    ],
-    "Superstar": [
-        "thigo",
-        "antho27",
-        "cb_killa",
-        "dareturnofnobodyhasabandonedme",
-        "fireafyanimations",
-        "1greg7",
-        "realgoggleskun",
-        "gungholizard",
-        "tehcartoonman22145",
-        "jankespro12",
-        "kraggerthemenace",
-        "lindinhodebonito",
-        "marcioleo123",
-        "revilleaj",
-        "rowster64",
-        "russellinu",
-        "supercar11",
-        "thebritishytper",
-        "toony6125",
-        "waterdeervt",
-        "zappaboi"
     ],
     "SoftwareLicense": [
         "Nonsensical Video Generator (GPL-3.0 License)",
@@ -64,7 +34,7 @@
         "MoonSharp (BSD-3-Clause License)",
         "Sdcb.FFmpeg (GPL-3.0 License)",
         "FFmpeg (GPL-3.0 License)",
-        "yt-dlp (Unlicense)"
+        "yt-dlp (The Unlicense)"
     ],
     "FontLicense": [
         "Munro (SIL Open Font License)",
