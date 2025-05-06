@@ -34,7 +34,7 @@ namespace NonsensicalVideoGenerator
             Texture2D banner = GlobalContent.GetTexture("BlogBanner");
             SpriteFont font = L.FontLarge();
             // Draw title
-            string title = L.T(0, "Update:Title", L.T(0, "Update:Month" + BlogData.Month.ToString(CultureInfo.InvariantCulture)), BlogData.Year.ToString(CultureInfo.InvariantCulture), "v" + Global.productVersion.Remove(0, 2).Remove(3));
+            string title = L.T(0, "Blog:UpdateTitle", L.T(0, "Blog:UpdateMonth" + BlogData.Month.ToString(CultureInfo.InvariantCulture)), BlogData.Year.ToString(CultureInfo.InvariantCulture), "v" + Global.productVersion.Remove(0, 2).Remove(3));
             Vector2 titleSize = font.MeasureString(title);
             GlobalContent.DrawString(spriteBatch, font, title, new Vector2(GlobalGraphics.Scale(220+1) - titleSize.X / 2, GlobalGraphics.Scale(59+1)), Color.Black);
             GlobalContent.DrawString(spriteBatch, font, title, new Vector2(GlobalGraphics.Scale(220) - titleSize.X / 2, GlobalGraphics.Scale(59)), Color.White);
@@ -46,7 +46,7 @@ namespace NonsensicalVideoGenerator
             int subtitleHeight = 85;
             for(int i = 0; i < BlogData.Subtitle.Count; i++)
             {
-                string subtitle = BlogData.Subtitle[i].Replace("%version%", Global.productVersion.Remove(7)).Replace("%month%", BlogData.Month.ToString("D2", CultureInfo.InvariantCulture)).Replace("%day%", BlogData.Day.ToString("D2", CultureInfo.InvariantCulture)).Replace("%year%", BlogData.Year.ToString(CultureInfo.InvariantCulture)).Replace("%tier%", L.T(0, "Update:Tier" + BlogData.Tier.ToString(CultureInfo.InvariantCulture)));
+                string subtitle = BlogData.Subtitle[i].Replace("%version%", Global.productVersion.Remove(7)).Replace("%month%", BlogData.Month.ToString("D2", CultureInfo.InvariantCulture)).Replace("%day%", BlogData.Day.ToString("D2", CultureInfo.InvariantCulture)).Replace("%year%", BlogData.Year.ToString(CultureInfo.InvariantCulture)).Replace("%tier%", L.T(0, "Blog:UpdateTier" + BlogData.Tier.ToString(CultureInfo.InvariantCulture)));
                 Vector2 subtitleSize = font.MeasureString(subtitle);
                 GlobalContent.DrawString(spriteBatch, font, subtitle, new Vector2(GlobalGraphics.Scale(273+1) - subtitleSize.X / 2, GlobalGraphics.Scale(subtitleHeight+1)), Color.Black);
                 GlobalContent.DrawString(spriteBatch, font, subtitle, new Vector2(GlobalGraphics.Scale(273) - subtitleSize.X / 2, GlobalGraphics.Scale(subtitleHeight)), Color.White);
@@ -56,7 +56,7 @@ namespace NonsensicalVideoGenerator
             int descriptionHeight = 133;
             for(int i = 0; i < BlogData.Description.Count; i++)
             {
-                string text = BlogData.Description[i].Replace("%footer%", L.T(0, "Update:Footer"));
+                string text = BlogData.Description[i].Replace("%footer%", L.T(0, "Blog:UpdateFooter"));
                 Vector2 descriptionSize = font.MeasureString(text);
                 GlobalContent.DrawString(spriteBatch, font, text, new Vector2(GlobalGraphics.Scale(220+1) - descriptionSize.X / 2, GlobalGraphics.Scale(descriptionHeight+1)), Color.Black);
                 GlobalContent.DrawString(spriteBatch, font, text, new Vector2(GlobalGraphics.Scale(220) - descriptionSize.X / 2, GlobalGraphics.Scale(descriptionHeight)), Color.White);
