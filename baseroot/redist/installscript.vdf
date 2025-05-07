@@ -2,10 +2,10 @@
 {
 	"Run Process"
 	{
-		"windowsdesktop-runtime-8.0.11-win-x64"
+		"windowsdesktop-runtime-8.0.15-win-x64"
 		{
 			"HasRunKey"		"HKEY_LOCAL_MACHINE\\Software\\Valve\\Steam\\Apps\\2516360"
-			"process 1"		"%INSTALLDIR%\\redist\\windowsdesktop-runtime-8.0.11-win-x64.exe"
+			"process 1"		"%INSTALLDIR%\\redist\\windowsdesktop-runtime-8.0.15-win-x64.exe"
 			"command 1"		"/install /quiet /norestart"
 			"NoCleanUp"		"1"
 			"Requirement_OS"
@@ -21,5 +21,5 @@
 }
 "kvsignatures"
 {
-	"InstallScript"		"11d508eea6d8e4d8415593eac6577266deb645fe8b1a87aafd7f055fff75bed4b93e33962104d5517447820ece35a2ab695d9e9a4899a00a3a40f3a14859473dbf2ff871bafc88368e93092c6deb2f2f2e65f3ccd36afa5a52e172455ae4528fae28ec1412502f08a6a698c510d0e1b8367abb5f4268d57b82610d21cc8d397b"
+	"InstallScript"		"26a84b631e6520505a573a5d99513681d8e30f17b7df3535acc49909660f215df9a4b6f6a365e2c727a272dd952616d35e2b4bb948e586a2c984fefca7edd3bce1e2d793deed26c2678848a702ecd986930c0f2e6bc10d001236439cfdae6fe3dd718858e16edb0018308f7c38d204ac570ac1e7acbc36a0afbca7451f06069f"
 }

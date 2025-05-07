@@ -1,15 +1,39 @@
-April 2025: Update v7.1
+May 2025: Update v7.2
 
 Here are the changes in this update:
 
+[h3]General Changes[/h3]
 [list]
-[*]
-[*]
-[*]
-[*]
-[*]
-[*]
-[*]
+[*]Changed how background music is loaded.
+[*]Added a workaround for certain Workshop effects to download stock media properly.
+[list]
+[*]The media files will be downloaded from the NVG public GitHub repository.
+[/list]
+[*]Removed unused tutorial window.
+[list]
+[*]Previously used to install FFmpeg and allow addons to ask for permission.
+[*]Associated localization tokens have been removed.
+[/list]
+[*]Restored the Welcome text when NVG starts.
+[*]Updated .NET Desktop Runtime to 8.0.15.
+[/list]
+
+[h3]Bug Fixes[/h3]
+[list]
+[*]Fixed a bug where playing audio files does not properly update its volume level.
+[*]Fixed "Resource is temporarily unavailable" error when video playback loops.
+[*]Fixed a bug where scrollable pages show contents below the rendered area.
+[list]
+[*]This was previously only noticable in fullscreen mode.
+[/list]
+[/list]
+
+[h3]Localization Updates[/h3]
+[list]
+[*]Added extended font variants for LanaPixel and Noto Sans.
+[*]Added support for localized default outros.
+[*]Added more localization tokens for the Blog tab.
+[*]Updated the localization files.
 [/list]
 
 Let me know if you have any issues with this update through the [url=https://discord.gg/8ppmspR6Wh]NVG Community Discord[/url].

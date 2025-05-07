@@ -32,20 +32,6 @@
 /processorParam:TextureFormat=Compressed
 /build:fonts/lanapixel-x1.spritefont
 
-#begin fonts/lanapixel-x1.spritefont
-/importer:FontDescriptionImporter
-/processor:FontDescriptionProcessor
-/processorParam:PremultiplyAlpha=True
-/processorParam:TextureFormat=Compressed
-/build:fonts/lanapixel-x1.spritefont
-
-#begin fonts/lanapixel-x2.spritefont
-/importer:FontDescriptionImporter
-/processor:FontDescriptionProcessor
-/processorParam:PremultiplyAlpha=True
-/processorParam:TextureFormat=Compressed
-/build:fonts/lanapixel-x2.spritefont
-
 #begin fonts/lanapixel-x2.spritefont
 /importer:FontDescriptionImporter
 /processor:FontDescriptionProcessor
@@ -59,20 +45,6 @@
 /processorParam:PremultiplyAlpha=True
 /processorParam:TextureFormat=Compressed
 /build:fonts/lanapixel-x3.spritefont
-
-#begin fonts/lanapixel-x3.spritefont
-/importer:FontDescriptionImporter
-/processor:FontDescriptionProcessor
-/processorParam:PremultiplyAlpha=True
-/processorParam:TextureFormat=Compressed
-/build:fonts/lanapixel-x3.spritefont
-
-#begin fonts/lanapixel-x4.spritefont
-/importer:FontDescriptionImporter
-/processor:FontDescriptionProcessor
-/processorParam:PremultiplyAlpha=True
-/processorParam:TextureFormat=Compressed
-/build:fonts/lanapixel-x4.spritefont
 
 #begin fonts/lanapixel-x4.spritefont
 /importer:FontDescriptionImporter
@@ -116,33 +88,12 @@
 /processorParam:TextureFormat=Compressed
 /build:fonts/munro-small-x1.spritefont
 
-#begin fonts/munro-small-x1.spritefont
-/importer:FontDescriptionImporter
-/processor:FontDescriptionProcessor
-/processorParam:PremultiplyAlpha=True
-/processorParam:TextureFormat=Compressed
-/build:fonts/munro-small-x1.spritefont
-
 #begin fonts/munro-small-x2.spritefont
 /importer:FontDescriptionImporter
 /processor:FontDescriptionProcessor
 /processorParam:PremultiplyAlpha=True
 /processorParam:TextureFormat=Compressed
 /build:fonts/munro-small-x2.spritefont
-
-#begin fonts/munro-small-x2.spritefont
-/importer:FontDescriptionImporter
-/processor:FontDescriptionProcessor
-/processorParam:PremultiplyAlpha=True
-/processorParam:TextureFormat=Compressed
-/build:fonts/munro-small-x2.spritefont
-
-#begin fonts/munro-small-x3.spritefont
-/importer:FontDescriptionImporter
-/processor:FontDescriptionProcessor
-/processorParam:PremultiplyAlpha=True
-/processorParam:TextureFormat=Compressed
-/build:fonts/munro-small-x3.spritefont
 
 #begin fonts/munro-small-x3.spritefont
 /importer:FontDescriptionImporter
@@ -158,33 +109,12 @@
 /processorParam:TextureFormat=Compressed
 /build:fonts/munro-small-x4.spritefont
 
-#begin fonts/munro-small-x4.spritefont
-/importer:FontDescriptionImporter
-/processor:FontDescriptionProcessor
-/processorParam:PremultiplyAlpha=True
-/processorParam:TextureFormat=Compressed
-/build:fonts/munro-small-x4.spritefont
-
 #begin fonts/munro-x1.spritefont
 /importer:FontDescriptionImporter
 /processor:FontDescriptionProcessor
 /processorParam:PremultiplyAlpha=True
 /processorParam:TextureFormat=Compressed
 /build:fonts/munro-x1.spritefont
-
-#begin fonts/munro-x1.spritefont
-/importer:FontDescriptionImporter
-/processor:FontDescriptionProcessor
-/processorParam:PremultiplyAlpha=True
-/processorParam:TextureFormat=Compressed
-/build:fonts/munro-x1.spritefont
-
-#begin fonts/munro-x2.spritefont
-/importer:FontDescriptionImporter
-/processor:FontDescriptionProcessor
-/processorParam:PremultiplyAlpha=True
-/processorParam:TextureFormat=Compressed
-/build:fonts/munro-x2.spritefont
 
 #begin fonts/munro-x2.spritefont
 /importer:FontDescriptionImporter
@@ -200,33 +130,12 @@
 /processorParam:TextureFormat=Compressed
 /build:fonts/munro-x3.spritefont
 
-#begin fonts/munro-x3.spritefont
-/importer:FontDescriptionImporter
-/processor:FontDescriptionProcessor
-/processorParam:PremultiplyAlpha=True
-/processorParam:TextureFormat=Compressed
-/build:fonts/munro-x3.spritefont
-
 #begin fonts/munro-x4.spritefont
 /importer:FontDescriptionImporter
 /processor:FontDescriptionProcessor
 /processorParam:PremultiplyAlpha=True
 /processorParam:TextureFormat=Compressed
 /build:fonts/munro-x4.spritefont
-
-#begin fonts/munro-x4.spritefont
-/importer:FontDescriptionImporter
-/processor:FontDescriptionProcessor
-/processorParam:PremultiplyAlpha=True
-/processorParam:TextureFormat=Compressed
-/build:fonts/munro-x4.spritefont
-
-#begin fonts/notosans-x1.spritefont
-/importer:FontDescriptionImporter
-/processor:FontDescriptionProcessor
-/processorParam:PremultiplyAlpha=True
-/processorParam:TextureFormat=Compressed
-/build:fonts/notosans-x1.spritefont
 
 #begin fonts/notosans-x1.spritefont
 /importer:FontDescriptionImporter
@@ -242,33 +151,12 @@
 /processorParam:TextureFormat=Compressed
 /build:fonts/notosans-x2.spritefont
 
-#begin fonts/notosans-x2.spritefont
-/importer:FontDescriptionImporter
-/processor:FontDescriptionProcessor
-/processorParam:PremultiplyAlpha=True
-/processorParam:TextureFormat=Compressed
-/build:fonts/notosans-x2.spritefont
-
 #begin fonts/notosans-x3.spritefont
 /importer:FontDescriptionImporter
 /processor:FontDescriptionProcessor
 /processorParam:PremultiplyAlpha=True
 /processorParam:TextureFormat=Compressed
 /build:fonts/notosans-x3.spritefont
-
-#begin fonts/notosans-x3.spritefont
-/importer:FontDescriptionImporter
-/processor:FontDescriptionProcessor
-/processorParam:PremultiplyAlpha=True
-/processorParam:TextureFormat=Compressed
-/build:fonts/notosans-x3.spritefont
-
-#begin fonts/notosans-x4.spritefont
-/importer:FontDescriptionImporter
-/processor:FontDescriptionProcessor
-/processorParam:PremultiplyAlpha=True
-/processorParam:TextureFormat=Compressed
-/build:fonts/notosans-x4.spritefont
 
 #begin fonts/notosans-x4.spritefont
 /importer:FontDescriptionImporter
@@ -1217,41 +1105,41 @@
 /processorParam:TextureFormat=Color
 /build:graphics/vidwindow.png
 
-#begin music/theme1.wma
-/importer:WmaImporter
+#begin music/theme1.ogg
+/importer:OggImporter
 /processor:SongProcessor
 /processorParam:Quality=Best
-/build:music/theme1.wma
+/build:music/theme1.ogg
 
-#begin music/theme2.wma
-/importer:WmaImporter
+#begin music/theme2.ogg
+/importer:OggImporter
 /processor:SongProcessor
 /processorParam:Quality=Best
-/build:music/theme2.wma
+/build:music/theme2.ogg
 
-#begin music/theme3.wma
-/importer:WmaImporter
+#begin music/theme3.ogg
+/importer:OggImporter
 /processor:SongProcessor
 /processorParam:Quality=Best
-/build:music/theme3.wma
+/build:music/theme3.ogg
 
-#begin music/theme4.wma
-/importer:WmaImporter
+#begin music/theme4.ogg
+/importer:OggImporter
 /processor:SongProcessor
 /processorParam:Quality=Best
-/build:music/theme4.wma
+/build:music/theme4.ogg
 
-#begin music/theme5.wma
-/importer:WmaImporter
+#begin music/theme5.ogg
+/importer:OggImporter
 /processor:SongProcessor
 /processorParam:Quality=Best
-/build:music/theme5.wma
+/build:music/theme5.ogg
 
-#begin music/theme6.wma
-/importer:WmaImporter
+#begin music/theme6.ogg
+/importer:OggImporter
 /processor:SongProcessor
 /processorParam:Quality=Best
-/build:music/theme6.wma
+/build:music/theme6.ogg
 
 #begin sound/addsource.wav
 /importer:WavImporter
@@ -1985,11 +1873,11 @@
 /processorParam:TextureFormat=Color
 /build:themes/halloween/graphics/tile.png
 
-#begin themes/halloween/music/theme1.wma
-/importer:WmaImporter
+#begin themes/halloween/music/theme1.ogg
+/importer:OggImporter
 /processor:SongProcessor
 /processorParam:Quality=Best
-/build:themes/halloween/music/theme1.wma
+/build:themes/halloween/music/theme1.ogg
 
 #begin themes/holiday/graphics/actions/disableall.png
 /importer:TextureImporter
