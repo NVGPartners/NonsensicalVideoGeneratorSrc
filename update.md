@@ -21,6 +21,6 @@
 > - Added more localization tokens for the Blog tab.
 > - Updated the localization files.
 > Let me know if you have any issues with this update through the <#873289037186748437> channel.
-> Also, please help translate NVG into your language on [GitHub](https://github.com/KiwifruitDev/NonsensicalVideoGenerator/wiki/Localization)!
+> Also, please help translate NVG into your language on [GitHub](<https://github.com/KiwifruitDev/NonsensicalVideoGenerator/wiki/Localization>)!
 > Happy generating! :nonsensicalvideogenerator:
 <https://store.steampowered.com/news/app/2516360/view/499446213320377116>
