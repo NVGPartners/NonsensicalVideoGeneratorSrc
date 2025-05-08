@@ -30,7 +30,7 @@ The following instructions are for building **Nonsensical Video Generator** from
         - Fill in the placeholders with your details
 - Debugging:
     - Open the **Run and Debug** tab in VS Code
-    - Select "Build and Launch (Debug WindowsDX)"
+    - Select "Build and Launch (Debug)"
 - Publishing:
     - Make sure that `NonsensicalVideoGenerator.csproj` has an incremented version number from live release
     - Close Steam to prevent login conflicts

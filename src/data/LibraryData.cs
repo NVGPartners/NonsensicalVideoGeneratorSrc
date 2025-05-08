@@ -1,18 +1,11 @@
 using System;
 using System.Collections.Generic;
 using System.IO;
-#if MONOGAME
 using Microsoft.Xna.Framework;
-#else
-using System.Drawing;
-#endif
-using Newtonsoft.Json;
-using System.Runtime.InteropServices;
 using System.ComponentModel;
 using System.Net;
 using System.Diagnostics;
 using System.Linq;
-using Steamworks;
 using System.Globalization;
 using System.Reflection;
 
@@ -430,7 +423,7 @@ namespace NonsensicalVideoGenerator
         public static string GetLocalizedDefaultOutro(string path)
         {
             // Must be the default outro.
-            if(!path.Contains("outros") && !path.EndsWith("defaultoutro.mp4"))
+            if(!path.Contains("outros") || !path.EndsWith("defaultoutro.mp4"))
                 return path;
             // Find the default outro in the locales folder.
             string basePath = Path.Combine(Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location) ?? ".");
@@ -570,9 +563,7 @@ namespace NonsensicalVideoGenerator
                 if(downloadType == null)
                 {
                     ConsoleOutput.WriteLine("Failed to download clip: Invalid download type", Color.Red);
-#if MONOGAME
                     LibraryPage.Done(false);
-#endif
                     continue;
                 }
                 string downloadUrl = downloadUrls[i];
@@ -629,17 +620,13 @@ namespace NonsensicalVideoGenerator
                 catch (Exception ex)
                 {
                     ConsoleOutput.WriteLine("Failed to download clip: " + ex.Message, Color.Red);
-#if MONOGAME
                     LibraryPage.Done(false);
-#endif
                     continue;
                 }
                 // Add it to the library.
                 LibraryFile file = new(Path.GetFileNameWithoutExtension(path), path, downloadType);
                 // Run callback
-#if MONOGAME
                 LibraryPage.Done(true);
-#endif
                 libraryFiles.Add(file);
                 Global.justCompletedRender = true; // Refresh the library.
                 ConsoleOutput.WriteLine("Downloaded clip to library: " + path, Color.Green);

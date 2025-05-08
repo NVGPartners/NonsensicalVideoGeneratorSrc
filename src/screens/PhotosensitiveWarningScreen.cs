@@ -1,15 +1,10 @@
-#if MONOGAME
-using System;
 using System.Collections.Generic;
 using System.ComponentModel;
-using System.Reflection;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Content;
 using Microsoft.Xna.Framework.Graphics;
 using Microsoft.Xna.Framework.Input;
-using Steamworks;
 using System.Globalization;
-using System.IO;
 
 namespace NonsensicalVideoGenerator
 {
@@ -220,7 +215,7 @@ namespace NonsensicalVideoGenerator
                                 ConsoleOutput.WriteLine("User acknowledged photosensitive warning.", Color.LightGreen);
                             }
                             accepted = true;
-                            GlobalContent.GetSound("Select").Play(int.Parse(SaveData.saveValues["SoundEffectVolume"], CultureInfo.InvariantCulture) / 100f, 0f, 0f);
+                            GlobalContent.PlaySound("Select");
                         }
                     }
                 }
@@ -262,7 +257,6 @@ namespace NonsensicalVideoGenerator
                             ScreenManager.PushNavigation("Menu");
                             ScreenManager.PushNavigation("Content");
                             ScreenManager.PushNavigation("Background");
-                            ScreenManager.PushNavigation("Socials");
                             ScreenManager.GetScreen<ContentScreen>("Content")?.Show();
                             ScreenManager.GetScreen<MenuScreen>("Menu")?.Show();
                             if(FramePlayer.audio != null)
@@ -272,7 +266,6 @@ namespace NonsensicalVideoGenerator
                             }
                             ScreenManager.GetScreen<BackgroundScreen>("Background")?.Show();
                             ScreenManager.GetScreen<HeaderScreen>("Header")?.Show();
-                            ScreenManager.GetScreen<SocialScreen>("Socials")?.Show();
                             Global.ready = true;
                             Global.readyTime = gameTime.TotalGameTime.TotalMilliseconds;
                             if(Global.selectLanguage)
@@ -281,11 +274,9 @@ namespace NonsensicalVideoGenerator
                             if(SaveData.saveValues["ActiveTheme"] == "")
                             {
                                 Global.waitReady = 2500;
-                                GlobalContent.GetSound("Start").Play(int.Parse(SaveData.saveValues["SoundEffectVolume"], CultureInfo.InvariantCulture) / 100f, 0f, 0f);
+                                GlobalContent.PlaySound("Start");
                             }
                             fadingIn = true;
-                            Global.generator.CleanUp();
-                            VideoCache.ClearCache();
                         }
                         accepted = false;
                     }
@@ -396,4 +387,3 @@ namespace NonsensicalVideoGenerator
         }
     }
 }
-#endif

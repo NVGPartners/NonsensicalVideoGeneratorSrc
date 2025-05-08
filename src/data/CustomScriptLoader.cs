@@ -1,12 +1,4 @@
-using System.Diagnostics;
-using System.Reflection;
 using System.IO;
-using System.Collections.Generic;
-using System;
-using Newtonsoft.Json;
-using System.Linq;
-using System.Text.RegularExpressions;
-using Newtonsoft.Json.Linq;
 using MoonSharp.Interpreter;
 using MoonSharp.Interpreter.Loaders;
 

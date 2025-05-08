@@ -1,7 +1,4 @@
-#if MONOGAME
 using System;
-using System.Collections.Generic;
-using System.Diagnostics;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Content;
 using Microsoft.Xna.Framework.Graphics;
@@ -188,7 +185,7 @@ namespace NonsensicalVideoGenerator
                         if (MouseInput.LastMouseState.LeftButton == ButtonState.Released && MouseInput.MouseState.LeftButton == ButtonState.Pressed)
                         {
                             // Play sound
-                            GlobalContent.GetSound("Select").Play(int.Parse(SaveData.saveValues["SoundEffectVolume"], System.Globalization.CultureInfo.InvariantCulture) / 100f, 0f, 0f);    
+                            GlobalContent.PlaySound("Select");
                             if(Pagination.DrawnPage != segment)
                             {
                                 string name = Pagination.GetPage(segment).Name;
@@ -245,4 +242,3 @@ namespace NonsensicalVideoGenerator
         }
     }
 }
-#endif

@@ -59,6 +59,8 @@ function ThemeMetadata(pluginSettings)
             ["PluginEntryPostRenderEffectAltPluginsPage"] = {64, 192, 64, 255},
             ["PluginEntryThemePluginsPage"] = {255, 128, 128, 255},
             ["PluginEntryThemeAltPluginsPage"] = {192, 64, 64, 255},
+            ["PluginEntryBootMoviePluginsPage"] = {255, 255, 0, 255},
+            ["PluginEntryBootMovieAltPluginsPage"] = {192, 192, 0, 255},
             ["BackgroundOverlayScreen"] = {128, 128, 128, 255},
             ["BackgroundLibraryPage"] = {128, 128, 128, 255},
             ["ObstaclePastimeGameScreen"] = {0, 0, 0, 255},

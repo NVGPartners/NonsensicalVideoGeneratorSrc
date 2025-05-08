@@ -1,10 +1,8 @@
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Content;
 using Microsoft.Xna.Framework.Graphics;
-using System.Xml;
 using System.Globalization;
 using System.Diagnostics;
-using System.Collections.Generic;
 
 namespace NonsensicalVideoGenerator
 {
@@ -77,7 +75,7 @@ namespace NonsensicalVideoGenerator
                     case 2: // left click
                         if(Global.ready)
                         {
-                            GlobalContent.GetSound("Select").Play(int.Parse(SaveData.saveValues["SoundEffectVolume"], System.Globalization.CultureInfo.InvariantCulture) / 100f, 0f, 0f);
+                            GlobalContent.PlaySound("Select");
                             ProcessStartInfo psi = new()
                             {
                                 FileName = "https://discord.gg/8ppmspR6Wh",
@@ -95,7 +93,7 @@ namespace NonsensicalVideoGenerator
                     case 2: // left click
                         if(Global.ready)
                         {
-                            GlobalContent.GetSound("Select").Play(int.Parse(SaveData.saveValues["SoundEffectVolume"], System.Globalization.CultureInfo.InvariantCulture) / 100f, 0f, 0f);
+                            GlobalContent.PlaySound("Select");
                             ProcessStartInfo psi = new()
                             {
                                 FileName = "https://github.com/KiwifruitDev/NonsensicalVideoGenerator",
@@ -116,7 +114,7 @@ namespace NonsensicalVideoGenerator
                 switch(i)
                 {
                     case 2:
-                        GlobalContent.GetSound("Select").Play(int.Parse(SaveData.saveValues["SoundEffectVolume"], CultureInfo.InvariantCulture) / 100f, 0f, 0f);
+                        GlobalContent.PlaySound("Select");
                         ProcessStartInfo startInfo = new()
                         {
                             FileName = BlogData.Url.Replace("%postid%", BlogData.PostId).Replace("%locale%", L.GetLocale().name),

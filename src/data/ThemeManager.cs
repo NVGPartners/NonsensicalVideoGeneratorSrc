@@ -1,22 +1,12 @@
 using System;
 using System.Collections.Generic;
 using System.IO;
-using System.Linq;
 using System.Reflection;
-
-#if MONOGAME
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Audio;
 using Microsoft.Xna.Framework.Content;
 using Microsoft.Xna.Framework.Graphics;
 using Microsoft.Xna.Framework.Media;
-
-
-
-#else
-using System.Drawing;
-#endif
-using Newtonsoft.Json;
 
 namespace NonsensicalVideoGenerator
 {
@@ -83,6 +73,8 @@ namespace NonsensicalVideoGenerator
             {"PluginEntryPostRenderEffectAltPluginsPage", new Color(64, 192, 64, 255)},
             {"PluginEntryThemePluginsPage", new Color(255, 128, 128, 255)},
             {"PluginEntryThemeAltPluginsPage", new Color(192, 64, 64, 255)},
+            {"PluginEntryBootMoviePluginsPage", new Color(255, 255, 0, 255)},
+            {"PluginEntryBootMovieAltPluginsPage", new Color(192, 192, 0, 255)},
             {"BackgroundOverlayScreen", new Color(128, 128, 128, 255)},
             {"BackgroundLibraryPage", Color.Gray},
             {"ObstaclePastimeGameScreen", Color.Black},
@@ -153,39 +145,26 @@ namespace NonsensicalVideoGenerator
                 string layerPath = Path.GetDirectoryName(theme.path) + "/layer/";
                 if(!Directory.Exists(layerPath))
                 {
-                    // Disable the addon
-                    Plugin? foundPlugin = PluginHandler.plugins.Find(x => x.path == theme.path);
-                    if(foundPlugin != null)
-                        foundPlugin.enabled = false;
-                    PluginHandler.SavePluginSettings();
-                    GlobalContent.GetSound("Error").Play(int.Parse(SaveData.saveValues["SoundEffectVolume"], System.Globalization.CultureInfo.InvariantCulture) / 100f, 0f, 0f);
-                    if(activeTheme.prefix != "")
+                    // Count layerpath/music/theme*.ogg (indexed from 1 to 9)
+                    if(Directory.Exists(layerPath + "music/"))
                     {
-                        SaveData.saveValues["ActiveTheme"] = "";
-                        SaveData.Save();
-                        ApplyTheme(DefaultThemes.Nonsensical);
-                    }
-                    continue;
-                }
-                // Count layerpath/music/theme*.ogg (indexed from 1 to 9)
-                if(Directory.Exists(layerPath + "music/"))
-                {
-                    for(int i = 1; i < 10; i++)
-                    {
-                        if(File.Exists(layerPath + $"music/theme{i}.wma"))
+                        for(int i = 1; i < 10; i++)
                         {
-                            songCount = i;
+                            if(File.Exists(layerPath + $"music/theme{i}.wma") || File.Exists(layerPath + $"music/theme{i}.ogg"))
+                            {
+                                songCount = i;
+                            }
                         }
                     }
-                }
-                // Count layerpath/graphics/misclick/*.png (indexed from 1 to 9)
-                if(Directory.Exists(layerPath + "graphics/misclick/"))
-                {
-                    for(int i = 1; i < 10; i++)
+                    // Count layerpath/graphics/misclick/*.png (indexed from 1 to 9)
+                    if(Directory.Exists(layerPath + "graphics/misclick/"))
                     {
-                        if(File.Exists(layerPath + $"graphics/misclick/{i}.png"))
+                        for(int i = 1; i < 10; i++)
                         {
-                            misclickCount = i;
+                            if(File.Exists(layerPath + $"graphics/misclick/{i}.png"))
+                            {
+                                misclickCount = i;
+                            }
                         }
                     }
                 }
@@ -251,7 +230,12 @@ namespace NonsensicalVideoGenerator
                     fullPath += ".wav";
                     break;
                 case "Song":
+                    // Check if music is wma or ogg
                     fullPath += ".wma";
+                    if(!File.Exists(fullPath))
+                    {
+                        fullPath = fullPath.Replace(".wma", ".ogg");
+                    }
                     break;
             }
             // Check to see if the file exists
@@ -313,7 +297,7 @@ namespace NonsensicalVideoGenerator
                     ScreenManager.LoadContent(UserInterface.instance.Content, UserInterface.instance.GraphicsDevice);
                 }
                 Global.waitReady = 2500;
-                GlobalContent.GetSound("Start").Play(int.Parse(SaveData.saveValues["SoundEffectVolume"], System.Globalization.CultureInfo.InvariantCulture) / 100f, 0f, 0f);
+                GlobalContent.PlaySound("Start");
                 FramePlayer.canPlayBgMusic = true;
                 return true;
             };

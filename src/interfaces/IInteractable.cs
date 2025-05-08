@@ -1,10 +1,7 @@
-#if MONOGAME
 using System;
-using System.Collections.Generic;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Content;
 using Microsoft.Xna.Framework.Graphics;
-using Microsoft.Xna.Framework.Input;
 
 namespace NonsensicalVideoGenerator
 {
@@ -23,4 +20,3 @@ namespace NonsensicalVideoGenerator
         public void LoadContent(ContentManager contentManager, GraphicsDevice graphicsDevice, string internalName);
     }
 }
-#endif

@@ -3,9 +3,7 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio Version 17
 VisualStudioVersion = 17.13.35806.99
 MinimumVisualStudioVersion = 10.0.40219.1
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "NVGWindowsDX", "NVGWindowsDX.csproj", "{AFD0CBA3-E90B-47C4-BA45-32937471BC75}"
-EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "NVGDesktopGL", "NVGDesktopGL.csproj", "{6EEC4EB6-D51C-9B07-F8DA-78886CB24F2F}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "NonsensicalVideoGenerator", "NonsensicalVideoGenerator.csproj", "{AFD0CBA3-E90B-47C4-BA45-32937471BC75}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution

@@ -1,6 +1,4 @@
-#if MONOGAME
 using System;
-using System.Collections.Generic;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Content;
 using Microsoft.Xna.Framework.Graphics;
@@ -62,7 +60,7 @@ namespace NonsensicalVideoGenerator
                 if ((mouseButtonFlags & 2) == 2)
                 {
                     SwitchState = !SwitchState;
-                    GlobalContent.GetSound("Option").Play(int.Parse(SaveData.saveValues["SoundEffectVolume"], System.Globalization.CultureInfo.InvariantCulture) / 100f, 0f, 0f);
+                    GlobalContent.PlaySound("Option");
                 }
                 // Turn flags into state (most significant bit)
                 State = (int)Math.Log(mouseButtonFlags, 2) + 1;
@@ -98,7 +96,7 @@ namespace NonsensicalVideoGenerator
                 string token = "Interactable:"+internalName+"Title";
                 // check if the token exists
                 string localized = L.T(0, token, PluginHandler.GetPluginListFilter());
-                if (localized != token)
+                if (localized != token || L.GetLocale().name == "dummy")
                     localizedTitle = localized;
                 else
                     localizedTitle = ""; // no title
@@ -106,8 +104,10 @@ namespace NonsensicalVideoGenerator
             SpriteFont spriteFont = L.FontLarge();
             if(internalName.Contains("ViewLocalizationOptions") || internalName.Contains("SelectLanguageOptionsPage"))
             {
-                localizedTitle = L.T(0, "Interactable:"+internalName+"Title", L.cyclerLocale.localizedName);
-                spriteFont = GlobalContent.GetFont(L.cyclerLocale.fontLarge);
+                localizedTitle = L.cyclerLocale != null 
+                    ? L.T(0, "Interactable:"+internalName+"Title", L.cyclerLocale.localizedName) 
+                    : L.T(0, "Interactable:"+internalName+"Title");
+                spriteFont = L.cyclerLocale != null ? GlobalContent.GetFont(L.cyclerLocale.fontLarge) : L.FontLarge();
             }
             GlobalContent.DrawString(spriteBatch, spriteFont, localizedTitle, new Vector2(GlobalGraphics.Scale(bounds.X + 29 + 1), GlobalGraphics.Scale(bounds.Y + 2 + 1)), Color.Black);
             GlobalContent.DrawString(spriteBatch, spriteFont, localizedTitle, new Vector2(GlobalGraphics.Scale(bounds.X + 29), GlobalGraphics.Scale(bounds.Y + 2)), Color.White);
@@ -123,7 +123,7 @@ namespace NonsensicalVideoGenerator
                     string token = "Interactable:"+internalName+"Tooltip";
                     // check if the token exists
                     string localized = L.T(0, token);
-                    if (localized != token)
+                    if (localized != token || L.GetLocale().name == "dummy")
                         Global.tooltip = localized;
                     else
                         Global.tooltip = ""; // no tooltip
@@ -135,4 +135,3 @@ namespace NonsensicalVideoGenerator
         }
     }
 }
-#endif

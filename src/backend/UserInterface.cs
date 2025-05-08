@@ -2,18 +2,13 @@
 using System.Linq;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
-using Microsoft.Xna.Framework.Input;
-using Microsoft.Xna.Framework.Audio;
 using Microsoft.Xna.Framework.Media;
-using System.Diagnostics;
 using System.IO;
-using System.Text;
 using System.Windows.Forms;
 using System.Globalization;
-using System.Collections.Generic;
-using MonoGame.Extended.Framework.Media;
 using MonoGame.Extended.VideoPlayback;
 using System.Reflection;
+using System.Collections.Generic;
 
 namespace NonsensicalVideoGenerator
 {
@@ -36,7 +31,7 @@ namespace NonsensicalVideoGenerator
         private MusicState _musicState = MusicState.Paused;
         public MonoGame.Extended.Framework.Media.VideoPlayer? videoPlayer;
         public MonoGame.Extended.Framework.Media.Video? video;
-        public string videoPath = "bootmovie.mp4";
+        public string videoPath = "";
         public int music = 0;
         public bool introFinished = false;
         public UserInterface()
@@ -92,7 +87,7 @@ namespace NonsensicalVideoGenerator
             }
             GlobalGraphics.SetAspectRatio(aspectRatio);
             _graphics.ApplyChanges();
-            Form? windowForm = (Form)Control.FromHandle(Window.Handle);
+            Form? windowForm = Control.FromHandle(Window.Handle) as Form;
             if(windowForm != null)
             {
                 // Place window in center of screen.
@@ -106,8 +101,8 @@ namespace NonsensicalVideoGenerator
         }
         public void CenterToScreen()
         {
-            Form? windowForm = (Form)Control.FromHandle(Window.Handle);
-            if(windowForm != null)
+            Form? windowForm = Control.FromHandle(Window.Handle) as Form;
+            if(windowForm != null && Screen.PrimaryScreen != null)
             {
                 // Place window in center of screen.
                 windowForm.Location = new System.Drawing.Point(Screen.PrimaryScreen.WorkingArea.Width / 2 - windowForm.Width / 2, Screen.PrimaryScreen.WorkingArea.Height / 2 - windowForm.Height / 2);
@@ -115,7 +110,7 @@ namespace NonsensicalVideoGenerator
         }
         public void SetAlwaysOnTop(bool alwaysOnTop)
         {
-            Form? windowForm = (Form)Control.FromHandle(Window.Handle);
+            Form? windowForm = Control.FromHandle(Window.Handle) as Form;
             if(windowForm != null)
             {
                 windowForm.TopMost = alwaysOnTop;
@@ -136,7 +131,8 @@ namespace NonsensicalVideoGenerator
         {
             if(e != null && e.Data != null)
             {
-                Global.dragDropFiles = ((string[])e.Data.GetData(DataFormats.FileDrop)).ToList();
+                var files = e.Data.GetData(DataFormats.FileDrop) as string[];
+                Global.dragDropFiles = files != null ? files.ToList() : new List<string>();
                 Global.dragDrop = false;
             }
         }
@@ -150,15 +146,20 @@ namespace NonsensicalVideoGenerator
                 DiscordRPC.Initialize();
             ConsoleOutput.WriteLine("Starting initialization for v" + Global.productVersion + "...", Color.Transparent);
             Kiwano.Check();
+            Global.generator.CleanUp();
+            VideoCache.ClearCache();
             // File drag and drop support.
 #if WINDOWSDX
-            Form gameForm = (Form)Form.FromHandle(Window.Handle);
-            gameForm.AllowDrop = true;
-            gameForm.DragEnter += new DragEventHandler(DragEnter);
-            gameForm.DragDrop += new DragEventHandler(DragDrop);
-            gameForm.DragLeave += new EventHandler(DragLeave);
+            Form? gameForm = Control.FromHandle(Window.Handle) as Form;
+            if (gameForm != null)
+            {
+                gameForm.AllowDrop = true;
+                gameForm.DragEnter += new DragEventHandler(DragEnter);
+                gameForm.DragDrop += new DragEventHandler(DragDrop);
+                gameForm.DragLeave += new EventHandler(DragLeave);
+            }
             ConsoleOutput.WriteLine("Form supports drag and drop.", Color.Transparent);
-#elif DESKTOPGL
+#else
             ConsoleOutput.WriteLine("Form does not support drag and drop.", Color.Transparent);
 #endif
             // Set window title.
@@ -180,14 +181,20 @@ namespace NonsensicalVideoGenerator
             // Show blog if new version.
             if(SaveData.saveValues["LastVersion"] != Global.productVersion)
             {
+                // Fix plugin list filter flags (new plugin type was added)
+                if(SaveData.saveValues["PluginListFilterFlags"] == "7")
+                    SaveData.saveValues["PluginListFilterFlags"] = "15";
                 Pagination.SetPage(4);
                 SaveData.saveValues["LastVersion"] = Global.productVersion;
                 SaveData.Save();
             }
 #if WINDOWSDX
             Window.AllowAltF4 = false;
-            Form _GameForm = (Form)Form.FromHandle(Window.Handle);
-            _GameForm.Closing += ClosingForm;
+            Form? _GameForm = Control.FromHandle(Window.Handle) as Form;
+            if (_GameForm != null)
+            {
+                _GameForm.Closing += ClosingForm;
+            }
 #endif
             // match aspect ratio
             AspectRatio aspectRatio = new();
@@ -212,24 +219,18 @@ namespace NonsensicalVideoGenerator
             // Load all screen content.
             ScreenManager.LoadContent(Content, GraphicsDevice);
             videoPlayer = new MonoGame.Extended.Framework.Media.VideoPlayer(GraphicsDevice);
-            if(SaveData.saveValues["ActiveTheme"] != "")
-            {
-                string basepath = Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location) ?? ".";
-                // Search inside recursively of plugins folder for {activetheme}.mp4
-                string[] files = Directory.GetFiles(Path.Combine(basepath, "plugins"), SaveData.saveValues["ActiveTheme"] + ".mp4", SearchOption.AllDirectories);
-                if(files.Length > 0)
-                {
-                    // Remove basepath from path.
-                    videoPath = files[0].Replace(basepath, "").Replace("\\", "/").TrimStart('/');
-                    ConsoleOutput.WriteLine("Found theme video: " + videoPath, Color.Transparent);
-                }
-            }
             try
             {
-                if(File.Exists(videoPath))
+                string? randomBootMovie = PluginHandler.PickRandomBootMovie();
+                if(randomBootMovie != null && File.Exists(randomBootMovie))
+                {
+                    videoPath = VideoCache.GetCachePath(randomBootMovie);
                     video = VideoHelper.LoadFromFile(videoPath);
+                }
                 else
+                {
                     ConsoleOutput.WriteLine("Could not load boot video: " + videoPath, Color.Red);
+                }
             }
             catch (Exception e)
             {
@@ -239,7 +240,11 @@ namespace NonsensicalVideoGenerator
             {
                 introFinished = true;
                 ScreenManager.PushNavigation("Intro");
-                ScreenManager.GetScreen<PhotosensitiveWarningScreen>("Intro").Show();
+                var screen = ScreenManager.GetScreen<PhotosensitiveWarningScreen>("Intro");
+                if (screen != null)
+                {
+                    screen.Show();
+                }
             }
             else if(video != null)
             {
@@ -264,16 +269,13 @@ namespace NonsensicalVideoGenerator
             if(video != null)
             {
                 video.Dispose();
-                FramePlayer.canPlayBgMusic = true;
             }
+            FramePlayer.canPlayBgMusic = true;
             base.UnloadContent();
         }
         public void FindMusic()
         {
-#if DESKTOPGL
-            music = 0;
-            _musicState = MusicState.Paused;
-#else
+#if WINDOWSDX
             music = ThemeManager.GetNextSongIndex(music);
             _musicState = MusicState.Playing;
             try
@@ -284,6 +286,9 @@ namespace NonsensicalVideoGenerator
             {
                 //ConsoleOutput.WriteLine("Failed to play music: " + ex.Message, Color.Red);
             }
+#else
+            music = 0;
+            _musicState = MusicState.Paused;
 #endif
         }
         protected override void Update(GameTime gameTime)
@@ -311,15 +316,20 @@ namespace NonsensicalVideoGenerator
             else
                 _windowState = WindowState.Unfocused;
             // Title screen video
-            if(introFinished || videoPlayer.State == MediaState.Stopped || videoPlayer.PlayPosition.Seconds >= 6)
+            if(introFinished || videoPath == "" || (videoPlayer != null && (videoPlayer.State == MediaState.Stopped || (videoPlayer.PlayPosition.Seconds >= 6 && videoPath.EndsWith("kiwifruitdevlogo.mp4")))))
             {
                 if(!introFinished)
                 {
                     videoPath = "";
                     introFinished = true;
-                    video.Dispose();
+                    if(video != null)
+                        video.Dispose();
                     ScreenManager.PushNavigation("Intro");
-                    ScreenManager.GetScreen<PhotosensitiveWarningScreen>("Intro").Show();
+                    var screen = ScreenManager.GetScreen<PhotosensitiveWarningScreen>("Intro");
+                    if (screen != null)
+                    {
+                        screen.Show();
+                    }
                 }
                 FramePlayer.Update(gameTime);
                 // Play music after 500ms.
@@ -392,14 +402,24 @@ namespace NonsensicalVideoGenerator
                 {
                     try
                     {
-                        // Title screen video
-                        Texture2D texture = videoPlayer.GetTexture();
-                        if (texture != null)
-                            _spriteBatch.Draw(texture, new Rectangle(0, 0, GlobalGraphics.scaledWidth, GlobalGraphics.scaledHeight), Color.White);
+                        if(videoPlayer != null)
+                        {
+                            // Title screen video
+                            Texture2D texture = videoPlayer.GetTexture();
+                            if (texture != null)
+                                _spriteBatch.Draw(texture, new Rectangle(0, 0, GlobalGraphics.scaledWidth, GlobalGraphics.scaledHeight), Color.White);
+                        }
                     }
                     catch {}
                 }
-                ScreenManager.Draw(gameTime, _spriteBatch);
+                try
+                {
+                    ScreenManager.Draw(gameTime, _spriteBatch);
+                }
+                catch(Exception e)
+                {
+                    ConsoleOutput.WriteLine("Error while drawing screen: " + e.Message, Color.Red);
+                }
                 _spriteBatch.End();
                 _spriteBatch.Begin(SpriteSortMode.Deferred,
                     BlendState.AlphaBlend,
@@ -445,13 +465,7 @@ namespace NonsensicalVideoGenerator
                 // Exit page is always the last
                 Global.exitOpacityIncrease = 0.0075f;
                 Global.fakeExit = false;
-                GlobalContent.GetSound("Quit").Play(int.Parse(SaveData.saveValues["SoundEffectVolume"], CultureInfo.InvariantCulture) / 100f, 0f, 0f);
-                //ScreenManager.GetScreen<MenuScreen>("Menu")?.Hide();
-                //if(FramePlayer.audio != null)
-                //    ScreenManager.GetScreen<VideoScreen>("Video")?.Hide();
-                //ScreenManager.GetScreen<ContentScreen>("Content")?.Hide();
-                //ScreenManager.GetScreen<HeaderScreen>("Header")?.Hide();
-                //ScreenManager.GetScreen<SocialScreen>("Socials")?.Hide();
+                GlobalContent.PlaySound("Quit");
                 if(SteamManager.initialized)
                     SteamManager.Shutdown();
                 DiscordRPC.Shutdown();

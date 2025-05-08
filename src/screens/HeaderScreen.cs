@@ -1,20 +1,13 @@
 using System;
 using System.Collections.Generic;
-
-#if MONOGAME
 using Microsoft.Xna.Framework;
-using Microsoft.Xna.Framework.Audio;
 using Microsoft.Xna.Framework.Content;
 using Microsoft.Xna.Framework.Graphics;
 using Microsoft.Xna.Framework.Input;
-using Microsoft.Xna.Framework.Media;
 using MonoGame.Extended.Tweening;
-#endif
-
 
 namespace NonsensicalVideoGenerator
 {
-#if MONOGAME
     public class ClickHeader
     {
         public Rectangle clickOffset = new();
@@ -279,11 +272,11 @@ namespace NonsensicalVideoGenerator
                                     jumping = true;
                                     down = false;
                                 }
-                                GlobalContent.GetSound("AddSource").Play(int.Parse(SaveData.saveValues["SoundEffectVolume"], System.Globalization.CultureInfo.InvariantCulture) / 100f, 0f, 0f);
+                                GlobalContent.PlaySound("AddSource");
                             }
                             else
                             {
-                                GlobalContent.GetSound("Prompt").Play(int.Parse(SaveData.saveValues["SoundEffectVolume"], System.Globalization.CultureInfo.InvariantCulture) / 100f, 0f, 0f);
+                                GlobalContent.PlaySound("Prompt");
                             }
                             // Seed random generator
                             if(Global.randomSeed != 0 && !Global.parameters.Contains("-seed"))
@@ -294,7 +287,7 @@ namespace NonsensicalVideoGenerator
                         }
                         else
                         {
-                            GlobalContent.GetSound("Prompt").Play(int.Parse(SaveData.saveValues["SoundEffectVolume"], System.Globalization.CultureInfo.InvariantCulture) / 100f, 0f, 0f);
+                            GlobalContent.PlaySound("Prompt");
                         }
                         return true;
                     }
@@ -321,5 +314,4 @@ namespace NonsensicalVideoGenerator
             GlobalContent.AddTexture("Debug", ThemeManager.LoadLayeredContent<Texture2D>("graphics/debug"));
         }
     }
-#endif
 }

@@ -6,7 +6,8 @@
     
     -- All assets are stored inside of your addon's folder under "layer".
 
-    -- For music, you can have up to 9 songs as "theme1.wma" through "theme9.wma". Only the music included in your theme will play.
+    -- For music, you can have up to 9 songs as "theme1.wma" through "theme9.wma". These files may be in .wma or .ogg format.
+    -- Only the music included in your theme will play, otherwise the default theme music will play.
     -- This also applies to the misclick graphics in the "misclick" folder, you can have from 1-9 misclick graphics.
     -- If any music and/or misclick graphics are found, the default music and/or misclick graphics will not be loaded.
 
@@ -65,6 +66,8 @@ function ThemeMetadata(pluginSettings)
             ["PluginEntryPostRenderEffectAltPluginsPage"] = {64, 192, 64, 255},
             ["PluginEntryThemePluginsPage"] = {255, 128, 128, 255},
             ["PluginEntryThemeAltPluginsPage"] = {192, 64, 64, 255},
+            ["PluginEntryBootMoviePluginsPage"] = {255, 255, 0, 255},
+            ["PluginEntryBootMovieAltPluginsPage"] = {192, 192, 0, 255},
             ["BackgroundOverlayScreen"] = {128, 128, 128, 255},
             ["BackgroundLibraryPage"] = {128, 128, 128, 255},
             ["ObstaclePastimeGameScreen"] = {0, 0, 0, 255},

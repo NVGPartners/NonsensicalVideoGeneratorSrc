@@ -1,4 +1,3 @@
-#if MONOGAME
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
@@ -9,7 +8,7 @@ using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Content;
 using Microsoft.Xna.Framework.Graphics;
 using Microsoft.Xna.Framework.Input;
-using MonoGame.Extended.Tweening;
+using MonoGame.Extended.VideoPlayback;
 
 namespace NonsensicalVideoGenerator
 {
@@ -73,6 +72,9 @@ namespace NonsensicalVideoGenerator
                 Color curColor = ThemeManager.GetColor("PluginEntryGenericPluginsPage");
                 for(int i = 0; i < plcount; i++)
                 {
+                    // Make sure this plugin is actually in range
+                    if(PluginHandler.plugins.Count() <= i)
+                        break;
                     bool filtered = false;
                     // Alternate colors so it's easier to see
                     if((i -  offsetpl) % 2 != 0)
@@ -102,6 +104,14 @@ namespace NonsensicalVideoGenerator
                             if((i -  offsetpl) % 2 != 0)
                                 curColor = ThemeManager.GetColor("PluginEntryThemeAltPluginsPage");
                             if(!PluginHandler.pluginListFilter.HasFlag(PluginListFilter.Themes))
+                                filtered = true;
+                            break;
+                        case AddonType.BootMovie: // orange
+                            //curColor = new Color(255, 128, 0);
+                            curColor = ThemeManager.GetColor("PluginEntryBootMoviePluginsPage");
+                            if((i -  offsetpl) % 2 != 0)
+                                curColor = ThemeManager.GetColor("PluginEntryBootMovieAltPluginsPage");
+                            if(!PluginHandler.pluginListFilter.HasFlag(PluginListFilter.BootMovies))
                                 filtered = true;
                             break;
                     }
@@ -154,24 +164,45 @@ namespace NonsensicalVideoGenerator
                         if(nam.ToLower().EndsWith(" background"))
                             nam = nam.Substring(0, nam.Length - 10);
                     }
+                    else if(PluginHandler.plugins[i].GetAddonType() == AddonType.BootMovie)
+                    {
+                        if(nam.ToLower().EndsWith(" movie"))
+                            nam = nam.Substring(0, nam.Length - 6);
+                        if(nam.ToLower().EndsWith(" bootmovie"))
+                            nam = nam.Substring(0, nam.Length - 10);
+                        if(nam.ToLower().EndsWith(" boot movie"))
+                            nam = nam.Substring(0, nam.Length - 11);
+                        if(nam.ToLower().EndsWith(" intro"))
+                            nam = nam.Substring(0, nam.Length - 6);
+                        if(nam.ToLower().EndsWith(" video"))
+                            nam = nam.Substring(0, nam.Length - 6);
+                        if(nam.ToLower().EndsWith(" intro video"))
+                            nam = nam.Substring(0, nam.Length - 12);
+                        if(nam.ToLower().EndsWith(" startup"))
+                            nam = nam.Substring(0, nam.Length - 8);
+                    }
 
                     // Add type to name
                     switch(PluginHandler.plugins[i].GetAddonType())
                     {
                         case AddonType.Effect:
                             if(nam.Length + 7 <= 26)
-                                nam = L.T(0, "Addons:TypePrefixEffect", nam);
+                                nam = L.T(0, "Addons:TypePrefixEffect", nam); // " Effect"
                             break;
                         case AddonType.PostRenderEffect:
                             if(nam.Length + 19 <= 26)
-                                nam = L.T(0, "Addons:TypePrefixPostRenderEffect", nam);
+                                nam = L.T(0, "Addons:TypePrefixPostRenderEffect", nam); // " Post-Render Effect"
                             // special case: abbreviate because this type is kinda long 
                             else if(nam.Length + 10 <= 26)
-                                nam = L.T(0, "Addons:TypePrefixPostRenderEffectAlt", nam);
+                                nam = L.T(0, "Addons:TypePrefixPostRenderEffectAlt", nam); // " PR-Effect"
                             break;
                         case AddonType.Theme:
                             if(nam.Length + 6 <= 26)
-                                nam = L.T(0, "Addons:TypePrefixTheme", nam);
+                                nam = L.T(0, "Addons:TypePrefixTheme", nam); // " Theme"
+                            break;
+                        case AddonType.BootMovie:
+                            if(nam.Length + 9 <= 26)
+                                nam = L.T(0, "Addons:TypePrefixBootMovie", nam); // " Movie"
                             break;
                     }
 
@@ -241,6 +272,9 @@ namespace NonsensicalVideoGenerator
             int offsetpl = 0;
             for(int i = 0; i < plcount; i++)
             {
+                // Make sure this plugin is actually in range
+                if(PluginHandler.plugins.Count() <= i)
+                    break;
                 bool filtered = false;
                 switch(PluginHandler.plugins[i].GetAddonType())
                 {
@@ -254,6 +288,10 @@ namespace NonsensicalVideoGenerator
                         break;
                     case AddonType.Theme:
                         if(!PluginHandler.pluginListFilter.HasFlag(PluginListFilter.Themes))
+                            filtered = true;
+                        break;
+                    case AddonType.BootMovie:
+                        if(!PluginHandler.pluginListFilter.HasFlag(PluginListFilter.BootMovies))
                             filtered = true;
                         break;
                 }
@@ -291,6 +329,10 @@ namespace NonsensicalVideoGenerator
                                 if(!PluginHandler.pluginListFilter.HasFlag(PluginListFilter.Themes))
                                     filtered = true;
                                 break;
+                            case AddonType.BootMovie:
+                                if(!PluginHandler.pluginListFilter.HasFlag(PluginListFilter.BootMovies))
+                                    filtered = true;
+                                break;
                         }
                         if(filtered)
                         {
@@ -315,14 +357,36 @@ namespace NonsensicalVideoGenerator
                                 // Is this a workshop plugin?
                                 // If so, tooltip should be "Open workshop page."
                                 // Otherwise, tooltip should be "Open plugin directory."
-                                if (PluginHandler.plugins[i].workshopId != ""
-                                    && PluginHandler.plugins[i].rootPath.Contains("workshop"))
+                                if (PluginHandler.plugins[i].workshopId != "" && PluginHandler.plugins[i].rootPath.Contains("workshop"))
+                                {
                                     internalTooltip = L.T(0, "Addons:ButtonOpenWorkshop");
-                                else if(PluginHandler.plugins[i].workshopId != ""
-                                    && PluginHandler.plugins[i].workshopId != "stock")
-                                    internalTooltip = L.T(0, "Addons:ButtonOpenCodeEditor");
+                                }
+                                else if(PluginHandler.plugins[i].workshopId != "" && PluginHandler.plugins[i].workshopId != "stock")
+                                {
+                                    switch(PluginHandler.plugins[i].GetAddonType())
+                                    {
+                                        case AddonType.Theme:
+                                            internalTooltip = L.T(0, "Addons:ButtonOpenAddonDirectory");
+                                            break;
+                                        case AddonType.BootMovie:
+                                            internalTooltip = L.T(0, "Addons:ButtonPlayBootMovie");
+                                            break;
+                                        default:
+                                            internalTooltip = L.T(0, "Addons:ButtonOpenCodeEditor");
+                                            break;
+                                    }
+                                }
                                 else
-                                    internalTooltip = L.T(0, "Addons:ButtonOpenStockDirectory");
+                                {
+                                    if(PluginHandler.plugins[i].GetAddonType() == AddonType.BootMovie)
+                                    {
+                                        internalTooltip = L.T(0, "Addons:ButtonPlayBootMovie");
+                                    }
+                                    else
+                                    {
+                                        internalTooltip = L.T(0, "Addons:ButtonOpenStockDirectory");
+                                    }
+                                }
                             }
                             catch {}
                         }
@@ -378,7 +442,7 @@ namespace NonsensicalVideoGenerator
                                 {
                                     dragging = true;
                                     dragOffset = MouseInput.MouseState.Y - GlobalGraphics.Scale(69 + scrollOffset * (214 - 69) / maxScrollOffset);
-                                    GlobalContent.GetSound("Option").Play(int.Parse(SaveData.saveValues["SoundEffectVolume"], CultureInfo.InvariantCulture) / 100f, 0f, 0f);
+                                    GlobalContent.PlaySound("Option");
                                     return true;
                                 }
                                 // on scroll bar empty space (move center of handle to there)
@@ -386,7 +450,7 @@ namespace NonsensicalVideoGenerator
                                     && MouseInput.MouseState.Y >= GlobalGraphics.Scale(69+4) && MouseInput.MouseState.Y < GlobalGraphics.Scale(223-4))
                                 {
                                     scrollOffset = (MouseInput.MouseState.Y - GlobalGraphics.Scale(69) - GlobalGraphics.Scale(4)) * maxScrollOffset / (GlobalGraphics.Scale(214) - GlobalGraphics.Scale(69));
-                                    GlobalContent.GetSound("Option").Play(int.Parse(SaveData.saveValues["SoundEffectVolume"], CultureInfo.InvariantCulture) / 100f, 0f, 0f);
+                                    GlobalContent.PlaySound("Option");
                                     return true;
                                 }
                                 // 293, 57, 11x11 Scroll Up
@@ -395,7 +459,7 @@ namespace NonsensicalVideoGenerator
                                 {
                                     if(scrollOffset - 1 >= 0)
                                     {
-                                        GlobalContent.GetSound("Option").Play(int.Parse(SaveData.saveValues["SoundEffectVolume"], CultureInfo.InvariantCulture) / 100f, 0f, 0f);
+                                        GlobalContent.PlaySound("Option");
                                         int oldScrollOffset = scrollOffset;
                                         // Round down scroll offset to the nearest 16 multiple.
                                         scrollOffset = (int)(Math.Floor((double)scrollOffset / 16) * 16);
@@ -412,7 +476,7 @@ namespace NonsensicalVideoGenerator
                                     }
                                     else
                                     {
-                                        GlobalContent.GetSound("Error").Play(int.Parse(SaveData.saveValues["SoundEffectVolume"], CultureInfo.InvariantCulture) / 100f, 0f, 0f);
+                                        GlobalContent.PlaySound("Error");
                                     }
                                     return true;
                                 }
@@ -422,7 +486,7 @@ namespace NonsensicalVideoGenerator
                                 {
                                     if (scrollOffset + 1 <= maxScrollOffset)
                                     {
-                                        GlobalContent.GetSound("Option").Play(int.Parse(SaveData.saveValues["SoundEffectVolume"], CultureInfo.InvariantCulture) / 100f, 0f, 0f);
+                                        GlobalContent.PlaySound("Option");
                                         int oldScrollOffset = scrollOffset;
                                         // Round up scroll offset to the nearest 16 multiple.
                                         scrollOffset = (int)(Math.Ceiling((double)scrollOffset / 16) * 16);
@@ -439,7 +503,7 @@ namespace NonsensicalVideoGenerator
                                     }
                                     else
                                     {
-                                        GlobalContent.GetSound("Error").Play(int.Parse(SaveData.saveValues["SoundEffectVolume"], CultureInfo.InvariantCulture) / 100f, 0f, 0f);
+                                        GlobalContent.PlaySound("Error");
                                     }
                                     return true;
                                 }
@@ -449,7 +513,7 @@ namespace NonsensicalVideoGenerator
                         {
                             if (MouseInput.MouseState.LeftButton == ButtonState.Released)
                             {
-                                GlobalContent.GetSound("Option").Play(int.Parse(SaveData.saveValues["SoundEffectVolume"], CultureInfo.InvariantCulture) / 100f, 0f, 0f);
+                                GlobalContent.PlaySound("Option");
                                 dragging = false;
                             }
                             else
@@ -481,7 +545,7 @@ namespace NonsensicalVideoGenerator
                             {
                                 // Set to 0 because this is the top.
                                 scrollOffset = 0;
-                                GlobalContent.GetSound("Error").Play(int.Parse(SaveData.saveValues["SoundEffectVolume"], CultureInfo.InvariantCulture) / 100f, 0f, 0f);
+                                GlobalContent.PlaySound("Error");
                                 return true;
                             }
                             // 293, 224, 11x11 Scroll Down
@@ -490,7 +554,7 @@ namespace NonsensicalVideoGenerator
                             {
                                 // Set to max because this is the bottom.
                                 scrollOffset = maxScrollOffset;
-                                GlobalContent.GetSound("Error").Play(int.Parse(SaveData.saveValues["SoundEffectVolume"], CultureInfo.InvariantCulture) / 100f, 0f, 0f);
+                                GlobalContent.PlaySound("Error");
                                 return true;
                             }
                         }
@@ -515,6 +579,10 @@ namespace NonsensicalVideoGenerator
                                 break;
                             case AddonType.Theme:
                                 if(!PluginHandler.pluginListFilter.HasFlag(PluginListFilter.Themes))
+                                    filtered = true;
+                                break;
+                            case AddonType.BootMovie:
+                                if(!PluginHandler.pluginListFilter.HasFlag(PluginListFilter.BootMovies))
                                     filtered = true;
                                 break;
                         }
@@ -561,6 +629,10 @@ namespace NonsensicalVideoGenerator
                                     if(!PluginHandler.pluginListFilter.HasFlag(PluginListFilter.Themes))
                                         filtered = true;
                                     break;
+                                case AddonType.BootMovie:
+                                    if(!PluginHandler.pluginListFilter.HasFlag(PluginListFilter.BootMovies))
+                                        filtered = true;
+                                    break;
                             }
                             if(filtered)
                             {
@@ -604,11 +676,11 @@ namespace NonsensicalVideoGenerator
                                         });
                                     }
                                     PluginHandler.SavePluginSettings();
-                                    GlobalContent.GetSound("Option").Play(int.Parse(SaveData.saveValues["SoundEffectVolume"], CultureInfo.InvariantCulture) / 100f, 0f, 0f);
+                                    GlobalContent.PlaySound("Option");
                                 }
                                 else
                                 {
-                                    GlobalContent.GetSound("Error").Play(int.Parse(SaveData.saveValues["SoundEffectVolume"], CultureInfo.InvariantCulture) / 100f, 0f, 0f);
+                                    GlobalContent.PlaySound("Error");
                                 }
                                 return true;
                             }
@@ -621,19 +693,60 @@ namespace NonsensicalVideoGenerator
                             if (MouseInput.MouseState.X >= GlobalGraphics.Scale(138) && MouseInput.MouseState.X < GlobalGraphics.Scale(inRange)
                                 && MouseInput.MouseState.Y >= GlobalGraphics.Scale(59 + ((i-offsetpl) * 16) - scrollOffset) && MouseInput.MouseState.Y < GlobalGraphics.Scale(70 + ((i-offsetpl) * 16) - scrollOffset))
                             {
-                                GlobalContent.GetSound("Option").Play(int.Parse(SaveData.saveValues["SoundEffectVolume"], CultureInfo.InvariantCulture) / 100f, 0f, 0f);
+                                GlobalContent.PlaySound("Option");
                                 // Open directory and select file
                                 ProcessStartInfo startInfo = new();
                                 // Workshop plugin should open workshop page
                                 if(PluginHandler.plugins[i].workshopId != ""
                                     && PluginHandler.plugins[i].rootPath.Contains("workshop"))
                                 {
-                                    startInfo.FileName = "https://steamcommunity.com/sharedfiles/filedetails/?id=" + PluginHandler.plugins[i].workshopId;
+                                    startInfo.FileName = "steam://openurl/https://steamcommunity.com/sharedfiles/filedetails/?id=" + PluginHandler.plugins[i].workshopId;
                                     startInfo.UseShellExecute = true;
                                     Process.Start(startInfo);
+                                    return true;
                                 }
-                                else if(PluginHandler.plugins[i].workshopId != ""
-                                    && PluginHandler.plugins[i].workshopId != "stock")
+                                if(PluginHandler.plugins[i].GetAddonType() == AddonType.BootMovie)
+                                {
+                                    string filePath = PluginHandler.plugins[i].path.Replace(".lua", ".mp4");
+                                    if(File.Exists(filePath))
+                                    {
+                                        FramePlayer.Stop();
+                                        GlobalContent.PlaySound("Select");
+                                        if(UserInterface.instance != null)
+                                        {
+                                            if(UserInterface.instance.videoPlayer != null)
+                                            {
+                                                UserInterface.instance.videoPlayer.Dispose();
+                                                Global.videoPlaying = false;
+                                                UserInterface.instance.videoPlayer = null;
+                                            }
+                                            UserInterface.instance.videoPlayer = new MonoGame.Extended.Framework.Media.VideoPlayer(UserInterface.instance.GraphicsDevice);
+                                            FramePlayer.canPlayBgMusic = true;
+                                            if(UserInterface.instance.video != null)
+                                            {
+                                                UserInterface.instance.video.Dispose();
+                                                UserInterface.instance.video = null;
+                                            }
+                                            string cachePath = VideoCache.GetCachePath(filePath);
+                                            UserInterface.instance.videoPath = cachePath;
+                                            UserInterface.instance.video = VideoHelper.LoadFromFile(cachePath);
+                                            //UserInterface.instance.videoPlayer.IsLooped = true;
+                                            UserInterface.instance.videoPlayer.Play(UserInterface.instance.video);
+                                            Global.videoPlaying = true;
+                                            UserInterface.instance.videoPlayer.Volume = float.Parse(SaveData.saveValues["VideoVolume"], CultureInfo.InvariantCulture) / 100f;
+                                        }
+                                        FramePlayer.canPlayBgMusic = false;
+                                        Global.generator.progressText = L.T(0, "Video:StatusPlay");
+                                        if(ScreenManager.GetScreen<VideoScreen>("Video") == null
+                                            || ScreenManager.GetScreen<VideoScreen>("Video")?.screenType == ScreenType.Hidden)
+                                        {
+                                            ScreenManager.PushNavigation("Video");
+                                            ScreenManager.GetScreen<VideoScreen>("Video")?.Show();
+                                        }
+                                        return true;
+                                    }
+                                }
+                                if(PluginHandler.plugins[i].workshopId != "" && PluginHandler.plugins[i].workshopId != "stock")
                                 {
                                     try
                                     {
@@ -642,20 +755,13 @@ namespace NonsensicalVideoGenerator
                                         startInfo.UseShellExecute = true;
                                         startInfo.CreateNoWindow = true;
                                         Process.Start(startInfo);
+                                        return true;
                                     }
-                                    catch
-                                    {
-                                        startInfo.FileName = "explorer.exe";
-                                        startInfo.Arguments = "/select, \"" + Path.GetFullPath(PluginHandler.plugins[i].path) + "\"";
-                                        Process.Start(startInfo);
-                                    }
+                                    catch {}
                                 }
-                                else
-                                {
-                                    startInfo.FileName = "explorer.exe";
-                                    startInfo.Arguments = "/select, \"" + Path.GetFullPath(PluginHandler.plugins[i].path) + "\"";
-                                    Process.Start(startInfo);
-                                }
+                                startInfo.FileName = "explorer.exe";
+                                startInfo.Arguments = "/select, \"" + Path.GetFullPath(PluginHandler.plugins[i].path) + "\"";
+                                Process.Start(startInfo);
                                 return true;
                             }
                             // Settings button
@@ -664,7 +770,7 @@ namespace NonsensicalVideoGenerator
                                 if (MouseInput.MouseState.X >= GlobalGraphics.Scale(256) && MouseInput.MouseState.X < GlobalGraphics.Scale(267)
                                     && MouseInput.MouseState.Y >= GlobalGraphics.Scale(59 + ((i-offsetpl) * 16) - scrollOffset) && MouseInput.MouseState.Y < GlobalGraphics.Scale(70 + ((i-offsetpl) * 16) - scrollOffset))
                                 {
-                                    GlobalContent.GetSound("Select").Play(int.Parse(SaveData.saveValues["SoundEffectVolume"], CultureInfo.InvariantCulture) / 100f, 0f, 0f);
+                                    GlobalContent.PlaySound("Select");
                                     // Open settings
                                     controller.Clear();
                                     settingsIndex = i;
@@ -672,15 +778,15 @@ namespace NonsensicalVideoGenerator
                                     if(PluginHandler.plugins[i].workshopId != ""
                                         && PluginHandler.plugins[i].workshopId != "stock")
                                     {
-                                        if(PluginHandler.plugins[i].submittedId != "" || PluginHandler.plugins[i].workshopId != "")
+                                        if(PluginHandler.plugins[i].submittedId != "")
                                         {
                                             controller.Add("VisitWorkshopPage", new Button("View Workshop", "View this effect on the Workshop.", new Vector2(119+100, 60+10+19*7), (int i, string n) => {
                                                 switch(i)
                                                 {
                                                     case 2:
-                                                        GlobalContent.GetSound("Select").Play(int.Parse(SaveData.saveValues["SoundEffectVolume"], CultureInfo.InvariantCulture) / 100f, 0f, 0f);
+                                                        GlobalContent.PlaySound("Select");
                                                         ProcessStartInfo startInfo = new();
-                                                        startInfo.FileName = "https://steamcommunity.com/sharedfiles/filedetails/?id=" + (string.IsNullOrEmpty(PluginHandler.plugins[settingsIndex].submittedId) ? PluginHandler.plugins[settingsIndex].workshopId : PluginHandler.plugins[settingsIndex].submittedId);
+                                                        startInfo.FileName = "steam://openurl/https://steamcommunity.com/sharedfiles/filedetails/?id=" + (string.IsNullOrEmpty(PluginHandler.plugins[settingsIndex].submittedId) ? PluginHandler.plugins[settingsIndex].workshopId : PluginHandler.plugins[settingsIndex].submittedId);
                                                         startInfo.UseShellExecute = true;
                                                         Process.Start(startInfo);
                                                         return true;
@@ -690,7 +796,7 @@ namespace NonsensicalVideoGenerator
                                         }
                                         if(PluginHandler.plugins[i].rootPath.Contains("user"))
                                         {
-                                            controller.Add("Delete", new Button("Delete", "", new Vector2(119+100, 60+10+19*8), (int i, string n) => {
+                                            controller.Add("Delete", new Button("Delete", "Delete from addons folder.", new Vector2(119+100, 60+10+19*8), (int i, string n) => {
                                                 switch(i)
                                                 {
                                                     case 2:
@@ -706,7 +812,7 @@ namespace NonsensicalVideoGenerator
                                                                 ThemeManager.ApplyTheme(DefaultThemes.defaultTheme);
                                                             }
                                                             Directory.Delete(Path.GetDirectoryName(PluginHandler.plugins[settingsIndex].path) ?? "", true);
-                                                            GlobalContent.GetSound("Select").Play(int.Parse(SaveData.saveValues["SoundEffectVolume"], CultureInfo.InvariantCulture) / 100f, 0f, 0f);
+                                                            GlobalContent.PlaySound("Select");
                                                             if(SteamManager.initialized)
                                                                 PluginHandler.LoadWorkshop(false);
                                                             else
@@ -716,7 +822,7 @@ namespace NonsensicalVideoGenerator
                                                         }
                                                         catch
                                                         {
-                                                            GlobalContent.GetSound("Error").Play(int.Parse(SaveData.saveValues["SoundEffectVolume"], CultureInfo.InvariantCulture) / 100f, 0f, 0f);
+                                                            GlobalContent.PlaySound("Error");
                                                         }
                                                         return true;
                                                 }
@@ -726,162 +832,150 @@ namespace NonsensicalVideoGenerator
                                                 switch(i)
                                                 {
                                                     case 2: // left click
-                                                        GlobalContent.GetSound("Select").Play(int.Parse(SaveData.saveValues["SoundEffectVolume"], CultureInfo.InvariantCulture) / 100f, 0f, 0f);
+                                                        GlobalContent.PlaySound("Select");
                                                         Name = L.T(0, "Addons:WorkshopTags", PluginHandler.plugins[settingsIndex].GetDisplayName());
                                                         controller.Clear();
-                                                        controller.Add("LibraryCustom", new Switch("Custom Library", "Uses a custom library type.", new Vector2(139, 60+19*8), (int i, string n) => {
-                                                            bool switchState = (i & 256) != 0;
-                                                            if((i & 2) != 0)
-                                                            {
-                                                                if(switchState)
-                                                                    selectedFlagsWorkshop |= WorkshopTag.Library_Custom;
-                                                                else
-                                                                    selectedFlagsWorkshop &= ~WorkshopTag.Library_Custom;
-                                                            }
-                                                            return switchState;
-                                                        }, (selectedFlagsWorkshop & WorkshopTag.Library_Custom) != 0));
-                                                        controller.Add("LibraryOverlay", new Switch("Overlay Library", "Uses the overlay library type.", new Vector2(139, 60+19*7), (int i, string n) => {
-                                                            bool switchState = (i & 256) != 0;
-                                                            if((i & 2) != 0)
-                                                            {
-                                                                if(switchState)
-                                                                    selectedFlagsWorkshop |= WorkshopTag.Library_Overlay;
-                                                                else
-                                                                    selectedFlagsWorkshop &= ~WorkshopTag.Library_Overlay;
-                                                            }
-                                                            return switchState;
-                                                        }, (selectedFlagsWorkshop & WorkshopTag.Library_Overlay) != 0));
-                                                        controller.Add("LibraryOutro", new Switch("Outro Library", "Uses the outro library type.", new Vector2(139, 60+19*6), (int i, string n) => {
-                                                            bool switchState = (i & 256) != 0;
-                                                            if((i & 2) != 0)
-                                                            {
-                                                                if(switchState)
-                                                                    selectedFlagsWorkshop |= WorkshopTag.Library_Outro;
-                                                                else
-                                                                    selectedFlagsWorkshop &= ~WorkshopTag.Library_Outro;
-                                                            }
-                                                            return switchState;
-                                                        }, (selectedFlagsWorkshop & WorkshopTag.Library_Outro) != 0));
-                                                        controller.Add("LibraryIntro", new Switch("Intro Library", "Uses the intro library type.", new Vector2(139, 60+19*5), (int i, string n) => {
-                                                            bool switchState = (i & 256) != 0;
-                                                            if((i & 2) != 0)
-                                                            {
-                                                                if(switchState)
-                                                                    selectedFlagsWorkshop |= WorkshopTag.Library_Intro;
-                                                                else
-                                                                    selectedFlagsWorkshop &= ~WorkshopTag.Library_Intro;
-                                                            }
-                                                            return switchState;
-                                                        }, (selectedFlagsWorkshop & WorkshopTag.Library_Intro) != 0));
-                                                        controller.Add("LibraryTransition", new Switch("Transition Library", "Uses the transition library type.", new Vector2(139, 60+19*4), (int i, string n) => {
-                                                            bool switchState = (i & 256) != 0;
-                                                            if((i & 2) != 0)
-                                                            {
-                                                                if(switchState)
-                                                                    selectedFlagsWorkshop |= WorkshopTag.Library_Transition;
-                                                                else
-                                                                    selectedFlagsWorkshop &= ~WorkshopTag.Library_Transition;
-                                                            }
-                                                            return switchState;
-                                                        }, (selectedFlagsWorkshop & WorkshopTag.Library_Transition) != 0));
-                                                        controller.Add("LibraryMaterial", new Switch("Material Library", "Uses the material library type.", new Vector2(139, 60+19*3), (int i, string n) => {
-                                                            bool switchState = (i & 256) != 0;
-                                                            if((i & 2) != 0)
-                                                            {
-                                                                if(switchState)
-                                                                    selectedFlagsWorkshop |= WorkshopTag.Library_Material;
-                                                                else
-                                                                    selectedFlagsWorkshop &= ~WorkshopTag.Library_Material;
-                                                            }
-                                                            return switchState;
-                                                        }, (selectedFlagsWorkshop & WorkshopTag.Library_Material) != 0));
-                                                        controller.Add("LibraryMusic", new Switch("Music Library", "Uses the music library type.", new Vector2(139, 60+19*2), (int i, string n) => {
-                                                            bool switchState = (i & 256) != 0;
-                                                            if((i & 2) != 0)
-                                                            {
-                                                                if(switchState)
-                                                                    selectedFlagsWorkshop |= WorkshopTag.Library_Music;
-                                                                else
-                                                                    selectedFlagsWorkshop &= ~WorkshopTag.Library_Music;
-                                                            }
-                                                            return switchState;
-                                                        }, (selectedFlagsWorkshop & WorkshopTag.Library_Music) != 0));
-                                                        controller.Add("LibrarySFX", new Switch("Sound FX Library", "Uses the sound fx library type.", new Vector2(139, 60+19), (int i, string n) => {
-                                                            bool switchState = (i & 256) != 0;
-                                                            if((i & 2) != 0)
-                                                            {
-                                                                if(switchState)
-                                                                    selectedFlagsWorkshop |= WorkshopTag.Library_SFX;
-                                                                else
-                                                                    selectedFlagsWorkshop &= ~WorkshopTag.Library_SFX;
-                                                            }
-                                                            return switchState;
-                                                        }, (selectedFlagsWorkshop & WorkshopTag.Library_SFX) != 0));
-                                                        controller.Add("Image", new Switch("Image", "Applies image effects.", new Vector2(139+55+55, 60), (int i, string n) => {
-                                                            bool switchState = (i & 256) != 0;
-                                                            if((i & 2) != 0)
-                                                            {
-                                                                // add or remove WorkshopTag.Image to flags
-                                                                if(switchState)
-                                                                    selectedFlagsWorkshop |= WorkshopTag.Effect_ImageOnly;
-                                                                else
-                                                                    selectedFlagsWorkshop &= ~WorkshopTag.Effect_ImageOnly;
-                                                            }
-                                                            return switchState;
-                                                        }, (selectedFlagsWorkshop & WorkshopTag.Effect_ImageOnly) != 0));
-                                                        controller.Add("Audio", new Switch("Audio", "Applies audio effects.", new Vector2(139+55, 60), (int i, string n) => {
-                                                            bool switchState = (i & 256) != 0;
-                                                            if((i & 2) != 0)
-                                                            {
-                                                                if(switchState)
-                                                                    selectedFlagsWorkshop |= WorkshopTag.Effect_AudioOnly;
-                                                                else
-                                                                    selectedFlagsWorkshop &= ~WorkshopTag.Effect_AudioOnly;
-                                                            }
-                                                            return switchState;
-                                                        }, (selectedFlagsWorkshop & WorkshopTag.Effect_AudioOnly) != 0));
-                                                        controller.Add("Video", new Switch("Video", "Applies video effects.", new Vector2(139, 60), (int i, string n) => {
-                                                            bool switchState = (i & 256) != 0;
-                                                            if((i & 2) != 0)
-                                                            {
-                                                                // add or remove WorkshopTag.Video to flags
-                                                                if(switchState)
-                                                                    selectedFlagsWorkshop |= WorkshopTag.Effect_VideoOnly;
-                                                                else
-                                                                    selectedFlagsWorkshop &= ~WorkshopTag.Effect_VideoOnly;
-                                                            }
-                                                            return switchState;
-                                                        }, (selectedFlagsWorkshop & WorkshopTag.Effect_VideoOnly) != 0));
+                                                        selectedFlagsWorkshop = 0;
+                                                        AddonType addonType = PluginHandler.plugins[settingsIndex].GetAddonType();
+                                                        if(addonType != AddonType.Effect && addonType != AddonType.PostRenderEffect)
+                                                        {
+                                                            controller.Add("WorkshopTagsNotAvailable", new Label("Workshop tags are not available.", new Vector2(153, 140)));
+                                                        }
+                                                        else
+                                                        {
+                                                            controller.Add("LibraryCustom", new Switch("Custom Library", "Uses a custom library type.", new Vector2(139, 60+19*8), (int i, string n) => {
+                                                                bool switchState = (i & 256) != 0;
+                                                                if((i & 2) != 0)
+                                                                {
+                                                                    if(switchState)
+                                                                        selectedFlagsWorkshop |= WorkshopTag.Library_Custom;
+                                                                    else
+                                                                        selectedFlagsWorkshop &= ~WorkshopTag.Library_Custom;
+                                                                }
+                                                                return switchState;
+                                                            }, (selectedFlagsWorkshop & WorkshopTag.Library_Custom) != 0));
+                                                            controller.Add("LibraryOverlay", new Switch("Overlay Library", "Uses the overlay library type.", new Vector2(139, 60+19*7), (int i, string n) => {
+                                                                bool switchState = (i & 256) != 0;
+                                                                if((i & 2) != 0)
+                                                                {
+                                                                    if(switchState)
+                                                                        selectedFlagsWorkshop |= WorkshopTag.Library_Overlay;
+                                                                    else
+                                                                        selectedFlagsWorkshop &= ~WorkshopTag.Library_Overlay;
+                                                                }
+                                                                return switchState;
+                                                            }, (selectedFlagsWorkshop & WorkshopTag.Library_Overlay) != 0));
+                                                            controller.Add("LibraryOutro", new Switch("Outro Library", "Uses the outro library type.", new Vector2(139, 60+19*6), (int i, string n) => {
+                                                                bool switchState = (i & 256) != 0;
+                                                                if((i & 2) != 0)
+                                                                {
+                                                                    if(switchState)
+                                                                        selectedFlagsWorkshop |= WorkshopTag.Library_Outro;
+                                                                    else
+                                                                        selectedFlagsWorkshop &= ~WorkshopTag.Library_Outro;
+                                                                }
+                                                                return switchState;
+                                                            }, (selectedFlagsWorkshop & WorkshopTag.Library_Outro) != 0));
+                                                            controller.Add("LibraryIntro", new Switch("Intro Library", "Uses the intro library type.", new Vector2(139, 60+19*5), (int i, string n) => {
+                                                                bool switchState = (i & 256) != 0;
+                                                                if((i & 2) != 0)
+                                                                {
+                                                                    if(switchState)
+                                                                        selectedFlagsWorkshop |= WorkshopTag.Library_Intro;
+                                                                    else
+                                                                        selectedFlagsWorkshop &= ~WorkshopTag.Library_Intro;
+                                                                }
+                                                                return switchState;
+                                                            }, (selectedFlagsWorkshop & WorkshopTag.Library_Intro) != 0));
+                                                            controller.Add("LibraryTransition", new Switch("Transition Library", "Uses the transition library type.", new Vector2(139, 60+19*4), (int i, string n) => {
+                                                                bool switchState = (i & 256) != 0;
+                                                                if((i & 2) != 0)
+                                                                {
+                                                                    if(switchState)
+                                                                        selectedFlagsWorkshop |= WorkshopTag.Library_Transition;
+                                                                    else
+                                                                        selectedFlagsWorkshop &= ~WorkshopTag.Library_Transition;
+                                                                }
+                                                                return switchState;
+                                                            }, (selectedFlagsWorkshop & WorkshopTag.Library_Transition) != 0));
+                                                            controller.Add("LibraryMaterial", new Switch("Material Library", "Uses the material library type.", new Vector2(139, 60+19*3), (int i, string n) => {
+                                                                bool switchState = (i & 256) != 0;
+                                                                if((i & 2) != 0)
+                                                                {
+                                                                    if(switchState)
+                                                                        selectedFlagsWorkshop |= WorkshopTag.Library_Material;
+                                                                    else
+                                                                        selectedFlagsWorkshop &= ~WorkshopTag.Library_Material;
+                                                                }
+                                                                return switchState;
+                                                            }, (selectedFlagsWorkshop & WorkshopTag.Library_Material) != 0));
+                                                            controller.Add("LibraryMusic", new Switch("Music Library", "Uses the music library type.", new Vector2(139, 60+19*2), (int i, string n) => {
+                                                                bool switchState = (i & 256) != 0;
+                                                                if((i & 2) != 0)
+                                                                {
+                                                                    if(switchState)
+                                                                        selectedFlagsWorkshop |= WorkshopTag.Library_Music;
+                                                                    else
+                                                                        selectedFlagsWorkshop &= ~WorkshopTag.Library_Music;
+                                                                }
+                                                                return switchState;
+                                                            }, (selectedFlagsWorkshop & WorkshopTag.Library_Music) != 0));
+                                                            controller.Add("LibrarySFX", new Switch("Sound FX Library", "Uses the sound fx library type.", new Vector2(139, 60+19), (int i, string n) => {
+                                                                bool switchState = (i & 256) != 0;
+                                                                if((i & 2) != 0)
+                                                                {
+                                                                    if(switchState)
+                                                                        selectedFlagsWorkshop |= WorkshopTag.Library_SFX;
+                                                                    else
+                                                                        selectedFlagsWorkshop &= ~WorkshopTag.Library_SFX;
+                                                                }
+                                                                return switchState;
+                                                            }, (selectedFlagsWorkshop & WorkshopTag.Library_SFX) != 0));
+                                                            controller.Add("Image", new Switch("Image", "Applies image effects.", new Vector2(139+55+55, 60), (int i, string n) => {
+                                                                bool switchState = (i & 256) != 0;
+                                                                if((i & 2) != 0)
+                                                                {
+                                                                    // add or remove WorkshopTag.Image to flags
+                                                                    if(switchState)
+                                                                        selectedFlagsWorkshop |= WorkshopTag.Effect_ImageOnly;
+                                                                    else
+                                                                        selectedFlagsWorkshop &= ~WorkshopTag.Effect_ImageOnly;
+                                                                }
+                                                                return switchState;
+                                                            }, (selectedFlagsWorkshop & WorkshopTag.Effect_ImageOnly) != 0));
+                                                            controller.Add("Audio", new Switch("Audio", "Applies audio effects.", new Vector2(139+55, 60), (int i, string n) => {
+                                                                bool switchState = (i & 256) != 0;
+                                                                if((i & 2) != 0)
+                                                                {
+                                                                    if(switchState)
+                                                                        selectedFlagsWorkshop |= WorkshopTag.Effect_AudioOnly;
+                                                                    else
+                                                                        selectedFlagsWorkshop &= ~WorkshopTag.Effect_AudioOnly;
+                                                                }
+                                                                return switchState;
+                                                            }, (selectedFlagsWorkshop & WorkshopTag.Effect_AudioOnly) != 0));
+                                                            controller.Add("Video", new Switch("Video", "Applies video effects.", new Vector2(139, 60), (int i, string n) => {
+                                                                bool switchState = (i & 256) != 0;
+                                                                if((i & 2) != 0)
+                                                                {
+                                                                    // add or remove WorkshopTag.Video to flags
+                                                                    if(switchState)
+                                                                        selectedFlagsWorkshop |= WorkshopTag.Effect_VideoOnly;
+                                                                    else
+                                                                        selectedFlagsWorkshop &= ~WorkshopTag.Effect_VideoOnly;
+                                                                }
+                                                                return switchState;
+                                                            }, (selectedFlagsWorkshop & WorkshopTag.Effect_VideoOnly) != 0));
+                                                        }
                                                         controller.Add("Submit", new Button("Submit", "Submit to Steam Workshop.", new Vector2(139+139, 60+10+19*7), (int i, string n) => {
                                                             switch(i)
                                                             {
                                                                 case 2: // left click
-                                                                    GlobalContent.GetSound("Option").Play(int.Parse(SaveData.saveValues["SoundEffectVolume"], CultureInfo.InvariantCulture) / 100f, 0f, 0f);
-#if WINDOWSDX
-                                                                    // Select png, jpg, or gif icon with file dialog
-                                                                    System.Windows.Forms.OpenFileDialog fileDialog = new System.Windows.Forms.OpenFileDialog();
-                                                                    fileDialog.Filter = "Joint Photographic Experts Group (*.jpg, *.jpeg)|*.jpg;*.jpeg";
-                                                                    fileDialog.Title = "Select Workshop Icon";
-                                                                    fileDialog.InitialDirectory = Path.GetFullPath(@"templates");
-                                                                    fileDialog.FileName = "workshop.jpg";
-                                                                    if(fileDialog.ShowDialog() == System.Windows.Forms.DialogResult.OK)
-                                                                    {
-                                                                        // file must be under 1mb, otherwise complain
-                                                                        if(new FileInfo(fileDialog.FileName).Length > 1048576)
-                                                                        {
-                                                                            GlobalContent.GetSound("Error").Play(int.Parse(SaveData.saveValues["SoundEffectVolume"], CultureInfo.InvariantCulture) / 100f, 0f, 0f);
-                                                                            ConsoleOutput.WriteLine("Selected Workshop Icon is too large. Must be under 1mb.", Color.Red);
-                                                                            Global.generator.progressText = L.T(0, "Addons:StatusFailPreviewSize");
-                                                                            return true;
-                                                                        }
-                                                                        Name = "PageAddons";
-                                                                        editingSettings = false;
-                                                                        controller.Clear();
-                                                                        Global.generator.progressText = L.T(0, "Addons:StatusUploading");
-                                                                        ConsoleOutput.WriteLine("Publishing " + Path.GetFileName(PluginHandler.plugins[settingsIndex].path) + " with icon " + Path.GetFileName(fileDialog.FileName), Color.RoyalBlue);
-                                                                        PluginHandler.PublishPlugin(PluginHandler.plugins[settingsIndex], selectedFlagsWorkshop, fileDialog.FileName);
-                                                                    }
-#endif
+                                                                    GlobalContent.PlaySound("Option");
+                                                                    Name = "PageAddons";
+                                                                    editingSettings = false;
+                                                                    controller.Clear();
+                                                                    PluginHandler.PublishPlugin(PluginHandler.plugins[settingsIndex], selectedFlagsWorkshop);
                                                                     return true;
                                                             }
                                                             return false;
@@ -890,7 +984,7 @@ namespace NonsensicalVideoGenerator
                                                             switch(i)
                                                             {
                                                                 case 2: // left click
-                                                                    GlobalContent.GetSound("Back").Play(int.Parse(SaveData.saveValues["SoundEffectVolume"], CultureInfo.InvariantCulture) / 100f, 0f, 0f);
+                                                                    GlobalContent.PlaySound("Back");
                                                                     controller.Clear();
                                                                     Name = "PageAddons";
                                                                     editingSettings = false;
@@ -908,7 +1002,7 @@ namespace NonsensicalVideoGenerator
                                         switch(i)
                                         {
                                             case 2: // left click
-                                                GlobalContent.GetSound("Back").Play(int.Parse(SaveData.saveValues["SoundEffectVolume"], CultureInfo.InvariantCulture) / 100f, 0f, 0f);
+                                                GlobalContent.PlaySound("Back");
                                                 controller.Clear();
                                                 Name = "PageAddons";
                                                 editingSettings = false;
@@ -959,7 +1053,7 @@ namespace NonsensicalVideoGenerator
                                                         string oldValue = PluginHandler.plugins[settingsIndex].settings[keyFromIndex.Replace("NoLocalization:", "")].ToString() ?? "";
                                                         if(!controller.interactables.ContainsKey(keyFromIndex))
                                                         {
-                                                            GlobalContent.GetSound("Error").Play(int.Parse(SaveData.saveValues["SoundEffectVolume"], CultureInfo.InvariantCulture) / 100f, 0f, 0f);
+                                                            GlobalContent.PlaySound("Error");
                                                             return true;
                                                         }
                                                         PluginHandler.plugins[settingsIndex].settings[keyFromIndex.Replace("NoLocalization:", "")] = switchState ? "1" : "0";
@@ -979,7 +1073,7 @@ namespace NonsensicalVideoGenerator
                                                         string oldValue = PluginHandler.plugins[settingsIndex].settings[keyFromIndex.Replace("NoLocalization:", "")].ToString() ?? "";
                                                         if(!controller.interactables.ContainsKey(keyFromIndex))
                                                         {
-                                                            GlobalContent.GetSound("Error").Play(int.Parse(SaveData.saveValues["SoundEffectVolume"], CultureInfo.InvariantCulture) / 100f, 0f, 0f);
+                                                            GlobalContent.PlaySound("Error");
                                                             return true;
                                                         }
                                                         PluginHandler.plugins[settingsIndex].settings[keyFromIndex.Replace("NoLocalization:", "")] = controller.interactables[keyFromIndex].Tooltip;
@@ -1013,7 +1107,7 @@ namespace NonsensicalVideoGenerator
                             {
                                 pluginCreation = true;
                                 editingSettings = true;
-                                GlobalContent.GetSound("Select").Play(int.Parse(SaveData.saveValues["SoundEffectVolume"], CultureInfo.InvariantCulture) / 100f, 0f, 0f);
+                                GlobalContent.PlaySound("Select");
                                 return true;
                             }
                         }
@@ -1048,10 +1142,10 @@ namespace NonsensicalVideoGenerator
                     case 2: // left click
                         if(Global.ready)
                         {
-                            GlobalContent.GetSound("Select").Play(int.Parse(SaveData.saveValues["SoundEffectVolume"], System.Globalization.CultureInfo.InvariantCulture) / 100f, 0f, 0f);
+                            GlobalContent.PlaySound("Select");
                             ProcessStartInfo psi = new()
                             {
-                                FileName = "https://steamcommunity.com/app/2516360/workshop/",
+                                FileName = "steam://openurl/https://steamcommunity.com/app/2516360/workshop/",
                                 UseShellExecute = true
                             };
                             Process.Start(psi);
@@ -1064,7 +1158,7 @@ namespace NonsensicalVideoGenerator
                 switch(i)
                 {
                     case 2: // left click
-                        GlobalContent.GetSound("Select").Play(int.Parse(SaveData.saveValues["SoundEffectVolume"], CultureInfo.InvariantCulture) / 100f, 0f, 0f);
+                        GlobalContent.PlaySound("Select");
                         if(SteamManager.initialized)
                             PluginHandler.LoadWorkshop(false);
                         else
@@ -1078,9 +1172,9 @@ namespace NonsensicalVideoGenerator
                 switch(i)
                 {
                     case 2: // left click
-                        GlobalContent.GetSound("Select").Play(int.Parse(SaveData.saveValues["SoundEffectVolume"], CultureInfo.InvariantCulture) / 100f, 0f, 0f);
+                        GlobalContent.PlaySound("Select");
                         PluginHandler.CyclePluginListFilter();
-                        if(PluginHandler.pluginListFilter == (PluginListFilter.Effects | PluginListFilter.PostRenderEffects | PluginListFilter.Themes))
+                        if(PluginHandler.pluginListFilter == (PluginListFilter.Effects | PluginListFilter.PostRenderEffects | PluginListFilter.Themes | PluginListFilter.BootMovies))
                             Name = "PageAddons";
                         else
                             Name = PluginHandler.GetPluginListFilter();
@@ -1093,10 +1187,10 @@ namespace NonsensicalVideoGenerator
                 switch(i)
                 {
                     case 2: // left click
-                        GlobalContent.GetSound("Select").Play(int.Parse(SaveData.saveValues["SoundEffectVolume"], CultureInfo.InvariantCulture) / 100f, 0f, 0f);
+                        GlobalContent.PlaySound("Select");
                         if(PluginHandler.pluginListFilter == PluginListFilter.Themes)
                         {
-                            GlobalContent.GetSound("Error").Play(int.Parse(SaveData.saveValues["SoundEffectVolume"], CultureInfo.InvariantCulture) / 100f, 0f, 0f);
+                            GlobalContent.PlaySound("Error");
                             return true;
                         }
                         for(int index = 0; index < PluginHandler.plugins.Count; index++)
@@ -1116,10 +1210,10 @@ namespace NonsensicalVideoGenerator
                 switch(i)
                 {
                     case 2: // left click
-                        GlobalContent.GetSound("Select").Play(int.Parse(SaveData.saveValues["SoundEffectVolume"], CultureInfo.InvariantCulture) / 100f, 0f, 0f);
+                        GlobalContent.PlaySound("Select");
                         if(PluginHandler.pluginListFilter == PluginListFilter.Themes)
                         {
-                            GlobalContent.GetSound("Error").Play(int.Parse(SaveData.saveValues["SoundEffectVolume"], CultureInfo.InvariantCulture) / 100f, 0f, 0f);
+                            GlobalContent.PlaySound("Error");
                             return true;
                         }
                         for(int index = 0; index < PluginHandler.plugins.Count; index++)
@@ -1134,13 +1228,33 @@ namespace NonsensicalVideoGenerator
                 }
                 return false;
             }, ThemeManager.LoadLayeredContent<Texture2D>("graphics/actions/disableall")));
+            controllerPluginCreation.Add("PluginBootMovie", new Switch("Boot Movie", "Pick a video file for NVG to play on startup.", new Vector2(139, 60+19*4), (int i, string n) => {
+                bool switchState = (i & 256) != 0;
+                if((i & 2) != 0)
+                {
+                    Switch? buttonMinimalSwitch = controllerPluginCreation.interactables["PluginMinimal"] as Switch;
+                    Switch? buttonThemeSwitch = controllerPluginCreation.interactables["PluginTheme"] as Switch;
+                    if(buttonMinimalSwitch != null)
+                        buttonMinimalSwitch.SwitchState = false;
+                    if(buttonThemeSwitch != null)
+                        buttonThemeSwitch.SwitchState = false;
+                    if(switchState)
+                        templateType = 3;
+                    else
+                        templateType = 0;
+                }
+                return switchState;
+            }, templateType == 3));
             controllerPluginCreation.Add("PluginTheme", new Switch("Theme Template", "Create a theme for " + Global.productNameShort + ".", new Vector2(139, 60+19*3), (int i, string n) => {
                 bool switchState = (i & 256) != 0;
                 if((i & 2) != 0)
                 {
                     Switch? buttonSwitch = controllerPluginCreation.interactables["PluginMinimal"] as Switch;
+                    Switch? buttonBootMovieSwitch = controllerPluginCreation.interactables["PluginBootMovie"] as Switch;
                     if(buttonSwitch != null)
                         buttonSwitch.SwitchState = false;
+                    if(buttonBootMovieSwitch != null)
+                        buttonBootMovieSwitch.SwitchState = false;
                     if(switchState)
                         templateType = 2;
                     else
@@ -1153,8 +1267,11 @@ namespace NonsensicalVideoGenerator
                 if((i & 2) != 0)
                 {
                     Switch? buttonSwitch = controllerPluginCreation.interactables["PluginTheme"] as Switch;
+                    Switch? buttonBootMovieSwitch = controllerPluginCreation.interactables["PluginBootMovie"] as Switch;
                     if(buttonSwitch != null)
                         buttonSwitch.SwitchState = false;
+                    if(buttonBootMovieSwitch != null)
+                        buttonBootMovieSwitch.SwitchState = false;
                     if(switchState)
                         templateType = 1;
                     else
@@ -1175,7 +1292,7 @@ namespace NonsensicalVideoGenerator
                 switch(i)
                 {
                     case 2: // left click
-                        GlobalContent.GetSound("Select").Play(int.Parse(SaveData.saveValues["SoundEffectVolume"], CultureInfo.InvariantCulture) / 100f, 0f, 0f);
+                        GlobalContent.PlaySound("Select");
                         PluginHandler.CyclePluginListFilter();
                         scrollOffset = 0;
                         controllerPluginCreation.interactables["Filter"].Name = "Filter: "+PluginHandler.GetPluginListFilter();
@@ -1187,7 +1304,7 @@ namespace NonsensicalVideoGenerator
                 switch(i)
                 {
                     case 2: // left click
-                        GlobalContent.GetSound("Back").Play(int.Parse(SaveData.saveValues["SoundEffectVolume"], CultureInfo.InvariantCulture) / 100f, 0f, 0f);
+                        GlobalContent.PlaySound("Back");
                         editingSettings = false;
                         pluginCreation = false;
                         return true;
@@ -1198,7 +1315,7 @@ namespace NonsensicalVideoGenerator
                 switch(i)
                 {
                     case 2:
-                        GlobalContent.GetSound("Option").Play(int.Parse(SaveData.saveValues["SoundEffectVolume"], CultureInfo.InvariantCulture) / 100f, 0f, 0f);
+                        GlobalContent.PlaySound("Option");
                         if(SteamManager.initialized)
                             PluginHandler.LoadWorkshop(false);
                         else
@@ -1215,7 +1332,7 @@ namespace NonsensicalVideoGenerator
                         pluginCreation = false;
                         if(PluginHandler.CreatePlugin(customPluginFileName, customPluginName, templateType, out string file))
                         {
-                            GlobalContent.GetSound("Select").Play(int.Parse(SaveData.saveValues["SoundEffectVolume"], CultureInfo.InvariantCulture) / 100f, 0f, 0f);
+                            GlobalContent.PlaySound("Select");
                             // load plugins
                             if(SteamManager.initialized)
                                 PluginHandler.LoadWorkshop(false);
@@ -1226,7 +1343,7 @@ namespace NonsensicalVideoGenerator
                         }
                         else
                         {
-                            GlobalContent.GetSound("Error").Play(int.Parse(SaveData.saveValues["SoundEffectVolume"], CultureInfo.InvariantCulture) / 100f, 0f, 0f);
+                            GlobalContent.PlaySound("Error");
                             editingSettings = false;
                         }
                         return true;
@@ -1239,4 +1356,3 @@ namespace NonsensicalVideoGenerator
         }
     }
 }
-#endif

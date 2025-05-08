@@ -1,13 +1,9 @@
-#if MONOGAME
-using System;
-using System.Collections.Generic;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Input;
 using Microsoft.Xna.Framework.Content;
 using Microsoft.Xna.Framework.Graphics;
 using MonoGame.Extended.Tweening;
 using System.Globalization;
-using Microsoft.Xna.Framework.Media;
 
 namespace NonsensicalVideoGenerator
 {
@@ -128,11 +124,11 @@ namespace NonsensicalVideoGenerator
                 }
                 if(!toggled)
                 {
-                    GlobalContent.GetSound("Back").Play(int.Parse(SaveData.saveValues["SoundEffectVolume"], CultureInfo.InvariantCulture) / 100f, 0f, 0f);
+                    GlobalContent.PlaySound("Back");
                 }
                 else
                 {
-                    GlobalContent.GetSound("Select").Play(int.Parse(SaveData.saveValues["SoundEffectVolume"], CultureInfo.InvariantCulture) / 100f, 0f, 0f);
+                    GlobalContent.PlaySound("Select");
                     //UserInterface.instance.music = 0;
                 }
             }
@@ -216,4 +212,3 @@ namespace NonsensicalVideoGenerator
         }
     }
 }
-#endif

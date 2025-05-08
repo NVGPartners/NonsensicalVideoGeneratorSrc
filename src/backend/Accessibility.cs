@@ -1,8 +1,4 @@
-#if MONOGAME
-using System;
 using System.Collections.Generic;
-using System.Diagnostics;
-using System.Reflection;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using Microsoft.Xna.Framework.Input;
@@ -56,7 +52,7 @@ namespace NonsensicalVideoGenerator
             {
                 if(!showDisambiguation)
                 {
-                    GlobalContent.GetSound("Disambiguation").Play(int.Parse(SaveData.saveValues["SoundEffectVolume"], System.Globalization.CultureInfo.InvariantCulture) / 100f, 0f, 0f);
+                    GlobalContent.PlaySound("Disambiguation");
                     showDisambiguation = true;
                     selectedDisambiguationOption = -1;
                     offset = 0;
@@ -73,7 +69,7 @@ namespace NonsensicalVideoGenerator
                 else
                 {
                     synth.SpeakAsyncCancelAll();
-                    GlobalContent.GetSound("Back").Play(int.Parse(SaveData.saveValues["SoundEffectVolume"], System.Globalization.CultureInfo.InvariantCulture) / 100f, 0f, 0f);
+                    GlobalContent.PlaySound("Back");
                     showDisambiguation = false;
                     result = true;
                 }
@@ -100,7 +96,7 @@ namespace NonsensicalVideoGenerator
             // Check if user pressed escape key and disambiguation is already showing.
             if(newKeyboardState2.IsKeyDown(Keys.Escape) && !oldKeyboardState2.IsKeyDown(Keys.Escape) && showDisambiguation)
             {
-                GlobalContent.GetSound("Back").Play(int.Parse(SaveData.saveValues["SoundEffectVolume"], System.Globalization.CultureInfo.InvariantCulture) / 100f, 0f, 0f);
+                GlobalContent.PlaySound("Back");
                 showDisambiguation = false;
                 result = true;
             }
@@ -208,17 +204,17 @@ namespace NonsensicalVideoGenerator
                         // Only 46 possible keys, so shift until the last option is able to be selected.
                         if(offset < -(disambiguationOptions.Count - 1))
                         {
-                            //GlobalContent.GetSound("Error").Play(int.Parse(SaveData.saveValues["SoundEffectVolume"], System.Globalization.CultureInfo.InvariantCulture) / 100f, 0f, 0f);
+                            //GlobalContent.PlaySound("Error");
                             //offset = -(disambiguationOptions.Count - 1);
                             offset = 0;
                         }
                         else if(offset > 0)
                         {
-                            //GlobalContent.GetSound("Error").Play(int.Parse(SaveData.saveValues["SoundEffectVolume"], System.Globalization.CultureInfo.InvariantCulture) / 100f, 0f, 0f);
+                            //GlobalContent.PlaySound("Error");
                             //offset = 0;
                             offset = -(disambiguationOptions.Count - 1);
                         }
-                        GlobalContent.GetSound("Option").Play(int.Parse(SaveData.saveValues["SoundEffectVolume"], System.Globalization.CultureInfo.InvariantCulture) / 100f, 0f, 0f);
+                        GlobalContent.PlaySound("Option");
                         TTS();
                     }
                 }
@@ -240,22 +236,22 @@ namespace NonsensicalVideoGenerator
                         // Only 46 possible keys, so shift until the last option is able to be selected.
                         if(offset < -(disambiguationOptions.Count - 1))
                         {
-                            //GlobalContent.GetSound("Error").Play(int.Parse(SaveData.saveValues["SoundEffectVolume"], System.Globalization.CultureInfo.InvariantCulture) / 100f, 0f, 0f);
+                            //GlobalContent.PlaySound("Error");
                             //offset = -(disambiguationOptions.Count - 1);
                             offset = 0;
                         }
                         else if(offset > 0)
                         {
-                            //GlobalContent.GetSound("Error").Play(int.Parse(SaveData.saveValues["SoundEffectVolume"], System.Globalization.CultureInfo.InvariantCulture) / 100f, 0f, 0f);
+                            //GlobalContent.PlaySound("Error");
                             //offset = 0;
                             offset = -(disambiguationOptions.Count - 1);
                         }
-                        GlobalContent.GetSound("Option").Play(int.Parse(SaveData.saveValues["SoundEffectVolume"], System.Globalization.CultureInfo.InvariantCulture) / 100f, 0f, 0f);
+                        GlobalContent.PlaySound("Option");
                         TTS();
                     }
                     else
                     {
-                        GlobalContent.GetSound("Error").Play(int.Parse(SaveData.saveValues["SoundEffectVolume"], System.Globalization.CultureInfo.InvariantCulture) / 100f, 0f, 0f);
+                        GlobalContent.PlaySound("Error");
                     }
                 }
                 if(offset < -(disambiguationOptions.Count - 1))
@@ -333,7 +329,7 @@ namespace NonsensicalVideoGenerator
                             selectedDisambiguationOption = i;
                             showDisambiguation = false;
                             holdItForMe = true;
-                            GlobalContent.GetSound("CompatSelect").Play(int.Parse(SaveData.saveValues["SoundEffectVolume"], System.Globalization.CultureInfo.InvariantCulture) / 100f, 0f, 0f);
+                            GlobalContent.PlaySound("CompatSelect");
                             TTS(L.T(0, "Accessibility:Selected", disambiguationOptions[i].tts));
                             return;
                         }
@@ -351,4 +347,3 @@ namespace NonsensicalVideoGenerator
         }
     }
 }
-#endif

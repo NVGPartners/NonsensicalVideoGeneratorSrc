@@ -1,4 +1,3 @@
-#if MONOGAME
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Content;
 using Microsoft.Xna.Framework.Graphics;
@@ -15,4 +14,3 @@ namespace NonsensicalVideoGenerator
         public void LoadContent(ContentManager contentManager, GraphicsDevice graphicsDevice);
     }
 }
-#endif

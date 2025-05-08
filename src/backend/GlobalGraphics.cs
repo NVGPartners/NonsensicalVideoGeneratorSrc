@@ -1,9 +1,7 @@
-#if MONOGAME
 using System;
 using System.Collections.Generic;
-using System.Reflection;
+using System.Globalization;
 using Microsoft.Xna.Framework;
-using Microsoft.Xna.Framework.Content;
 using Microsoft.Xna.Framework.Graphics;
 
 namespace NonsensicalVideoGenerator
@@ -53,7 +51,7 @@ namespace NonsensicalVideoGenerator
     /// </summary>
     public static class GlobalGraphics
     {
-        public static int scale = (int)Math.Round(double.Parse(SaveData.saveValues["ScreenScale"], System.Globalization.CultureInfo.InvariantCulture));
+        public static int scale = (int)Math.Round(double.Parse(SaveData.saveValues["ScreenScale"], CultureInfo.InvariantCulture));
         public static Vector2 drawOffset = new(0, 0);
         public static Point preferredResolution = new(320, 240);
         public static bool fullScreen = false;
@@ -84,9 +82,12 @@ namespace NonsensicalVideoGenerator
         {
             drawOffset = aspectRatio.drawOffset;
             preferredResolution = new Point(aspectRatio.preferredResolution.X * scale, aspectRatio.preferredResolution.Y * scale);
-            UserInterface.instance.Resize(preferredResolution.X, preferredResolution.Y);
-            // center to screen
-            UserInterface.instance.CenterToScreen();
+            if(UserInterface.instance != null)
+            {
+                UserInterface.instance.Resize(preferredResolution.X, preferredResolution.Y);
+                // center to screen
+                UserInterface.instance.CenterToScreen();
+            }
         }
         public static AspectRatio GetAspectRatio()
         {
@@ -199,4 +200,3 @@ namespace NonsensicalVideoGenerator
         }
     }
 }
-#endif

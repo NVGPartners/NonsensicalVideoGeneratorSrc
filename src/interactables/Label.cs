@@ -1,10 +1,7 @@
-#if MONOGAME
 using System;
-using System.Collections.Generic;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Content;
 using Microsoft.Xna.Framework.Graphics;
-using Microsoft.Xna.Framework.Input;
 
 namespace NonsensicalVideoGenerator
 {
@@ -68,7 +65,7 @@ namespace NonsensicalVideoGenerator
                 string token = "Interactable:"+internalName+"Title";
                 // check if the token exists
                 string localized = L.T(0, token, PluginHandler.GetPluginListFilter());
-                if (localized != token)
+                if (localized != token || L.GetLocale().name == "dummy")
                     localizedTitle = localized;
                 else
                     localizedTitle = ""; // no title
@@ -92,4 +89,3 @@ namespace NonsensicalVideoGenerator
         }
     }
 }
-#endif

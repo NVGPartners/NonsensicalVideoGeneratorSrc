@@ -5,11 +5,8 @@ using System.Diagnostics;
 using System.IO;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Audio;
-using Microsoft.Xna.Framework.Content;
 using Microsoft.Xna.Framework.Graphics;
-using Microsoft.Xna.Framework.Input;
 using Microsoft.Xna.Framework.Media;
-using MonoGame.Extended.Tweening;
 using System.Globalization;
 using MonoGame.Extended.VideoPlayback;
 
@@ -18,21 +15,13 @@ namespace NonsensicalVideoGenerator
     public static class FramePlayer
     {
         public static int currentFrame = 0;
-#if MONOGAME
         public static List<Texture2D> frames = new();
         public static Texture2D? audioFrame;
-#else
-        public static List<Image> frames = new();
-#endif
         public static double timeStarted = 0;
         public static int fps = 30;
         public static bool playing = false;
         public static bool audioPlaying = false;
-#if MONOGAME
         public static SoundEffectInstance? audio;
-#else
-        public static SoundPlayer audio;
-#endif
         public static bool processing = false;
         public static double startedProcessing = 0;
         public static string currentPath = "";
@@ -169,24 +158,16 @@ namespace NonsensicalVideoGenerator
                         return;
                     Global.generator.progressText = L.T(0, "Video:StatusLoadFrame", i.ToString(CultureInfo.InvariantCulture), curcount.ToString(CultureInfo.InvariantCulture));
                     FileStream frameFile = File.OpenRead($".\\temp\\extracted\\frames\\{i}.bmp");
-#if MONOGAME
                     if(UserInterface.instance != null)
                         frames.Add(Texture2D.FromStream(UserInterface.instance.GraphicsDevice, frameFile));
-#else
-                    frames.Add(Image.FromStream(frameFile));
-#endif
                     frameFile.Close();
                 }
                 // Load audio
                 FileStream audioFile = File.OpenRead(".\\temp\\extracted\\audio.wav");
-#if MONOGAME
                 SoundEffect snd = SoundEffect.FromStream(audioFile);
                 audio = snd.CreateInstance();
                 //ScreenManager.PushNavigation("Video");
                 //ScreenManager.GetScreen<VideoScreen>("Video")?.Show();
-#else
-                audio = new SoundPlayer(audioFile);
-#endif
                 audioFile.Close();
                 if(worker.CancellationPending || !processing)
                     return;
@@ -196,7 +177,7 @@ namespace NonsensicalVideoGenerator
                 ConsoleOutput.WriteLine($"Failed to extract frames and audio.");
                 ConsoleOutput.WriteLine(e.Message);
                 Stop();
-                GlobalContent.GetSound("Error").Play(int.Parse(SaveData.saveValues["SoundEffectVolume"], CultureInfo.InvariantCulture) / 100f, 0f, 0f);
+                GlobalContent.PlaySound("Error");
                 Global.generator.progressText = L.T(0, "Video:StatusFailPlay");
             }
             processing = false;
@@ -291,27 +272,21 @@ namespace NonsensicalVideoGenerator
                 startedProcessing = 0;
                 canPlayBgMusic = true;
                 // Unload frames
-#if MONOGAME
                 foreach(Texture2D frame in frames)
                 {
                     frame.Dispose();
                 }
-#else
-                foreach(Image frame in frames)
-                {
-                    frame.Dispose();
-                }
-#endif
                 frames.Clear();
                 // Unload audio
                 if(audio != null)
                 {
-                    audio.Stop();
-                    audio.Dispose();
+                    if (audio != null)
+                    {
+                        audio.Stop();
+                        audio.Dispose();
+                    }
                     audio = null;
-#if MONOGAME
                     //ScreenManager.GetScreen<VideoScreen>("Video")?.Hide();
-#endif
                     Global.generator.progressText = L.T(0, "Video:StatusStop");
                 }
             }
@@ -364,52 +339,14 @@ namespace NonsensicalVideoGenerator
                     audio.Stop();
                     audio.Dispose();
                     audio = null;
-#if MONOGAME
                     //ScreenManager.GetScreen<VideoScreen>("Video")?.Hide();
-#endif
                 }
                 FileStream audioFile = File.OpenRead(".\\temp\\extracted\\audio.wav");
-#if MONOGAME
                 SoundEffect snd = SoundEffect.FromStream(audioFile);
                 audio = snd.CreateInstance();
-#else
-                audio = new SoundPlayer(audioFile);
-#endif
                 audioFile.Close();
                 currentAudioTime = 0;
-#if MONOGAME
                 audioLength = snd.Duration.TotalMilliseconds;
-#else
-                // Get length of audio with ffprobe
-                startInfo = new()
-                {
-                    FileName = "ffprobe",
-                    Arguments = "-v error -show_entries format=duration -of default=noprint_wrappers=1:nokey=1 \"" + currentPath + "\"",
-                    UseShellExecute = false,
-                    RedirectStandardOutput = true,
-                    CreateNoWindow = true
-                };
-                process = new()
-                {
-                    StartInfo = startInfo
-                };
-                process.OutputDataReceived += (sender, args) => {
-                    if(args.Data != null)
-                    {
-                        audioLength = double.Parse(args.Data, CultureInfo.InvariantCulture) * 1000;
-                        ConsoleOutput.WriteLine(args.Data, Color.Transparent);
-                    }
-                };
-                if(audioConvertWorker.CancellationPending || !processing)
-                    return;
-                process.Start();
-                if(audioConvertWorker.CancellationPending || !processing)
-                    return;
-                process.BeginOutputReadLine();
-                if(audioConvertWorker.CancellationPending || !processing)
-                    return;
-                process.WaitForExit();
-#endif
                 canPlayBgMusic = false;
                 Process waveProcess = Generator.GenerateThumbnail(currentPath, ".\\temp\\extracted\\audio.bmp", LibraryRootType.Audio, 100, 78);
                 // Defer until the process is finished
@@ -419,11 +356,12 @@ namespace NonsensicalVideoGenerator
                 }
                 audioFrame = null;
                 FileStream audioFrameFile = File.OpenRead(".\\temp\\extracted\\audio.bmp");
-                audioFrame = Texture2D.FromStream(UserInterface.instance.GraphicsDevice, audioFrameFile);
+                if(UserInterface.instance != null)
+                    audioFrame = Texture2D.FromStream(UserInterface.instance.GraphicsDevice, audioFrameFile);
                 audioFrameFile.Close();
                 if(SaveData.saveValues["UseExternalVideoPlayer"] == "false")
                 {
-                    audio.Volume = float.Parse(SaveData.saveValues["VideoVolume"], System.Globalization.CultureInfo.InvariantCulture) / 100f;
+                    audio.Volume = float.Parse(SaveData.saveValues["VideoVolume"], CultureInfo.InvariantCulture) / 100f;
                     audio.Play();
                     //ScreenManager.PushNavigation("Video");
                     //ScreenManager.GetScreen<VideoScreen>("Video")?.Show();
@@ -464,7 +402,7 @@ namespace NonsensicalVideoGenerator
                 {
                     ConsoleOutput.WriteLine($"Failed to open external video player.", Color.Red);
                     ConsoleOutput.WriteLine(e.Message, Color.Red);
-                    GlobalContent.GetSound("Error").Play(int.Parse(SaveData.saveValues["SoundEffectVolume"], CultureInfo.InvariantCulture) / 100f, 0f, 0f);
+                    GlobalContent.PlaySound("Error");
                     Global.generator.progressText = L.T(0, "Video:StatusFailPlay");
                 }
                 return;
@@ -476,7 +414,7 @@ namespace NonsensicalVideoGenerator
                 {
                     if(!audioPlaying && frames.Count == 0)
                     {
-                        audio.Volume = float.Parse(SaveData.saveValues["VideoVolume"], System.Globalization.CultureInfo.InvariantCulture) / 100f;
+                        audio.Volume = float.Parse(SaveData.saveValues["VideoVolume"], CultureInfo.InvariantCulture) / 100f;
                         audio.Play();
                         Global.generator.progressText = L.T(0, "Video:StatusPlay");
                         canPlayBgMusic = false;
@@ -552,7 +490,7 @@ namespace NonsensicalVideoGenerator
                         {
                             ConsoleOutput.WriteLine($"Failed to play media.");
                             ConsoleOutput.WriteLine(e.Message);
-                            GlobalContent.GetSound("Error").Play(int.Parse(SaveData.saveValues["SoundEffectVolume"], CultureInfo.InvariantCulture) / 100f, 0f, 0f);
+                            GlobalContent.PlaySound("Error");
                             Global.generator.progressText = L.T(0, "Video:StatusFailPlay");
                         }
                     }
@@ -560,7 +498,7 @@ namespace NonsensicalVideoGenerator
             }
             else
             {
-                GlobalContent.GetSound("Error").Play(int.Parse(SaveData.saveValues["SoundEffectVolume"], CultureInfo.InvariantCulture) / 100f, 0f, 0f);
+                GlobalContent.PlaySound("Error");
                 Global.generator.progressText = L.T(0, "Video:StatusFailStop");
             }
         }
@@ -595,7 +533,8 @@ namespace NonsensicalVideoGenerator
                     currentAudioTime += gameTime.ElapsedGameTime.TotalMilliseconds;
                     if(currentAudioTime > audioLength)
                     {
-                        audio.Stop();
+                        if(audio != null)
+                            audio.Stop();
                         currentAudioTime = 0;
                         audioPlaying = false;
                         canPlayBgMusic = true;
@@ -607,7 +546,7 @@ namespace NonsensicalVideoGenerator
                     Global.generator.progressText = L.T(0, "Video:StatusPlay");
                     timeStarted = gameTime.TotalGameTime.TotalSeconds;
                     canPlayBgMusic = false;
-                    audio.Volume = float.Parse(SaveData.saveValues["VideoVolume"], System.Globalization.CultureInfo.InvariantCulture) / 100f;
+                    audio.Volume = float.Parse(SaveData.saveValues["VideoVolume"], CultureInfo.InvariantCulture) / 100f;
                     audio.Play();
                     audio.Volume = int.Parse(SaveData.saveValues["VideoVolume"], CultureInfo.InvariantCulture) / 100f;
                     currentFrame = 0;

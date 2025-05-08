@@ -1,6 +1,4 @@
 using Microsoft.Xna.Framework;
-using Microsoft.Xna.Framework.Content;
-using Microsoft.Xna.Framework.Graphics;
 
 namespace NonsensicalVideoGenerator
 {
@@ -51,42 +49,16 @@ namespace NonsensicalVideoGenerator
             {
                 if(Pagination.SelectedPage != Pagination.TopPageCount)
                     lastPage = Pagination.SelectedPage;
-                GlobalContent.GetSound("Select").Play(int.Parse(SaveData.saveValues["SoundEffectVolume"], System.Globalization.CultureInfo.InvariantCulture) / 100f, 0f, 0f);
+                GlobalContent.PlaySound("Select");
                 Pagination.SetPage(Pagination.TopPageCount);
-                ScreenManager.PushNavigation("Content");
-                ScreenManager.GetScreen<ContentScreen>("Content")?.Show();
-                ScreenManager.GetScreen<ContentScreen>("Content").offset = new Vector2(0, 0);
-                if(SaveData.saveValues["UseExternalVideoPlayer"] == "false")
-                {
-                    ScreenManager.GetScreen<VideoScreen>("Video")?.Hide();
-                    ScreenManager.GetScreen<VideoScreen>("Video").offset = new Vector2(GlobalGraphics.Scale(-124), 0);
-                }
-                ScreenManager.GetScreen<SocialScreen>("Socials")?.Hide();
-                ScreenManager.GetScreen<SocialScreen>("Socials").offset = new Vector2(0, GlobalGraphics.Scale(240));
-                ScreenManager.GetScreen<MenuScreen>("Menu")?.Hide();
-                ScreenManager.GetScreen<MenuScreen>("Menu").offset = new Vector2(GlobalGraphics.Scale(-124), 0);
             }
         }
         public static void HideDebugMenu()
         {
             if(debugMode)
             {
-                GlobalContent.GetSound("Back").Play(int.Parse(SaveData.saveValues["SoundEffectVolume"], System.Globalization.CultureInfo.InvariantCulture) / 100f, 0f, 0f);
+                GlobalContent.PlaySound("Back");
                 Pagination.SetPage(lastPage);
-                ScreenManager.PushNavigation("Content");
-                ScreenManager.GetScreen<ContentScreen>("Content").Show();
-                ScreenManager.GetScreen<ContentScreen>("Content").offset = new Vector2(0, 0);
-                if(SaveData.saveValues["UseExternalVideoPlayer"] == "false")
-                {
-                    ScreenManager.GetScreen<VideoScreen>("Video")?.Show();
-                    ScreenManager.GetScreen<VideoScreen>("Video").offset = new Vector2(0, 0);
-                }
-                ScreenManager.PushNavigation("Socials");
-                ScreenManager.GetScreen<SocialScreen>("Socials")?.Show();
-                ScreenManager.GetScreen<SocialScreen>("Socials").offset = new Vector2(0, 0);
-                ScreenManager.PushNavigation("Menu");
-                ScreenManager.GetScreen<MenuScreen>("Menu")?.Show();
-                ScreenManager.GetScreen<MenuScreen>("Menu").offset = new Vector2(0, 0);
             }
         }
         public static void ToggleDebugMenu()

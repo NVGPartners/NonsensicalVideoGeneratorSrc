@@ -1,6 +1,4 @@
-#if MONOGAME
 using System;
-using System.Collections.Generic;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Content;
 using Microsoft.Xna.Framework.Graphics;
@@ -80,7 +78,7 @@ namespace NonsensicalVideoGenerator
                 string token = "Interactable:"+internalName+"Title";
                 // check if the token exists
                 string localized = L.T(0, token, PluginHandler.GetPluginListFilter());
-                if (localized != token)
+                if (localized != token || L.GetLocale().name == "dummy")
                     localizedTitle = localized;
                 else
                     localizedTitle = ""; // no title
@@ -88,7 +86,7 @@ namespace NonsensicalVideoGenerator
             SpriteFont spriteFont = L.FontLarge();
             if(internalName.Contains("ViewLocalizationOptions") || internalName.Contains("SelectLanguageOptionsPage"))
             {
-                spriteFont = GlobalContent.GetFont(L.cyclerLocale.fontLarge);
+                spriteFont = L.cyclerLocale != null ? GlobalContent.GetFont(L.cyclerLocale.fontLarge) : L.FontLarge();
                 if(State >= 1 && Tooltip != "")
                     Global.tooltipIsCycler = true;
             }
@@ -122,7 +120,7 @@ namespace NonsensicalVideoGenerator
                     string token = "Interactable:"+internalName+"Tooltip";
                     // check if the token exists
                     string localized = L.T(0, token);
-                    if (localized != token)
+                    if (localized != token || L.GetLocale().name == "dummy")
                         Global.tooltip = localized;
                     else
                         Global.tooltip = ""; // no tooltip
@@ -134,4 +132,3 @@ namespace NonsensicalVideoGenerator
         }
     }
 }
-#endif

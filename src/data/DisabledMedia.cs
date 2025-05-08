@@ -1,12 +1,7 @@
 using System;
 using System.Collections.Generic;
 using System.IO;
-using System.Linq;
-#if MONOGAME
 using Microsoft.Xna.Framework;
-#else
-using System.Drawing;
-#endif
 using Newtonsoft.Json;
 
 namespace NonsensicalVideoGenerator

@@ -1,12 +1,8 @@
 using System;
 using System.Collections.Generic;
+using System.Globalization;
 using System.IO;
-using System.Text;
-#if MONOGAME
 using Microsoft.Xna.Framework;
-#else
-using System.Drawing;
-#endif
 
 namespace NonsensicalVideoGenerator
 {
@@ -104,20 +100,12 @@ namespace NonsensicalVideoGenerator
                     }
                 }
             }
-#if !MONOGAME
-            // Write to console.
-            if(c != Color.Transparent)
-            {
-#endif
-                ConsoleColor cc = GetColor(c);
-                Console.ForegroundColor = cc;
-                if (!newLine)
-                    Console.Write(line);
-                else
-                    Console.WriteLine(line);
-#if !MONOGAME
-            }
-#endif
+            ConsoleColor cc = GetColor(c);
+            Console.ForegroundColor = cc;
+            if (!newLine)
+                Console.Write(line);
+            else
+                Console.WriteLine(line);
             // Remove old lines.
             while (output.Count > maxLines)
                 output.RemoveAt(0);
@@ -157,15 +145,11 @@ namespace NonsensicalVideoGenerator
                     string[] colorValues = colorString.Split(',');
                     if(colorValues.Length == 3)
                     {
-                        if (int.TryParse(colorValues[0], System.Globalization.NumberStyles.Integer, System.Globalization.CultureInfo.InvariantCulture, out int r)
-                        && int.TryParse(colorValues[1], System.Globalization.NumberStyles.Integer, System.Globalization.CultureInfo.InvariantCulture, out int g)
-                        && int.TryParse(colorValues[2], System.Globalization.NumberStyles.Integer, System.Globalization.CultureInfo.InvariantCulture, out int b))
+                        if (int.TryParse(colorValues[0], System.Globalization.NumberStyles.Integer, CultureInfo.InvariantCulture, out int r)
+                        && int.TryParse(colorValues[1], System.Globalization.NumberStyles.Integer, CultureInfo.InvariantCulture, out int g)
+                        && int.TryParse(colorValues[2], System.Globalization.NumberStyles.Integer, CultureInfo.InvariantCulture, out int b))
                         {
-#if MONOGAME
                             c = new Color(r, g, b);
-#else
-                            c = Color.FromArgb(r, g, b);
-#endif
                             line = line.Substring(end + 2);
                         }
                     }

@@ -1,8 +1,6 @@
-#if MONOGAME
 using System;
 using System.Diagnostics;
 using System.Globalization;
-using System.IO;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Content;
 using Microsoft.Xna.Framework.Graphics;
@@ -98,7 +96,7 @@ namespace NonsensicalVideoGenerator
                                 {
                                     dragging = true;
                                     dragOffset = MouseInput.MouseState.Y - GlobalGraphics.Scale(69 + scrollOffset * (214 - 69) / maxScrollOffset);
-                                    GlobalContent.GetSound("Option").Play(int.Parse(SaveData.saveValues["SoundEffectVolume"], CultureInfo.InvariantCulture) / 100f, 0f, 0f);
+                                    GlobalContent.PlaySound("Option");
                                     return true;
                                 }
                                 // on scroll bar empty space (move center of handle to there)
@@ -106,7 +104,7 @@ namespace NonsensicalVideoGenerator
                                     && MouseInput.MouseState.Y >= GlobalGraphics.Scale(69+4) && MouseInput.MouseState.Y < GlobalGraphics.Scale(223-4))
                                 {
                                     scrollOffset = (MouseInput.MouseState.Y - GlobalGraphics.Scale(69) - GlobalGraphics.Scale(4)) * maxScrollOffset / (GlobalGraphics.Scale(214) - GlobalGraphics.Scale(69));
-                                    GlobalContent.GetSound("Option").Play(int.Parse(SaveData.saveValues["SoundEffectVolume"], CultureInfo.InvariantCulture) / 100f, 0f, 0f);
+                                    GlobalContent.PlaySound("Option");
                                     return true;
                                 }
                                 // 293, 57, 11x11 Scroll Up
@@ -115,7 +113,7 @@ namespace NonsensicalVideoGenerator
                                 {
                                     if(scrollOffset - 1 >= 0)
                                     {
-                                        GlobalContent.GetSound("Option").Play(int.Parse(SaveData.saveValues["SoundEffectVolume"], CultureInfo.InvariantCulture) / 100f, 0f, 0f);
+                                        GlobalContent.PlaySound("Option");
                                         int oldScrollOffset = scrollOffset;
                                         // Round down scroll offset to the nearest 16 multiple.
                                         scrollOffset = (int)(Math.Floor((double)scrollOffset / 16) * 16);
@@ -132,7 +130,7 @@ namespace NonsensicalVideoGenerator
                                     }
                                     else
                                     {
-                                        GlobalContent.GetSound("Error").Play(int.Parse(SaveData.saveValues["SoundEffectVolume"], CultureInfo.InvariantCulture) / 100f, 0f, 0f);
+                                        GlobalContent.PlaySound("Error");
                                     }
                                     return true;
                                 }
@@ -142,7 +140,7 @@ namespace NonsensicalVideoGenerator
                                 {
                                     if (scrollOffset + 1 <= maxScrollOffset)
                                     {
-                                        GlobalContent.GetSound("Option").Play(int.Parse(SaveData.saveValues["SoundEffectVolume"], CultureInfo.InvariantCulture) / 100f, 0f, 0f);
+                                        GlobalContent.PlaySound("Option");
                                         int oldScrollOffset = scrollOffset;
                                         // Round up scroll offset to the nearest 16 multiple.
                                         scrollOffset = (int)(Math.Ceiling((double)scrollOffset / 16) * 16);
@@ -159,7 +157,7 @@ namespace NonsensicalVideoGenerator
                                     }
                                     else
                                     {
-                                        GlobalContent.GetSound("Error").Play(int.Parse(SaveData.saveValues["SoundEffectVolume"], CultureInfo.InvariantCulture) / 100f, 0f, 0f);
+                                        GlobalContent.PlaySound("Error");
                                     }
                                     return true;
                                 }
@@ -169,7 +167,7 @@ namespace NonsensicalVideoGenerator
                         {
                             if (MouseInput.MouseState.LeftButton == ButtonState.Released)
                             {
-                                GlobalContent.GetSound("Option").Play(int.Parse(SaveData.saveValues["SoundEffectVolume"], CultureInfo.InvariantCulture) / 100f, 0f, 0f);
+                                GlobalContent.PlaySound("Option");
                                 dragging = false;
                             }
                             else
@@ -201,7 +199,7 @@ namespace NonsensicalVideoGenerator
                             {
                                 // Set to 0 because this is the top.
                                 scrollOffset = 0;
-                                GlobalContent.GetSound("Error").Play(int.Parse(SaveData.saveValues["SoundEffectVolume"], CultureInfo.InvariantCulture) / 100f, 0f, 0f);
+                                GlobalContent.PlaySound("Error");
                                 return true;
                             }
                             // 293, 224, 11x11 Scroll Down
@@ -210,7 +208,7 @@ namespace NonsensicalVideoGenerator
                             {
                                 // Set to max because this is the bottom.
                                 scrollOffset = maxScrollOffset;
-                                GlobalContent.GetSound("Error").Play(int.Parse(SaveData.saveValues["SoundEffectVolume"], CultureInfo.InvariantCulture) / 100f, 0f, 0f);
+                                GlobalContent.PlaySound("Error");
                                 return true;
                             }
                         }
@@ -352,7 +350,7 @@ namespace NonsensicalVideoGenerator
                         Name = "PageOptions";
                     DiscordRPC.curtab = DiscordRPC.ToTab(Name);
                     SteamRichPresence.curtab = SteamRichPresence.ToTab(Name);
-                    GlobalContent.GetSound("Select").Play(int.Parse(SaveData.saveValues["SoundEffectVolume"], CultureInfo.InvariantCulture) / 100f, 0f, 0f);
+                    GlobalContent.PlaySound("Select");
                     return true;
             }
             return false;
@@ -368,7 +366,7 @@ namespace NonsensicalVideoGenerator
                 switch(i)
                 {
                     case 2: // left click
-                        GlobalContent.GetSound("Select").Play(int.Parse(SaveData.saveValues["SoundEffectVolume"], CultureInfo.InvariantCulture) / 100f, 0f, 0f);
+                        GlobalContent.PlaySound("Select");
                         SaveData.saveValues["MusicVolume"] = "50";
                         SaveData.saveValues["SoundEffectVolume"] = "100";
                         SaveData.saveValues["VideoVolume"] = "100";
@@ -390,7 +388,7 @@ namespace NonsensicalVideoGenerator
                         ((Switch)scrollView.Controller.interactables["SkipPhotosensitiveWarningScreen"]).SwitchState = SaveData.saveValues["SkipPhotosensitiveWarningScreen"] == "true";
                         ((Switch)scrollView.Controller.interactables["DisableHolidays"]).SwitchState = SaveData.saveValues["DisableHolidays"] == "true";
                         ((Switch)scrollView.Controller.interactables["UseExternalVideoPlayer"]).SwitchState = SaveData.saveValues["UseExternalVideoPlayer"] == "true";
-                        if(UserInterface.instance.videoPlayer != null)
+                        if(UserInterface.instance != null && UserInterface.instance.videoPlayer != null)
                             UserInterface.instance.videoPlayer.Volume = int.Parse(SaveData.saveValues["VideoVolume"], CultureInfo.InvariantCulture) / 100f;
                         if(FramePlayer.audio != null)
                             FramePlayer.audio.Volume = float.Parse(SaveData.saveValues["VideoVolume"], CultureInfo.InvariantCulture) / 100f;
@@ -403,7 +401,7 @@ namespace NonsensicalVideoGenerator
                 switch(i)
                 {
                     case 2: // left click
-                        GlobalContent.GetSound("Select").Play(int.Parse(SaveData.saveValues["SoundEffectVolume"], CultureInfo.InvariantCulture) / 100f, 0f, 0f);
+                        GlobalContent.PlaySound("Select");
                         SaveData.saveValues["Locale"] = "english";
                         SaveData.Save();
                         L.LoadLocale("english");
@@ -515,7 +513,7 @@ namespace NonsensicalVideoGenerator
                 SaveData.saveValues["VideoVolume"] = scrollView.Controller.interactables["VideoVolume"].Tooltip;
                 if(oldValue != SaveData.saveValues["VideoVolume"])
                     SaveData.Save();
-                if(UserInterface.instance.videoPlayer != null)
+                if(UserInterface.instance != null && UserInterface.instance.videoPlayer != null)
                     UserInterface.instance.videoPlayer.Volume = int.Parse(SaveData.saveValues["VideoVolume"], CultureInfo.InvariantCulture) / 100f;
                 if(FramePlayer.audio != null)
                     FramePlayer.audio.Volume = float.Parse(SaveData.saveValues["VideoVolume"], CultureInfo.InvariantCulture) / 100f;
@@ -544,7 +542,7 @@ namespace NonsensicalVideoGenerator
                     if(oldValue != SaveData.saveValues["MatchAspectRatio"])
                         SaveData.Save();
                     if(GlobalGraphics.fullScreen)
-                        GlobalContent.GetSound("Error").Play(int.Parse(SaveData.saveValues["SoundEffectVolume"], CultureInfo.InvariantCulture) / 100f, 0f, 0f);
+                        GlobalContent.PlaySound("Error");
                     else
                         GlobalGraphics.SetAspectRatio(switchState ? GlobalGraphics.FindMatchingAspectRatio() : new AspectRatio());
                 }
@@ -558,7 +556,8 @@ namespace NonsensicalVideoGenerator
                     SaveData.saveValues["AlwaysOnTop"] = switchState.ToString().ToLower();
                     if(oldValue != SaveData.saveValues["AlwaysOnTop"])
                         SaveData.Save();
-                    UserInterface.instance.SetAlwaysOnTop(switchState);
+                    if(UserInterface.instance != null)
+                        UserInterface.instance.SetAlwaysOnTop(switchState);
                 }
                 return switchState;
             }, SaveData.saveValues["AlwaysOnTop"] == "true"));
@@ -570,7 +569,8 @@ namespace NonsensicalVideoGenerator
                     SaveData.saveValues["Fullscreen"] = switchState.ToString().ToLower();
                     if(oldValue != SaveData.saveValues["Fullscreen"])
                         SaveData.Save();
-                    UserInterface.instance.SetFullscreen(switchState);
+                    if(UserInterface.instance != null)
+                        UserInterface.instance.SetFullscreen(switchState);
                 }
                 return switchState;
             }, SaveData.saveValues["Fullscreen"] == "true"));
@@ -633,4 +633,3 @@ namespace NonsensicalVideoGenerator
         }
     }
 }
-#endif

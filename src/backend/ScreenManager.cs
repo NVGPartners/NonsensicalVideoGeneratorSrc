@@ -1,8 +1,5 @@
-#if MONOGAME
 using System;
 using System.Collections.Generic;
-using System.Diagnostics;
-using System.Globalization;
 using System.Linq;
 using System.Reflection;
 using Microsoft.Xna.Framework;
@@ -44,9 +41,12 @@ namespace NonsensicalVideoGenerator
                         // Log or inspect the loader exceptions for debugging
                         foreach (var loaderException in ex.LoaderExceptions)
                         {
-                            Console.WriteLine(loaderException.Message);
+                            if (loaderException != null)
+                            {
+                                Console.WriteLine(loaderException.Message);
+                            }
                         }
-                        t = ex.Types.Where(type => type != null).ToArray(); // Use only successfully loaded types
+                        t = ex.Types.Where(type => type != null).Select(type => type!).ToArray(); // Use only successfully loaded types
                     }
                     catch (Exception ex)
                     {
@@ -222,23 +222,26 @@ namespace NonsensicalVideoGenerator
                     }
                 }
             }
-            // Any key pressed will skip the intro
-            if(!UserInterface.instance.introFinished && (keyboardState.GetPressedKeys().Length > 0 || MouseInput.MouseState.LeftButton == ButtonState.Pressed))
+            if(UserInterface.instance != null)
             {
-                UserInterface.instance.videoPlayer.Stop();
-                FramePlayer.canPlayBgMusic = true;
-                GlobalContent.GetSound("Hover").Play(int.Parse(SaveData.saveValues["SoundEffectVolume"], CultureInfo.InvariantCulture) / 100f, 0f, 0f);
-            }
-            // F11 or Alt+Enter will toggle fullscreen
-            if(keyboardState.IsKeyDown(Keys.F11) && lastKeyboardState.IsKeyUp(Keys.F11)
-                || keyboardState.IsKeyDown(Keys.LeftAlt) && keyboardState.IsKeyDown(Keys.Enter) && lastKeyboardState.IsKeyUp(Keys.Enter))
-            {
-                UserInterface.instance.ToggleFullscreen();
-            }
-            // Alt+F4 will close the game
-            if(keyboardState.IsKeyDown(Keys.LeftAlt) && keyboardState.IsKeyDown(Keys.F4))
-            {
-                UserInterface.instance.ExitGracefully();
+                // Any key pressed will skip the intro
+                if(UserInterface.instance.videoPlayer != null && !UserInterface.instance.introFinished && (keyboardState.GetPressedKeys().Length > 0 || MouseInput.MouseState.LeftButton == ButtonState.Pressed))
+                {
+                    UserInterface.instance.videoPlayer.Stop();
+                    FramePlayer.canPlayBgMusic = true;
+                    GlobalContent.PlaySound("Hover");
+                }
+                // F11 or Alt+Enter will toggle fullscreen
+                if(keyboardState.IsKeyDown(Keys.F11) && lastKeyboardState.IsKeyUp(Keys.F11)
+                    || keyboardState.IsKeyDown(Keys.LeftAlt) && keyboardState.IsKeyDown(Keys.Enter) && lastKeyboardState.IsKeyUp(Keys.Enter))
+                {
+                    UserInterface.instance.ToggleFullscreen();
+                }
+                // Alt+F4 will close the game
+                if(keyboardState.IsKeyDown(Keys.LeftAlt) && keyboardState.IsKeyDown(Keys.F4))
+                {
+                    UserInterface.instance.ExitGracefully();
+                }
             }
             // Toggle debug mode
             // CTRL+F3 will toggle debug mode
@@ -266,7 +269,6 @@ namespace NonsensicalVideoGenerator
                         if(SaveData.saveValues["UseExternalVideoPlayer"] == "false")
                             GetScreen<VideoScreen>("Video")?.Hide();
                         GetScreen<MenuScreen>("Menu")?.Hide();
-                        GetScreen<SocialScreen>("Socials")?.Hide();
                     }
                     else
                     {
@@ -274,13 +276,11 @@ namespace NonsensicalVideoGenerator
                         PushNavigation("Header");
                         PushNavigation("Video");
                         PushNavigation("Menu");
-                        PushNavigation("Socials");
                         GetScreen<ContentScreen>("Content")?.Show();
                         GetScreen<HeaderScreen>("Header")?.Show();
                         if(SaveData.saveValues["UseExternalVideoPlayer"] == "false")
                             GetScreen<VideoScreen>("Video")?.Show();
                         GetScreen<MenuScreen>("Menu")?.Show();
-                        GetScreen<SocialScreen>("Socials")?.Show();
                     }
                 }
                 // F6 will pause
@@ -307,6 +307,11 @@ namespace NonsensicalVideoGenerator
                 if(keyboardState.IsKeyDown(Keys.F9) && lastKeyboardState.IsKeyUp(Keys.F9))
                 {
                     L.ReloadLocales();
+                }
+                // F10 will unload all locales
+                if(keyboardState.IsKeyDown(Keys.F10) && lastKeyboardState.IsKeyUp(Keys.F10))
+                {
+                    L.UnloadLocales();
                 }
             }
             if(!Debug.paused)
@@ -335,4 +340,3 @@ namespace NonsensicalVideoGenerator
         }
     }
 }
-#endif

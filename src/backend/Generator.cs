@@ -1,25 +1,14 @@
 using System;
-using System.Collections;
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Globalization;
 using System.IO;
-using Newtonsoft.Json;
 using System.Diagnostics;
 using System.Threading;
-using System.Linq;
 using System.Text.RegularExpressions;
 using System.Reflection;
-using Steamworks;
-using Microsoft.Xna.Framework.Media;
 using MonoGame.Extended.VideoPlayback;
-
-
-#if MONOGAME
 using Microsoft.Xna.Framework;
-#else
-using System.Drawing;
-#endif
 
 namespace NonsensicalVideoGenerator
 {
@@ -149,30 +138,32 @@ namespace NonsensicalVideoGenerator
                         }
                         else
                         {
-#if MONOGAME
                             if (bool.Parse(SaveData.saveValues["PlayAutomatically"]))
                             {
                                 FramePlayer.Stop();
-                                if(UserInterface.instance.videoPlayer != null)
+                                if(UserInterface.instance != null)
                                 {
-                                    Global.videoPlaying = false;
-                                    UserInterface.instance.videoPlayer.Dispose();
-                                    UserInterface.instance.videoPlayer = null;
+                                    if(UserInterface.instance.videoPlayer != null)
+                                    {
+                                        Global.videoPlaying = false;
+                                        UserInterface.instance.videoPlayer.Dispose();
+                                        UserInterface.instance.videoPlayer = null;
+                                    }
+                                    UserInterface.instance.videoPlayer = new MonoGame.Extended.Framework.Media.VideoPlayer(UserInterface.instance.GraphicsDevice);
+                                    FramePlayer.canPlayBgMusic = true;
+                                    if(UserInterface.instance.video != null)
+                                    {
+                                        UserInterface.instance.video.Dispose();
+                                        UserInterface.instance.video = null;
+                                    }
+                                    string cachePath = VideoCache.GetCachePath(tempOutput);
+                                    UserInterface.instance.videoPath = cachePath;
+                                    UserInterface.instance.video = VideoHelper.LoadFromFile(cachePath);
+                                    //UserInterface.instance.videoPlayer.IsLooped = true;
+                                    UserInterface.instance.videoPlayer.Play(UserInterface.instance.video);
+                                    Global.videoPlaying = true;
+                                    UserInterface.instance.videoPlayer.Volume = float.Parse(SaveData.saveValues["VideoVolume"], CultureInfo.InvariantCulture) / 100f;
                                 }
-                                UserInterface.instance.videoPlayer = new MonoGame.Extended.Framework.Media.VideoPlayer(UserInterface.instance.GraphicsDevice);
-                                FramePlayer.canPlayBgMusic = true;
-                                if(UserInterface.instance.video != null)
-                                {
-                                    UserInterface.instance.video.Dispose();
-                                    UserInterface.instance.video = null;
-                                }
-                                string cachePath = VideoCache.GetCachePath(tempOutput);
-                                UserInterface.instance.videoPath = cachePath;
-                                UserInterface.instance.video = VideoHelper.LoadFromFile(cachePath);
-                                //UserInterface.instance.videoPlayer.IsLooped = true;
-                                UserInterface.instance.videoPlayer.Play(UserInterface.instance.video);
-                                Global.videoPlaying = true;
-                                UserInterface.instance.videoPlayer.Volume = float.Parse(SaveData.saveValues["VideoVolume"], CultureInfo.InvariantCulture) / 100f;
                                 FramePlayer.canPlayBgMusic = false;
                                 Global.generator.progressText = L.T(0, "Video:StatusPlay");
                                 if(ScreenManager.GetScreen<VideoScreen>("Video") == null
@@ -182,7 +173,6 @@ namespace NonsensicalVideoGenerator
                                     ScreenManager.GetScreen<VideoScreen>("Video")?.Show();
                                 }
                             }
-#endif
                         }
                     }
                     else
@@ -232,7 +222,7 @@ namespace NonsensicalVideoGenerator
                         }
                         SaveData.saveValues["TotalVideosRendered"] = (int.Parse(SaveData.saveValues["TotalVideosRendered"], CultureInfo.InvariantCulture) + 1).ToString(CultureInfo.InvariantCulture);
                         SaveData.Save();
-                        GlobalContent.GetSound("RenderComplete").Play(int.Parse(SaveData.saveValues["SoundEffectVolume"], CultureInfo.InvariantCulture) / 100f, 0f, 0f);
+                        GlobalContent.PlaySound("RenderComplete");
                         /*
                         // Open the video in the default video player if the user has that option enabled.
                         if (bool.Parse(SaveData.saveValues["PlayAutomatically"]))
@@ -786,30 +776,32 @@ namespace NonsensicalVideoGenerator
                         }
                         else
                         {
-#if MONOGAME
                             if (bool.Parse(SaveData.saveValues["PlayAutomatically"]))
                             {
                                 FramePlayer.Stop();
-                                if(UserInterface.instance.videoPlayer != null)
+                                if(UserInterface.instance != null)
                                 {
-                                    Global.videoPlaying = false;
-                                    UserInterface.instance.videoPlayer.Dispose();
-                                    UserInterface.instance.videoPlayer = null;
+                                    if(UserInterface.instance.videoPlayer != null)
+                                    {
+                                        Global.videoPlaying = false;
+                                        UserInterface.instance.videoPlayer.Dispose();
+                                        UserInterface.instance.videoPlayer = null;
+                                    }
+                                    UserInterface.instance.videoPlayer = new MonoGame.Extended.Framework.Media.VideoPlayer(UserInterface.instance.GraphicsDevice);
+                                    if(UserInterface.instance.video != null)
+                                    {
+                                        UserInterface.instance.video.Dispose();
+                                        UserInterface.instance.video = null;
+                                    }
+                                    FramePlayer.canPlayBgMusic = true;
+                                    string cachePath = VideoCache.GetCachePath(tempOutput);
+                                    UserInterface.instance.videoPath = cachePath;
+                                    UserInterface.instance.video = VideoHelper.LoadFromFile(cachePath);
+                                    //UserInterface.instance.videoPlayer.IsLooped = true;
+                                    UserInterface.instance.videoPlayer.Play(UserInterface.instance.video);
+                                    Global.videoPlaying = true;
+                                    UserInterface.instance.videoPlayer.Volume = float.Parse(SaveData.saveValues["VideoVolume"], CultureInfo.InvariantCulture) / 100f;
                                 }
-                                UserInterface.instance.videoPlayer = new MonoGame.Extended.Framework.Media.VideoPlayer(UserInterface.instance.GraphicsDevice);
-                                if(UserInterface.instance.video != null)
-                                {
-                                    UserInterface.instance.video.Dispose();
-                                    UserInterface.instance.video = null;
-                                }
-                                FramePlayer.canPlayBgMusic = true;
-                                string cachePath = VideoCache.GetCachePath(tempOutput);
-                                UserInterface.instance.videoPath = cachePath;
-                                UserInterface.instance.video = VideoHelper.LoadFromFile(cachePath);
-                                //UserInterface.instance.videoPlayer.IsLooped = true;
-                                UserInterface.instance.videoPlayer.Play(UserInterface.instance.video);
-                                Global.videoPlaying = true;
-                                UserInterface.instance.videoPlayer.Volume = float.Parse(SaveData.saveValues["VideoVolume"], CultureInfo.InvariantCulture) / 100f;
                                 FramePlayer.canPlayBgMusic = false;
                                 if(ScreenManager.GetScreen<VideoScreen>("Video") == null
                                     || ScreenManager.GetScreen<VideoScreen>("Video")?.screenType == ScreenType.Hidden)
@@ -818,7 +810,6 @@ namespace NonsensicalVideoGenerator
                                     ScreenManager.GetScreen<VideoScreen>("Video")?.Show();
                                 }
                             }
-#endif
                         }
                     }
                     else
@@ -895,9 +886,7 @@ namespace NonsensicalVideoGenerator
             Global.usedWorkshopPlugin = false;
             Global.rolledForOverlay = false;
             Global.usedAllEffectChance = false;
-#if MONOGAME
             FramePlayer.Stop();
-#endif
             try
             {
                 if(vidThreadWorker == null)
@@ -1575,6 +1564,86 @@ namespace NonsensicalVideoGenerator
                 // Do nothing
             }
             return process;
+        }
+        public static void GenerateGifPreview(string media, string templateImage, string output, LibraryRootType rootType = LibraryRootType.Video, double startTime = 0.0, double endTime = 6.0, int fps = 30, int baseWidth = 236, int baseHeight = 236, int cropWidth = 212, int cropHeight = 160, int padX = 12, int padY = 28)
+        {
+            // Generates a gif preview of the video using ffmpeg
+            ConsoleOutput.WriteLine("Generating gif preview for " + media, Color.Gray);
+            try
+            {
+                Dictionary<LibraryRootType, string> rootTypeFilters = new()
+                {
+                    {LibraryRootType.Video, $"[0:v]scale={cropWidth.ToString(CultureInfo.InvariantCulture)}:{cropHeight.ToString(CultureInfo.InvariantCulture)},pad=width={baseWidth.ToString(CultureInfo.InvariantCulture)}:height={baseHeight.ToString(CultureInfo.InvariantCulture)}:x={padX.ToString(CultureInfo.InvariantCulture)}:y={padY.ToString(CultureInfo.InvariantCulture)}"},
+                    {LibraryRootType.Audio, $"[0:a]aformat=channel_layouts=mono,showwavespic=s={cropWidth.ToString(CultureInfo.InvariantCulture)}x{cropHeight.ToString(CultureInfo.InvariantCulture)}:colors=white"},
+                    {LibraryRootType.Image, $"[0:v]scale={cropWidth.ToString(CultureInfo.InvariantCulture)}:{cropHeight.ToString(CultureInfo.InvariantCulture)},pad=width={baseWidth.ToString(CultureInfo.InvariantCulture)}:height={baseHeight.ToString(CultureInfo.InvariantCulture)}:x={padX.ToString(CultureInfo.InvariantCulture)}:y={padY.ToString(CultureInfo.InvariantCulture)}"},
+                };
+                ProcessStartInfo startInfo = new ProcessStartInfo
+                {
+                    WindowStyle = ProcessWindowStyle.Hidden,
+                    FileName = Global.useSystemFFmpeg ? "ffmpeg" : @".\ffmpeg.exe",
+                    Arguments = $"-ss {startTime.ToString(CultureInfo.InvariantCulture)} -t {(endTime - startTime).ToString(CultureInfo.InvariantCulture)} -i \"{media}\" -i \"{templateImage}\" -filter_complex \"{rootTypeFilters[rootType]}[thumb];[thumb][1:v]overlay[finished]\" -map \"[finished]\" -r {fps.ToString(CultureInfo.InvariantCulture)} -y \"{output}\"",
+                    UseShellExecute = false,
+                    RedirectStandardError = true,
+                    WorkingDirectory = Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location) ?? ".",
+                    CreateNoWindow = true
+                };
+                Process process = new Process
+                {
+                    StartInfo = startInfo
+                };
+                process.ErrorDataReceived += (sender, e) =>
+                {
+                    if (e.Data != null)
+                        ConsoleOutput.WriteLine(e.Data, Color.Transparent);
+                };
+                process.Start();
+                process.BeginErrorReadLine();
+                process.WaitForExit();
+            }
+            catch (Exception ex)
+            {
+                ConsoleOutput.WriteLine(ex.Message);
+                ConsoleOutput.WriteLine("Could not generate gif preview.", Color.Red);
+            }
+        }
+        public static void SimpleClipVideo(string video, string output, double startTime, double endTime)
+        {
+            // Clips a video without re-encoding it
+            ConsoleOutput.WriteLine("Simple clip video: " + video + " from " + startTime.ToString(CultureInfo.InvariantCulture) + " to " + endTime.ToString(CultureInfo.InvariantCulture), Color.Gray);
+            try
+            {
+                ProcessStartInfo startInfo = new ProcessStartInfo()
+                {
+                    WindowStyle = ProcessWindowStyle.Hidden,
+                    FileName = Global.useSystemFFmpeg ? "ffmpeg" : @".\ffmpeg.exe",
+                    Arguments = "-ss " + startTime.ToString(CultureInfo.InvariantCulture)
+                            + " -t " + (endTime - startTime).ToString(CultureInfo.InvariantCulture)
+                            + " -i \"" + video + "\""
+                            + " -c copy -avoid_negative_ts make_zero -map 0:v:0 -map 0:a:0"
+                            + " -y \"" + output + "\"",
+                    UseShellExecute = false,
+                    RedirectStandardError = true,
+                    WorkingDirectory = Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location) ?? ".",
+                    CreateNoWindow = true
+                };
+                Process process = new Process()
+                {
+                    StartInfo = startInfo
+                };
+                process.ErrorDataReceived += (sender, e) =>
+                {
+                    if (e.Data != null)
+                        ConsoleOutput.WriteLine(e.Data, Color.Transparent);
+                };
+                process.Start();
+                process.BeginErrorReadLine();
+                process.WaitForExit();
+            }
+            catch (Exception ex)
+            {
+                ConsoleOutput.WriteLine(ex.Message);
+                ConsoleOutput.WriteLine("Could not clip video.", Color.Red);
+            }
         }
     }
 }

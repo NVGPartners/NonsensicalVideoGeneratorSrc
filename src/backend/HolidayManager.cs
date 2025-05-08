@@ -2,8 +2,6 @@ using System;
 using System.Collections.Generic;
 using System.Globalization;
 using Microsoft.Xna.Framework;
-using Microsoft.Xna.Framework.Content;
-using Microsoft.Xna.Framework.Graphics;
 
 namespace NonsensicalVideoGenerator
 {
@@ -119,9 +117,9 @@ namespace NonsensicalVideoGenerator
             Name = name;
             Priority = priority;
             Enabled = enabled;
-            Theme = theme;
-            Start = start;
-            End = end;
+            Theme = theme ?? DefaultThemes.Nonsensical;
+            Start = start ?? new SimpleDateTime();
+            End = end ?? new SimpleDateTime();
             StatusText = statusText;
         }
     }

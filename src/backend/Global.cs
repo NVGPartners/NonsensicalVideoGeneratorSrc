@@ -1,9 +1,6 @@
 using System;
 using System.Collections.Generic;
-using System.Diagnostics;
-using System.Reflection;
 using Steamworks;
-using Microsoft.Xna.Framework;
 
 namespace NonsensicalVideoGenerator
 {
@@ -14,15 +11,9 @@ namespace NonsensicalVideoGenerator
     {
         public static string productName = "Nonsensical Video Generator";
         public static string productNameShort = "NVG";
-        public static string productVersion = "0.0.0.0DX";
-#if DESKTOPGL
-        public static string productSku = "GL";
-#else
-        public static string productSku = "DX";
-#endif
-#if MONOGAME
+        public static string productVersion = "0.0.0.0";
+        public static string productSku = "";
         public static Mask mask = new();
-#endif
         public static bool justCompletedRender = true;
         public static bool exiting = false;
         public static bool fakeExit = false;

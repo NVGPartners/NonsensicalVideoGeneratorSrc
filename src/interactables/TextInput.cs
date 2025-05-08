@@ -1,7 +1,5 @@
 using System;
-using System.Collections.Generic;
 using System.Globalization;
-using System.Text.RegularExpressions;
 using System.Windows;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Content;
@@ -67,13 +65,13 @@ namespace NonsensicalVideoGenerator
                             // Check to make sure there's actually some text
                             if (Tooltip == "")
                             {
-                                GlobalContent.GetSound("Error").Play(int.Parse(SaveData.saveValues["SoundEffectVolume"], CultureInfo.InvariantCulture) / 100f, 0f, 0f);
+                                GlobalContent.PlaySound("Error");
                                 return true;
                             }
                             Callback(State, internalName);
                             Global.editing = "";
                             //Accessibility.allowAccessibility = true;
-                            GlobalContent.GetSound("Option").Play(int.Parse(SaveData.saveValues["SoundEffectVolume"], CultureInfo.InvariantCulture) / 100f, 0f, 0f);
+                            GlobalContent.PlaySound("Option");
                             Global.mask.Disable();
                         }
                         else if(Global.editing == "")
@@ -81,24 +79,24 @@ namespace NonsensicalVideoGenerator
                             // Check to make sure there's actually some text
                             if (Tooltip == "")
                             {
-                                GlobalContent.GetSound("Error").Play(int.Parse(SaveData.saveValues["SoundEffectVolume"], CultureInfo.InvariantCulture) / 100f, 0f, 0f);
+                                GlobalContent.PlaySound("Error");
                                 return true;
                             }
                             Callback(State, internalName);
                             Global.editing = Name + "Input";
                             //Accessibility.allowAccessibility = false;
-                            GlobalContent.GetSound("Option").Play(int.Parse(SaveData.saveValues["SoundEffectVolume"], CultureInfo.InvariantCulture) / 100f, 0f, 0f);
+                            GlobalContent.PlaySound("Option");
                             Global.mask.AddUnmaskedObject("TextEntry", new SimpleObject(new Rectangle(0, 0, GlobalGraphics.scaledWidth, GlobalGraphics.scaledHeight), Color.Transparent, GlobalContent.GetTexture("Pixel"), () => {
                                 // Check to make sure there's actually some text
                                 if (Tooltip == "")
                                 {
-                                    GlobalContent.GetSound("Error").Play(int.Parse(SaveData.saveValues["SoundEffectVolume"], CultureInfo.InvariantCulture) / 100f, 0f, 0f);
+                                    GlobalContent.PlaySound("Error");
                                     return true;
                                 }
                                 Callback(State, internalName);
                                 Global.editing = "";
                                 //Accessibility.allowAccessibility = true;
-                                GlobalContent.GetSound("Option").Play(int.Parse(SaveData.saveValues["SoundEffectVolume"], CultureInfo.InvariantCulture) / 100f, 0f, 0f);
+                                GlobalContent.PlaySound("Option");
                                 Global.mask.Disable();
                                 return true;
                             }, true));
@@ -111,18 +109,18 @@ namespace NonsensicalVideoGenerator
                             if (Global.editing != "")
                             {
                                 //Global.editing = "";
-                                GlobalContent.GetSound("Error").Play(int.Parse(SaveData.saveValues["SoundEffectVolume"], CultureInfo.InvariantCulture) / 100f, 0f, 0f);
+                                GlobalContent.PlaySound("Error");
                             }
                             else
                             {
                                 // Check to make sure there's actually some text
                                 if (Tooltip == "")
                                 {
-                                    GlobalContent.GetSound("Error").Play(int.Parse(SaveData.saveValues["SoundEffectVolume"], CultureInfo.InvariantCulture) / 100f, 0f, 0f);
+                                    GlobalContent.PlaySound("Error");
                                     return true;
                                 }
                                 Callback(State, internalName);
-                                GlobalContent.GetSound("Back").Play(int.Parse(SaveData.saveValues["SoundEffectVolume"], CultureInfo.InvariantCulture) / 100f, 0f, 0f);
+                                GlobalContent.PlaySound("Back");
                                 Global.mask.Disable();
                             }
                         }
@@ -138,13 +136,13 @@ namespace NonsensicalVideoGenerator
                         // Check to make sure there's actually some text
                         if (Tooltip == "")
                         {
-                            GlobalContent.GetSound("Error").Play(int.Parse(SaveData.saveValues["SoundEffectVolume"], CultureInfo.InvariantCulture) / 100f, 0f, 0f);
+                            GlobalContent.PlaySound("Error");
                             return true;
                         }
                         Callback(0, internalName);
                         Global.editing = "";
                         Accessibility.allowAccessibility = true;
-                        GlobalContent.GetSound("Option").Play(int.Parse(SaveData.saveValues["SoundEffectVolume"], CultureInfo.InvariantCulture) / 100f, 0f, 0f);
+                        GlobalContent.PlaySound("Option");
                     }
                     else
                     {
@@ -249,7 +247,7 @@ namespace NonsensicalVideoGenerator
                 string token = "Interactable:"+internalName+"Title";
                 // check if the token exists
                 string localized = L.T(0, token, PluginHandler.GetPluginListFilter());
-                if (localized != token)
+                if (localized != token || L.GetLocale().name == "dummy")
                     localizedTitle = localized;
                 else
                     localizedTitle = ""; // no title
@@ -268,7 +266,7 @@ namespace NonsensicalVideoGenerator
                     string token = "Interactable:"+internalName+"Tooltip";
                     // check if the token exists
                     string localized = L.T(0, token);
-                    if (localized != token)
+                    if (localized != token || L.GetLocale().name == "dummy")
                         Global.tooltip = localized;
                     else
                         Global.tooltip = ""; // no tooltip
@@ -333,13 +331,13 @@ namespace NonsensicalVideoGenerator
                                 // no newlines
                                 if (c == '\n')
                                 {
-                                    GlobalContent.GetSound("Error").Play(int.Parse(SaveData.saveValues["SoundEffectVolume"], CultureInfo.InvariantCulture) / 100f, 0f, 0f);
+                                    GlobalContent.PlaySound("Error");
                                     return;
                                 }
                                 // validate
                                 if (!ValidateInput(c))
                                 {
-                                    GlobalContent.GetSound("Error").Play(int.Parse(SaveData.saveValues["SoundEffectVolume"], CultureInfo.InvariantCulture) / 100f, 0f, 0f);
+                                    GlobalContent.PlaySound("Error");
                                     return;
                                 }
                             }
@@ -347,7 +345,7 @@ namespace NonsensicalVideoGenerator
                         }
                         else
                         {
-                            GlobalContent.GetSound("Error").Play(int.Parse(SaveData.saveValues["SoundEffectVolume"], CultureInfo.InvariantCulture) / 100f, 0f, 0f);
+                            GlobalContent.PlaySound("Error");
                         }
                     }
                     // \u0003 is copy
@@ -383,7 +381,7 @@ namespace NonsensicalVideoGenerator
                 }
                 else
                 {
-                    GlobalContent.GetSound("Error").Play(int.Parse(SaveData.saveValues["SoundEffectVolume"], CultureInfo.InvariantCulture) / 100f, 0f, 0f);
+                    GlobalContent.PlaySound("Error");
                 }
             }
         }

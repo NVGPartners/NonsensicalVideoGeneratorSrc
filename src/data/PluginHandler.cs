@@ -5,20 +5,14 @@ using System.Collections.Generic;
 using System;
 using Newtonsoft.Json;
 using System.Linq;
-#if MONOGAME
 using Microsoft.Xna.Framework;
-#else
-using System.Drawing;
-#endif
 using System.Text.RegularExpressions;
-using Newtonsoft.Json.Linq;
 using MoonSharp.Interpreter;
-using MoonSharp.Interpreter.Loaders;
 using Steamworks;
 using System.ComponentModel;
-using System.Threading;
 using System.Net;
 using System.Globalization;
+using System.Windows.Forms;
 
 namespace NonsensicalVideoGenerator
 {
@@ -41,6 +35,7 @@ namespace NonsensicalVideoGenerator
         Addon_PostRenderEffect = 4096,
         Addon_Theme = 8192,
         Effect_ImageOnly = 16384,
+        Addon_BootMovie = 32768,
     }
     public enum PluginType
     {
@@ -309,7 +304,8 @@ namespace NonsensicalVideoGenerator
     {
         Effect,
         PostRenderEffect,
-        Theme
+        Theme,
+        BootMovie
     }
     public class Plugin
     {
@@ -363,6 +359,8 @@ namespace NonsensicalVideoGenerator
                         return AddonType.PostRenderEffect;
                     case "theme":
                         return AddonType.Theme;
+                    case "bootmovie":
+                        return AddonType.BootMovie;
                     default:
                         return AddonType.Effect;
                 }
@@ -840,14 +838,20 @@ namespace NonsensicalVideoGenerator
                     luaScript = new Script(CoreModules.Preset_SoftSandbox);
                     luaScript.Options.ScriptLoader = new CustomScriptLoader();
                     luaScript.Options.DebugPrint = (s) => ConsoleOutput.WriteLine(s, Color.DarkCyan);
+                    SyntaxErrorException? syntaxError = null;
                     try
                     {
                         luaScript.DoFile(path);
                     }
                     catch(SyntaxErrorException e)
                     {
+                        syntaxError = e;
+                    }
+                    // Throw syntax error outside of try-catch block to inform user.
+                    if(syntaxError != null)
+                    {
                         Achievements.Award("ACHIEVEMENT_LUA_ERROR");
-                        throw e;
+                        throw syntaxError;
                     }
                     // Call plugin with query argument.
                     if(luaScript.Globals["Query"] != null)
@@ -1083,6 +1087,7 @@ namespace NonsensicalVideoGenerator
         Effects = 1,
         PostRenderEffects = 2,
         Themes = 4,
+        BootMovies = 8,
     }
     /// <summary>
     /// Plugin support.
@@ -1098,13 +1103,13 @@ namespace NonsensicalVideoGenerator
         public static bool publishing = false;
         public static bool updating = false;
         private static bool updateSilently = true;
-        public static PluginListFilter pluginListFilter = PluginListFilter.Effects | PluginListFilter.PostRenderEffects | PluginListFilter.Themes;
+        public static PluginListFilter pluginListFilter = PluginListFilter.Effects | PluginListFilter.PostRenderEffects | PluginListFilter.Themes | PluginListFilter.BootMovies;
         public static string GetPluginListFilter()
         {
             if(int.TryParse(SaveData.saveValues["PluginListFilterFlags"], NumberStyles.Integer, CultureInfo.InvariantCulture, out int filterType))
             {
                 // Check if filterType is valid
-                if (filterType >= 0 && filterType <= 7)
+                if (filterType >= 0 && filterType <= 15)
                 {
                     pluginListFilter = (PluginListFilter)filterType;
                 }
@@ -1123,7 +1128,7 @@ namespace NonsensicalVideoGenerator
         }
         public static string PluginListFilterToString()
         {
-            if (pluginListFilter == (PluginListFilter.Effects | PluginListFilter.PostRenderEffects | PluginListFilter.Themes))
+            if (pluginListFilter == (PluginListFilter.Effects | PluginListFilter.PostRenderEffects | PluginListFilter.Themes | PluginListFilter.BootMovies))
             {
                 return L.T(0, "Addons:FilterAll");
             }
@@ -1138,6 +1143,10 @@ namespace NonsensicalVideoGenerator
             else if (pluginListFilter == PluginListFilter.Themes)
             {
                 return L.T(0, "Addons:FilterThemes");
+            }
+            else if (pluginListFilter == PluginListFilter.BootMovies)
+            {
+                return L.T(0, "Addons:FilterBootMovies");
             }
             else if (pluginListFilter != PluginListFilter.None)
             {
@@ -1157,7 +1166,11 @@ namespace NonsensicalVideoGenerator
             }
             else if (pluginListFilter == PluginListFilter.Themes)
             {
-                pluginListFilter = PluginListFilter.Effects | PluginListFilter.PostRenderEffects | PluginListFilter.Themes;
+                pluginListFilter = PluginListFilter.BootMovies;
+            }
+            else if (pluginListFilter == PluginListFilter.BootMovies)
+            {
+                pluginListFilter = PluginListFilter.Effects | PluginListFilter.PostRenderEffects | PluginListFilter.Themes | PluginListFilter.BootMovies;
             }
             else
             {
@@ -1604,7 +1617,7 @@ namespace NonsensicalVideoGenerator
                 ConsoleOutput.WriteLine(e.DecoratedMessage, Color.Red);
                 if(!updateSilently)
                     Global.generator.progressText = L.T(0, "Addons:StatusFailLoadAddons");
-                GlobalContent.GetSound("Error").Play(int.Parse(SaveData.saveValues["SoundEffectVolume"], CultureInfo.InvariantCulture) / 100f, 0f, 0f);
+                GlobalContent.PlaySound("Error");
                 return false;
             }
             return true;
@@ -1684,6 +1697,10 @@ namespace NonsensicalVideoGenerator
                     case 2:
                         template = "theme.lua";
                         break;
+                    case 3:
+                        template = "bootmovie.lua";
+                        filename = filename + "_movie";
+                        break;
                 }
                 string templatePath = Path.Combine("templates", template);
                 string pluginPath = Path.Combine("plugins", "user", filename);
@@ -1693,12 +1710,36 @@ namespace NonsensicalVideoGenerator
                     Directory.CreateDirectory(pluginPath);
                 }
                 File.Copy(templatePath, pluginFile);
-                // If this is a theme, copy templates/defaultlayer recursively as /layer
                 if(templateType == 2)
                 {
+                    // If this is a theme, copy templates/defaultlayer recursively as /layer
                     string defaultLayerPath = Path.Combine("templates", "defaultlayer");
                     string layerPath = Path.Combine(pluginPath, "layer");
                     DirectoryCopy(defaultLayerPath, layerPath);
+                }
+                else if(templateType == 3)
+                {
+                    // Ask user to pick a video file or use bootmovie.mp4 otherwise.
+                    string bootMoviePath = Path.Combine("plugins", "user", "stock", "kiwifruitdevlogo.mp4");
+                    // Ask user to pick a video file.
+                    OpenFileDialog openFileDialog = new()
+                    {
+                        Filter = L.T(0, "Addons:FilterBootMovies") + "|*.mp4",
+                        Title = L.T(0, "Addons:BootMoviePicker"),
+                        Multiselect = false,
+                    };
+                    if (openFileDialog.ShowDialog() == DialogResult.OK)
+                    {
+                        if (File.Exists(openFileDialog.FileName))
+                        {
+                            bootMoviePath = openFileDialog.FileName;
+                        }
+                    }
+                    if (File.Exists(bootMoviePath))
+                    {
+                        // Copy boot movie and rename it to %filename%.mp4 (only 6 seconds long)
+                        Generator.SimpleClipVideo(bootMoviePath, Path.Combine(pluginPath, filename + ".mp4"), 0.0, 6.0);
+                    }
                 }
                 // Replace "effect" with filename in the file.
                 string fileContents = File.ReadAllText(pluginFile);
@@ -1721,7 +1762,26 @@ namespace NonsensicalVideoGenerator
         public static Plugin? publishPlugin = null;
         public static WorkshopTag flags = WorkshopTag.None;
         public static string workshopIcon = "";
-        public static void PublishPlugin(Plugin plugin, WorkshopTag tagflags, string iconPath)
+        public static string? PickWorkshopIcon()
+        {
+            // Select jpg, png, or gif icon with file dialog
+            OpenFileDialog fileDialog = new OpenFileDialog();
+            fileDialog.Filter = L.T(0, "Addons:WorkshopIcon") + " (*.jpg, *.png, *.gif)|*.jpg;*.png;*.gif|";
+            fileDialog.Title = L.T(0, "Addons:WorkshopIconPicker");
+            fileDialog.InitialDirectory = Path.GetFullPath(@"templates");
+            fileDialog.FileName = "workshop.jpg";
+            fileDialog.Multiselect = false;
+            // Show the dialog and check if the user selected a file
+            if (fileDialog.ShowDialog() == DialogResult.OK)
+            {
+                return fileDialog.FileName;
+            }
+            GlobalContent.PlaySound("Error");
+            ConsoleOutput.WriteLine("No icon selected.", Color.Red);
+            Global.generator.progressText = L.T(0, "Addons:StatusFailWorkshopIcon");
+            return null;
+        }
+        public static void PublishPlugin(Plugin plugin, WorkshopTag tagflags, bool skipIconParsing = false, bool forceIconForBootMovies = false)
         {
             if(publishing)
                 return;
@@ -1730,12 +1790,64 @@ namespace NonsensicalVideoGenerator
             {
                 if(!updateSilently)
                     Global.generator.progressText = L.T(0, "Addons:StatusSteamNotRunning");
-                GlobalContent.GetSound("Error").Play(int.Parse(SaveData.saveValues["SoundEffectVolume"], CultureInfo.InvariantCulture) / 100f, 0f, 0f);
+                GlobalContent.PlaySound("Error");
                 ConsoleOutput.WriteLine("Steam is not running, cannot publish addon.", Color.Red);
                 publishPlugin = null;
                 publishing = false;
                 return;
             }
+            string? iconPath = null;
+            if(!skipIconParsing)
+            {
+                if(plugin.GetAddonType() == AddonType.BootMovie && !forceIconForBootMovies)
+                {
+                    // Generate a GIF preview of the boot movie
+                    string movie = plugin.path.Replace(".lua", ".mp4");
+                    if(!File.Exists(movie))
+                    {
+                        // Pick a workshop icon
+                        iconPath = PickWorkshopIcon();
+                        skipIconParsing = false;
+                    }
+                    else
+                    {
+                        iconPath = Path.Combine(Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location) ?? ".", "temp", "publish_" + Path.GetFileNameWithoutExtension(plugin.path) + ".gif");
+                        Generator.GenerateGifPreview(movie, Path.Combine("templates", "bootmovie.png"), iconPath);
+                    }
+                }
+                else
+                {
+                    // Pick a workshop icon
+                    iconPath = PickWorkshopIcon();
+                }
+            }
+            bool failedCheck = false;
+            // file must exist
+            if(!File.Exists(iconPath) || iconPath == null)
+            {
+                GlobalContent.PlaySound("Error");
+                ConsoleOutput.WriteLine("No icon selected.", Color.Red);
+                Global.generator.progressText = L.T(0, "Addons:StatusFailWorkshopIcon");
+                failedCheck = true;
+            }
+            // file must be under 1mb
+            if(!failedCheck && iconPath != null && new FileInfo(iconPath).Length > 1048576)
+            {
+                GlobalContent.PlaySound("Error");
+                ConsoleOutput.WriteLine("Selected Workshop Icon is too large. Must be under 1mb.", Color.Red);
+                Global.generator.progressText = L.T(0, "Addons:StatusFailPreviewSize");
+                failedCheck = true;
+            }
+            // if these checks failed, don't publish the plugin
+            if(failedCheck || iconPath == null)
+            {
+                // redo publishplugin, force boot movies to choose an icon
+                if(skipIconParsing)
+                    PublishPlugin(plugin, tagflags, false, true);
+                return;
+            }
+            Global.generator.progressText = L.T(0, "Addons:StatusUploading");
+            ConsoleOutput.WriteLine("Publishing " + Path.GetFileName(plugin.path) + " with icon " + Path.GetFileName(iconPath), Color.RoyalBlue);
             publishing = true;
             publishPlugin = plugin;
             flags = tagflags;
@@ -1752,20 +1864,15 @@ namespace NonsensicalVideoGenerator
                 case AddonType.Theme:
                     flags |= WorkshopTag.Addon_Theme;
                     break;
+                case AddonType.BootMovie:
+                    flags |= WorkshopTag.Addon_BootMovie;
+                    break;
             }
             // Delete .publish in the plugin's directory if it exists
             string publishFile = Path.Combine(Path.GetDirectoryName(plugin.path) ?? "", ".publish");
             if(File.Exists(publishFile))
             {
                 File.Delete(publishFile);
-            }
-            // Also delete non-lua files so Steam doesn't upload them
-            foreach(string file in Directory.GetFiles(Path.GetDirectoryName(plugin.path) ?? ""))
-            {
-                if(Path.GetExtension(file) != ".lua")
-                {
-                    File.Delete(file);
-                }
             }
             if(createItemResult == null)
             {
@@ -1798,13 +1905,13 @@ namespace NonsensicalVideoGenerator
                 ConsoleOutput.WriteLine($"Error creating workshop item: {param.m_eResult}", Color.Red);
                 if(!updateSilently)
                     Global.generator.progressText = L.T(0, "Addons:StatusFailCreateWorkshopItem");
-                GlobalContent.GetSound("Error").Play(int.Parse(SaveData.saveValues["SoundEffectVolume"], CultureInfo.InvariantCulture) / 100f, 0f, 0f);
+                GlobalContent.PlaySound("Error");
                 publishPlugin = null;
                 publishing = false;
                 return;
             }
             if(!updateSilently)
-                    Global.generator.progressText = L.T(0, "Addons:StatusCreating");
+                Global.generator.progressText = L.T(0, "Addons:StatusCreating");
             UpdateWorkshopItem(param.m_nPublishedFileId);
         }
         public static void UpdateWorkshopItem(PublishedFileId_t id)
@@ -1818,7 +1925,7 @@ namespace NonsensicalVideoGenerator
                 ConsoleOutput.WriteLine($"Error updating workshop item: Invalid handle.", Color.Red);
                 if(!updateSilently)
                     Global.generator.progressText = L.T(0, "Addons:StatusFailUpdateWorkshopItem");
-                GlobalContent.GetSound("Error").Play(int.Parse(SaveData.saveValues["SoundEffectVolume"], CultureInfo.InvariantCulture) / 100f, 0f, 0f);
+                GlobalContent.PlaySound("Error");
                 publishPlugin = null;
                 publishing = false;
                 return;
@@ -1855,27 +1962,41 @@ namespace NonsensicalVideoGenerator
                     if(nam.ToLower().EndsWith(" preffect"))
                         nam = nam.Substring(0, nam.Length - 8);
                 }
-                else if(publishPlugin.GetAddonType() == AddonType.Theme)
+                else if(publishPlugin.GetAddonType() == AddonType.BootMovie)
                 {
-                    if(nam.ToLower().EndsWith(" theme"))
+                    if(nam.ToLower().EndsWith(" movie"))
                         nam = nam.Substring(0, nam.Length - 6);
-                    if(nam.ToLower().EndsWith(" bg"))
-                        nam = nam.Substring(0, nam.Length - 3);
-                    if(nam.ToLower().EndsWith(" background"))
+                    if(nam.ToLower().EndsWith(" bootmovie"))
                         nam = nam.Substring(0, nam.Length - 10);
+                    if(nam.ToLower().EndsWith(" boot movie"))
+                        nam = nam.Substring(0, nam.Length - 11);
+                    if(nam.ToLower().EndsWith(" intro"))
+                        nam = nam.Substring(0, nam.Length - 6);
+                    if(nam.ToLower().EndsWith(" video"))
+                        nam = nam.Substring(0, nam.Length - 6);
+                    if(nam.ToLower().EndsWith(" intro video"))
+                        nam = nam.Substring(0, nam.Length - 12);
+                    if(nam.ToLower().EndsWith(" startup"))
+                        nam = nam.Substring(0, nam.Length - 8);
                 }
+                if(nam.ToLower().EndsWith(" addon"))
+                    nam = nam.Substring(0, nam.Length - 6);
 
                 // Add type to name
+                // These aren't localized in order to clarify the type of addon 
                 switch(publishPlugin.GetAddonType())
                 {
                     case AddonType.Effect:
-                        nam = L.T(0, "Addons:TypePrefixEffect", nam);
+                        nam = nam + " Effect";
                         break;
                     case AddonType.PostRenderEffect:
-                        nam = L.T(0, "Addons:TypePrefixPostRenderEffect", nam);
+                        nam = nam + " Post-Render Effect";
                         break;
                     case AddonType.Theme:
-                        nam = L.T(0, "Addons:TypePrefixTheme", nam);
+                        nam = nam + " Theme";
+                        break;
+                    case AddonType.BootMovie:
+                        nam = nam + " Boot Movie";
                         break;
                 }
                 cont = SteamUGC.SetItemTitle(handle, nam);
@@ -1885,7 +2006,7 @@ namespace NonsensicalVideoGenerator
                 ConsoleOutput.WriteLine($"Error updating workshop item: Invalid title.", Color.Red);
                 if(!updateSilently)
                     Global.generator.progressText = L.T(0, "Addons:StatusFailUpdateWorkshopItem");
-                GlobalContent.GetSound("Error").Play(int.Parse(SaveData.saveValues["SoundEffectVolume"], CultureInfo.InvariantCulture) / 100f, 0f, 0f);
+                GlobalContent.PlaySound("Error");
                 publishPlugin = null;
                 publishing = false;
                 return;
@@ -1930,7 +2051,7 @@ namespace NonsensicalVideoGenerator
                 ConsoleOutput.WriteLine($"Error updating workshop item: Invalid visibility.", Color.Red);
                 if(!updateSilently)
                     Global.generator.progressText = L.T(0, "Addons:StatusFailUpdateWorkshopItem");
-                GlobalContent.GetSound("Error").Play(int.Parse(SaveData.saveValues["SoundEffectVolume"], CultureInfo.InvariantCulture) / 100f, 0f, 0f);
+                GlobalContent.PlaySound("Error");
                 publishPlugin = null;
                 publishing = false;
                 return;
@@ -1960,7 +2081,7 @@ namespace NonsensicalVideoGenerator
                 ConsoleOutput.WriteLine($"Error updating workshop item: Invalid content path.", Color.Red);
                 if(!updateSilently)
                     Global.generator.progressText = L.T(0, "Addons:StatusFailUpdateWorkshopItem");
-                GlobalContent.GetSound("Error").Play(int.Parse(SaveData.saveValues["SoundEffectVolume"], CultureInfo.InvariantCulture) / 100f, 0f, 0f);
+                GlobalContent.PlaySound("Error");
                 publishPlugin = null;
                 publishing = false;
                 return;
@@ -1972,7 +2093,7 @@ namespace NonsensicalVideoGenerator
                 ConsoleOutput.WriteLine($"Error updating workshop item: Invalid preview path.", Color.Red);
                 if(!updateSilently)
                     Global.generator.progressText = L.T(0, "Addons:StatusFailUpdateWorkshopItem");
-                GlobalContent.GetSound("Error").Play(int.Parse(SaveData.saveValues["SoundEffectVolume"], CultureInfo.InvariantCulture) / 100f, 0f, 0f);
+                GlobalContent.PlaySound("Error");
                 publishPlugin = null;
                 publishing = false;
                 return;
@@ -2035,6 +2156,10 @@ namespace NonsensicalVideoGenerator
             {
                 tags.Add("Theme");
             }
+            if((flags & WorkshopTag.Addon_BootMovie) != 0)
+            {
+                tags.Add("Boot Movie");
+            }
             // Submit tags
             cont = SteamUGC.SetItemTags(handle, tags.ToArray());
             if(!cont)
@@ -2042,7 +2167,7 @@ namespace NonsensicalVideoGenerator
                 ConsoleOutput.WriteLine($"Error updating workshop item: Invalid tags.", Color.Red);
                 if(!updateSilently)
                     Global.generator.progressText = L.T(0, "Addons:StatusFailUpdateWorkshopItem");
-                GlobalContent.GetSound("Error").Play(int.Parse(SaveData.saveValues["SoundEffectVolume"], CultureInfo.InvariantCulture) / 100f, 0f, 0f);
+                GlobalContent.PlaySound("Error");
                 publishPlugin = null;
                 publishing = false;
                 return;
@@ -2062,7 +2187,7 @@ namespace NonsensicalVideoGenerator
             {
                 if(!updateSilently)
                     Global.generator.progressText = L.T(0, "Addons:StatusFailUpload");
-                GlobalContent.GetSound("Error").Play(int.Parse(SaveData.saveValues["SoundEffectVolume"], CultureInfo.InvariantCulture) / 100f, 0f, 0f);
+                GlobalContent.PlaySound("Error");
                 ConsoleOutput.WriteLine($"Error updating workshop item: {param.m_eResult}", Color.Red);
                 publishPlugin = null;
                 publishing = false;
@@ -2070,7 +2195,7 @@ namespace NonsensicalVideoGenerator
             }
             if(!updateSilently)
                 Global.generator.progressText = L.T(0, "Addons:StatusUploadSuccess");
-            GlobalContent.GetSound("RenderComplete").Play(int.Parse(SaveData.saveValues["SoundEffectVolume"], CultureInfo.InvariantCulture) / 100f, 0f, 0f);
+            GlobalContent.PlaySound("RenderComplete");
             if(publishPlugin != null)
             {
                 ConsoleOutput.WriteLine($"Successfully published addon {publishPlugin.GetDisplayName()} to the workshop.", Color.Green);
@@ -2104,6 +2229,45 @@ namespace NonsensicalVideoGenerator
         public static List<Plugin> GetPluginsOfType(AddonType type)
         {
             return plugins.FindAll(plugin => plugin.GetAddonType() == type);
+        }
+        public static List<string> GetEnabledBootMovies()
+        {
+            // This function gets called before plugins are loaded
+            List<string> enabledAddons = new();
+            if (File.Exists(pluginSettingsPath))
+            {
+                Dictionary<string, Dictionary<string, object>>? pluginSettings = JsonConvert.DeserializeObject<Dictionary<string, Dictionary<string, object>>>(File.ReadAllText(pluginSettingsPath));
+                if (pluginSettings != null)
+                {
+                    foreach(KeyValuePair<string, Dictionary<string, object>> pluginSetting in pluginSettings)
+                    {
+                        string pluginName = pluginSetting.Key;
+                        Dictionary<string, object> settings = pluginSetting.Value;
+                        if (settings.ContainsKey("disabled") && bool.Parse(settings["disabled"].ToString() ?? "") == false)
+                        {
+                            // Add the plugin name to the list of enabled addons
+                            enabledAddons.Add(Path.GetFileNameWithoutExtension(pluginName));
+                        }
+                    }
+                }
+            }
+            // Return recursive mp4 files in the plugins directory if they are not disabled
+            return Directory.GetFiles(pluginPath, "*.mp4", SearchOption.AllDirectories)
+                .Where(file => enabledAddons.Contains(Path.GetFileNameWithoutExtension(file)))
+                .ToList();
+        }
+        public static string? PickRandomBootMovie()
+        {
+            // Get all boot movies in the plugins directory
+            List<string> bootMovies = GetEnabledBootMovies();
+            if(bootMovies.Count == 0)
+            {
+                return null;
+            }
+            int seed = DateTime.UtcNow.Millisecond;
+            Random rnd = new(seed);
+            int index = rnd.Next(bootMovies.Count);
+            return bootMovies[index];
         }
     }
 }

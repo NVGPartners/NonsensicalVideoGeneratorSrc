@@ -5,7 +5,6 @@ using System.Reflection;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Content;
 using Microsoft.Xna.Framework.Graphics;
-using Steamworks;
 using System.Globalization;
 using MonoGame.Extended.VideoPlayback;
 
@@ -80,14 +79,14 @@ namespace NonsensicalVideoGenerator
                             if(consoleScreen.Toggle())
                             {
                                 ConsoleOutput.ResetScroll();
-                                GlobalContent.GetSound("Select").Play(int.Parse(SaveData.saveValues["SoundEffectVolume"], CultureInfo.InvariantCulture) / 100f, 0f, 0f);
+                                GlobalContent.PlaySound("Select");
                                 if(Accessibility.showDisambiguation)
                                     Accessibility.TTS(L.T(0, "Accessibility:ConsoleShown"));
                                 //UserInterface.instance.music = 0;
                             }
                             else
                             {
-                                GlobalContent.GetSound("Back").Play(int.Parse(SaveData.saveValues["SoundEffectVolume"], CultureInfo.InvariantCulture) / 100f, 0f, 0f);
+                                GlobalContent.PlaySound("Back");
                                 if(Accessibility.showDisambiguation)
                                     Accessibility.TTS(L.T(0, "Accessibility:ConsoleHidden"));
                             }
@@ -95,7 +94,7 @@ namespace NonsensicalVideoGenerator
                         else
                         {
                             ConsoleOutput.WriteLine("Console not found!!!");
-                            GlobalContent.GetSound("Error").Play(int.Parse(SaveData.saveValues["SoundEffectVolume"], CultureInfo.InvariantCulture) / 100f, 0f, 0f);
+                            GlobalContent.PlaySound("Error");
                             if(Accessibility.showDisambiguation)
                                 Accessibility.TTS(L.T(0, "Accessibility:ConsoleNotFound"));
                         }
@@ -111,10 +110,10 @@ namespace NonsensicalVideoGenerator
                 case 2: // left click
                     if(!Global.canRender || Global.generator.generatorActive)
                     {
-                        GlobalContent.GetSound("Error").Play(int.Parse(SaveData.saveValues["SoundEffectVolume"], CultureInfo.InvariantCulture) / 100f, 0f, 0f);
+                        GlobalContent.PlaySound("Error");
                         return true;
                     }
-                    GlobalContent.GetSound("Select").Play(int.Parse(SaveData.saveValues["SoundEffectVolume"], CultureInfo.InvariantCulture) / 100f, 0f, 0f);
+                    GlobalContent.PlaySound("Select");
                     Global.generator.StartGeneration((sender, e) => {
                         if(e.ProgressPercentage == 100)
                         {
@@ -156,11 +155,11 @@ namespace NonsensicalVideoGenerator
                             catch {}
                             SaveData.saveValues["TotalVideosRendered"] = (int.Parse(SaveData.saveValues["TotalVideosRendered"], CultureInfo.InvariantCulture) + 1).ToString(CultureInfo.InvariantCulture);
                             SaveData.Save();
-                            GlobalContent.GetSound("RenderComplete").Play(int.Parse(SaveData.saveValues["SoundEffectVolume"], CultureInfo.InvariantCulture) / 100f, 0f, 0f);
+                            GlobalContent.PlaySound("RenderComplete");
                         }
                         else
                         {
-                            GlobalContent.GetSound("Error").Play(int.Parse(SaveData.saveValues["SoundEffectVolume"], CultureInfo.InvariantCulture) / 100f, 0f, 0f);
+                            GlobalContent.PlaySound("Error");
                         }
                         Global.justCompletedRender = true;
                         //SteamUserStats.SetAchievement("RENDER_VIDEO");
@@ -183,7 +182,7 @@ namespace NonsensicalVideoGenerator
                 switch(i)
                 {
                     case 2: // left click
-                        GlobalContent.GetSound("Select").Play(int.Parse(SaveData.saveValues["SoundEffectVolume"], CultureInfo.InvariantCulture) / 100f, 0f, 0f);
+                        GlobalContent.PlaySound("Select");
                         //SaveData.saveValues["ScreenScale"] = "2";
                         //SaveData.saveValues["BackgroundSaturation"] = "0";
                         SaveData.saveValues["MinStreamDuration"] = "0.2";
@@ -266,27 +265,30 @@ namespace NonsensicalVideoGenerator
                             if(file.Path != null)
                             {
                                 FramePlayer.Stop();
-                                GlobalContent.GetSound("Select").Play(int.Parse(SaveData.saveValues["SoundEffectVolume"], CultureInfo.InvariantCulture) / 100f, 0f, 0f);
-                                if(UserInterface.instance.videoPlayer != null)
+                                GlobalContent.PlaySound("Select");
+                                if(UserInterface.instance != null)
                                 {
-                                    UserInterface.instance.videoPlayer.Dispose();
-                                    Global.videoPlaying = false;
-                                    UserInterface.instance.videoPlayer = null;
+                                    if(UserInterface.instance.videoPlayer != null)
+                                    {
+                                        UserInterface.instance.videoPlayer.Dispose();
+                                        Global.videoPlaying = false;
+                                        UserInterface.instance.videoPlayer = null;
+                                    }
+                                    UserInterface.instance.videoPlayer = new MonoGame.Extended.Framework.Media.VideoPlayer(UserInterface.instance.GraphicsDevice);
+                                    FramePlayer.canPlayBgMusic = true;
+                                    if(UserInterface.instance.video != null)
+                                    {
+                                        UserInterface.instance.video.Dispose();
+                                        UserInterface.instance.video = null;
+                                    }
+                                    string cachePath = VideoCache.GetCachePath(file.Path);
+                                    UserInterface.instance.videoPath = cachePath;
+                                    UserInterface.instance.video = VideoHelper.LoadFromFile(cachePath);
+                                    //UserInterface.instance.videoPlayer.IsLooped = true;
+                                    UserInterface.instance.videoPlayer.Play(UserInterface.instance.video);
+                                    Global.videoPlaying = true;
+                                    UserInterface.instance.videoPlayer.Volume = float.Parse(SaveData.saveValues["VideoVolume"], CultureInfo.InvariantCulture) / 100f;
                                 }
-                                UserInterface.instance.videoPlayer = new MonoGame.Extended.Framework.Media.VideoPlayer(UserInterface.instance.GraphicsDevice);
-                                FramePlayer.canPlayBgMusic = true;
-                                if(UserInterface.instance.video != null)
-                                {
-                                    UserInterface.instance.video.Dispose();
-                                    UserInterface.instance.video = null;
-                                }
-                                string cachePath = VideoCache.GetCachePath(file.Path);
-                                UserInterface.instance.videoPath = cachePath;
-                                UserInterface.instance.video = VideoHelper.LoadFromFile(cachePath);
-                                //UserInterface.instance.videoPlayer.IsLooped = true;
-                                UserInterface.instance.videoPlayer.Play(UserInterface.instance.video);
-                                Global.videoPlaying = true;
-                                UserInterface.instance.videoPlayer.Volume = float.Parse(SaveData.saveValues["VideoVolume"], CultureInfo.InvariantCulture) / 100f;
                                 FramePlayer.canPlayBgMusic = false;
                                 Global.generator.progressText = L.T(0, "Video:StatusPlay");
                                 if(ScreenManager.GetScreen<VideoScreen>("Video") == null
@@ -298,7 +300,7 @@ namespace NonsensicalVideoGenerator
                                 return true;
                             }
                         }
-                        GlobalContent.GetSound("Error").Play(int.Parse(SaveData.saveValues["SoundEffectVolume"], CultureInfo.InvariantCulture) / 100f, 0f, 0f);
+                        GlobalContent.PlaySound("Error");
                         return true;
                 }
                 return false;
@@ -309,7 +311,7 @@ namespace NonsensicalVideoGenerator
                 switch(i)
                 {
                     case 2: // left click
-                        GlobalContent.GetSound("Select").Play(int.Parse(SaveData.saveValues["SoundEffectVolume"], CultureInfo.InvariantCulture) / 100f, 0f, 0f);
+                        GlobalContent.PlaySound("Select");
                         Global.generator.CancelGeneration(true);
                         return true;
                 }
@@ -319,7 +321,7 @@ namespace NonsensicalVideoGenerator
                 switch(i)
                 {
                     case 2: // left click
-                        GlobalContent.GetSound("Select").Play(int.Parse(SaveData.saveValues["SoundEffectVolume"], CultureInfo.InvariantCulture) / 100f, 0f, 0f);
+                        GlobalContent.PlaySound("Select");
                         Global.generator.CancelGeneration(true, true);
                         return true;
                 }

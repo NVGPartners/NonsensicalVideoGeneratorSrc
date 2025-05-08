@@ -1,17 +1,13 @@
-#if MONOGAME
 using System;
 using System.Collections.Generic;
 using System.Globalization;
 using System.IO;
 using System.Reflection;
 using Microsoft.Xna.Framework;
-using Microsoft.Xna.Framework.Audio;
 using Microsoft.Xna.Framework.Content;
 using Microsoft.Xna.Framework.Graphics;
 using Microsoft.Xna.Framework.Input;
-using Microsoft.Xna.Framework.Media;
 using MonoGame.Extended.Tweening;
-using Steamworks;
 using Newtonsoft.Json;
 
 namespace NonsensicalVideoGenerator
@@ -96,7 +92,7 @@ namespace NonsensicalVideoGenerator
                     waiting = false;
                     if(!Debug.gameCheat)
                         velocity = -jump;
-                    GlobalContent.GetSound("Option").Play(int.Parse(SaveData.saveValues["SoundEffectVolume"], CultureInfo.InvariantCulture) / 100f, 0f, 0f);
+                    GlobalContent.PlaySound("Option");
                     return true;
                 }
             }
@@ -124,7 +120,7 @@ namespace NonsensicalVideoGenerator
                         if (MouseInput.LastMouseState.LeftButton == ButtonState.Released && MouseInput.MouseState.LeftButton == ButtonState.Pressed)
                         {
                             velocity = -jump;
-                            GlobalContent.GetSound("Hover").Play(int.Parse(SaveData.saveValues["SoundEffectVolume"], CultureInfo.InvariantCulture) / 100f, 0f, 0f);
+                            GlobalContent.PlaySound("Hover");
                             return true;
                         }
                     }
@@ -267,22 +263,6 @@ namespace NonsensicalVideoGenerator
                 {
                     Accessibility.CompatAccessibility(new Rectangle(GlobalGraphics.Scale(player.spacing), (int)GlobalGraphics.Scale(player.spacingPlacementY) + GlobalGraphics.Scale(player.height/2), GlobalGraphics.Scale(player.width), GlobalGraphics.Scale(player.height/2)), L.T(0, "Accessibility:GamePlayer"));
                 }
-                /*
-                if (handleInput && MouseInput.MouseState.RightButton == ButtonState.Pressed && MouseInput.LastMouseState.RightButton == ButtonState.Released)
-                {
-                    GlobalContent.GetSound("Back").Play(int.Parse(SaveData.saveValues["SoundEffectVolume"], CultureInfo.InvariantCulture) / 100f, 0f, 0f);
-                    Hide();
-                    ScreenManager.PushNavigation("Video");
-                    ScreenManager.GetScreen<VideoScreen>("Video")?.Show();
-                    ScreenManager.PushNavigation("Content");
-                    ScreenManager.GetScreen<ContentScreen>("Content")?.Show();
-                    ScreenManager.PushNavigation("Header");
-                    ScreenManager.GetScreen<HeaderScreen>("Header")?.Show();
-                    ScreenManager.PushNavigation("Socials");
-                    ScreenManager.GetScreen<SocialScreen>("Socials")?.Show();
-                    return true;
-                }
-                */
                 // Query obstacles so player can collide with them
                 if (!player.dead)
                 {
@@ -295,7 +275,7 @@ namespace NonsensicalVideoGenerator
                         // If player is in an obstacle, die
                         if(obstacle.CheckCollision(new Rectangle(GlobalGraphics.Scale(player.spacing), GlobalGraphics.Scale((int)player.spacingPlacementY), GlobalGraphics.Scale(player.width), GlobalGraphics.Scale(player.height))))
                         {
-                            GlobalContent.GetSound("Error").Play(int.Parse(SaveData.saveValues["SoundEffectVolume"], CultureInfo.InvariantCulture) / 100f, 0f, 0f);
+                            GlobalContent.PlaySound("Error");
                             player.dead = true;
                             // timer in 0.05 seconds
                             timer = (float)gameTime.TotalGameTime.TotalMilliseconds + 50f;
@@ -313,11 +293,11 @@ namespace NonsensicalVideoGenerator
                             if(!obstacle.isDead && !obstacle.point)
                             {
                                 obstacle.point = true;
-                                GlobalContent.GetSound("AddSource").Play(int.Parse(SaveData.saveValues["SoundEffectVolume"], CultureInfo.InvariantCulture) / 100f, 0f, 0f);
+                                GlobalContent.PlaySound("AddSource");
                                 if(player.points < 2147483647)
                                     player.points++;
                                 if(player.points == 2147483647)
-                                    GlobalContent.GetSound("RenderComplete").Play(int.Parse(SaveData.saveValues["SoundEffectVolume"], CultureInfo.InvariantCulture) / 100f, 0f, 0f);
+                                    GlobalContent.PlaySound("RenderComplete");
                                 // Increment currentCreditIndex
                                 // If out of range of the key, increment currentCreditKey and set currentCreditIndex to -1
                                 if(credits.Count > 0)
@@ -358,7 +338,7 @@ namespace NonsensicalVideoGenerator
                                 }
                                 if(player.points >= highScore)
                                 {
-                                    GlobalContent.GetSound("Prompt").Play(int.Parse(SaveData.saveValues["SoundEffectVolume"], CultureInfo.InvariantCulture) / 100f, 0f, 0f);
+                                    GlobalContent.PlaySound("Prompt");
                                     highScore = player.points;
                                     SaveData.saveValues["GameHighScore"] = highScore.ToString(CultureInfo.InvariantCulture);
                                     SaveData.Save();
@@ -373,7 +353,7 @@ namespace NonsensicalVideoGenerator
                         }
                         if(phase == 0 && player.spacingPlacementY > 240-player.height)
                         {
-                            GlobalContent.GetSound("Error").Play(int.Parse(SaveData.saveValues["SoundEffectVolume"], CultureInfo.InvariantCulture) / 100f, 0f, 0f);
+                            GlobalContent.PlaySound("Error");
                             player.dead = true;
                             // timer in 0.05 seconds
                             timer = (float)gameTime.TotalGameTime.TotalMilliseconds + 50f;
@@ -600,4 +580,3 @@ namespace NonsensicalVideoGenerator
         }
     }
 }
-#endif

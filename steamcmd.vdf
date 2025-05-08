@@ -1,7 +1,7 @@
 "AppBuild"
 {
 	"AppID" "2516360"
-	"Desc" "Upload Nonsensical Video Generator WindowsDX"
+	"Desc" "Upload Nonsensical Video Generator"
 	"ContentRoot" "C:\Users\Kiwi\Documents\NVGDev\NVGMonoGame\bin\x64\Release\net8.0-windows\"
 	"BuildOutput" "C:\Users\Kiwi\Documents\NVGDev\NVGMonoGame\steamcmdoutput"
 	"Depots"

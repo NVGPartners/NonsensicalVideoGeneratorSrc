@@ -1,8 +1,6 @@
 using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Xml;
-
+using System.Globalization;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Audio;
 using Microsoft.Xna.Framework.Content;
@@ -11,43 +9,6 @@ using Microsoft.Xna.Framework.Media;
 
 namespace NonsensicalVideoGenerator
 {
-#if !MONOGAME
-    public class SoundEffect
-    {
-        // Just a wrapper for System.Media.SoundPlayer.
-        private System.Media.SoundPlayer soundPlayer;
-        public SoundEffect(string path)
-        {
-            soundPlayer = new System.Media.SoundPlayer(path);
-        }
-        public void Play(float volume = 1.0f, float pitch = 0.0f, float pan = 0.0f)
-        {
-            soundPlayer.Play();
-        }
-        public void Dispose()
-        {
-            soundPlayer.Dispose();
-        }
-    }
-    // Wrapper to load content.
-    public class ContentManager
-    {
-        public ContentManager()
-        {
-        }
-        public T Load<T>(string path)
-        {
-            if(typeof(T) == typeof(SoundEffect))
-            {
-                return (T)(object)new SoundEffect(path);
-            }
-            else
-            {
-                throw new Exception("Unsupported type.");
-            }
-        }
-    }
-#endif
     /// <summary>
     /// Store content for access by other classes.
     /// </summary>
@@ -75,9 +36,8 @@ namespace NonsensicalVideoGenerator
             AddSound("Start", ThemeManager.LoadLayeredContent<SoundEffect>("sound/start"));
             AddSound("CompatSelect", ThemeManager.LoadLayeredContent<SoundEffect>("sound/compatselect"));
             AddSound("Disambiguation", ThemeManager.LoadLayeredContent<SoundEffect>("sound/disambiguation"));
-#if MONOGAME
             // Load default fonts.
-            int scale = int.Parse(SaveData.saveValues["ScreenScale"], System.Globalization.CultureInfo.InvariantCulture);
+            int scale = int.Parse(SaveData.saveValues["ScreenScale"], CultureInfo.InvariantCulture);
             AddFont("Munro", ThemeManager.LoadLayeredContent<SpriteFont>("fonts/munro-x"+scale), new Vector2(0, 0));
             AddFont("MunroSmall", ThemeManager.LoadLayeredContent<SpriteFont>("fonts/munro-small-x"+scale), new Vector2(0, 0));
             AddFont("NotoSans", ThemeManager.LoadLayeredContent<SpriteFont>("fonts/notosans-x"+scale), new Vector2(-scale/2, -scale*2f));
@@ -175,7 +135,6 @@ namespace NonsensicalVideoGenerator
             AddTexture("InteractiveTextEntryInner", ThemeManager.LoadLayeredContent<Texture2D>("graphics/interactivetextentryinner"));
             AddTexture("PluginPage", ThemeManager.LoadLayeredContent<Texture2D>("graphics/pluginpage"));
             AddTexture("ScrollHandle", ThemeManager.LoadLayeredContent<Texture2D>("graphics/scrollhandle"));
-#endif
         }
         public static void UnloadContent()
         {
@@ -285,6 +244,23 @@ namespace NonsensicalVideoGenerator
                 position += fontOffsets[spriteFont];
             }
             spriteBatch.DrawString(spriteFont, text, position, color);
+        }
+        public static void PlaySound(string name)
+        {
+            // Play sound if it exists.
+            if (sounds.ContainsKey(name))
+            {
+                float soundEffectVolume = float.Parse(SaveData.saveValues["SoundEffectVolume"], CultureInfo.InvariantCulture);
+                // Check if sound effect volume is set to 0.
+                if (soundEffectVolume > 0)
+                {
+                    sounds[name].Play(soundEffectVolume / 100f, 0.0f, 0.0f);
+                }
+            }
+            else
+            {
+                ConsoleOutput.WriteLine($"Sound {name} not found.", Color.Red);
+            }
         }
     }
 }

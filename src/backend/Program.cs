@@ -123,15 +123,8 @@ namespace NonsensicalVideoGenerator
                 SaveData.saveValues["Fullscreen"] = "true";
             HolidayManager.CheckHolidays();
             Global.productVersion = (Assembly.GetExecutingAssembly().GetName().Version?.ToString() ?? "0.0.0.0") + Global.productSku;
-#if MONOGAME
             using (var game = new UserInterface())
                 game.Run();
-#else
-            // windows forms
-            Application.EnableVisualStyles();
-            Application.SetCompatibleTextRenderingDefault(false);
-            Application.Run(new MainForm());
-#endif
             // On graceful exit, save the game data
             SaveData.Save();
         }

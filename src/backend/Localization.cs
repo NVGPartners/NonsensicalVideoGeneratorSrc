@@ -1,8 +1,6 @@
 using System;
 using System.Collections.Generic;
-using System.Globalization;
 using Microsoft.Xna.Framework;
-using Microsoft.Xna.Framework.Content;
 using Microsoft.Xna.Framework.Graphics;
 using Newtonsoft.Json;
 using System.IO;
@@ -256,10 +254,20 @@ namespace NonsensicalVideoGenerator
                 if(files[i].StartsWith(defaultLocale))
                     continue;
                 string newLocale = Path.GetFileNameWithoutExtension(files[i]).Replace(".json", "");
-                L.LoadLocale(newLocale);
+                LoadLocale(newLocale);
             }
             // Load desired locale from save data.
-            L.LoadLocale(currentLocale);
+            LoadLocale(currentLocale);
+        }
+
+        public static void UnloadLocales()
+        {
+            locales.Clear();
+            locales.Add(dummyLocale);
+            localeIndex = 0;
+            cyclerLocale = null;
+            cyclerLocaleIndex = 1;
+            cyclerTimer = 0;
         }
     }
 }

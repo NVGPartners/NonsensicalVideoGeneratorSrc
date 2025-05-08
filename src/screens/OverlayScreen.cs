@@ -1,7 +1,4 @@
-#if MONOGAME
 using System;
-using System.Linq;
-using System.Reflection;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Content;
 using Microsoft.Xna.Framework.Graphics;
@@ -53,7 +50,7 @@ namespace NonsensicalVideoGenerator
             }
             if(videoFullscreen)
             {
-                if(UserInterface.instance.videoPlayer != null && UserInterface.instance.videoPlayer.State != MediaState.Stopped)
+                if(UserInterface.instance != null && UserInterface.instance.video != null && UserInterface.instance.videoPlayer != null && UserInterface.instance.videoPlayer.State != MediaState.Stopped)
                 {
                     try
                     {
@@ -116,7 +113,10 @@ namespace NonsensicalVideoGenerator
                 SpriteFont spriteFont = L.FontSmall();
                 if(Global.tooltipIsCycler)
                 {
-                    spriteFont = GlobalContent.GetFont(L.cyclerLocale.fontLarge);
+                    if (L.cyclerLocale != null)
+                    {
+                        spriteFont = GlobalContent.GetFont(L.cyclerLocale.fontLarge);
+                    }
                     Global.tooltipIsCycler = false;
                 }
                 string tooltip = Global.tooltip;
@@ -202,9 +202,10 @@ namespace NonsensicalVideoGenerator
             {
                 if (MouseInput.LastMouseState.LeftButton == ButtonState.Released && MouseInput.MouseState.LeftButton == ButtonState.Pressed)
                 {
-                    GlobalContent.GetSound("Select").Play(int.Parse(SaveData.saveValues["SoundEffectVolume"], System.Globalization.CultureInfo.InvariantCulture) / 100f, 0f, 0f);
+                    GlobalContent.PlaySound("Select");
                     videoFullscreen = false;
-                    UserInterface.instance.ExitGracefully();
+                    if(UserInterface.instance != null)
+                        UserInterface.instance.ExitGracefully();
                     return true;
                 }
             }
@@ -214,7 +215,7 @@ namespace NonsensicalVideoGenerator
             {
                 if (MouseInput.LastMouseState.LeftButton == ButtonState.Released && MouseInput.MouseState.LeftButton == ButtonState.Pressed)
                 {
-                    GlobalContent.GetSound("Select").Play(int.Parse(SaveData.saveValues["SoundEffectVolume"], System.Globalization.CultureInfo.InvariantCulture) / 100f, 0f, 0f);
+                    GlobalContent.PlaySound("Select");
                     videoFullscreen = !videoFullscreen;
                     return true;
                 }
@@ -225,7 +226,7 @@ namespace NonsensicalVideoGenerator
             {
                 if (MouseInput.LastMouseState.LeftButton == ButtonState.Released && MouseInput.MouseState.LeftButton == ButtonState.Pressed)
                 {
-                    GlobalContent.GetSound("Select").Play(int.Parse(SaveData.saveValues["SoundEffectVolume"], System.Globalization.CultureInfo.InvariantCulture) / 100f, 0f, 0f);
+                    GlobalContent.PlaySound("Select");
                     videoFullscreen = false;
                     return true;
                 }
@@ -239,4 +240,3 @@ namespace NonsensicalVideoGenerator
         }
     }
 }
-#endif
