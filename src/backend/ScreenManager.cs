@@ -224,12 +224,20 @@ namespace NonsensicalVideoGenerator
             }
             if(UserInterface.instance != null)
             {
-                // Any key pressed will skip the intro
-                if(UserInterface.instance.videoPlayer != null && !UserInterface.instance.introFinished && (keyboardState.GetPressedKeys().Length > 0 || MouseInput.MouseState.LeftButton == ButtonState.Pressed))
+                // Pressing the space bar will skip the intro video.
+                if(UserInterface.instance.videoPlayer != null && !UserInterface.instance.introFinished)
                 {
-                    UserInterface.instance.videoPlayer.Stop();
-                    FramePlayer.canPlayBgMusic = true;
-                    GlobalContent.PlaySound("Hover");
+                    if(keyboardState.IsKeyDown(Keys.Space))
+                    {
+                        UserInterface.instance.videoPlayer.Stop();
+                        UserInterface.instance.videoPath = "";
+                        FramePlayer.canPlayBgMusic = true;
+                        GlobalContent.PlaySound("Select");
+                    }
+                    else if(keyboardState.GetPressedKeys().Length > 0 || (MouseInput.MouseState.LeftButton == ButtonState.Pressed && MouseInput.LastMouseState.LeftButton == ButtonState.Released))
+                    {
+                        GlobalContent.PlaySound("Hover");
+                    }
                 }
                 // F11 or Alt+Enter will toggle fullscreen
                 if(keyboardState.IsKeyDown(Keys.F11) && lastKeyboardState.IsKeyUp(Keys.F11)

@@ -354,38 +354,22 @@ namespace NonsensicalVideoGenerator
                         {
                             try
                             {
-                                // Is this a workshop plugin?
-                                // If so, tooltip should be "Open workshop page."
-                                // Otherwise, tooltip should be "Open plugin directory."
+                                // User plugins should be "Open plugin directory."
+                                // Workshop plugins should be "Open workshop page."
+                                // Stock plugins should be "Open stock directory."
+                                // Boot movies should be "Play boot movie."
+                                internalTooltip = L.T(0, "Addons:ButtonOpenAddonDirectory");
+                                if(PluginHandler.plugins[i].workshopId == "stock")
+                                {
+                                    internalTooltip = L.T(0, "Addons:ButtonOpenStockDirectory");
+                                }
                                 if (PluginHandler.plugins[i].workshopId != "" && PluginHandler.plugins[i].rootPath.Contains("workshop"))
                                 {
                                     internalTooltip = L.T(0, "Addons:ButtonOpenWorkshop");
                                 }
-                                else if(PluginHandler.plugins[i].workshopId != "" && PluginHandler.plugins[i].workshopId != "stock")
+                                if(PluginHandler.plugins[i].GetAddonType() == AddonType.BootMovie)
                                 {
-                                    switch(PluginHandler.plugins[i].GetAddonType())
-                                    {
-                                        case AddonType.Theme:
-                                            internalTooltip = L.T(0, "Addons:ButtonOpenAddonDirectory");
-                                            break;
-                                        case AddonType.BootMovie:
-                                            internalTooltip = L.T(0, "Addons:ButtonPlayBootMovie");
-                                            break;
-                                        default:
-                                            internalTooltip = L.T(0, "Addons:ButtonOpenCodeEditor");
-                                            break;
-                                    }
-                                }
-                                else
-                                {
-                                    if(PluginHandler.plugins[i].GetAddonType() == AddonType.BootMovie)
-                                    {
-                                        internalTooltip = L.T(0, "Addons:ButtonPlayBootMovie");
-                                    }
-                                    else
-                                    {
-                                        internalTooltip = L.T(0, "Addons:ButtonOpenStockDirectory");
-                                    }
+                                    internalTooltip = L.T(0, "Addons:ButtonPlayBootMovie");
                                 }
                             }
                             catch {}
@@ -693,18 +677,7 @@ namespace NonsensicalVideoGenerator
                             if (MouseInput.MouseState.X >= GlobalGraphics.Scale(138) && MouseInput.MouseState.X < GlobalGraphics.Scale(inRange)
                                 && MouseInput.MouseState.Y >= GlobalGraphics.Scale(59 + ((i-offsetpl) * 16) - scrollOffset) && MouseInput.MouseState.Y < GlobalGraphics.Scale(70 + ((i-offsetpl) * 16) - scrollOffset))
                             {
-                                GlobalContent.PlaySound("Option");
-                                // Open directory and select file
-                                ProcessStartInfo startInfo = new();
-                                // Workshop plugin should open workshop page
-                                if(PluginHandler.plugins[i].workshopId != ""
-                                    && PluginHandler.plugins[i].rootPath.Contains("workshop"))
-                                {
-                                    startInfo.FileName = "steam://openurl/https://steamcommunity.com/sharedfiles/filedetails/?id=" + PluginHandler.plugins[i].workshopId;
-                                    startInfo.UseShellExecute = true;
-                                    Process.Start(startInfo);
-                                    return true;
-                                }
+                                // Play boot movie if it's a boot movie
                                 if(PluginHandler.plugins[i].GetAddonType() == AddonType.BootMovie)
                                 {
                                     string filePath = PluginHandler.plugins[i].path.Replace(".lua", ".mp4");
@@ -746,19 +719,17 @@ namespace NonsensicalVideoGenerator
                                         return true;
                                     }
                                 }
-                                if(PluginHandler.plugins[i].workshopId != "" && PluginHandler.plugins[i].workshopId != "stock")
+                                GlobalContent.PlaySound("Option");
+                                ProcessStartInfo startInfo = new();
+                                // Workshop plugin should open workshop page
+                                if(PluginHandler.plugins[i].workshopId != "" && PluginHandler.plugins[i].rootPath.Contains("workshop"))
                                 {
-                                    try
-                                    {
-                                        startInfo.FileName = "code";
-                                        startInfo.Arguments = "\"" + Path.GetFullPath(PluginHandler.plugins[i].path) + "\"";
-                                        startInfo.UseShellExecute = true;
-                                        startInfo.CreateNoWindow = true;
-                                        Process.Start(startInfo);
-                                        return true;
-                                    }
-                                    catch {}
+                                    startInfo.FileName = "steam://openurl/https://steamcommunity.com/sharedfiles/filedetails/?id=" + PluginHandler.plugins[i].workshopId;
+                                    startInfo.UseShellExecute = true;
+                                    Process.Start(startInfo);
+                                    return true;
                                 }
+                                // Open directory and select file
                                 startInfo.FileName = "explorer.exe";
                                 startInfo.Arguments = "/select, \"" + Path.GetFullPath(PluginHandler.plugins[i].path) + "\"";
                                 Process.Start(startInfo);
@@ -1200,6 +1171,8 @@ namespace NonsensicalVideoGenerator
                                 PluginHandler.plugins[index].enabled = true;
                             if(PluginHandler.pluginListFilter.HasFlag(PluginListFilter.PostRenderEffects) && type == AddonType.PostRenderEffect)
                                 PluginHandler.plugins[index].enabled = true;
+                            if(PluginHandler.pluginListFilter.HasFlag(PluginListFilter.BootMovies) && type == AddonType.BootMovie)
+                                PluginHandler.plugins[index].enabled = true;
                         }
                         PluginHandler.SavePluginSettings();
                         return true;
@@ -1222,6 +1195,8 @@ namespace NonsensicalVideoGenerator
                             if(PluginHandler.pluginListFilter.HasFlag(PluginListFilter.Effects) && type == AddonType.Effect)
                                 PluginHandler.plugins[index].enabled = false;
                             if(PluginHandler.pluginListFilter.HasFlag(PluginListFilter.PostRenderEffects) && type == AddonType.PostRenderEffect)
+                                PluginHandler.plugins[index].enabled = false;
+                            if(PluginHandler.pluginListFilter.HasFlag(PluginListFilter.BootMovies) && type == AddonType.BootMovie)
                                 PluginHandler.plugins[index].enabled = false;
                         }
                         return true;

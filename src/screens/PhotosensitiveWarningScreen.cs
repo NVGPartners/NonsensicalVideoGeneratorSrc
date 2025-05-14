@@ -268,6 +268,7 @@ namespace NonsensicalVideoGenerator
                             ScreenManager.GetScreen<HeaderScreen>("Header")?.Show();
                             Global.ready = true;
                             Global.readyTime = gameTime.TotalGameTime.TotalMilliseconds;
+                            FramePlayer.canPlayBgMusic = true;
                             if(Global.selectLanguage)
                                 Pagination.SetPage(3); // show options
                             // Play startup sound.

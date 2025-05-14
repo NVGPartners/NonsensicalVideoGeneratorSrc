@@ -34,6 +34,8 @@ namespace NonsensicalVideoGenerator
         public string videoPath = "";
         public int music = 0;
         public bool introFinished = false;
+        public bool introStarted = false;
+        public double introGoal = 0;
         public UserInterface()
         {
             ConsoleOutput.WriteLine("Creating new UserInterface instance...", Color.Transparent);
@@ -218,24 +220,6 @@ namespace NonsensicalVideoGenerator
             GlobalContent.LoadDefaultContent(Content, GraphicsDevice);
             // Load all screen content.
             ScreenManager.LoadContent(Content, GraphicsDevice);
-            videoPlayer = new MonoGame.Extended.Framework.Media.VideoPlayer(GraphicsDevice);
-            try
-            {
-                string? randomBootMovie = PluginHandler.PickRandomBootMovie();
-                if(randomBootMovie != null && File.Exists(randomBootMovie))
-                {
-                    videoPath = VideoCache.GetCachePath(randomBootMovie);
-                    video = VideoHelper.LoadFromFile(videoPath);
-                }
-                else
-                {
-                    ConsoleOutput.WriteLine("Could not load boot video: " + videoPath, Color.Red);
-                }
-            }
-            catch (Exception e)
-            {
-                ConsoleOutput.WriteLine($"Failed to load video: {e.Message}", Color.Red);
-            }
             if(bool.Parse(SaveData.saveValues["SkipPhotosensitiveWarningScreen"]))
             {
                 introFinished = true;
@@ -245,12 +229,6 @@ namespace NonsensicalVideoGenerator
                 {
                     screen.Show();
                 }
-            }
-            else if(video != null)
-            {
-                videoPlayer.Play(video);
-                videoPlayer.Volume = float.Parse(SaveData.saveValues["VideoVolume"], CultureInfo.InvariantCulture) / 100f;
-                FramePlayer.canPlayBgMusic = false;
             }
             base.LoadContent();
         }
@@ -316,7 +294,42 @@ namespace NonsensicalVideoGenerator
             else
                 _windowState = WindowState.Unfocused;
             // Title screen video
-            if(introFinished || videoPath == "" || (videoPlayer != null && (videoPlayer.State == MediaState.Stopped || (videoPlayer.PlayPosition.Seconds >= 6 && videoPath.EndsWith("kiwifruitdevlogo.mp4")))))
+            if(!introStarted)
+            {
+                introStarted = true;
+                videoPlayer = new MonoGame.Extended.Framework.Media.VideoPlayer(GraphicsDevice);
+                try
+                {
+                    string? randomBootMovie = PluginHandler.PickRandomBootMovie();
+                    if(randomBootMovie != null && File.Exists(randomBootMovie))
+                    {
+                        videoPath = VideoCache.GetCachePath(randomBootMovie);
+                        video = VideoHelper.LoadFromFile(videoPath);
+                        // current time + intro duration
+                        introGoal = gameTime.TotalGameTime.TotalSeconds + video.Duration.Seconds + 1;
+                        if(randomBootMovie.ToLower().EndsWith("kiwifruitdevlogo.mp4"))
+                        {
+                            introGoal -= 2;
+                        }
+                    }
+                    else
+                    {
+                        ConsoleOutput.WriteLine("Could not load boot video: " + videoPath, Color.Red);
+                    }
+                }
+                catch (Exception e)
+                {
+                    ConsoleOutput.WriteLine($"Failed to load video: {e.Message}", Color.Red);
+                    introFinished = true;
+                }
+                if(video != null)
+                {
+                    videoPlayer.Play(video);
+                    videoPlayer.Volume = float.Parse(SaveData.saveValues["VideoVolume"], CultureInfo.InvariantCulture) / 100f;
+                    FramePlayer.canPlayBgMusic = false;
+                }
+            }
+            if(introStarted && (introFinished || videoPath == "" || (videoPlayer != null && video != null && gameTime.TotalGameTime.TotalSeconds >= introGoal)))
             {
                 if(!introFinished)
                 {

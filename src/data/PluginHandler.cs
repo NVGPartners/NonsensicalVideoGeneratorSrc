@@ -1788,8 +1788,7 @@ namespace NonsensicalVideoGenerator
             // Is Steam API available?
             if(SteamAPI.IsSteamRunning() == false || !SteamManager.initialized)
             {
-                if(!updateSilently)
-                    Global.generator.progressText = L.T(0, "Addons:StatusSteamNotRunning");
+                Global.generator.progressText = L.T(0, "Addons:StatusSteamNotRunning");
                 GlobalContent.PlaySound("Error");
                 ConsoleOutput.WriteLine("Steam is not running, cannot publish addon.", Color.Red);
                 publishPlugin = null;
@@ -1903,15 +1902,13 @@ namespace NonsensicalVideoGenerator
             if (param.m_eResult != EResult.k_EResultOK || bIOFailure)
             {
                 ConsoleOutput.WriteLine($"Error creating workshop item: {param.m_eResult}", Color.Red);
-                if(!updateSilently)
-                    Global.generator.progressText = L.T(0, "Addons:StatusFailCreateWorkshopItem");
+                Global.generator.progressText = L.T(0, "Addons:StatusFailCreateWorkshopItem");
                 GlobalContent.PlaySound("Error");
                 publishPlugin = null;
                 publishing = false;
                 return;
             }
-            if(!updateSilently)
-                Global.generator.progressText = L.T(0, "Addons:StatusCreating");
+            Global.generator.progressText = L.T(0, "Addons:StatusCreating");
             UpdateWorkshopItem(param.m_nPublishedFileId);
         }
         public static void UpdateWorkshopItem(PublishedFileId_t id)
@@ -1923,8 +1920,7 @@ namespace NonsensicalVideoGenerator
             if(handle.m_UGCUpdateHandle == 0)
             {
                 ConsoleOutput.WriteLine($"Error updating workshop item: Invalid handle.", Color.Red);
-                if(!updateSilently)
-                    Global.generator.progressText = L.T(0, "Addons:StatusFailUpdateWorkshopItem");
+                Global.generator.progressText = L.T(0, "Addons:StatusFailUpdateWorkshopItem");
                 GlobalContent.PlaySound("Error");
                 publishPlugin = null;
                 publishing = false;
@@ -2004,8 +2000,7 @@ namespace NonsensicalVideoGenerator
             if(!cont)
             {
                 ConsoleOutput.WriteLine($"Error updating workshop item: Invalid title.", Color.Red);
-                if(!updateSilently)
-                    Global.generator.progressText = L.T(0, "Addons:StatusFailUpdateWorkshopItem");
+                Global.generator.progressText = L.T(0, "Addons:StatusFailUpdateWorkshopItem");
                 GlobalContent.PlaySound("Error");
                 publishPlugin = null;
                 publishing = false;
@@ -2049,8 +2044,7 @@ namespace NonsensicalVideoGenerator
             if(!cont)
             {
                 ConsoleOutput.WriteLine($"Error updating workshop item: Invalid visibility.", Color.Red);
-                if(!updateSilently)
-                    Global.generator.progressText = L.T(0, "Addons:StatusFailUpdateWorkshopItem");
+                Global.generator.progressText = L.T(0, "Addons:StatusFailUpdateWorkshopItem");
                 GlobalContent.PlaySound("Error");
                 publishPlugin = null;
                 publishing = false;
@@ -2079,8 +2073,7 @@ namespace NonsensicalVideoGenerator
             if(!cont)
             {
                 ConsoleOutput.WriteLine($"Error updating workshop item: Invalid content path.", Color.Red);
-                if(!updateSilently)
-                    Global.generator.progressText = L.T(0, "Addons:StatusFailUpdateWorkshopItem");
+                Global.generator.progressText = L.T(0, "Addons:StatusFailUpdateWorkshopItem");
                 GlobalContent.PlaySound("Error");
                 publishPlugin = null;
                 publishing = false;
@@ -2091,8 +2084,7 @@ namespace NonsensicalVideoGenerator
             if(!cont)
             {
                 ConsoleOutput.WriteLine($"Error updating workshop item: Invalid preview path.", Color.Red);
-                if(!updateSilently)
-                    Global.generator.progressText = L.T(0, "Addons:StatusFailUpdateWorkshopItem");
+                Global.generator.progressText = L.T(0, "Addons:StatusFailUpdateWorkshopItem");
                 GlobalContent.PlaySound("Error");
                 publishPlugin = null;
                 publishing = false;
@@ -2165,8 +2157,7 @@ namespace NonsensicalVideoGenerator
             if(!cont)
             {
                 ConsoleOutput.WriteLine($"Error updating workshop item: Invalid tags.", Color.Red);
-                if(!updateSilently)
-                    Global.generator.progressText = L.T(0, "Addons:StatusFailUpdateWorkshopItem");
+                Global.generator.progressText = L.T(0, "Addons:StatusFailUpdateWorkshopItem");
                 GlobalContent.PlaySound("Error");
                 publishPlugin = null;
                 publishing = false;
@@ -2176,8 +2167,7 @@ namespace NonsensicalVideoGenerator
             SteamAPICall_t call = SteamUGC.SubmitItemUpdate(handle, "Updated addon.");
             if(updateItemResult != null)
                 updateItemResult.Set(call);
-            if(!updateSilently)
-                Global.generator.progressText = L.T(0, "Addons:StatusPublishing");
+            Global.generator.progressText = L.T(0, "Addons:StatusPublishing");
         }
         public static void OnWorkshopItemUpdated(SubmitItemUpdateResult_t param, bool bIOFailure)
         {
@@ -2185,16 +2175,14 @@ namespace NonsensicalVideoGenerator
                 return;
             if (param.m_eResult != EResult.k_EResultOK || bIOFailure)
             {
-                if(!updateSilently)
-                    Global.generator.progressText = L.T(0, "Addons:StatusFailUpload");
+                Global.generator.progressText = L.T(0, "Addons:StatusFailUpload");
                 GlobalContent.PlaySound("Error");
                 ConsoleOutput.WriteLine($"Error updating workshop item: {param.m_eResult}", Color.Red);
                 publishPlugin = null;
                 publishing = false;
                 return;
             }
-            if(!updateSilently)
-                Global.generator.progressText = L.T(0, "Addons:StatusUploadSuccess");
+            Global.generator.progressText = L.T(0, "Addons:StatusUploadSuccess");
             GlobalContent.PlaySound("RenderComplete");
             if(publishPlugin != null)
             {
@@ -2206,6 +2194,12 @@ namespace NonsensicalVideoGenerator
                 publishPlugin = null;
             }
             publishing = false;
+            // Open workshop URL in steam client
+            if (publishPlugin != null)
+            {
+                string url = $"steam://openurl/https://steamcommunity.com/sharedfiles/filedetails/?id={publishPlugin.submittedId}";
+                Process.Start(new ProcessStartInfo(url) { UseShellExecute = true });
+            }
         }
         // Only for effect types
         public static int GetPluginCount(bool enabledOnly = false)
