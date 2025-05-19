@@ -1,19 +1,9 @@
-May 2025: Update v8.1
+May 2025: Update v8.2
 
 Here are the changes in this update:
 
 [list]
-[*]Fixed boot movies not playing back at their full duration.
-[*]Fixed main menu music not playing immediately after starting up.
-[*]Fixed a long pause in KiwifruitDev logo when selected as a boot movie.
-[*]Fixed the enable and disable all action buttons in the Addons tab not working for boot movies.
-[*]Skipping the boot movie is now performed with only the space bar.
-[*]Restored missing Workshop uploading status messages.
-[*]Submitting an addon to the Workshop now opens the page in the Steam client.
-[*]Changed inconsistent Addons tab entry buttons, removing the "Open in code editor" feature.
-[*]Removed unused tutorial window graphic in the theme template.
-[*]The Blog tab now uses ISO 8601 format for the date.
-[*]Updated the localization files.
+[*]
 [/list]
 
 Let me know if you have any issues with this update through the [url=https://discord.gg/8ppmspR6Wh]NVG Community Discord[/url].
