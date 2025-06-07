@@ -147,6 +147,7 @@ namespace NonsensicalVideoGenerator
                 {
                     StartInfo = startInfo
                 };
+                ConsoleOutput.WriteLine($"> {startInfo.FileName} {startInfo.Arguments}", Color.Transparent);
                 process.Start();
                 string output = "";
                 string error = "";
@@ -263,6 +264,7 @@ namespace NonsensicalVideoGenerator
                         if(e.Data != null)
                             ConsoleOutput.WriteLine(e.Data, Color.Red);
                     };
+                    ConsoleOutput.WriteLine($"> {startInfo.FileName} {startInfo.Arguments}", Color.Transparent);
                     process.Start();
                     process.BeginOutputReadLine();
                     process.BeginErrorReadLine();
@@ -584,6 +586,12 @@ namespace NonsensicalVideoGenerator
             if (dummyType == null)
             {
                 throw new Exception("Invalid subType");
+            }
+            // Material library in effect tests will always return the placeholder effect test video
+            if (Global.generator.pluginEffectTest != null && subType == "materials")
+            {
+                placeholders.Add("{LibraryFile_" + subType + "}", Path.Join("..", "effecttest.mp4"));
+                return "{LibraryFile_" + subType + "}";
             }
             string file = LibraryData.PickRandom(dummyType, Global.generator.globalRandom);
             // remove placeholder if it already exists
@@ -1962,7 +1970,9 @@ namespace NonsensicalVideoGenerator
                 {
                     if(nam.ToLower().EndsWith(" movie"))
                         nam = nam.Substring(0, nam.Length - 6);
-                    if(nam.ToLower().EndsWith(" bootmovie"))
+                    if(nam.ToLower().EndsWith(" boot"))
+                        nam = nam.Substring(0, nam.Length - 5);
+                    if (nam.ToLower().EndsWith(" bootmovie"))
                         nam = nam.Substring(0, nam.Length - 10);
                     if(nam.ToLower().EndsWith(" boot movie"))
                         nam = nam.Substring(0, nam.Length - 11);
@@ -2198,7 +2208,9 @@ namespace NonsensicalVideoGenerator
             if (publishPlugin != null)
             {
                 string url = $"steam://openurl/https://steamcommunity.com/sharedfiles/filedetails/?id={publishPlugin.submittedId}";
-                Process.Start(new ProcessStartInfo(url) { UseShellExecute = true });
+                ProcessStartInfo startInfo = new ProcessStartInfo(url) { UseShellExecute = true };
+                ConsoleOutput.WriteLine($"> {startInfo.FileName} {startInfo.Arguments}", Color.Transparent);
+                Process.Start(startInfo);
             }
         }
         // Only for effect types

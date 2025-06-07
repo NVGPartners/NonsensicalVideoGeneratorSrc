@@ -81,6 +81,7 @@ namespace NonsensicalVideoGenerator
                                 FileName = "https://discord.gg/8ppmspR6Wh",
                                 UseShellExecute = true
                             };
+                            ConsoleOutput.WriteLine($"> {psi.FileName} {psi.Arguments}", Color.Transparent);
                             Process.Start(psi);
                         }
                         return true;
@@ -99,6 +100,7 @@ namespace NonsensicalVideoGenerator
                                 FileName = "https://github.com/KiwifruitDev/NonsensicalVideoGenerator",
                                 UseShellExecute = true
                             };
+                            ConsoleOutput.WriteLine($"> {psi.FileName} {psi.Arguments}", Color.Transparent);
                             Process.Start(psi);
                         }
                         return true;
@@ -120,6 +122,7 @@ namespace NonsensicalVideoGenerator
                             FileName = BlogData.Url.Replace("%postid%", BlogData.PostId).Replace("%locale%", L.GetLocale().name),
                             UseShellExecute = true
                         };
+                        ConsoleOutput.WriteLine($"> {startInfo.FileName} {startInfo.Arguments}", Color.Transparent);
                         Process.Start(startInfo);
                         return true;
                 }

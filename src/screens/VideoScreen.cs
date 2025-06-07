@@ -220,7 +220,7 @@ namespace NonsensicalVideoGenerator
                         {
                             UseShellExecute = true
                         };
-                        if(FramePlayer.audio != null)
+                        if (FramePlayer.audio != null)
                         {
                             FramePlayer.currentFrame = -1;
                             FramePlayer.audio.Stop();
@@ -229,7 +229,7 @@ namespace NonsensicalVideoGenerator
                             FramePlayer.canPlayBgMusic = true;
                             startInfo.FileName = FramePlayer.currentPath;
                         }
-                        else if(UserInterface.instance != null && UserInterface.instance.videoPlayer != null && UserInterface.instance.videoPlayer.State != MediaState.Stopped)
+                        else if (UserInterface.instance != null && UserInterface.instance.videoPlayer != null && UserInterface.instance.videoPlayer.State != MediaState.Stopped)
                         {
                             Global.videoPlaying = false;
                             UserInterface.instance.videoPlayer.Dispose();
@@ -237,9 +237,11 @@ namespace NonsensicalVideoGenerator
                             FramePlayer.canPlayBgMusic = true;
                             startInfo.FileName = UserInterface.instance.videoPath;
                             Global.generator.progressText = L.T(0, "Video:StatusStop");
+                            Hide();
                         }
                         try
                         {
+                        ConsoleOutput.WriteLine($"> {startInfo.FileName} {startInfo.Arguments}", Color.Transparent);
                             Process.Start(startInfo);
                         }
                         catch

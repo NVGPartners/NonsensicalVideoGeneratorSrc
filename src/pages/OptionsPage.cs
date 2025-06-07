@@ -590,6 +590,7 @@ namespace NonsensicalVideoGenerator
                     startInfo.FileName = "steam://run/" + Global.appId.ToString();
                     startInfo.UseShellExecute = true;
                     startInfo.Verb = "open";
+                    ConsoleOutput.WriteLine($"> {startInfo.FileName} {startInfo.Arguments}", Color.Transparent);
                     Process.Start(startInfo);
                     // Close software
                     try

@@ -80,6 +80,7 @@ namespace NonsensicalVideoGenerator
                     if (args.Data != null)
                         ConsoleOutput.WriteLine(args.Data, Color.Transparent);
                 };
+                ConsoleOutput.WriteLine($"> {startInfo.FileName} {startInfo.Arguments}", Color.Transparent);
                 process.Start();
                 if(worker.CancellationPending || !processing)
                     return;
@@ -108,6 +109,7 @@ namespace NonsensicalVideoGenerator
                 };
                 if(worker.CancellationPending || !processing)
                     return;
+                ConsoleOutput.WriteLine($"> {startInfo.FileName} {startInfo.Arguments}", Color.Transparent);
                 process.Start();
                 if(worker.CancellationPending || !processing)
                     return;
@@ -137,6 +139,7 @@ namespace NonsensicalVideoGenerator
                     };
                     if(worker.CancellationPending || !processing)
                         return;
+                    ConsoleOutput.WriteLine($"> {startInfo.FileName} {startInfo.Arguments}", Color.Transparent);
                     process.Start();
                     if(worker.CancellationPending || !processing)
                         return;
@@ -229,6 +232,7 @@ namespace NonsensicalVideoGenerator
                 };
                 if(countWorker.CancellationPending || !processing)
                     return;
+                ConsoleOutput.WriteLine($"> {startInfo.FileName} {startInfo.Arguments}", Color.Transparent);
                 process.Start();
                 if(countWorker.CancellationPending || !processing)
                     return;
@@ -322,6 +326,7 @@ namespace NonsensicalVideoGenerator
                 };
                 if(audioConvertWorker.CancellationPending || !processing)
                     return;
+                ConsoleOutput.WriteLine($"> {startInfo.FileName} {startInfo.Arguments}", Color.Transparent);
                 process.Start();
                 if(audioConvertWorker.CancellationPending || !processing)
                     return;
@@ -396,6 +401,7 @@ namespace NonsensicalVideoGenerator
                     {
                         StartInfo = startInfo
                     };
+                    ConsoleOutput.WriteLine($"> {startInfo.FileName} {startInfo.Arguments}", Color.Transparent);
                     process.Start();
                 }
                 catch(Exception e)

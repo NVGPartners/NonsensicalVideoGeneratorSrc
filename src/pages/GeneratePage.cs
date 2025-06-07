@@ -52,6 +52,8 @@ namespace NonsensicalVideoGenerator
                 // Draw text to indicate that rendering is in progress
                 SpriteFont font = L.FontLarge();
                 string text = L.T(0, "Generate:Rendering");
+                if(Global.generator.pluginEffectTest != null)
+                    text = L.T(0, "Generate:EffectTestInProgress");
                 Vector2 textSize = font.MeasureString(text);
                 GlobalContent.DrawString(spriteBatch, font, text, new Vector2(GlobalGraphics.Scale(1) + GlobalGraphics.Scale(135) + (GlobalGraphics.Scale(306) - GlobalGraphics.Scale(135) - textSize.X) / 2, GlobalGraphics.Scale(1) + GlobalGraphics.Scale(58) + (GlobalGraphics.Scale(236) - GlobalGraphics.Scale(58) - textSize.Y) / 2), Color.Black);
                 GlobalContent.DrawString(spriteBatch, font, text, new Vector2(GlobalGraphics.Scale(135) + (GlobalGraphics.Scale(306) - GlobalGraphics.Scale(135) - textSize.X) / 2, GlobalGraphics.Scale(58) + (GlobalGraphics.Scale(236) - GlobalGraphics.Scale(58) - textSize.Y) / 2), Color.White);
@@ -321,8 +323,15 @@ namespace NonsensicalVideoGenerator
                 switch(i)
                 {
                     case 2: // left click
-                        GlobalContent.PlaySound("Select");
-                        Global.generator.CancelGeneration(true, true);
+                        if (Global.generator.pluginEffectTest != null)
+                        {
+                            GlobalContent.PlaySound("Select");
+                            Global.generator.CancelGeneration(true, true);
+                        }
+                        else
+                        {
+                            GlobalContent.PlaySound("Error");
+                        }
                         return true;
                 }
                 return false;

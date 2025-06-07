@@ -62,6 +62,8 @@ namespace NonsensicalVideoGenerator
         public static string betterExportParams = "-vcodec libx264 -crf 28 -preset ultrafast -ac 2 -c:a aac -b:a 160k -ar 44100 -map_metadata -1 -reset_timestamps 1 -shortest -fflags +genpts";
         public bool audioSync = true;
         public static string exportParams = betterExportParams;
+        public BackgroundWorker? effectTestThreadWorker { get; set; }
+        public Plugin? pluginEffectTest = null;
         public void KillChildProcesses()
         {
             // Find all child processes of the current process and kill them.
@@ -76,15 +78,18 @@ namespace NonsensicalVideoGenerator
             startInfo.RedirectStandardError = true;
             Process process = new Process();
             // Add console print
-            process.OutputDataReceived += (object sender, DataReceivedEventArgs e) => {
+            process.OutputDataReceived += (object sender, DataReceivedEventArgs e) =>
+            {
                 if (e.Data != null)
                     ConsoleOutput.WriteLine(e.Data);
             };
-            process.ErrorDataReceived += (object sender, DataReceivedEventArgs e) => {
+            process.ErrorDataReceived += (object sender, DataReceivedEventArgs e) =>
+            {
                 if (e.Data != null)
                     ConsoleOutput.WriteLine(e.Data, Color.Red);
             };
             process.StartInfo = startInfo;
+            ConsoleOutput.WriteLine($"> {startInfo.FileName} {startInfo.Arguments}", Color.Transparent);
             process.Start();
             process.WaitForExit();
             process.Close();
@@ -188,6 +193,7 @@ namespace NonsensicalVideoGenerator
                         progressText = L.T(0, "Generate:StatusCompleted");
                         progressState = ProgressState.Completed;
                         generatorActive = false;
+                        pluginEffectTest = null;
                         // award achievements
                         if (SteamManager.initialized && Global.canAchieve)
                         {
@@ -889,6 +895,11 @@ namespace NonsensicalVideoGenerator
             FramePlayer.Stop();
             try
             {
+                if(effectTestThreadWorker != null && effectTestThreadWorker.IsBusy)
+                {
+                    ConsoleOutput.WriteLine("Effect test is busy...", Color.Red);
+                    return;
+                }
                 if(vidThreadWorker == null)
                 {
                     vidThreadWorker = new BackgroundWorker();
@@ -915,7 +926,6 @@ namespace NonsensicalVideoGenerator
                 }
                 forceConcatenate = false;
                 timeout = int.Parse(SaveData.saveValues["TimeOut"], CultureInfo.InvariantCulture);
-                tempOutput = Path.Combine(Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location) ?? ".", "library", "video", "renders", Global.videoTitle + ".mp4");
                 timeoutWorker.RunWorkerAsync();
                 vidThreadWorker.RunWorkerAsync();
                 ConsoleOutput.WriteLine("Generation started.", Color.Green);
@@ -944,45 +954,329 @@ namespace NonsensicalVideoGenerator
         }
         public void CancelGeneration(bool user = false, bool forceConcatenate = false)
         {
-            if(vidThreadWorker != null)
+            // Make sure it's not completed or cancelled already.
+            progressState = ProgressState.Failed;
+            if(user)
             {
-                // Make sure it's not completed or cancelled already.
-                progressState = ProgressState.Failed;
-                if(user)
+                this.forceConcatenate = forceConcatenate;
+                if(vidThreadWorker != null && vidThreadWorker.IsBusy)
                 {
-                    this.forceConcatenate = forceConcatenate;
-                    if(vidThreadWorker.IsBusy)
-                    {
-                        failureReason = L.T(0, "Generate:StatusCancelling");
-                        progressText = failureReason;
-                        ConsoleOutput.WriteLine("Generation cancelling...", Color.Yellow);
-                        StartKillThread();
-                    }
-                    else
-                    {
-                        failureReason = L.T(0, "Generate:StatusCancelled");
-                        progressText = failureReason;
-                        ConsoleOutput.WriteLine("Generation cancelled.", Color.Red);
-                    }
+                    failureReason = L.T(0, "Generate:StatusCancelling");
+                    progressText = failureReason;
+                    ConsoleOutput.WriteLine("Generation cancelling...", Color.Yellow);
+                    StartKillThread();
                 }
                 else
                 {
-                    try
-                    {
-                        vidThreadWorker.ReportProgress(1);
-                        // Play error sting (music)
-                        //UserInterface.instance.music = 1;
-                    }
-                    catch
-                    {
-                        // oh well
-                    }
+                    failureReason = L.T(0, "Generate:StatusCancelled");
+                    progressText = failureReason;
+                    ConsoleOutput.WriteLine("Generation cancelled.", Color.Red);
                 }
-                vidThreadWorker.CancelAsync();
-                generatorActive = false;
             }
+            else
+            {
+                try
+                {
+                    if(vidThreadWorker != null && vidThreadWorker.IsBusy)
+                        vidThreadWorker.ReportProgress(1);
+                    if(effectTestThreadWorker != null && effectTestThreadWorker.IsBusy)
+                        effectTestThreadWorker.ReportProgress(1);
+                    // Play error sting (music)
+                    //UserInterface.instance.music = 1;
+                }
+                catch
+                {
+                    // oh well
+                }
+            }
+            if(vidThreadWorker != null)
+                vidThreadWorker.CancelAsync();
+            if(effectTestThreadWorker != null)
+                effectTestThreadWorker.CancelAsync();
+
+            generatorActive = false;
+            pluginEffectTest = null;
+            
             if(timeoutWorker != null)
                 timeoutWorker.CancelAsync();
+        }
+        public void EffectTestThread(object? sender, DoWorkEventArgs e)
+        {
+            if (effectTestThreadWorker?.CancellationPending == true)
+                return;
+            
+            // Reset progress state
+            generatorActive = true; // first time use
+            progress = 0;
+            progressState = ProgressState.Parsing;
+
+            DiscordRPC.UpdatePresence();
+            SteamRichPresence.UpdatePresence();
+
+            // Load library.
+            LibraryData.Load();
+
+            // Check to ensure that the source pool is not empty.
+            if(PluginHandler.GetEnabledBootMovies().Count == 0)
+            {
+                ConsoleOutput.WriteLine("No boot movies enabled.", Color.Red);
+                progressText = L.T(0, "Addons:StatusFailNoBootMovies");
+                progressState = ProgressState.Failed;
+                failureReason = progressText;
+                CancelGeneration();
+                return;
+            }
+
+            // Set global random with seed.
+            if(Global.randomSeed != 0 && !Global.parameters.Contains("-seed"))
+            {
+                int seed = DateTime.UtcNow.Millisecond;
+                ConsoleOutput.WriteLine("Seed: " + seed.ToString(CultureInfo.InvariantCulture), Color.Gray);
+                Global.randomSeed = seed;
+                globalRandom = new Random(seed);
+            }
+
+            // Clean up previous temporary files.
+            CleanUp();
+
+            if (effectTestThreadWorker?.CancellationPending == true)
+                return;
+
+            // Make sure the temporary directory exists.
+            Directory.CreateDirectory(temporaryDirectory);
+
+            progressText = L.T(0, "Addons:StatusStartingEffectTest");
+            Clip thisClip = new Clip("effecttest.mp4", false, false, false);
+            timeout = int.Parse(SaveData.saveValues["TimeOut"], CultureInfo.InvariantCulture);
+            try
+            {
+                if (effectTestThreadWorker?.CancellationPending == true)
+                    return;
+                if (effectTestThreadWorker?.CancellationPending == true)
+                    return;
+                progress = 1;
+                string sourceToPick = PluginHandler.PickRandomBootMovie() ?? "";
+                if (sourceToPick == "")
+                {
+                    ConsoleOutput.WriteLine("No boot movies enabled.", Color.Gray);
+                    progressText = L.T(0, "Addons:StatusFailNoBootMovies");
+                    progressState = ProgressState.Failed;
+                    return;
+                }
+                if (effectTestThreadWorker?.CancellationPending == true)
+                    return;
+                FFprobe_EncodeVideo(sourceToPick, Path.Combine(temporaryDirectory, thisClip.name));
+                ConsoleOutput.WriteLine("Encoded test effect video.", Color.Gray);
+                if (effectTestThreadWorker?.CancellationPending == true)
+                    return;
+            }
+            catch (Exception ex2)
+            {
+                ConsoleOutput.WriteLine(ex2.Message, Color.Red);
+                // print line number
+                if (ex2.StackTrace != null)
+                {
+                    ConsoleOutput.WriteLine(ex2.StackTrace, Color.Red);
+                }
+                return;
+            }
+            try
+            {
+                if (effectTestThreadWorker?.CancellationPending == true)
+                    return;
+                // Call the plugin.
+                if (pluginEffectTest != null)
+                {
+                    PluginReturnValue effect = pluginEffectTest.Call(Path.Combine(temporaryDirectory, thisClip.name));
+                    if (effect.success)
+                    {
+                        // Check if effect job path contains output.mp4, if so, plugin was indeed successful.
+                        // so move to videoi.mp4
+                        // Search for output.mp4 in job folder.
+                        string[] files = Directory.GetFiles(effect.jobFolder);
+                        bool foundOutput = false;
+                        foreach (string file in files)
+                        {
+                            if (Path.GetFileName(file) == "output.mp4")
+                            {
+                                // Make sure this is a valid file with ffprobe.
+                                ProcessStartInfo ffprobe = new ProcessStartInfo()
+                                {
+                                    FileName = Global.useSystemFFprobe ? "ffprobe" : @".\ffprobe.exe",
+                                    Arguments = "-v error -select_streams v:0 -show_entries stream=codec_name -of default=noprint_wrappers=1:nokey=1 \"" + file + "\"",
+                                    UseShellExecute = false,
+                                    RedirectStandardOutput = true,
+                                    CreateNoWindow = true
+                                };
+                                Process? ffprobeProcess = new Process();
+                                ffprobeProcess.StartInfo = ffprobe;
+                                string isVideo = "";
+                                ffprobeProcess.OutputDataReceived += (sender, e) =>
+                                {
+                                    isVideo += e.Data;
+                                };
+                                ffprobeProcess.Start();
+                                ffprobeProcess.BeginOutputReadLine();
+                                ffprobeProcess.WaitForExit();
+                                if (isVideo != "" && isVideo != "N/A")
+                                {
+                                    foundOutput = true;
+                                }
+                                break;
+                            }
+                        }
+                        if (foundOutput)
+                        {
+                            // Delete existing videoi.mp4
+                            if (File.Exists(Path.Combine(temporaryDirectory, thisClip.name)))
+                                File.Delete(Path.Combine(temporaryDirectory, thisClip.name));
+                            try
+                            {
+                                File.Move(effect.jobFolder + "output.mp4", Path.Combine(temporaryDirectory, thisClip.name));
+                            }
+                            catch (Exception ex)
+                            {
+                                ConsoleOutput.WriteLine("Failed to move output.mp4 to " + thisClip.name + ": " + ex.Message, Color.Red);
+                                effect.success = false;
+                            }
+                        }
+                        else
+                        {
+                            effect.success = false;
+                        }
+                        // Delete job folder.
+                        if (!bool.Parse(SaveData.saveValues["HiddenKeepTemporaryJobFolders"]))
+                            Directory.Delete(effect.jobFolder, true);
+                        ConsoleOutput.WriteLine(effect.success ? "Applied " + effect.pluginName + " to effect test video." : "Failed to apply " + effect.pluginName + " to effect test video.", effect.success ? Color.LightGreen : Color.Red);
+                    }
+                    if (effectTestThreadWorker?.CancellationPending == true)
+                        return;
+                }
+                if (File.Exists(Path.Combine(temporaryDirectory, thisClip.name)))
+                {
+                    FramePlayer.Stop();
+                    if (UserInterface.instance != null)
+                    {
+                        if (UserInterface.instance.videoPlayer != null)
+                        {
+                            Global.videoPlaying = false;
+                            UserInterface.instance.videoPlayer.Dispose();
+                            UserInterface.instance.videoPlayer = null;
+                        }
+                        UserInterface.instance.videoPlayer = new MonoGame.Extended.Framework.Media.VideoPlayer(UserInterface.instance.GraphicsDevice);
+                        if (UserInterface.instance.video != null)
+                        {
+                            UserInterface.instance.video.Dispose();
+                            UserInterface.instance.video = null;
+                        }
+                        FramePlayer.canPlayBgMusic = true;
+                        string cachePath = VideoCache.GetCachePath(Path.Combine(temporaryDirectory, thisClip.name));
+                        UserInterface.instance.videoPath = cachePath;
+                        UserInterface.instance.video = VideoHelper.LoadFromFile(cachePath);
+                        //UserInterface.instance.videoPlayer.IsLooped = true;
+                        UserInterface.instance.videoPlayer.Play(UserInterface.instance.video);
+                        Global.videoPlaying = true;
+                        UserInterface.instance.videoPlayer.Volume = float.Parse(SaveData.saveValues["VideoVolume"], CultureInfo.InvariantCulture) / 100f;
+                    }
+                    FramePlayer.canPlayBgMusic = false;
+                    if (ScreenManager.GetScreen<VideoScreen>("Video") == null
+                        || ScreenManager.GetScreen<VideoScreen>("Video")?.screenType == ScreenType.Hidden)
+                    {
+                        ScreenManager.PushNavigation("Video");
+                        ScreenManager.GetScreen<VideoScreen>("Video")?.Show();
+                    }
+                }
+                if (effectTestThreadWorker?.CancellationPending == true)
+                    return;
+                progressText = L.T(0, "Addons:StatusEffectTestPlaying");
+                progressState = ProgressState.Completed;
+                generatorActive = false;
+                pluginEffectTest = null;
+                if (effectTestThreadWorker != null)
+                    effectTestThreadWorker.ReportProgress(100);
+                if (timeoutWorker != null)
+                    timeoutWorker.CancelAsync();
+            }
+            catch (Exception ex)
+            {
+                progressState = ProgressState.Failed;
+                failureReason = L.T(0, "Generate:StatusFailGeneric");
+                progressText = failureReason;
+                ConsoleOutput.WriteLine(ex.Message, Color.Red);
+                if (ex.StackTrace != null)
+                    ConsoleOutput.WriteLine(ex.StackTrace, Color.Transparent);
+                CancelGeneration();
+            }
+        }
+        public void StartEffectTest(Plugin plugin)
+        {
+            // Set the plugin to use for the effect test.
+            pluginEffectTest = plugin;
+            // Create dummy event handlers for the background worker.
+            StartEffectTest((sender, e) => { }, (sender, e) => { });
+        }
+        private void StartEffectTest(ProgressChangedEventHandler progressReporter, RunWorkerCompletedEventHandler completedReporter)
+        {
+            LibraryData.calledMedia.Clear();
+            Global.usedWorkshopPlugin = false;
+            Global.rolledForOverlay = false;
+            Global.usedAllEffectChance = false;
+            FramePlayer.Stop();
+            try
+            {
+                if(vidThreadWorker != null && vidThreadWorker.IsBusy)
+                {
+                    ConsoleOutput.WriteLine("Generation is busy...", Color.Red);
+                    return;
+                }
+                if(effectTestThreadWorker == null)
+                {
+                    effectTestThreadWorker = new BackgroundWorker();
+                    effectTestThreadWorker.DoWork += EffectTestThread;
+                    effectTestThreadWorker.WorkerReportsProgress = true;
+                    effectTestThreadWorker.WorkerSupportsCancellation = true;
+                    effectTestThreadWorker.ProgressChanged += progressReporter;
+                    effectTestThreadWorker.RunWorkerCompleted += completedReporter;
+                }
+                else
+                {
+                    effectTestThreadWorker.CancelAsync();
+                }
+                if(effectTestThreadWorker.IsBusy)
+                {
+                    ConsoleOutput.WriteLine("Effect test is busy...", Color.Red);
+                    return;
+                }
+                if(timeoutWorker == null)
+                {
+                    timeoutWorker = new BackgroundWorker();
+                    timeoutWorker.DoWork += TimeoutThread;
+                    timeoutWorker.WorkerSupportsCancellation = true;
+                }
+                forceConcatenate = false;
+                timeout = int.Parse(SaveData.saveValues["TimeOut"], CultureInfo.InvariantCulture);
+                tempOutput = Path.Combine(Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location) ?? ".", "library", "video", "renders", Global.videoTitle + ".mp4");
+                timeoutWorker.RunWorkerAsync();
+                effectTestThreadWorker.RunWorkerAsync();
+                ConsoleOutput.WriteLine("Generation started.", Color.Green);
+                // Print out current save data
+                ConsoleOutput.WriteLine("Save data:", Color.Transparent);
+                ConsoleOutput.WriteLine("{", Color.Transparent);
+                foreach(KeyValuePair<string, string> kvp in SaveData.saveValues)
+                {
+                    ConsoleOutput.WriteLine("  \"" + kvp.Key + "\": \"" + kvp.Value + "\"", Color.Transparent);
+                }
+                ConsoleOutput.WriteLine("}", Color.Transparent);
+            }
+            catch(Exception ex)
+            {
+                progressState = ProgressState.Failed;
+                failureReason = L.T(0, "Generate:StatusFailGeneric");
+                progressText = failureReason;
+                ConsoleOutput.WriteLine(ex.Message, Color.Red);
+                if(ex.StackTrace != null)
+                    ConsoleOutput.WriteLine(ex.StackTrace, Color.Transparent);
+            }
         }
         public float RandomFloat(float min, float max)
         {
@@ -1069,6 +1363,7 @@ namespace NonsensicalVideoGenerator
                     if (e.Data != null)
                         ConsoleOutput.WriteLine(e.Data, Color.Transparent);
                 };
+                ConsoleOutput.WriteLine($"> {startInfo.FileName} {startInfo.Arguments}", Color.Transparent);
                 process.Start();
                 process.BeginErrorReadLine();
                 process.WaitForExit();
@@ -1119,6 +1414,7 @@ namespace NonsensicalVideoGenerator
                     if (e.Data != null)
                         ConsoleOutput.WriteLine(e.Data, Color.Transparent);
                 };
+                ConsoleOutput.WriteLine($"> {startInfo.FileName} {startInfo.Arguments}", Color.Transparent);
                 process.Start();
                 process.BeginOutputReadLine();
                 process.BeginErrorReadLine();
@@ -1171,6 +1467,7 @@ namespace NonsensicalVideoGenerator
                     if (e.Data != null)
                         ConsoleOutput.WriteLine(e.Data, Color.Transparent);
                 };
+                ConsoleOutput.WriteLine($"> {startInfo.FileName} {startInfo.Arguments}", Color.Transparent);
                 process.Start();
                 process.BeginErrorReadLine();
                 process.WaitForExit();
@@ -1300,6 +1597,7 @@ namespace NonsensicalVideoGenerator
                     {
                         isVideo += e.Data;
                     };
+                    ConsoleOutput.WriteLine($"> {ffprobe.FileName} {ffprobe.Arguments}", Color.Transparent);
                     ffprobeProcess.Start();
                     ffprobeProcess.BeginOutputReadLine();
                     ffprobeProcess.WaitForExit();
@@ -1378,6 +1676,7 @@ namespace NonsensicalVideoGenerator
                 if (e.Data != null)
                     ConsoleOutput.WriteLine(e.Data, Color.Transparent);
             };
+            ConsoleOutput.WriteLine($"> {startInfo.FileName} {startInfo.Arguments}", Color.Transparent);
             process.Start();
             process.BeginErrorReadLine();
             process.WaitForExit();
@@ -1487,6 +1786,7 @@ namespace NonsensicalVideoGenerator
                         
                     ConsoleOutput.WriteLine(e.Data, Color.Transparent);
                 };
+                ConsoleOutput.WriteLine($"> {startInfo.FileName} {startInfo.Arguments}", Color.Transparent);
                 process.Start();
                 process.BeginErrorReadLine();
                 process.WaitForExit();
@@ -1555,6 +1855,7 @@ namespace NonsensicalVideoGenerator
                     if (e.Data != null)
                         ConsoleOutput.WriteLine(e.Data, Color.Transparent);
                 };
+                ConsoleOutput.WriteLine($"> {startInfo.FileName} {startInfo.Arguments}", Color.Transparent);
                 process.Start();
                 process.BeginErrorReadLine();
                 process.WaitForExit();
@@ -1596,6 +1897,7 @@ namespace NonsensicalVideoGenerator
                     if (e.Data != null)
                         ConsoleOutput.WriteLine(e.Data, Color.Transparent);
                 };
+                ConsoleOutput.WriteLine($"> {startInfo.FileName} {startInfo.Arguments}", Color.Transparent);
                 process.Start();
                 process.BeginErrorReadLine();
                 process.WaitForExit();
@@ -1635,6 +1937,7 @@ namespace NonsensicalVideoGenerator
                     if (e.Data != null)
                         ConsoleOutput.WriteLine(e.Data, Color.Transparent);
                 };
+                ConsoleOutput.WriteLine($"> {startInfo.FileName} {startInfo.Arguments}", Color.Transparent);
                 process.Start();
                 process.BeginErrorReadLine();
                 process.WaitForExit();

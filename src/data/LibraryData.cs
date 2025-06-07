@@ -611,6 +611,7 @@ namespace NonsensicalVideoGenerator
                             if(e.Data != null)
                                 ConsoleOutput.WriteLine(e.Data, Color.Red);
                         };
+                        ConsoleOutput.WriteLine($"> {startInfo.FileName} {startInfo.Arguments}", Color.Transparent);
                         process.Start();
                         process.BeginOutputReadLine();
                         process.BeginErrorReadLine();

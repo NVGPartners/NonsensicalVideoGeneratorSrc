@@ -28,6 +28,7 @@ namespace NonsensicalVideoGenerator
                         FileName = consoleTxt,
                         UseShellExecute = true
                     };
+                    ConsoleOutput.WriteLine($"> {startInfo.FileName} {startInfo.Arguments}", Color.Transparent);
                     Process.Start(startInfo);
                     Environment.Exit(0);
                 }

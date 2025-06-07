@@ -12,6 +12,7 @@ using System.Reflection;
 using System.Windows;
 using System.Globalization;
 using MonoGame.Extended.VideoPlayback;
+using SharpCompress;
 
 namespace NonsensicalVideoGenerator
 {
@@ -150,7 +151,7 @@ namespace NonsensicalVideoGenerator
             rects.Clear();
             rects.Add("VideoButton", new Rectangle(GlobalGraphics.Scale(135), GlobalGraphics.Scale(56), GlobalGraphics.Scale(typeButton.Width), GlobalGraphics.Scale(typeButton.Height)));
             rects.Add("AudioButton", new Rectangle(GlobalGraphics.Scale(166), GlobalGraphics.Scale(56), GlobalGraphics.Scale(typeButton.Width), GlobalGraphics.Scale(typeButton.Height)));
-            rects.Add("HeaderButton", new Rectangle(GlobalGraphics.Scale(200), GlobalGraphics.Scale(56), GlobalGraphics.Scale(headerButton.Width), GlobalGraphics.Scale(headerButton.Height)));
+            rects.Add("DownloadMediaButton", new Rectangle(GlobalGraphics.Scale(200), GlobalGraphics.Scale(56), GlobalGraphics.Scale(headerButton.Width), GlobalGraphics.Scale(headerButton.Height)));
             rects.Add("PageLeftButton", new Rectangle(GlobalGraphics.Scale(200), GlobalGraphics.Scale(223), GlobalGraphics.Scale(typeButton.Width), GlobalGraphics.Scale(typeButton.Height)));
             rects.Add("PageRightButton", new Rectangle(GlobalGraphics.Scale(276), GlobalGraphics.Scale(223), GlobalGraphics.Scale(typeButton.Width), GlobalGraphics.Scale(typeButton.Height)));
             // Interactable
@@ -285,7 +286,7 @@ namespace NonsensicalVideoGenerator
             spriteBatch.Draw(typeButton, rects["AudioButton"], Color.White);
 #if WINDOWSDX
             if(currentLibraryType != DefaultLibraryTypes.Render && currentLibraryType != DefaultLibraryTypes.NoImages)
-                spriteBatch.Draw(headerButton, rects["HeaderButton"], Color.White);
+                spriteBatch.Draw(headerButton, rects["DownloadMediaButton"], Color.White);
 #endif
             // Draw subtypes
             try
@@ -307,7 +308,7 @@ namespace NonsensicalVideoGenerator
             if(currentLibraryType != DefaultLibraryTypes.Render && currentLibraryType != DefaultLibraryTypes.NoImages)
             {
                 if((selectedFlags & 4) == 4)
-                    spriteBatch.Draw(headerButtonSelected, rects["HeaderButton"], Color.White);
+                    spriteBatch.Draw(headerButtonSelected, rects["DownloadMediaButton"], Color.White);
             }
             // Flags 8-32768 (0x8-0x8000, 13 bits) are for subtypes
             try
@@ -367,13 +368,11 @@ namespace NonsensicalVideoGenerator
 #if WINDOWSDX
             if(currentLibraryType != DefaultLibraryTypes.Render && currentLibraryType != DefaultLibraryTypes.NoImages)
             {
-                string totalIndicator = L.T(0, "Library:DownloadMedia");
-                if((selectedFlags & 4) == 4)
-                    totalIndicator =    L.T(0, "Library:DownloadMediaPasteURLS");
+                string totalIndicator = L.T(0, "Library:DownloadMediaTitle");
                 if(downloading)
                     totalIndicator =    L.T(0, "Library:Downloading");
                 Vector2 totalIndicatorSize = munroSmall.MeasureString(totalIndicator);
-                Vector2 totalPosition = new Vector2(rects["HeaderButton"].X + rects["HeaderButton"].Width / 2 - totalIndicatorSize.X / 2 + GlobalGraphics.Scale(1), GlobalGraphics.Scale(56));
+                Vector2 totalPosition = new Vector2(rects["DownloadMediaButton"].X + rects["DownloadMediaButton"].Width / 2 - totalIndicatorSize.X / 2 + GlobalGraphics.Scale(1), GlobalGraphics.Scale(56));
                 GlobalContent.DrawString(spriteBatch, munroSmall, totalIndicator, totalPosition + new Vector2(GlobalGraphics.Scale(1), GlobalGraphics.Scale(1)), Color.Black);
                 GlobalContent.DrawString(spriteBatch, munroSmall, totalIndicator, totalPosition, Color.White);
             }
@@ -550,34 +549,6 @@ namespace NonsensicalVideoGenerator
         }
         private void TextInput(object? sender, TextInputEventArgs e)
         {
-            if((selectedFlags & 4) == 4)
-            {
-                // If syn unicode character, paste from clipboard
-                if (e.Character == '\u0016')
-                {
-                    selectedFlags &= ~4;
-                    if(libraryFileCache.Keys.Contains(currentLibraryType))
-                    {
-                        Global.generator.progressText = L.T(0, "Library:Downloading");
-                        downloading = true;
-                        string clipboard = Clipboard.GetText();
-                        // Remove invalid characters
-                        clipboard = clipboard.Replace("\r", "");
-                        clipboard = clipboard.Replace("\t", "");
-                        clipboard = clipboard.Replace("\0", "");
-                        if (!LibraryData.DownloadClip(clipboard.Split('\n'), currentLibraryType))
-                        {
-                            downloading = false;
-                            Global.generator.progressText = L.T(0, "Library:StatusFailDownloadClip");
-                            GlobalContent.PlaySound("Error");
-                        }
-                    }
-                    else
-                    {
-                        GlobalContent.PlaySound("Error");
-                    }
-                }
-            }
         }
         public bool Update(GameTime gameTime, bool handleInput)
         {
@@ -731,9 +702,9 @@ namespace NonsensicalVideoGenerator
                 for(int i = 0; i < rects.Count; i++)
                 {   
 #if WINDOWSDX
-                    if((currentLibraryType == DefaultLibraryTypes.Render || currentLibraryType == DefaultLibraryTypes.NoImages) && rects.Keys.ElementAt(i) == "HeaderButton")
+                    if((currentLibraryType == DefaultLibraryTypes.Render || currentLibraryType == DefaultLibraryTypes.NoImages) && rects.Keys.ElementAt(i) == "DownloadMediaButton")
 #else
-                    if(rects.Keys.ElementAt(i) == "HeaderButton")   
+                    if(rects.Keys.ElementAt(i) == "DownloadMediaButton")   
 #endif
                         continue;
                     if(rects.Keys.ElementAt(i).Contains("Audio") && rects.Keys.ElementAt(i) != "AudioButton" && currentRootType != LibraryRootType.Audio)
@@ -743,10 +714,8 @@ namespace NonsensicalVideoGenerator
                     string tts = rects.Keys.ElementAt(i);
                     switch(tts)
                     {
-                        case "HeaderButton":
-                            string totalIndicator = L.T(0, "Library:DownloadMedia");
-                            if((selectedFlags & 4) == 4)
-                                totalIndicator = L.T(0, "Library:DownloadMediaPasteURLS");
+                        case "DownloadMediaButton":
+                            string totalIndicator = L.T(0, "Library:DownloadMediaTitle") + ": " + L.T(0, "Library:DownloadMediaDescription");
                             if(downloading)
                                 totalIndicator = L.T(0, "Library:Downloading");
                             tts = totalIndicator;
@@ -911,21 +880,40 @@ namespace NonsensicalVideoGenerator
                                         GlobalContent.PlaySound("Select");
                                         return true;
 #if WINDOWSDX
-                                    case "HeaderButton":
+                                    case "DownloadMediaButton":
                                         if(!left)
                                             break;
                                         if(libraryFileCache.Keys.Contains(currentLibraryType))
                                         {
                                             if(currentLibraryType != DefaultLibraryTypes.Render && currentLibraryType != DefaultLibraryTypes.NoImages)
                                             {
-                                                if(!downloading)
+                                                if (!downloading)
                                                 {
                                                     selectedFlags ^= 4;
                                                     GlobalContent.PlaySound("Option");
-                                                }
-                                                else
-                                                {
-                                                    GlobalContent.PlaySound("Error");
+                                                    if (libraryFileCache.Keys.Contains(currentLibraryType))
+                                                    {
+                                                        Global.generator.progressText = L.T(0, "Library:Downloading");
+                                                        downloading = true;
+                                                        string clipboard = Clipboard.GetText();
+                                                        // Remove invalid characters
+                                                        clipboard = clipboard.Replace("\r", "");
+                                                        clipboard = clipboard.Replace("\t", "");
+                                                        clipboard = clipboard.Replace("\0", "");
+                                                        if (clipboard.Replace("\n", "").Length > 0)
+                                                        {
+                                                            if (!LibraryData.DownloadClip(clipboard.Split('\n'), currentLibraryType))
+                                                            {
+                                                                downloading = false;
+                                                                Global.generator.progressText = L.T(0, "Library:StatusFailDownloadClip");
+                                                                GlobalContent.PlaySound("Error");
+                                                            }
+                                                        }
+                                                        else
+                                                        {
+                                                            GlobalContent.PlaySound("Error");
+                                                        }
+                                                    }
                                                 }
                                             }
                                         }
@@ -1120,6 +1108,7 @@ namespace NonsensicalVideoGenerator
                                                     FileName = "explorer.exe",
                                                     Arguments = "/select, \"" + Path.GetFullPath(LibraryData.GetLocalizedDefaultOutro(file.Path)) + "\""
                                                 };
+                                                ConsoleOutput.WriteLine($"> {startInfo.FileName} {startInfo.Arguments}", Color.Transparent);
                                                 Process.Start(startInfo);
                                             }
                                             GlobalContent.PlaySound("Select");
@@ -1341,6 +1330,7 @@ namespace NonsensicalVideoGenerator
                                                     FileName = Path.GetFullPath(@"library\" + path.Value),
                                                     UseShellExecute = true,
                                                 };
+                                                ConsoleOutput.WriteLine($"> {startInfo.FileName} {startInfo.Arguments}", Color.Transparent);
                                                 Process.Start(startInfo);
                                                 GlobalContent.PlaySound("Option");
                                                 return true;
@@ -1408,12 +1398,27 @@ namespace NonsensicalVideoGenerator
                 // Hovering over type buttons will set tooltip
                 foreach (KeyValuePair<string, Rectangle> rect in rects)
                 {
+                    // Mouse over?
+                    if (!rect.Value.Contains(MouseInput.MouseState.Position))
+                        continue;
+                    string[] fileExtensions = Array.Empty<string>();
+                    foreach (KeyValuePair<LibraryType, string[]> type in LibraryData.libraryFileTypes)
+                    {
+                        if (rect.Key == "VideoButton" && type.Key == DefaultLibraryTypes.Video ||
+                            rect.Key == "AudioButton" && type.Key == DefaultLibraryTypes.Audio ||
+                            rect.Key == "ImageButton" && type.Key == DefaultLibraryTypes.Image)
+                        {
+                            fileExtensions = type.Value;
+                        }
+                    }
+                    if (fileExtensions.Length > 0 || rect.Key == "DownloadMediaButton")
+                    {
+                        tooltip = L.T(0, "Library:" + rect.Key.Replace("Button", "Description"), fileExtensions.Count() > 0 ? "*" + string.Join(", *", fileExtensions) : "");
+                        break;
+                    }
                     string rootString = currentRootType.ToString();
                     if (rect.Key.StartsWith(rootString))
                     {
-                        // Mouse over?
-                        if (!rect.Value.Contains(MouseInput.MouseState.Position))
-                            continue;
                         // Get index
                         int index = libraryTypes[currentRootType].IndexOf(rect.Key.Substring(currentRootType.ToString().Length, rect.Key.Length - currentRootType.ToString().Length - 6));
                         if(index == -1)
