@@ -12,7 +12,7 @@ using Newtonsoft.Json;
 
 namespace NonsensicalVideoGenerator
 {
-    public class PastimeGameObstacle : IObject
+    public class PastimeGameObstacle
     {
         public int distance = 320;
         public int spacingPlacementY = 200;
@@ -27,14 +27,16 @@ namespace NonsensicalVideoGenerator
             distance = 320 + offset;
             spacingPlacementY = Global.generator.globalRandom.Next(spacing*2, height-(spacing*2));
         }
-        public bool Update(GameTime gameTime, bool handleInput)
+        public bool Update(GameTime gameTime, bool handleInput, int speed = 2, int spacingOverride = -1)
         {
             if(!isDead)
-                distance -= 2;
+                distance -= speed;
             if(distance < -width)
             {
                 point = false;
                 distance = 320;
+                if (spacingOverride > 0)
+                    spacing = spacingOverride;
                 spacingPlacementY = Global.generator.globalRandom.Next(spacing*2, height-(spacing*2));
             }
             return false;
@@ -49,9 +51,6 @@ namespace NonsensicalVideoGenerator
             spriteBatch.Draw(GlobalContent.GetTexture("Pixel"), hitboxes[0], ThemeManager.GetColor("ObstaclePastimeGameScreen"));
             spriteBatch.Draw(GlobalContent.GetTexture("Pixel"), hitboxes[1], ThemeManager.GetColor("ObstaclePastimeGameScreen"));
         }
-        public void LoadContent(ContentManager contentManager, GraphicsDevice graphicsDevice)
-        {
-        }
         public bool CheckCollision(Rectangle hitbox)
         {
             if (hitboxes[0].Intersects(hitbox) || hitboxes[1].Intersects(hitbox))
@@ -59,7 +58,7 @@ namespace NonsensicalVideoGenerator
             return false;
         }
     }
-    public class PastimeGamePlayer : IObject
+    public class PastimeGamePlayer
     {
         public int distance = 0;
         public float spacingPlacementY = 0f;
@@ -138,9 +137,6 @@ namespace NonsensicalVideoGenerator
             spriteBatch.Draw(GlobalContent.GetTexture("Pixel"), new Rectangle(GlobalGraphics.Scale(spacing) + GlobalGraphics.Scale(width/2), (int)GlobalGraphics.Scale(spacingPlacementY), GlobalGraphics.Scale(1), GlobalGraphics.Scale(height)), Color.White);
             spriteBatch.Draw(GlobalContent.GetTexture("Pixel"), new Rectangle(GlobalGraphics.Scale(spacing), (int)GlobalGraphics.Scale(spacingPlacementY) + GlobalGraphics.Scale(height/2), GlobalGraphics.Scale(width), GlobalGraphics.Scale(1)), Color.White);
         }
-        public void LoadContent(ContentManager contentManager, GraphicsDevice graphicsDevice)
-        {
-        }
     }
     /// <summary>
     /// This screen was made for April Fools 2023, it now functions as the credits screen.
@@ -171,6 +167,12 @@ namespace NonsensicalVideoGenerator
         private string creditsFile = "credits.json";
         private Dictionary<string, List<string>> credits = new();
         private PastimeGamePlayer player = new();
+        private int baseObstacleSpeed = 2;
+        private int obstacleSpeed = 2;
+        private int minSpacing = 18; // Minimum gap between obstacles
+        private int baseSpacing = 38;
+        public float tryAgainY = -40f;
+        private bool showTryAgain = false;
         public void Show()
         {
             toggle = true;
@@ -254,10 +256,14 @@ namespace NonsensicalVideoGenerator
             tween.Update((float)gameTime.ElapsedGameTime.TotalSeconds);
             if(Pagination.SelectedPage == 5)
             {
+                // Gradually increase difficulty
+                obstacleSpeed = baseObstacleSpeed + (player.points / 10); // Speed up every 10 points
+                int newSpacing = baseSpacing - (player.points / 10) * 2; // Decrease gap every 10 points
+                if (newSpacing < minSpacing) newSpacing = minSpacing;
                 // Update obstacles
                 foreach (PastimeGameObstacle obstacle in obstacles)
                 {
-                    obstacle.Update(gameTime, handleInput);
+                    obstacle.Update(gameTime, handleInput, obstacleSpeed, newSpacing);
                 }
                 if(handleInput)
                 {
@@ -285,6 +291,13 @@ namespace NonsensicalVideoGenerator
                                     .Easing(EasingFunctions.Linear);
                             }
                             phase = 1;
+
+                            // Show "Try Again!" message
+                            showTryAgain = true;
+                            tryAgainY = -40f;
+                            tween.TweenTo(this, t => t.tryAgainY, GlobalGraphics.Scale(120), 0.25f)
+                                .Easing(EasingFunctions.ExponentialOut);
+
                             break;
                         }
                         // Once past obstacle, earn point
@@ -432,6 +445,9 @@ namespace NonsensicalVideoGenerator
                                         .Easing(EasingFunctions.ExponentialInOut);
                                 }
                             }
+                            // Hide "Try Again!" after a short delay and reset on restart
+                            showTryAgain = false;
+                            tryAgainY = -40f;
                             phase = 5;
                             timer = (float)gameTime.TotalGameTime.TotalMilliseconds + 500f;
                             break;
@@ -534,6 +550,16 @@ namespace NonsensicalVideoGenerator
                 GlobalContent.DrawString(spriteBatch, font, Global.generator.progressText, new Vector2(GlobalGraphics.Scale(320) - textSize2.X - GlobalGraphics.Scale(9), GlobalGraphics.Scale(8) + textSize.Y), Color.White);
             }
             */
+            // Draw "Try Again!" message if needed
+            if (showTryAgain)
+            {
+                SpriteFont fontLarge = L.FontLarge();
+                string msg = L.T(0, "Try Again!");
+                Vector2 textSizeTryAgain = fontLarge.MeasureString(msg);
+                Vector2 pos = new Vector2(GlobalGraphics.Scale(160) - textSizeTryAgain.X / 2, tryAgainY);
+                GlobalContent.DrawString(spriteBatch, fontLarge, msg, pos + new Vector2(2, 2), Color.Black * 0.5f);
+                GlobalContent.DrawString(spriteBatch, fontLarge, msg, pos, Color.White);
+            }
             // End offset spritebatch
             spriteBatch.End();
             // Remake spritebatch
@@ -544,12 +570,6 @@ namespace NonsensicalVideoGenerator
         }
         public void LoadContent(ContentManager contentManager, GraphicsDevice graphicsDevice)
         {
-            // Load player
-            player.LoadContent(contentManager, graphicsDevice);
-            foreach (PastimeGameObstacle obstacle in obstacles)
-            {
-                obstacle.LoadContent(contentManager, graphicsDevice);
-            }
             // Set high score
             highScore = int.Parse(SaveData.saveValues["GameHighScore"], CultureInfo.InvariantCulture);
             // Load credits from credits.json

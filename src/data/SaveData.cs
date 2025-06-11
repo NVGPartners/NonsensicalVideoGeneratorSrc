@@ -62,6 +62,7 @@ namespace NonsensicalVideoGenerator
             {"AlwaysOnTop", "false"},
             {"MatchAspectRatio", "false"},
             {"UseNativeCursor", "false"},
+            {"VideoFPS", "30"},
         };
         public static string saveFileName = "Options.json";
         public static bool Save()

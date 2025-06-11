@@ -1348,7 +1348,7 @@ namespace NonsensicalVideoGenerator
                 startInfo.Arguments = "-i \"" + video
                         + "\" -ss " + startTime
                         + " -to " + endTime
-                        + (SaveData.saveValues["ConstrainAspectRatio"] == "true" ? " -vf scale=" + SaveData.saveValues["VideoWidth"] + "x" + SaveData.saveValues["VideoHeight"] + ",setsar=1:1,fps=fps=30" : " -vf \"scale=(iw*sar)*min(" + SaveData.saveValues["VideoWidth"] + "/(iw*sar)\\," + SaveData.saveValues["VideoHeight"] + "/ih):ih*min(" + SaveData.saveValues["VideoWidth"] + "/(iw*sar)\\," + SaveData.saveValues["VideoHeight"] + "/ih),pad=" + SaveData.saveValues["VideoWidth"] + ":" + SaveData.saveValues["VideoHeight"] + ":(" + SaveData.saveValues["VideoWidth"] + "-iw*min(" + SaveData.saveValues["VideoWidth"] + "/iw\\," + SaveData.saveValues["VideoHeight"] + "/ih))/2:(" + SaveData.saveValues["VideoHeight"] + "-ih*min(" + SaveData.saveValues["VideoWidth"] + "/iw\\," + SaveData.saveValues["VideoHeight"] + "/ih))/2,setsar=1:1,fps=fps=30\"")
+                        + (SaveData.saveValues["ConstrainAspectRatio"] == "true" ? " -vf scale=" + SaveData.saveValues["VideoWidth"] + "x" + SaveData.saveValues["VideoHeight"] + ",setsar=1:1,fps=fps=" + SaveData.saveValues["VideoFPS"] : " -vf \"scale=(iw*sar)*min(" + SaveData.saveValues["VideoWidth"] + "/(iw*sar)\\," + SaveData.saveValues["VideoHeight"] + "/ih):ih*min(" + SaveData.saveValues["VideoWidth"] + "/(iw*sar)\\," + SaveData.saveValues["VideoHeight"] + "/ih),pad=" + SaveData.saveValues["VideoWidth"] + ":" + SaveData.saveValues["VideoHeight"] + ":(" + SaveData.saveValues["VideoWidth"] + "-iw*min(" + SaveData.saveValues["VideoWidth"] + "/iw\\," + SaveData.saveValues["VideoHeight"] + "/ih))/2:(" + SaveData.saveValues["VideoHeight"] + "-ih*min(" + SaveData.saveValues["VideoWidth"] + "/iw\\," + SaveData.saveValues["VideoHeight"] + "/ih))/2,setsar=1:1,fps=fps=" + SaveData.saveValues["VideoFPS"] + "\"")
                         + (Global.generator.audioSync == true ? " -af aresample=async=1000" : "")
                         + " "+exportParams
                         + " -y"
@@ -1452,7 +1452,7 @@ namespace NonsensicalVideoGenerator
                 startInfo.WindowStyle = ProcessWindowStyle.Hidden;
                 startInfo.FileName = Global.useSystemFFmpeg ? "ffmpeg" : @".\ffmpeg.exe";
                 startInfo.Arguments = "-i \"" + video + "\" " + appendNoAudio
-                        + (SaveData.saveValues["ConstrainAspectRatio"] == "true" ? " -vf scale=" + SaveData.saveValues["VideoWidth"] + "x" + SaveData.saveValues["VideoHeight"] + ",setsar=1:1,fps=fps=30" : " -vf \"scale=(iw*sar)*min(" + SaveData.saveValues["VideoWidth"] + "/(iw*sar)\\," + SaveData.saveValues["VideoHeight"] + "/ih):ih*min(" + SaveData.saveValues["VideoWidth"] + "/(iw*sar)\\," + SaveData.saveValues["VideoHeight"] + "/ih),pad=" + SaveData.saveValues["VideoWidth"] + ":" + SaveData.saveValues["VideoHeight"] + ":(" + SaveData.saveValues["VideoWidth"] + "-iw*min(" + SaveData.saveValues["VideoWidth"] + "/iw\\," + SaveData.saveValues["VideoHeight"] + "/ih))/2:(" + SaveData.saveValues["VideoHeight"] + "-ih*min(" + SaveData.saveValues["VideoWidth"] + "/iw\\," + SaveData.saveValues["VideoHeight"] + "/ih))/2,setsar=1:1,fps=fps=30\"")
+                        + (SaveData.saveValues["ConstrainAspectRatio"] == "true" ? " -vf scale=" + SaveData.saveValues["VideoWidth"] + "x" + SaveData.saveValues["VideoHeight"] + ",setsar=1:1,fps=fps=" + SaveData.saveValues["VideoFPS"] : " -vf \"scale=(iw*sar)*min(" + SaveData.saveValues["VideoWidth"] + "/(iw*sar)\\," + SaveData.saveValues["VideoHeight"] + "/ih):ih*min(" + SaveData.saveValues["VideoWidth"] + "/(iw*sar)\\," + SaveData.saveValues["VideoHeight"] + "/ih),pad=" + SaveData.saveValues["VideoWidth"] + ":" + SaveData.saveValues["VideoHeight"] + ":(" + SaveData.saveValues["VideoWidth"] + "-iw*min(" + SaveData.saveValues["VideoWidth"] + "/iw\\," + SaveData.saveValues["VideoHeight"] + "/ih))/2:(" + SaveData.saveValues["VideoHeight"] + "-ih*min(" + SaveData.saveValues["VideoWidth"] + "/iw\\," + SaveData.saveValues["VideoHeight"] + "/ih))/2,setsar=1:1,fps=fps=" + SaveData.saveValues["VideoFPS"] + "\"")
                         + (Global.generator.audioSync == true ? " -af aresample=async=1000" : "")
                         + " "+exportParams
                         + " -y"
@@ -1555,7 +1555,7 @@ namespace NonsensicalVideoGenerator
                         startInfo2.FileName = Global.useSystemFFmpeg ? "ffmpeg" : @".\ffmpeg.exe";
                         startInfo2.Arguments = "-i \"" + Path.Combine(temporaryDirectory, thisClip.name) + "\" " + appendNoAudio
                                 + (Global.generator.audioSync == true ? " -af \"aresample=async=1000\"" : "")
-                                + (SaveData.saveValues["ConstrainAspectRatio"] == "true" ? " -vf scale=" + SaveData.saveValues["VideoWidth"] + "x" + SaveData.saveValues["VideoHeight"] + ",setsar=1:1,fps=fps=30" : " -vf \"scale=(iw*sar)*min(" + SaveData.saveValues["VideoWidth"] + "/(iw*sar)\\," + SaveData.saveValues["VideoHeight"] + "/ih):ih*min(" + SaveData.saveValues["VideoWidth"] + "/(iw*sar)\\," + SaveData.saveValues["VideoHeight"] + "/ih),pad=" + SaveData.saveValues["VideoWidth"] + ":" + SaveData.saveValues["VideoHeight"] + ":(" + SaveData.saveValues["VideoWidth"] + "-iw*min(" + SaveData.saveValues["VideoWidth"] + "/iw\\," + SaveData.saveValues["VideoHeight"] + "/ih))/2:(" + SaveData.saveValues["VideoHeight"] + "-ih*min(" + SaveData.saveValues["VideoWidth"] + "/iw\\," + SaveData.saveValues["VideoHeight"] + "/ih))/2,setsar=1:1,fps=fps=30\"")
+                                + (SaveData.saveValues["ConstrainAspectRatio"] == "true" ? " -vf scale=" + SaveData.saveValues["VideoWidth"] + "x" + SaveData.saveValues["VideoHeight"] + ",setsar=1:1,fps=fps=" + SaveData.saveValues["VideoFPS"] : " -vf \"scale=(iw*sar)*min(" + SaveData.saveValues["VideoWidth"] + "/(iw*sar)\\," + SaveData.saveValues["VideoHeight"] + "/ih):ih*min(" + SaveData.saveValues["VideoWidth"] + "/(iw*sar)\\," + SaveData.saveValues["VideoHeight"] + "/ih),pad=" + SaveData.saveValues["VideoWidth"] + ":" + SaveData.saveValues["VideoHeight"] + ":(" + SaveData.saveValues["VideoWidth"] + "-iw*min(" + SaveData.saveValues["VideoWidth"] + "/iw\\," + SaveData.saveValues["VideoHeight"] + "/ih))/2:(" + SaveData.saveValues["VideoHeight"] + "-ih*min(" + SaveData.saveValues["VideoWidth"] + "/iw\\," + SaveData.saveValues["VideoHeight"] + "/ih))/2,setsar=1:1,fps=fps=" + SaveData.saveValues["VideoFPS"] + "\"")
                                 + " "+exportParams
                                 + " -y"
                                 + " \"" + Path.Combine(temporaryDirectory, "concat" + i2 + ".mp4") + "\"";
@@ -1653,7 +1653,7 @@ namespace NonsensicalVideoGenerator
                 concat += "[" + i + ":v:0][" + i + ":a:0]";
             }
             concat += "concat=n=" + clips2.Count + ":v=1:a=1[outv][outa];"
-                    + "[outv]scale=" + SaveData.saveValues["VideoWidth"] + "x" + SaveData.saveValues["VideoHeight"] + ",setsar=1:1,fps=fps=30[outv]"
+                    + "[outv]scale=" + SaveData.saveValues["VideoWidth"] + "x" + SaveData.saveValues["VideoHeight"] + ",setsar=1:1,fps=fps=" + SaveData.saveValues["VideoFPS"] + "[outv]"
                     + (Global.generator.audioSync == true ? ";[outa]aresample=async=1000[outa]" : "")
                     + "\""
                     + " -map \"[outv]\""
@@ -1715,7 +1715,7 @@ namespace NonsensicalVideoGenerator
                     concat2 += "[" + i + ":v:0][" + i + ":a:0]";
                 }
                 concat2 += "concat=n=" + clips3.Count + ":v=1:a=1[outv][outa];"
-                        + "[outv]scale=" + SaveData.saveValues["VideoWidth"] + "x" + SaveData.saveValues["VideoHeight"] + ",setsar=1:1,fps=fps=30[outv]"
+                        + "[outv]scale=" + SaveData.saveValues["VideoWidth"] + "x" + SaveData.saveValues["VideoHeight"] + ",setsar=1:1,fps=fps=" + SaveData.saveValues["VideoFPS"] + "[outv]"
                         + (Global.generator.audioSync == true ? ";[outa]aresample=async=1000[outa]" : "")
                         + "\""
                         + " -map \"[outv]\""
@@ -1768,7 +1768,7 @@ namespace NonsensicalVideoGenerator
                 startInfo.Arguments = "-i \"" + video
                         + "\" -i \"" + overlay
                         + "\" -filter_complex \""
-                        + "[1:v]colorkey=0x" + chromaKeyColor + ":" + chromaKeySimilarity + ":" + chromaKeyBlend + ",scale=" + SaveData.saveValues["VideoWidth"] + "x" + SaveData.saveValues["VideoHeight"] + ",setsar=1:1,fps=fps=30[outv];"
+                        + "[1:v]colorkey=0x" + chromaKeyColor + ":" + chromaKeySimilarity + ":" + chromaKeyBlend + ",scale=" + SaveData.saveValues["VideoWidth"] + "x" + SaveData.saveValues["VideoHeight"] + ",setsar=1:1,fps=fps=" + SaveData.saveValues["VideoFPS"] + "[outv];"
                         + "[0:v][outv]overlay=shortest=1[finalv];"
                         + "[0:a][1:a]amix=inputs=2:duration=shortest" + (Global.generator.audioSync == true ? ",aresample=async=1000" : "") + "[outa]"
                         + "\""

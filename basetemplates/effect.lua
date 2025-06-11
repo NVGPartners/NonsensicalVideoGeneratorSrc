@@ -20,6 +20,7 @@ function Query(localeName, localizationTokens)
             --   effect             An effect that gets applied at random.
             --   postrendereffect   An effect that gets applied after rendering.
             --   theme              A theme for the software. Only Query() is called.
+            --   bootmovie          A boot movie that plays when the software starts. Must include %filenamenoext%.mp4 in the addon directory.
             {
                 ["name"] = "Addon Type",
                 ["value"] = "effect",

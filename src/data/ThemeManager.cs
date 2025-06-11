@@ -19,6 +19,7 @@ namespace NonsensicalVideoGenerator
         public int songCount;
         public int misclickCount;
         public Dictionary<string, Color> colorTable;
+        public List<string> musicAttributions;
         public Theme(string name, string description, string prefix, int songCount, int misclickCount, bool mgcb = false)
         {
             this.name = name;
@@ -28,8 +29,9 @@ namespace NonsensicalVideoGenerator
             this.misclickCount = misclickCount;
             this.mgcb = mgcb;
             this.colorTable = new Dictionary<string, Color>();
+            this.musicAttributions = new List<string>();
         }
-        public Theme(string name, string description, string prefix, int songCount, int misclickCount, Dictionary<string, Color> colorTable, bool mgcb = false)
+        public Theme(string name, string description, string prefix, int songCount, int misclickCount, Dictionary<string, Color> colorTable, List<string> musicAttributions, bool mgcb = false)
         {
             this.name = name;
             this.description = description;
@@ -37,11 +39,12 @@ namespace NonsensicalVideoGenerator
             this.songCount = songCount;
             this.misclickCount = misclickCount;
             this.colorTable = colorTable;
+            this.musicAttributions = musicAttributions;
             this.mgcb = mgcb;
         }
         public Color GetColor(string colorName)
         {
-            if(colorTable.ContainsKey(colorName))
+            if (colorTable.ContainsKey(colorName))
             {
                 return colorTable[colorName];
             }
@@ -49,6 +52,14 @@ namespace NonsensicalVideoGenerator
             {
                 return Color.Transparent;
             }
+        }
+        public string GetMusicAttribution(int musicIndex)
+        {
+            if (musicIndex < 0 || musicIndex >= musicAttributions.Count)
+            {
+                return "";
+            }
+            return musicAttributions[musicIndex];
         }
     }
     public static class DefaultThemes
@@ -82,17 +93,28 @@ namespace NonsensicalVideoGenerator
             {"TileBackgroundScreen", new Color(102, 102, 102, 255)},
             {"VideoPlayerProgressBar", new Color(255, 0, 0, 255)},
             {"VideoPlayerProgressBarBackground", new Color(0, 0, 0, 0)},
+        },
+        new List<string>()
+        {
+            "KiwifruitDev - This is Nonsense!",
+            "Bobby I Guess - A Nonsensical Song",
+            "Bobby I Guess - A Nonsensical Song Yet Again",
+            "Bobby I Guess - Creation",
+            "Bobby I Guess - Where We Began",
+            "Bobby I Guess - Jazzy",
         }, true);
-        public static Theme Anniversary = new Theme("Anniversary", "Celebrate NVG's anniversary!", "themes/anniversary/", 6, 4, new Dictionary<string, Color>() {}, true);
+        public static Theme Anniversary = new Theme("Anniversary", "Celebrate NVG's anniversary!", "themes/anniversary/", 6, 4, new Dictionary<string, Color>() {}, new List<string>() {}, true);
         public static Theme Birthday = new Theme("Birthday", "Happy birthday to KiwifruitDev!", "themes/birthday/", 6, 5, new Dictionary<string, Color>() {
             {"BackgroundScreen", new Color(100, 122, 58, 255)},
             {"TileBackgroundScreen", new Color(134, 165, 79, 255)}
-        }, true);
+        }, new List<string>() {}, true);
         public static Theme Spooky = new Theme("Spooky", "Trick or treat!", "themes/halloween/", 1, 5, new Dictionary<string, Color>() {
             {"VideoPlayerProgressBar", new Color(60, 0, 128, 255)},
+        }, new List<string>() {
+            "Bobby I Guess - Halloween",
         }, true);
         public static Theme Holiday = new Theme("Holiday", "Merry Christmas!", "themes/holiday/", 6, 8, new Dictionary<string, Color>() {
-        }, true);
+        }, new List<string>() {}, true);
         public static List<Theme> themes = new List<Theme>()
         {
             Nonsensical,
@@ -114,7 +136,7 @@ namespace NonsensicalVideoGenerator
         public static void LoadThemes()
         {
             themes.Clear();
-            foreach(Theme theme in DefaultThemes.themes)
+            foreach (Theme theme in DefaultThemes.themes)
             {
                 themes.Add(theme);
             }
@@ -128,13 +150,13 @@ namespace NonsensicalVideoGenerator
                 string themeDescription = "";
                 int songCount = DefaultThemes.Nonsensical.songCount;
                 int misclickCount = DefaultThemes.Nonsensical.misclickCount;
-                if(theme.settings.Count > 0)
+                if (theme.settings.Count > 0)
                 {
                     List<string> extsettings = new();
-                    foreach(KeyValuePair<string, object> setting in theme.settings)
+                    foreach (KeyValuePair<string, object> setting in theme.settings)
                     {
                         // Hide display name and create description, add options too
-                        if(theme.settingTypes[setting.Key] == SettingType.Label && setting.Key.ToLower() != "addon type" && setting.Key.ToLower() != "display name" && theme.settingTypes.ContainsKey(setting.Key))
+                        if (theme.settingTypes[setting.Key] == SettingType.Label && setting.Key.ToLower() != "addon type" && setting.Key.ToLower() != "display name" && theme.settingTypes.ContainsKey(setting.Key))
                         {
                             themeDescription = $"{setting.Value.ToString()}";
                             break;
@@ -143,25 +165,25 @@ namespace NonsensicalVideoGenerator
                 }
                 // Make sure directory exists
                 string layerPath = Path.GetDirectoryName(theme.path) + "/layer/";
-                if(!Directory.Exists(layerPath))
+                if (!Directory.Exists(layerPath))
                 {
                     // Count layerpath/music/theme*.ogg (indexed from 1 to 9)
-                    if(Directory.Exists(layerPath + "music/"))
+                    if (Directory.Exists(layerPath + "music/"))
                     {
-                        for(int i = 1; i < 10; i++)
+                        for (int i = 1; i < 10; i++)
                         {
-                            if(File.Exists(layerPath + $"music/theme{i}.wma") || File.Exists(layerPath + $"music/theme{i}.ogg"))
+                            if (File.Exists(layerPath + $"music/theme{i}.wma") || File.Exists(layerPath + $"music/theme{i}.ogg"))
                             {
                                 songCount = i;
                             }
                         }
                     }
                     // Count layerpath/graphics/misclick/*.png (indexed from 1 to 9)
-                    if(Directory.Exists(layerPath + "graphics/misclick/"))
+                    if (Directory.Exists(layerPath + "graphics/misclick/"))
                     {
-                        for(int i = 1; i < 10; i++)
+                        for (int i = 1; i < 10; i++)
                         {
-                            if(File.Exists(layerPath + $"graphics/misclick/{i}.png"))
+                            if (File.Exists(layerPath + $"graphics/misclick/{i}.png"))
                             {
                                 misclickCount = i;
                             }
@@ -170,10 +192,11 @@ namespace NonsensicalVideoGenerator
                 }
                 Theme thisTheme = new Theme(themeName, themeDescription, layerPath, songCount, misclickCount)
                 {
-                    colorTable = theme.themeColors
+                    colorTable = theme.themeColors,
+                    musicAttributions = theme.themeMusicAttributions
                 };
                 themes.Add(thisTheme);
-                if(SaveData.saveValues["ActiveTheme"] == Path.GetFileName(theme.path))
+                if (SaveData.saveValues["ActiveTheme"] == Path.GetFileName(theme.path))
                 {
                     themeChanged = true;
                     newTheme = thisTheme;
@@ -182,12 +205,12 @@ namespace NonsensicalVideoGenerator
                 {
                     // Disable the addon
                     Plugin? foundPlugin = PluginHandler.plugins.Find(x => x.path == theme.path);
-                    if(foundPlugin != null)
+                    if (foundPlugin != null)
                         foundPlugin.enabled = false;
                     PluginHandler.SavePluginSettings();
                 }
             }
-            if(themeChanged)
+            if (themeChanged)
             {
                 ApplyTheme(newTheme);
             }
@@ -200,7 +223,7 @@ namespace NonsensicalVideoGenerator
         // Replacement for contentManager.Load<T>(path)
         public static T LoadLayeredContent<T>(string path)
         {
-            if(UserInterface.instance == null)
+            if (UserInterface.instance == null)
             {
                 // Can't proceed, MonoGame isn't initialized
                 throw new InvalidOperationException("MonoGame isn't initialized. Cannot load content.");
@@ -208,10 +231,10 @@ namespace NonsensicalVideoGenerator
             ContentManager contentManager = UserInterface.instance.Content;
             GraphicsDevice graphicsDevice = UserInterface.instance.GraphicsDevice;
             // If active theme uses mgcb, apply prefix and load
-            if(activeTheme.mgcb)
+            if (activeTheme.mgcb)
             {
                 // Make sure xnb file exists
-                if(!File.Exists(Path.Combine(Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location) ?? ".", "Content", activeTheme.prefix + path + ".xnb")))
+                if (!File.Exists(Path.Combine(Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location) ?? ".", "Content", activeTheme.prefix + path + ".xnb")))
                 {
                     //ConsoleOutput.WriteLine($"Fallback: {path} not found in {activeTheme.name}.", Color.Yellow);
                     // If not, load from default theme
@@ -232,17 +255,44 @@ namespace NonsensicalVideoGenerator
                 case "Song":
                     // Check if music is wma or ogg
                     fullPath += ".wma";
-                    if(!File.Exists(fullPath))
+                    if (!File.Exists(fullPath))
                     {
                         fullPath = fullPath.Replace(".wma", ".ogg");
                     }
                     break;
             }
+            int musicIndex = -1;
+            string defaultAttribution = "";
+            if (typeof(T).Name == "Song")
+            {
+                // Get song name, remove extension
+                string songName = Path.GetFileNameWithoutExtension(path);
+                int defaultMusicCount = DefaultThemes.Nonsensical.songCount;
+                if (songName.StartsWith("theme") && int.TryParse(songName.Substring(5), out int songIndex) && songIndex > 0 && songIndex <= defaultMusicCount)
+                {
+                    musicIndex = songIndex - 1; // Convert to zero-based index
+                    // Get the default attribution for this song index
+                    if (musicIndex < DefaultThemes.Nonsensical.musicAttributions.Count)
+                    {
+                        defaultAttribution = DefaultThemes.Nonsensical.musicAttributions[musicIndex];
+                    }
+                    // Add blank attributions if they don't exist in the default theme
+                    for (int i = activeTheme.musicAttributions.Count; i < songIndex; i++)
+                    {
+                        activeTheme.musicAttributions.Add("");
+                    }
+                }
+            }
             // Check to see if the file exists
-            if(!File.Exists(fullPath))
+            if (!File.Exists(fullPath))
             {
                 //ConsoleOutput.WriteLine($"Fallback: {path} not found in {activeTheme.name}.", Color.Yellow);
                 // If not, load from default theme
+                if (musicIndex != -1)
+                {
+                    // Restore the music attribution for the song because it is actually loaded from the default theme
+                    activeTheme.musicAttributions[musicIndex] = defaultAttribution;
+                }
                 return contentManager.Load<T>(path);
             }
             //ConsoleOutput.WriteLine($"Loading {path} from {activeTheme.name}.", Color.Yellow);
@@ -257,6 +307,14 @@ namespace NonsensicalVideoGenerator
                     string uriString = Path.Combine(Directory.GetCurrentDirectory(), fullPath);
                     uriString = uriString.Replace('\\', '/');
                     Uri uri = new Uri(uriString);
+                    if (musicIndex != -1)
+                    {
+                        // Set blank attribution for the song if there isn't one set
+                        if (string.IsNullOrEmpty(activeTheme.musicAttributions[musicIndex]) || activeTheme.musicAttributions[musicIndex] == defaultAttribution)
+                        {
+                            activeTheme.musicAttributions[musicIndex] = "   "; // this is a hack to make sure the attribution is not empty
+                        }
+                    }
                     return (T)(object)Song.FromUri(Path.GetFileNameWithoutExtension(fullPath), uri);
                 default: // SpriteFont
                     //ConsoleOutput.WriteLine($"Failed to load {path}.", Color.Red);
@@ -270,7 +328,7 @@ namespace NonsensicalVideoGenerator
         public static int GetNextSongIndex(int currentSong)
         {
             int songCount = GetSongCount();
-            if(currentSong >= songCount - 1)
+            if (currentSong >= songCount - 1)
             {
                 return 0;
             }
@@ -288,7 +346,7 @@ namespace NonsensicalVideoGenerator
             Global.exitFunc = () =>
             {
                 activeTheme = theme;
-                if(UserInterface.instance != null)
+                if (UserInterface.instance != null)
                 {
                     UserInterface.instance.Content.Unload();
                     // Load default content.
@@ -305,11 +363,20 @@ namespace NonsensicalVideoGenerator
         public static Color GetColor(string colorName)
         {
             Color color = activeTheme.GetColor(colorName);
-            if(color == Color.Transparent)
+            if (color == Color.Transparent)
             {
                 color = DefaultThemes.Nonsensical.GetColor(colorName);
             }
             return color;
+        }
+        public static string GetMusicAttribution(int musicIndex)
+        {
+            string attribution = activeTheme.GetMusicAttribution(musicIndex);
+            if (string.IsNullOrEmpty(attribution))
+            {
+                attribution = DefaultThemes.Nonsensical.GetMusicAttribution(musicIndex);
+            }
+            return attribution;
         }
     }
 }

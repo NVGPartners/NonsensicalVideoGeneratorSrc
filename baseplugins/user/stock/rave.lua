@@ -107,7 +107,7 @@ function StartGeneration(options, pluginSettings, functions)
     -- Apply effect
     if not classicRave then
         functions.folderCreate(frames)
-        functions.runFFmpeg("-i \"" .. options.inputVideo .. "\" -vf fps=30 \"" .. frames .. "\\frame%0d.png\"")
+        functions.runFFmpeg("-i \"" .. options.inputVideo .. "\" -vf fps=" .. options.fps .. " \"" .. frames .. "\\frame%0d.png\"")
     else
         functions.runFFmpeg("-i \"" .. options.inputVideo .. "\" -filter_complex \"[0:v]frei0r=filter_name=nervous,frei0r=filter_name=colorize:filter_params=0[outv]\" -map \"[outv]\" -vcodec libx264 -crf 28 -preset ultrafast -ac 2 -c:a aac -b:a 160k -reset_timestamps 1 -shortest -fflags +genpts -y \"" .. temp2 .. "\"")
     end

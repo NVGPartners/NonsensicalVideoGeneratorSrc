@@ -30,7 +30,7 @@ namespace NonsensicalVideoGenerator
         private LibraryType currentLibraryType = DefaultLibraryTypes.Material;
         private readonly Dictionary<LibraryType, List<LibraryFile>> libraryFileCache = new();
         private readonly Dictionary<int, Texture2D> videoPlayers = new();
-        private int selectedFlags = 1 | 8; // 1 = Video, 8 = First SubType
+        private static int selectedFlags = 1 | 8; // 1 = Video, 8 = First SubType
         private int staticAnim = 0;
         private int audioAnim = 0;
         private int deleteConfirmPos = -1;
@@ -160,8 +160,9 @@ namespace NonsensicalVideoGenerator
         }
         public static void Done(bool success)
         {
+            selectedFlags &= ~4;
             downloading = false;
-            if(success)
+            if (success)
             {
                 GlobalContent.PlaySound("RenderComplete");
                 Global.generator.progressText = L.T(0, "Library:StatusDownloadedClip");
@@ -360,10 +361,10 @@ namespace NonsensicalVideoGenerator
                 GlobalContent.DrawString(spriteBatch, munroSmall, L.T(0, "Library:AudioTitle"), new Vector2(GlobalGraphics.Scale(170 + 1), GlobalGraphics.Scale(56 + 1)), Color.Black);
                 GlobalContent.DrawString(spriteBatch, munroSmall, L.T(0, "Library:AudioTitle"), new Vector2(GlobalGraphics.Scale(170), GlobalGraphics.Scale(56)), Color.White);
             }
-            GlobalContent.DrawString(spriteBatch, munroSmall, L.T(0, "Library:BackButton"), new Vector2(GlobalGraphics.Scale(205 + 1), GlobalGraphics.Scale(223 + 1)), Color.Black);
-            GlobalContent.DrawString(spriteBatch, munroSmall, L.T(0, "Library:BackButton"), new Vector2(GlobalGraphics.Scale(205), GlobalGraphics.Scale(223)), Color.White);
-            GlobalContent.DrawString(spriteBatch, munroSmall, L.T(0, "Library:NextButton"), new Vector2(GlobalGraphics.Scale(281 + 1), GlobalGraphics.Scale(223 + 1)), Color.Black);
-            GlobalContent.DrawString(spriteBatch, munroSmall, L.T(0, "Library:NextButton"), new Vector2(GlobalGraphics.Scale(281), GlobalGraphics.Scale(223)), Color.White);
+            GlobalContent.DrawString(spriteBatch, munroSmall, "<-", new Vector2(GlobalGraphics.Scale(205 + 1), GlobalGraphics.Scale(223 + 1)), Color.Black);
+            GlobalContent.DrawString(spriteBatch, munroSmall, "<-", new Vector2(GlobalGraphics.Scale(205), GlobalGraphics.Scale(223)), Color.White);
+            GlobalContent.DrawString(spriteBatch, munroSmall, "->", new Vector2(GlobalGraphics.Scale(281 + 1), GlobalGraphics.Scale(223 + 1)), Color.Black);
+            GlobalContent.DrawString(spriteBatch, munroSmall, "->", new Vector2(GlobalGraphics.Scale(281), GlobalGraphics.Scale(223)), Color.White);
             // Downloader
 #if WINDOWSDX
             if(currentLibraryType != DefaultLibraryTypes.Render && currentLibraryType != DefaultLibraryTypes.NoImages)
@@ -904,9 +905,7 @@ namespace NonsensicalVideoGenerator
                                                         {
                                                             if (!LibraryData.DownloadClip(clipboard.Split('\n'), currentLibraryType))
                                                             {
-                                                                downloading = false;
-                                                                Global.generator.progressText = L.T(0, "Library:StatusFailDownloadClip");
-                                                                GlobalContent.PlaySound("Error");
+                                                                Done(false);
                                                             }
                                                         }
                                                         else

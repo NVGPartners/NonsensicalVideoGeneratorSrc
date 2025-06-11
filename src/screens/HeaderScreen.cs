@@ -4,6 +4,7 @@ using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Content;
 using Microsoft.Xna.Framework.Graphics;
 using Microsoft.Xna.Framework.Input;
+using Microsoft.Xna.Framework.Media;
 using MonoGame.Extended.Tweening;
 
 namespace NonsensicalVideoGenerator
@@ -150,17 +151,17 @@ namespace NonsensicalVideoGenerator
             // Draw rendering progress
             if(Global.generator.progressText != "")
             {
-                string rendering = Global.videoTitle.Replace("Render", "#");
-                // measure to center horizontally (one on top of the other)
-                Vector2 renderingSize = font.MeasureString(rendering);
-                Vector2 progressSize = font.MeasureString(Global.generator.progressText != "" ? Global.generator.progressText : (Global.generator.failureReason != "" ? Global.generator.failureReason : Global.generator.progress + "%"));
-                if(Pagination.DrawnPage != 5)
+                if (Pagination.DrawnPage != 5 && MediaPlayer.State == MediaState.Playing && MediaPlayer.Volume != 0)
                 {
-                    GlobalContent.DrawString(spriteBatch, font, rendering, new Vector2(GlobalGraphics.Scale(320/2) - renderingSize.X/2 + GlobalGraphics.Scale(1), GlobalGraphics.Scale(8 + 1)), Color.Black);
-                    GlobalContent.DrawString(spriteBatch, font, rendering, new Vector2(GlobalGraphics.Scale(320/2) - renderingSize.X/2, GlobalGraphics.Scale(8)), Color.White);
+                    // Get music attribution
+                    string rendering = ThemeManager.GetMusicAttribution(UserInterface.instance.music); //Global.videoTitle.Replace("Render", "#");
+                    Vector2 textSize = font.MeasureString(rendering);
+                    GlobalContent.DrawString(spriteBatch, font, rendering, new Vector2(GlobalGraphics.Scale(320) - textSize.X - GlobalGraphics.Scale(8), GlobalGraphics.Scale(9)), Color.Black);
+                    GlobalContent.DrawString(spriteBatch, font, rendering, new Vector2(GlobalGraphics.Scale(320) - textSize.X - GlobalGraphics.Scale(9), GlobalGraphics.Scale(8)), Color.White);
                 }
-                GlobalContent.DrawString(spriteBatch, font, Global.generator.progressText, new Vector2(GlobalGraphics.Scale(320/2) - progressSize.X/2 + GlobalGraphics.Scale(1), GlobalGraphics.Scale(8 + 1) + renderingSize.Y), Color.Black);
-                GlobalContent.DrawString(spriteBatch, font, Global.generator.progressText, new Vector2(GlobalGraphics.Scale(320/2) - progressSize.X/2, GlobalGraphics.Scale(8) + renderingSize.Y), Color.White);
+                Vector2 progressSize = font.MeasureString(Global.generator.progressText != "" ? Global.generator.progressText : (Global.generator.failureReason != "" ? Global.generator.failureReason : Global.generator.progress + "%"));
+                GlobalContent.DrawString(spriteBatch, font, Global.generator.progressText, new Vector2(GlobalGraphics.Scale(320/2) - progressSize.X/2 + GlobalGraphics.Scale(1), GlobalGraphics.Scale(8 + 1) + progressSize.Y), Color.Black);
+                GlobalContent.DrawString(spriteBatch, font, Global.generator.progressText, new Vector2(GlobalGraphics.Scale(320/2) - progressSize.X/2, GlobalGraphics.Scale(8) + progressSize.Y), Color.White);
             }
             // End offset spritebatch
             spriteBatch.End();

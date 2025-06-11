@@ -40,13 +40,14 @@ function Query(localeName, localizationTokens)
     }
 end
 
--- Here is where you can set the colors for your theme.
--- All colors are in RGBA format, with each value being from 0 to 255.
--- Do not set colors to pure transparent (0, 0, 0, 0) as they will not work.
--- If you want to use the default color for a specific element, just remove it from the table.
+-- When this theme gets loaded, these settings will be applied.
 -- This function is entirely optional and can be deleted if you don't want to use it.
 function ThemeMetadata(pluginSettings)
     return {
+        -- Here is where you can set the colors for your theme.
+        -- All colors are in RGBA format, with each value being from 0 to 255.
+        -- Do not set colors to pure transparent (0, 0, 0, 0) as they will not work.
+        -- If you want to use the default color for a specific element, just remove it from the table.
         ["colorTable"] = {
             ["ClearColor"] = {0, 0, 0, 255},
             ["ShadowActionButtonInteractable"] = {0, 0, 0, 255},
@@ -75,6 +76,16 @@ function ThemeMetadata(pluginSettings)
             ["TileBackgroundScreen"] = {102, 102, 102, 255},
             ["VideoPlayerProgressBar"] = {255, 0, 0, 255},
             ["VideoPlayerProgressBarBackground"] = {0, 0, 0, 0},
+        },
+        -- Set proper names for each of the music tracks.
+        -- These names will be displayed in the top center of the screen when the music is playing.
+        ["musicattributions"] = {
+            "KiwifruitDev - This is Nonsense!",
+            "Bobby I Guess - A Nonsensical Song",
+            "Bobby I Guess - A Nonsensical Song Yet Again",
+            "Bobby I Guess - Creation",
+            "Bobby I Guess - Where We Began",
+            "Bobby I Guess - Jazzy",
         }
     }
 end

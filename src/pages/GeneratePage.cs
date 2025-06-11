@@ -219,6 +219,7 @@ namespace NonsensicalVideoGenerator
                         SaveData.saveValues["ConstrainAspectRatio"] = "true";
                         SaveData.saveValues["EnableTimeOut"] = "true";
                         SaveData.saveValues["TimeOut"] = "60";
+                        SaveData.saveValues["VideoFPS"] = "30";
                         SaveData.Save();
                         scrollView.Controller.interactables["MinStreamDuration"].Tooltip = SaveData.saveValues["MinStreamDuration"];
                         scrollView.Controller.interactables["MaxStreamDuration"].Tooltip = SaveData.saveValues["MaxStreamDuration"];
@@ -337,41 +338,73 @@ namespace NonsensicalVideoGenerator
                 return false;
             }));
             // PAGE 3
-            scrollView.Controller.Add("DisableClipsAfterMaxUniqueClips", new Switch("Disable Clips After Max Reached", "Disable clips after they reach the max unique clip count.", new Vector2(139, 60-(8*3)+(19*19)+(10*1)+(9*1)), (int i, string n) => {
+            scrollView.Controller.Add("DisableClipsAfterMaxUniqueClips", new Switch("Disable Clips After Max Reached", "Disable clips after they reach the max unique clip count.", new Vector2(139, 60-(8*3)+(19*20)+(10*1)+(9*1)), (int i, string n) => {
                 bool switchState = (i & 256) != 0;
                 if((i & 2) != 0)
                 {
+                    // If MaxUniqueClips is 0, force disable this switch and DeleteClipsAfterMaxUniqueClips
+                    if (int.Parse(SaveData.saveValues["MaxUniqueClips"], CultureInfo.InvariantCulture) == 0)
+                    {
+                        GlobalContent.PlaySound("Error");
+                        SaveData.saveValues["DisableClipsAfterMaxUniqueClips"] = "false";
+                        SaveData.saveValues["DeleteClipsAfterMaxUniqueClips"] = "false";
+                        Switch? pageSwitches = scrollView.Controller.interactables["DisableClipsAfterMaxUniqueClips"] as Switch;
+                        if (pageSwitches != null)
+                            pageSwitches.SwitchState = false;
+                        Switch? deleteSwitches = scrollView.Controller.interactables["DeleteClipsAfterMaxUniqueClips"] as Switch;
+                        if (deleteSwitches != null)
+                            deleteSwitches.SwitchState = false;
+                        SaveData.Save();
+                        return false;
+                    }
                     string oldValue = SaveData.saveValues["DisableClipsAfterMaxUniqueClips"];
                     SaveData.saveValues["DisableClipsAfterMaxUniqueClips"] = switchState.ToString().ToLower();
-                    if(oldValue != SaveData.saveValues["DisableClipsAfterMaxUniqueClips"])
+                    if (oldValue != SaveData.saveValues["DisableClipsAfterMaxUniqueClips"])
                     {
-                        SaveData.saveValues["DeleteClipsAfterMaxUniqueClips"] = "false";
+                        // At least one switch must be enabled
+                        SaveData.saveValues["DeleteClipsAfterMaxUniqueClips"] = (!switchState).ToString().ToLower();
                         Switch? pageSwitches = scrollView.Controller.interactables["DeleteClipsAfterMaxUniqueClips"] as Switch;
-                        if(pageSwitches != null)
-                            pageSwitches.SwitchState = false;
+                        if (pageSwitches != null)
+                            pageSwitches.SwitchState = !switchState;
                         SaveData.Save();
                     }
                 }
                 return switchState;
             }, SaveData.saveValues["DisableClipsAfterMaxUniqueClips"] == "true"));
-            scrollView.Controller.Add("DeleteClipsAfterMaxUniqueClips", new Switch("Delete Clips After Max Reached", "Delete clips after they reach the max unique clip count.", new Vector2(139, 60-(8*3)+(19*18)+(10*1)+(9*1)), (int i, string n) => {
+            scrollView.Controller.Add("DeleteClipsAfterMaxUniqueClips", new Switch("Delete Clips After Max Reached", "Delete clips after they reach the max unique clip count.", new Vector2(139, 60-(8*3)+(19*19)+(10*1)+(9*1)), (int i, string n) => {
                 bool switchState = (i & 256) != 0;
                 if((i & 2) != 0)
                 {
+                    // If MaxUniqueClips is 0, force disable this switch and DisableClipsAfterMaxUniqueClips
+                    if (int.Parse(SaveData.saveValues["MaxUniqueClips"], CultureInfo.InvariantCulture) == 0)
+                    {
+                        GlobalContent.PlaySound("Error");
+                        SaveData.saveValues["DisableClipsAfterMaxUniqueClips"] = "false";
+                        SaveData.saveValues["DeleteClipsAfterMaxUniqueClips"] = "false";
+                        Switch? pageSwitches = scrollView.Controller.interactables["DisableClipsAfterMaxUniqueClips"] as Switch;
+                        if (pageSwitches != null)
+                            pageSwitches.SwitchState = false;
+                        Switch? deleteSwitches = scrollView.Controller.interactables["DeleteClipsAfterMaxUniqueClips"] as Switch;
+                        if (deleteSwitches != null)
+                            deleteSwitches.SwitchState = false;
+                        SaveData.Save();
+                        return false;
+                    }
                     string oldValue = SaveData.saveValues["DeleteClipsAfterMaxUniqueClips"];
                     SaveData.saveValues["DeleteClipsAfterMaxUniqueClips"] = switchState.ToString().ToLower();
-                    if(oldValue != SaveData.saveValues["DeleteClipsAfterMaxUniqueClips"])
+                    if (oldValue != SaveData.saveValues["DeleteClipsAfterMaxUniqueClips"])
                     {
-                        SaveData.saveValues["DisableClipsAfterMaxUniqueClips"] = "false";
+                        // At least one switch must be enabled
+                        SaveData.saveValues["DisableClipsAfterMaxUniqueClips"] = (!switchState).ToString().ToLower();
                         Switch? pageSwitches = scrollView.Controller.interactables["DisableClipsAfterMaxUniqueClips"] as Switch;
-                        if(pageSwitches != null)
-                            pageSwitches.SwitchState = false;
+                        if (pageSwitches != null)
+                            pageSwitches.SwitchState = !switchState;
                         SaveData.Save();
                     }
                 }
                 return switchState;
             }, SaveData.saveValues["DeleteClipsAfterMaxUniqueClips"] == "true"));
-            scrollView.Controller.Add("MaxUniqueClips", new TextEntry("Max Unique Media", "The max times a unique media file can be used.", SaveData.saveValues["MaxUniqueClips"], new Vector2(139, 60-(8*3)+(19*17)+(10*1)+(9*1)), 24, 3, 1, (int i, string n) => {
+            scrollView.Controller.Add("MaxUniqueClips", new TextEntry("Max Unique Media", "The max times a unique media file can be used.", SaveData.saveValues["MaxUniqueClips"], new Vector2(139, 60-(8*3)+(19*18)+(10*1)+(9*1)), 24, 3, 1, (int i, string n) => {
                 int oldValue = int.Parse(SaveData.saveValues["MaxUniqueClips"], CultureInfo.InvariantCulture);
                 // Range: 0-100
                 if(int.Parse(scrollView.Controller.interactables["MaxUniqueClips"].Tooltip, CultureInfo.InvariantCulture) < 0)
@@ -379,11 +412,35 @@ namespace NonsensicalVideoGenerator
                 SaveData.saveValues["MaxUniqueClips"] = scrollView.Controller.interactables["MaxUniqueClips"].Tooltip;
                 if(oldValue != int.Parse(SaveData.saveValues["MaxUniqueClips"], CultureInfo.InvariantCulture))
                     SaveData.Save();
+                // If changed from 0 to any other value, enable "DisableClipsAfterMaxUniqueClips" and disable "DeleteClipsAfterMaxUniqueClips"
+                if (oldValue == 0 && int.Parse(SaveData.saveValues["MaxUniqueClips"], CultureInfo.InvariantCulture) > 0)
+                {
+                    Switch? pageSwitches = scrollView.Controller.interactables["DisableClipsAfterMaxUniqueClips"] as Switch;
+                    if (pageSwitches != null)
+                        pageSwitches.SwitchState = true;
+                    pageSwitches = scrollView.Controller.interactables["DeleteClipsAfterMaxUniqueClips"] as Switch;
+                    if (pageSwitches != null)
+                        pageSwitches.SwitchState = false;
+                    SaveData.saveValues["DeleteClipsAfterMaxUniqueClips"] = "false";
+                    SaveData.saveValues["DisableClipsAfterMaxUniqueClips"] = "true";
+                }
+                // If changed to 0 from any other value, disable both "DisableClipsAfterMaxUniqueClips" and "DeleteClipsAfterMaxUniqueClips"
+                if (oldValue != 0 && int.Parse(SaveData.saveValues["MaxUniqueClips"], CultureInfo.InvariantCulture) == 0)
+                {
+                    Switch? pageSwitches = scrollView.Controller.interactables["DisableClipsAfterMaxUniqueClips"] as Switch;
+                    if (pageSwitches != null)
+                        pageSwitches.SwitchState = false;
+                    pageSwitches = scrollView.Controller.interactables["DeleteClipsAfterMaxUniqueClips"] as Switch;
+                    if (pageSwitches != null)
+                        pageSwitches.SwitchState = false;
+                    SaveData.saveValues["DeleteClipsAfterMaxUniqueClips"] = "false";
+                    SaveData.saveValues["DisableClipsAfterMaxUniqueClips"] = "false";
+                }
                 return false;
             }));
-            scrollView.Controller.Add("StreamerOptions", new Label("Streamer Options:", new Vector2(139, 60-(8*2)+(19*16)+(10*1)+(9*1))));
+            scrollView.Controller.Add("RepetitionOptions", new Label("Repetition Options:", new Vector2(139, 60-(8*2)+(19*17)+(10*1)+(9*1))));
             // ADVANCED MODE
-            scrollView.Controller.Add("EnableTimeOut", new Switch("", "Cancel operations if they take too long.", new Vector2(139, 60-(8*2)+(19*15)+(10*1)+(9*1)), (int i, string n) => {
+            scrollView.Controller.Add("EnableTimeOut", new Switch("", "Cancel operations if they take too long.", new Vector2(139, 60-(8*2)+(19*16)+(10*1)+(9*1)), (int i, string n) => {
                 bool switchState = (i & 256) != 0;
                 if((i & 2) != 0)
                 {
@@ -394,7 +451,7 @@ namespace NonsensicalVideoGenerator
                 }
                 return switchState;
             }, SaveData.saveValues["EnableTimeOut"] == "true"));
-            scrollView.Controller.Add("TimeOut", new TextEntry("Time Out", "How long until operations are canceled, in seconds.", SaveData.saveValues["TimeOut"], new Vector2(168, 60-(8*2)+(19*15)+(10*1)+(9*1)), 24, 3, 1, (int i, string n) => {
+            scrollView.Controller.Add("TimeOut", new TextEntry("Time Out", "How long until operations are canceled, in seconds.", SaveData.saveValues["TimeOut"], new Vector2(168, 60-(8*2)+(19*16)+(10*1)+(9*1)), 24, 3, 1, (int i, string n) => {
                 int oldValue = int.Parse(SaveData.saveValues["TimeOut"], CultureInfo.InvariantCulture);
                 // Range: 0-100
                 if(int.Parse(scrollView.Controller.interactables["TimeOut"].Tooltip, CultureInfo.InvariantCulture) < 0)
@@ -404,7 +461,7 @@ namespace NonsensicalVideoGenerator
                     SaveData.Save();
                 return false;
             }));
-            scrollView.Controller.Add("ConstrainAspectRatio", new Switch("Constrain Aspect Ratio", "Clips will retain their original aspect ratio when disabled.", new Vector2(139, 60-(8*2)+(19*14)+(10*1)+(9*1)), (int i, string n) => {
+            scrollView.Controller.Add("ConstrainAspectRatio", new Switch("Constrain Aspect Ratio", "Clips will retain their original aspect ratio when disabled.", new Vector2(139, 60-(8*2)+(19*15)+(10*1)+(9*1)), (int i, string n) => {
                 bool switchState = (i & 256) != 0;
                 if((i & 2) != 0)
                 {
@@ -415,7 +472,7 @@ namespace NonsensicalVideoGenerator
                 }
                 return switchState;
             }, SaveData.saveValues["ConstrainAspectRatio"] == "true"));
-            scrollView.Controller.Add("PlayOverlayInFull", new Switch("Overlays Play in Full", "Play overlays at their full length.", new Vector2(139, 60-(8*2)+(19*13)+(10*1)+(9*1)), (int i, string n) => {
+            scrollView.Controller.Add("PlayOverlayInFull", new Switch("Overlays Play in Full", "Play overlays at their full length.", new Vector2(139, 60-(8*2)+(19*14)+(10*1)+(9*1)), (int i, string n) => {
                 bool switchState = (i & 256) != 0;
                 if((i & 2) != 0)
                 {
@@ -426,7 +483,7 @@ namespace NonsensicalVideoGenerator
                 }
                 return switchState;
             }, SaveData.saveValues["PlayOverlayInFull"] == "true"));                       
-            scrollView.Controller.Add("TransitionEffectChance", new TextEntry("Transition Effect Chance", "How often transitions get effects, from 0-100.", SaveData.saveValues["TransitionEffectChance"], new Vector2(139, 60-(8*2)+(19*12)+(10*1)+(9*1)), 24, 3, 1, (int i, string n) => {
+            scrollView.Controller.Add("TransitionEffectChance", new TextEntry("Transition Effect Chance", "How often transitions get effects, from 0-100.", SaveData.saveValues["TransitionEffectChance"], new Vector2(139, 60-(8*2)+(19*13)+(10*1)+(9*1)), 24, 3, 1, (int i, string n) => {
                 int oldValue = int.Parse(SaveData.saveValues["TransitionEffectChance"], CultureInfo.InvariantCulture);
                 // Range: 0-100
                 if(int.Parse(scrollView.Controller.interactables["TransitionEffectChance"].Tooltip, CultureInfo.InvariantCulture) < 0)
@@ -438,7 +495,7 @@ namespace NonsensicalVideoGenerator
                     SaveData.Save();
                 return false;
             }));
-            scrollView.Controller.Add("TransitionEffects", new Switch("Transition Effects", "Allow transitions to use effects.", new Vector2(139, 60-(8*2)+(19*11)+(10*1)+(9*1)), (int i, string n) => {
+            scrollView.Controller.Add("TransitionEffects", new Switch("Transition Effects", "Allow transitions to use effects.", new Vector2(139, 60-(8*2)+(19*12)+(10*1)+(9*1)), (int i, string n) => {
                 bool switchState = (i & 256) != 0;
                 if((i & 2) != 0)
                 {
@@ -449,7 +506,7 @@ namespace NonsensicalVideoGenerator
                 }
                 return switchState;
             }, SaveData.saveValues["TransitionEffects"] == "true"));
-            scrollView.Controller.Add("TransitionChance", new TextEntry("Transition Chance", "How often transitions are rolled, from 0-100.", SaveData.saveValues["TransitionChance"], new Vector2(139, 60-(8*2)+(19*10)+(10*1)+(9*1)), 24, 3, 1, (int i, string n) => {
+            scrollView.Controller.Add("TransitionChance", new TextEntry("Transition Chance", "How often transitions are rolled, from 0-100.", SaveData.saveValues["TransitionChance"], new Vector2(139, 60-(8*2)+(19*11)+(10*1)+(9*1)), 24, 3, 1, (int i, string n) => {
                 int oldValue = int.Parse(SaveData.saveValues["TransitionChance"], CultureInfo.InvariantCulture);
                 if(int.Parse(scrollView.Controller.interactables["TransitionChance"].Tooltip, CultureInfo.InvariantCulture) < 0)
                     scrollView.Controller.interactables["TransitionChance"].Tooltip = "0";
@@ -460,7 +517,7 @@ namespace NonsensicalVideoGenerator
                     SaveData.Save();
                 return false;
             }));
-            scrollView.Controller.Add("EffectChance", new TextEntry("Effect Chance", "How often any effect are used, from 0-100.", SaveData.saveValues["EffectChance"], new Vector2(139, 60-(8*2)+(19*9)+(10*1)+(9*1)), 24, 3, 1, (int i, string n) => {
+            scrollView.Controller.Add("EffectChance", new TextEntry("Effect Chance", "How often any effect are used, from 0-100.", SaveData.saveValues["EffectChance"], new Vector2(139, 60-(8*2)+(19*10)+(10*1)+(9*1)), 24, 3, 1, (int i, string n) => {
                 int oldValue = int.Parse(SaveData.saveValues["EffectChance"], CultureInfo.InvariantCulture);
                 if(int.Parse(scrollView.Controller.interactables["EffectChance"].Tooltip, CultureInfo.InvariantCulture) < 0)
                     scrollView.Controller.interactables["EffectChance"].Tooltip = "0";
@@ -471,7 +528,7 @@ namespace NonsensicalVideoGenerator
                     SaveData.Save();
                 return false;
             }));
-            scrollView.Controller.Add("OverlayChance", new TextEntry("Overlay Chance", "How often overlays are rolled, from 0-100.", SaveData.saveValues["OverlayChance"], new Vector2(139, 60-(8*2)+(19*8)+(10*1)+(9*1)), 24, 3, 1, (int i, string n) => {
+            scrollView.Controller.Add("OverlayChance", new TextEntry("Overlay Chance", "How often overlays are rolled, from 0-100.", SaveData.saveValues["OverlayChance"], new Vector2(139, 60-(8*2)+(19*9)+(10*1)+(9*1)), 24, 3, 1, (int i, string n) => {
                 int oldValue = int.Parse(SaveData.saveValues["OverlayChance"], CultureInfo.InvariantCulture);
                 if(int.Parse(scrollView.Controller.interactables["OverlayChance"].Tooltip, CultureInfo.InvariantCulture) < 0)
                     scrollView.Controller.interactables["OverlayChance"].Tooltip = "0";
@@ -479,6 +536,19 @@ namespace NonsensicalVideoGenerator
                     scrollView.Controller.interactables["OverlayChance"].Tooltip = "100";
                 SaveData.saveValues["OverlayChance"] = scrollView.Controller.interactables["OverlayChance"].Tooltip;
                 if(oldValue != int.Parse(SaveData.saveValues["OverlayChance"], CultureInfo.InvariantCulture))
+                    SaveData.Save();
+                return false;
+            }));
+            scrollView.Controller.Add("FPS", new TextEntry("Output Frame Rate", "why is a description still being set here?", SaveData.saveValues["VideoFPS"], new Vector2(139, 60-(8*2)+(19*8)+(10*1)+(9*1)), 24, 4, 1, (int i, string n) => {
+                string oldValue = SaveData.saveValues["VideoFPS"];
+                // minimum must be 1
+                if(int.Parse(scrollView.Controller.interactables["FPS"].Tooltip, CultureInfo.InvariantCulture) < 1)
+                    scrollView.Controller.interactables["FPS"].Tooltip = "1";
+                // maximum must be 240
+                if(int.Parse(scrollView.Controller.interactables["FPS"].Tooltip, CultureInfo.InvariantCulture) > 240)
+                    scrollView.Controller.interactables["FPS"].Tooltip = "240";
+                SaveData.saveValues["VideoFPS"] = scrollView.Controller.interactables["FPS"].Tooltip;
+                if(oldValue != SaveData.saveValues["VideoFPS"])
                     SaveData.Save();
                 return false;
             }));
@@ -589,7 +659,7 @@ namespace NonsensicalVideoGenerator
             controllerRendering.LoadContent(contentManager, graphicsDevice);
             actionController.LoadContent(contentManager, graphicsDevice);
             actionControllerRendering.LoadContent(contentManager, graphicsDevice);
-            scrollView.MaxScrollOffset = 16*13;
+            scrollView.MaxScrollOffset = 16*14;
         }
     }
 }

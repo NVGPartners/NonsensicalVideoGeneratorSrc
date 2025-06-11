@@ -125,8 +125,8 @@ function PostCommand(commandindex, outputresult, errorresult, options, pluginSet
     elseif commandindex == 2 then
         -- outputResult is the duration of the material
         starttime = functions.randomDouble(0, tonumber(outputresult))
-        -- Trim material to start at starttime and resize to options.width x options.height at 30 fps
-        functions.runFFmpeg("-ss " .. starttime .. " -i \"" .. material .. "\" -filter:v \"fps=30,scale=" .. options.width .. ":" .. options.height .. "\" -vcodec libx264 -crf 28 -preset ultrafast -ac 2 -c:a aac -b:a 160k -reset_timestamps 1 -shortest -fflags +genpts -af \"aresample=async=1000\" -y \"" .. materialclip .. "\"")
+        -- Trim material to start at starttime and resize to options.width x options.height at options.fps fps
+        functions.runFFmpeg("-ss " .. starttime .. " -i \"" .. material .. "\" -filter:v \"fps=" .. options.fps .. ",scale=" .. options.width .. ":" .. options.height .. "\" -vcodec libx264 -crf 28 -preset ultrafast -ac 2 -c:a aac -b:a 160k -reset_timestamps 1 -shortest -fflags +genpts -af \"aresample=async=1000\" -y \"" .. materialclip .. "\"")
     elseif commandindex > 2 and commandindex <= sfxcount + 2 then
         -- Convert all spadinners to 44100hz, 224k bitrate, and mp3
         local index = commandindex - 2

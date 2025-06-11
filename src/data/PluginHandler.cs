@@ -323,6 +323,7 @@ namespace NonsensicalVideoGenerator
         public Dictionary<string, SettingType> settingTypes = new();
         public static Dictionary<string, string> placeholders = new();
         public Dictionary<string, Color> themeColors = new();
+        public List<string> themeMusicAttributions = new();
         // Fix broken URLs that Workshop addons use
         public static readonly string urlBase = "https://github.com/KiwifruitDev/NonsensicalVideoGenerator/raw/main/addonlibraries/";
         public static Dictionary<string, string> urlMapper = new()
@@ -392,7 +393,7 @@ namespace NonsensicalVideoGenerator
             Regex regex = new Regex(@"[^\s""]+|""([^""]*)""");
             MatchCollection matches = regex.Matches(args);
             foreach (Match match in matches)
-            {   
+            {
                 string matchString = match.ToString();
                 // If the match is not inside of quotes, check for pipes
                 if (!matchString.StartsWith("\"") && !matchString.EndsWith("\""))
@@ -421,9 +422,9 @@ namespace NonsensicalVideoGenerator
                 ConsoleOutput.WriteLine("An addon attempted to create a batch or powershell script.", Color.Red);
                 illegal = true;
             }
-            if(illegal)
+            if (illegal)
             {
-                ConsoleOutput.WriteLine("Offending command: "+args, Color.Red);
+                ConsoleOutput.WriteLine("Offending command: " + args, Color.Red);
             }
             return !illegal;
         }
@@ -432,7 +433,7 @@ namespace NonsensicalVideoGenerator
         public static string ReplacePlaceholders(string args)
         {
             string result = args;
-            foreach(KeyValuePair<string, string> placeholder in placeholders)
+            foreach (KeyValuePair<string, string> placeholder in placeholders)
             {
                 result = result.Replace(placeholder.Key, placeholder.Value);
             }
@@ -441,39 +442,39 @@ namespace NonsensicalVideoGenerator
         // RunFFmpeg for lua
         public static void RunFFmpeg(string args)
         {
-            if(!ValidateInput(args)) return;
+            if (!ValidateInput(args)) return;
             PluginHandler.commands.Add(new Command(CommandType.FFmpeg, ReplacePlaceholders(args), jobDirectory));
         }
         // RunFFprobe for lua
         public static void RunFFprobe(string args)
         {
-            if(!ValidateInput(args)) return;
+            if (!ValidateInput(args)) return;
             PluginHandler.commands.Add(new Command(CommandType.FFprobe, ReplacePlaceholders(args), jobDirectory));
         }
         // RunMagick for lua
         public static void RunMagick(string args)
         {
-            if(!ValidateInput(args)) return;
+            if (!ValidateInput(args)) return;
             PluginHandler.commands.Add(new Command(CommandType.Magick, ReplacePlaceholders(args), jobDirectory));
         }
         // RunVocoder for lua
         public static void RunVocoder(string args)
         {
-            if(!ValidateInput(args)) return;
+            if (!ValidateInput(args)) return;
             PluginHandler.commands.Add(new Command(CommandType.Vocoder, ReplacePlaceholders(args), jobDirectory));
         }
         // FolderCreate for lua
         public static void FolderCreate(string path)
         {
-            if(!ValidateInput(path)) return;
+            if (!ValidateInput(path)) return;
             string combinedPath = Path.Combine(jobDirectory, ReplacePlaceholders(path));
             Directory.CreateDirectory(combinedPath);
         }
         // FileCopy for lua
         public static void FileCopy(string source, string dest)
         {
-            if(!ValidateInput(source)) return;
-            if(!ValidateInput(dest)) return;
+            if (!ValidateInput(source)) return;
+            if (!ValidateInput(dest)) return;
             string combinedSource = Path.Combine(jobDirectory, ReplacePlaceholders(source));
             string combinedDest = Path.Combine(jobDirectory, ReplacePlaceholders(dest));
             File.Copy(combinedSource, combinedDest);
@@ -481,7 +482,7 @@ namespace NonsensicalVideoGenerator
         // FileDelete for lua
         public static void FileDelete(string path)
         {
-            if(!ValidateInput(path)) return;
+            if (!ValidateInput(path)) return;
             string combinedPath = Path.Combine(jobDirectory, ReplacePlaceholders(path));
             if (File.Exists(combinedPath))
                 File.Delete(combinedPath);
@@ -489,8 +490,8 @@ namespace NonsensicalVideoGenerator
         // FileMove for lua
         public static void FileMove(string source, string dest)
         {
-            if(!ValidateInput(source)) return;
-            if(!ValidateInput(dest)) return;
+            if (!ValidateInput(source)) return;
+            if (!ValidateInput(dest)) return;
             string combinedSource = Path.Combine(jobDirectory, ReplacePlaceholders(source));
             string combinedDest = Path.Combine(jobDirectory, ReplacePlaceholders(dest));
             if (File.Exists(combinedSource))
@@ -499,21 +500,21 @@ namespace NonsensicalVideoGenerator
         // FileExists for lua
         public static bool FileExists(string path)
         {
-            if(!ValidateInput(path)) return false;
+            if (!ValidateInput(path)) return false;
             string combinedPath = Path.Combine(jobDirectory, ReplacePlaceholders(path));
             return File.Exists(combinedPath);
         }
         // FolderExists for lua
         public static bool FolderExists(string path)
         {
-            if(!ValidateInput(path)) return false;
+            if (!ValidateInput(path)) return false;
             string combinedPath = Path.Combine(jobDirectory, ReplacePlaceholders(path));
             return Directory.Exists(combinedPath);
         }
         // EnumerateFiles for lua
         public static IEnumerable<string> EnumerateFiles(string path)
         {
-            if(!ValidateInput(path)) return new List<string>();
+            if (!ValidateInput(path)) return new List<string>();
             string combinedPath = Path.Combine(jobDirectory, ReplacePlaceholders(path));
             // use relative path
             return Directory.EnumerateFiles(combinedPath, "*", SearchOption.AllDirectories).Select(file =>
@@ -525,7 +526,7 @@ namespace NonsensicalVideoGenerator
         // WriteFile for lua
         public static void WriteFile(string path, string contents)
         {
-            if(!ValidateInput(path)) return;
+            if (!ValidateInput(path)) return;
             string combinedPath = Path.Combine(jobDirectory, ReplacePlaceholders(path));
             if (File.Exists(combinedPath))
                 File.Delete(combinedPath);
@@ -600,7 +601,7 @@ namespace NonsensicalVideoGenerator
                 placeholders.Remove("{LibraryFile_" + subType + "}");
             }
             string thepath = Path.Join("..", "..", file);
-            if(thepath != "..\\..")
+            if (thepath != "..\\..")
             {
                 placeholders.Add("{LibraryFile_" + subType + "}", thepath);
                 return "{LibraryFile_" + subType + "}";
@@ -610,7 +611,7 @@ namespace NonsensicalVideoGenerator
         // AddToLibrary for lua
         public void AddToLibrary(string rootType, string subType, string path)
         {
-            if(!ValidateInput(path))
+            if (!ValidateInput(path))
             {
                 ConsoleOutput.WriteLine("Addon attempted to add a file to the library with an invalid path.", Color.Red);
                 return;
@@ -641,7 +642,7 @@ namespace NonsensicalVideoGenerator
             // Add to library
             ConsoleOutput.WriteLine($"Loading {ReplacePlaceholders(path)} to library", Color.LightBlue);
             LibraryFile libfile = new(Path.GetFileNameWithoutExtension(ReplacePlaceholders(path)), Path.Combine("temp", Path.GetDirectoryName(jobDirectory) ?? ".", ReplacePlaceholders(path)), dummyType);
-            if(LibraryData.Load(libfile) == null)
+            if (LibraryData.Load(libfile) == null)
             {
                 ConsoleOutput.WriteLine($"Failed to load {ReplacePlaceholders(path)} to library", Color.Red);
                 return;
@@ -675,18 +676,18 @@ namespace NonsensicalVideoGenerator
         {
             string replacedUrl = ReplacePlaceholders(url);
             // Compare with urlMapper
-            if(urlMapper.ContainsKey(replacedUrl))
+            if (urlMapper.ContainsKey(replacedUrl))
             {
                 // Replace with urlMapper value
                 replacedUrl = urlBase + urlMapper[replacedUrl];
             }
-            else if(replacedUrl.Contains("discord.com") || replacedUrl.Contains("discordapp.com"))
+            else if (replacedUrl.Contains("discord.com") || replacedUrl.Contains("discordapp.com"))
             {
                 // If it contains discordapp.com, deny it
                 ConsoleOutput.WriteLine("Addons can't download from Discord, tell the author!", Color.Red);
                 return;
             }
-            if(subType == "")
+            if (subType == "")
                 rootType = jobDirectory;
             CommandType commandType = CommandType.Download;
             // Is it a YouTube url?
@@ -726,7 +727,7 @@ namespace NonsensicalVideoGenerator
             switch (type)
             {
                 case PluginType.Lua:
-                    if(luaScript == null)
+                    if (luaScript == null)
                         return new PluginReturnValue(false, Path.GetFileName(path));
                     // Run Generate function if it exists.
                     if (luaScript.Globals["StartGeneration"] != null)
@@ -791,7 +792,7 @@ namespace NonsensicalVideoGenerator
                                 {
                                     // PostCommand function is called with the index of the command
                                     string[] outputs = PluginHandler.commands[i].Call();
-                                    luaScript.Call(luaScript.Globals["PostCommand"], i+1, outputs[0], outputs[1], videoOptions, pluginSettings, functions);
+                                    luaScript.Call(luaScript.Globals["PostCommand"], i + 1, outputs[0], outputs[1], videoOptions, pluginSettings, functions);
                                 }
                                 DynValue result2 = luaScript.Call(luaScript.Globals["StopGeneration"], videoOptions, pluginSettings, functions);
                                 if (result2.Type == DataType.Boolean && result2.Boolean)
@@ -825,7 +826,7 @@ namespace NonsensicalVideoGenerator
         }
         public bool Query()
         {
-            switch(type)
+            switch (type)
             {
                 default:
                     return true;
@@ -851,18 +852,18 @@ namespace NonsensicalVideoGenerator
                     {
                         luaScript.DoFile(path);
                     }
-                    catch(SyntaxErrorException e)
+                    catch (SyntaxErrorException e)
                     {
                         syntaxError = e;
                     }
                     // Throw syntax error outside of try-catch block to inform user.
-                    if(syntaxError != null)
+                    if (syntaxError != null)
                     {
                         Achievements.Award("ACHIEVEMENT_LUA_ERROR");
                         throw syntaxError;
                     }
                     // Call plugin with query argument.
-                    if(luaScript.Globals["Query"] != null)
+                    if (luaScript.Globals["Query"] != null)
                     {
                         // Argument 1: Current locale (L.locale.name)
                         // Argument 2: Table of localization tokens (L.locale.localizationTokens)
@@ -893,11 +894,11 @@ namespace NonsensicalVideoGenerator
                                 }
                                 string rootTypeStr = library.Table.Get("type").String;
                                 LibraryRootType rootType = LibraryRootType.Video;
-                                if(rootTypeStr == "audio")
+                                if (rootTypeStr == "audio")
                                     rootType = LibraryRootType.Audio;
-                                else if(rootTypeStr == "image")
+                                else if (rootTypeStr == "image")
                                     rootType = LibraryRootType.Image;
-                                else if(rootTypeStr != "video")
+                                else if (rootTypeStr != "video")
                                     rootTypeStr = "video";
                                 string libraryPrettyName = library.Table.Get("name").String;
                                 string libraryName = library.Table.Get("path").String;
@@ -905,9 +906,9 @@ namespace NonsensicalVideoGenerator
                                 LibraryType dummyType = new(rootType, libraryName, libraryTooltip);
                                 string libPath = Path.Join(rootTypeStr, libraryName);
                                 LibraryType libraryType = DefaultLibraryTypes.Video;
-                                for(int i = 0; i < DefaultLibraryTypes.AllTypes.Count; i++)
+                                for (int i = 0; i < DefaultLibraryTypes.AllTypes.Count; i++)
                                 {
-                                    if(DefaultLibraryTypes.AllTypes[i].RootType == rootType && DefaultLibraryTypes.AllTypes[i].Special)
+                                    if (DefaultLibraryTypes.AllTypes[i].RootType == rootType && DefaultLibraryTypes.AllTypes[i].Special)
                                     {
                                         libraryType = DefaultLibraryTypes.AllTypes[i];
                                         break;
@@ -918,7 +919,7 @@ namespace NonsensicalVideoGenerator
                             }
                             // Print count
                             //if (libraryCount > 0)
-                                //ConsoleOutput.WriteLine($"Addon {Path.GetFileName(path)} added {libraryCount} libraries.", Color.LightBlue);
+                            //ConsoleOutput.WriteLine($"Addon {Path.GetFileName(path)} added {libraryCount} libraries.", Color.LightBlue);
                         }
                         DynValue luaSettings = luaQuery.Table.Get("settings");
                         if (luaSettings.Type == DataType.Table)
@@ -939,7 +940,7 @@ namespace NonsensicalVideoGenerator
                                 string settingValueType = setting.Table.Get("type").String;
                                 settings.Add(settingName, settingValue);
                                 settingTooltips.Add(settingName, settingTooltip);
-                                switch(settingValueType)
+                                switch (settingValueType)
                                 {
                                     case "int":
                                     case "integer":
@@ -981,7 +982,7 @@ namespace NonsensicalVideoGenerator
                             }
                             // Print count
                             //if (settingCount > 0)
-                                //ConsoleOutput.WriteLine($"Addon {Path.GetFileName(path)} added {settingCount} settings.", Color.LightBlue);
+                            //ConsoleOutput.WriteLine($"Addon {Path.GetFileName(path)} added {settingCount} settings.", Color.LightBlue);
                         }
                     }
                     return true;
@@ -990,10 +991,11 @@ namespace NonsensicalVideoGenerator
         public void GetThemeMetadata()
         {
             themeColors.Clear();
+            themeMusicAttributions.Clear();
             switch (type)
             {
                 case PluginType.Lua:
-                    if(luaScript == null)
+                    if (luaScript == null)
                         return;
                     // Run Generate function if it exists.
                     if (luaScript.Globals["ThemeMetadata"] != null)
@@ -1014,7 +1016,7 @@ namespace NonsensicalVideoGenerator
                                 {
                                     if (pair.Key.Type == DataType.String)
                                     {
-                                        switch(pair.Key.String)
+                                        switch (pair.Key.String)
                                         {
                                             case "colorTable":
                                                 if (pair.Value.Type == DataType.Table)
@@ -1049,6 +1051,18 @@ namespace NonsensicalVideoGenerator
                                                     }
                                                 }
                                                 break;
+                                            case "musicAttributions":
+                                                if (pair.Value.Type == DataType.Table)
+                                                {
+                                                    foreach (TablePair musicPair in pair.Value.Table.Pairs)
+                                                    {
+                                                        if (musicPair.Key.Type == DataType.String && musicPair.Value.Type == DataType.String)
+                                                        {
+                                                            themeMusicAttributions.Add(musicPair.Key.String);
+                                                        }
+                                                    }
+                                                }
+                                                break;
                                         }
                                     }
                                 }
@@ -1072,6 +1086,14 @@ namespace NonsensicalVideoGenerator
             {
                 return Color.Transparent;
             }
+        }
+        public string GetMusicAttribution(int musicIndex)
+        {
+            if (musicIndex < 0 || musicIndex >= themeMusicAttributions.Count)
+            {
+                return "";
+            }
+            return themeMusicAttributions[musicIndex];
         }
     }
     public class LibraryCombinedType
@@ -1752,6 +1774,7 @@ namespace NonsensicalVideoGenerator
                 // Replace "effect" with filename in the file.
                 string fileContents = File.ReadAllText(pluginFile);
                 fileContents = fileContents.Replace("%filename%", filename + ".lua");
+                fileContents = fileContents.Replace("%filenamenoext%", filename);
                 string camelCaseFileName = filename.Replace(" ", "").Replace("_", "").Replace("-", "").ToLower();
                 camelCaseFileName = camelCaseFileName.First().ToString().ToUpper() + camelCaseFileName.Substring(1);
                 fileContents = fileContents.Replace("%filenameraw%", camelCaseFileName);

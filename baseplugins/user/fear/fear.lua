@@ -104,7 +104,7 @@ function StartGeneration(options, pluginSettings, functions)
         hadToDownload = true
     else
         fear1 = functions.getRandomLibraryFile("video", "fear")
-        functions.runFFmpeg("-i \"" .. fear1 .. "\" -r 30 -filter_complex \"[0:v]scale='" .. options.width .. ":" .. options.height .. "',setsar=1[vid]\" -map \"[vid]\" -map \"0:a\" -y \"fear1.mp4\"")
+        functions.runFFmpeg("-i \"" .. fear1 .. "\" -r " .. options.fps .. " -filter_complex \"[0:v]scale='" .. options.width .. ":" .. options.height .. "',setsar=1[vid]\" -map \"[vid]\" -map \"0:a\" -y \"fear1.mp4\"")
     end
     return true
 end
@@ -117,20 +117,20 @@ function PostCommand(commandindex, outputresult, errorresult, options, pluginSet
     local ci = commandindex - cioffset + (hadToDownload and 0 or 1)
     if ci == 1 then
         fear1 = functions.getRandomLibraryFile("video", "fear")
-        functions.runFFmpeg("-i \"" .. fear1 .. "\" -r 30 -filter_complex \"[0:v]scale='" .. options.width .. ":" .. options.height .. "',setsar=1[vid]\" -map \"[vid]\" -map \"0:a\" -y \"fear1.mp4\"")
+        functions.runFFmpeg("-i \"" .. fear1 .. "\" -r " .. options.fps .. " -filter_complex \"[0:v]scale='" .. options.width .. ":" .. options.height .. "',setsar=1[vid]\" -map \"[vid]\" -map \"0:a\" -y \"fear1.mp4\"")
     elseif ci == 2 then
         functions.runFFmpeg("-i \"" .. options.inputVideo .. "\" -ss 00:00:00.000 -to 00:00:03.750 -y \"clip1.mp4\"")
     elseif ci == 3 then
         if doTwoFears then
             functions.getRandomLibraryFile("video", "materials")
-            functions.runFFmpeg("-i \"" .. material .. "\" -r 30 -ss 00:00:00.000 -to 00:00:03.750 -y \"clip2.mp4\"")
+            functions.runFFmpeg("-i \"" .. material .. "\" -r " .. options.fps .. " -ss 00:00:00.000 -to 00:00:03.750 -y \"clip2.mp4\"")
         else
             functions.runFFmpeg("-f concat -i \"vids.txt\" -y \"" .. options.outputVideo .. "\"")
         end
     elseif ci == 4 then
         if doTwoFears then
             fear2 = functions.getRandomLibraryFile("video", "fear")
-            functions.runFFmpeg("-i \"" .. fear2 .. "\" -r 30 -filter_complex \"[0:v]scale='" .. options.width .. ":" .. options.height .. "',setsar=1[vid]\" -map \"[vid]\" -map \"0:a\" -y \"fear2.mp4\"")
+            functions.runFFmpeg("-i \"" .. fear2 .. "\" -r " .. options.fps .. " -filter_complex \"[0:v]scale='" .. options.width .. ":" .. options.height .. "',setsar=1[vid]\" -map \"[vid]\" -map \"0:a\" -y \"fear2.mp4\"")
         end
     elseif ci == 5 then
         if doTwoFears then
