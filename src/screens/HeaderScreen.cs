@@ -151,7 +151,7 @@ namespace NonsensicalVideoGenerator
             // Draw rendering progress
             if(Global.generator.progressText != "")
             {
-                if (Pagination.DrawnPage != 5 && MediaPlayer.State == MediaState.Playing && MediaPlayer.Volume != 0)
+                if (UserInterface.instance != null && Pagination.DrawnPage != 5 && MediaPlayer.State == MediaState.Playing && MediaPlayer.Volume != 0)
                 {
                     // Get music attribution
                     string rendering = ThemeManager.GetMusicAttribution(UserInterface.instance.music); //Global.videoTitle.Replace("Render", "#");

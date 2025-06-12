@@ -1016,17 +1016,6 @@ namespace NonsensicalVideoGenerator
             // Load library.
             LibraryData.Load();
 
-            // Check to ensure that the source pool is not empty.
-            if(PluginHandler.GetEnabledBootMovies().Count == 0)
-            {
-                ConsoleOutput.WriteLine("No boot movies enabled.", Color.Red);
-                progressText = L.T(0, "Addons:StatusFailNoBootMovies");
-                progressState = ProgressState.Failed;
-                failureReason = progressText;
-                CancelGeneration();
-                return;
-            }
-
             // Set global random with seed.
             if(Global.randomSeed != 0 && !Global.parameters.Contains("-seed"))
             {
@@ -1034,6 +1023,26 @@ namespace NonsensicalVideoGenerator
                 ConsoleOutput.WriteLine("Seed: " + seed.ToString(CultureInfo.InvariantCulture), Color.Gray);
                 Global.randomSeed = seed;
                 globalRandom = new Random(seed);
+            }
+
+            // Pick a transition to use as the base for the effect test.
+            string sourceToPick = LibraryData.PickRandom(DefaultLibraryTypes.Transition, globalRandom);
+
+            // Select a boot movie if no transition could be picked.
+            if(sourceToPick == "" && PluginHandler.GetEnabledBootMovies().Count > 0)
+            {
+                sourceToPick = PluginHandler.PickRandomBootMovie() ?? "";
+            }
+
+            // Couldn't find a valid source
+            if (sourceToPick == "")
+            {
+                ConsoleOutput.WriteLine("No boot movies or transitions enabled.", Color.Gray);
+                progressText = L.T(0, "Addons:StatusFailNoBootMoviesOrTransitions");
+                progressState = ProgressState.Failed;
+                failureReason = progressText;
+                CancelGeneration();
+                return;
             }
 
             // Clean up previous temporary files.
@@ -1055,14 +1064,6 @@ namespace NonsensicalVideoGenerator
                 if (effectTestThreadWorker?.CancellationPending == true)
                     return;
                 progress = 1;
-                string sourceToPick = PluginHandler.PickRandomBootMovie() ?? "";
-                if (sourceToPick == "")
-                {
-                    ConsoleOutput.WriteLine("No boot movies enabled.", Color.Gray);
-                    progressText = L.T(0, "Addons:StatusFailNoBootMovies");
-                    progressState = ProgressState.Failed;
-                    return;
-                }
                 if (effectTestThreadWorker?.CancellationPending == true)
                     return;
                 FFprobe_EncodeVideo(sourceToPick, Path.Combine(temporaryDirectory, thisClip.name));
@@ -1217,11 +1218,6 @@ namespace NonsensicalVideoGenerator
         }
         private void StartEffectTest(ProgressChangedEventHandler progressReporter, RunWorkerCompletedEventHandler completedReporter)
         {
-            LibraryData.calledMedia.Clear();
-            Global.usedWorkshopPlugin = false;
-            Global.rolledForOverlay = false;
-            Global.usedAllEffectChance = false;
-            FramePlayer.Stop();
             try
             {
                 if(vidThreadWorker != null && vidThreadWorker.IsBusy)
@@ -1253,6 +1249,11 @@ namespace NonsensicalVideoGenerator
                     timeoutWorker.DoWork += TimeoutThread;
                     timeoutWorker.WorkerSupportsCancellation = true;
                 }
+                LibraryData.calledMedia.Clear();
+                Global.usedWorkshopPlugin = false;
+                Global.rolledForOverlay = false;
+                Global.usedAllEffectChance = false;
+                FramePlayer.Stop();
                 forceConcatenate = false;
                 timeout = int.Parse(SaveData.saveValues["TimeOut"], CultureInfo.InvariantCulture);
                 tempOutput = Path.Combine(Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location) ?? ".", "library", "video", "renders", Global.videoTitle + ".mp4");

@@ -301,6 +301,7 @@ namespace NonsensicalVideoGenerator
         TextInputLettersNumbersSpaces,
         Label,
         Switch,
+        Button,
     }
     public enum AddonType
     {
@@ -309,11 +310,11 @@ namespace NonsensicalVideoGenerator
         Theme,
         BootMovie
     }
-    public class Plugin
+    public class PluginMetadata
     {
-        public string path { get; set; }
-        public PluginType type { get; set; }
-        public bool enabled { get; set; }
+        public string path = "";
+        public PluginType type = PluginType.None;
+        public bool enabled = false;
         public string submittedId = "";
         public Script? luaScript;
         public string workshopId = "";
@@ -321,9 +322,12 @@ namespace NonsensicalVideoGenerator
         public Dictionary<string, object> settings = new();
         public Dictionary<string, string> settingTooltips = new();
         public Dictionary<string, SettingType> settingTypes = new();
-        public static Dictionary<string, string> placeholders = new();
         public Dictionary<string, Color> themeColors = new();
         public List<string> themeMusicAttributions = new();
+    }
+    public class Plugin : PluginMetadata
+    {
+        public static Dictionary<string, string> placeholders = new();
         // Fix broken URLs that Workshop addons use
         public static readonly string urlBase = "https://github.com/KiwifruitDev/NonsensicalVideoGenerator/raw/main/addonlibraries/";
         public static Dictionary<string, string> urlMapper = new()
@@ -608,6 +612,31 @@ namespace NonsensicalVideoGenerator
             }
             return "";
         }
+        // GetAddons for lua
+        public static List<PluginMetadata> GetAddons()
+        {
+            List<Plugin> pluginList = PluginHandler.plugins.FindAll(plugin => plugin.enabled);
+            List<PluginMetadata> metadataList = new();
+            foreach (Plugin plugin in pluginList)
+            {
+                metadataList.Add(new PluginMetadata
+                {
+                    path = plugin.path,
+                    type = plugin.type,
+                    enabled = plugin.enabled,
+                    submittedId = plugin.submittedId,
+                    luaScript = plugin.luaScript,
+                    workshopId = plugin.workshopId,
+                    rootPath = plugin.rootPath,
+                    settings = plugin.settings,
+                    settingTooltips = plugin.settingTooltips,
+                    settingTypes = plugin.settingTypes,
+                    themeColors = plugin.themeColors,
+                    themeMusicAttributions = plugin.themeMusicAttributions
+                });
+            }
+            return metadataList;
+        }
         // AddToLibrary for lua
         public void AddToLibrary(string rootType, string subType, string path)
         {
@@ -704,10 +733,74 @@ namespace NonsensicalVideoGenerator
             ConsoleOutput.WriteLine("Addons can no longer execute programs.", Color.Red);
             return;
         }
-        public PluginReturnValue Call(string video)
+        // OpenFilePicker for lua
+        // The arguments match some default windows file dialog options
+        public string OpenFilePicker(string title, string filter, bool multiselect = false)
+        {
+            // Show file dialog and return selected file path
+            OpenFileDialog openFileDialog = new()
+            {
+                Title = title,
+                Filter = filter,
+                Multiselect = multiselect,
+                InitialDirectory = jobDirectory
+            };
+            if (openFileDialog.ShowDialog() == DialogResult.OK)
+            {
+                string fileName = openFileDialog.FileName;
+                if (!string.IsNullOrEmpty(fileName))
+                {
+                    placeholders.Add("{FilePicker_" + title + "}", fileName);
+                }
+                return "{FilePicker_" + title + "}";
+            }
+            return "";
+        }
+        // SetStatusText for lua
+        public void SetStatusText(string text)
+        {
+            // Set status text in the main window
+            Global.generator.progressText = text;
+        }
+        // GetLibraryFileName for lua
+        public string GetLibraryFileName(string text)
+        {
+            // This will only work with library file placeholders
+            if (text.StartsWith("{LibraryFile_") && text.EndsWith("}"))
+            {
+                string replacedFile = ReplacePlaceholders(text);
+                // Return the name and extension
+                return Path.GetFileName(replacedFile);
+            }
+            return "";
+        }
+        // RunFFmpegSync for lua
+        public static void RunFFmpegSync(string args)
+        {
+            if (!ValidateInput(args)) return;
+            new Command(CommandType.FFmpeg, ReplacePlaceholders(args), jobDirectory).Call();
+        }
+        // RunFFprobeSync for lua
+        public static void RunFFprobeSync(string args)
+        {
+            if (!ValidateInput(args)) return;
+            new Command(CommandType.FFprobe, ReplacePlaceholders(args), jobDirectory).Call();
+        }
+        // RunMagickSync for lua
+        public static void RunMagickSync(string args)
+        {
+            if (!ValidateInput(args)) return;
+            new Command(CommandType.Magick, ReplacePlaceholders(args), jobDirectory).Call();
+        }
+        // RunVocoderSync for lua
+        public static void RunVocoderSync(string args)
+        {
+            if (!ValidateInput(args)) return;
+            new Command(CommandType.Vocoder, ReplacePlaceholders(args), jobDirectory).Call();
+        }
+        public PluginReturnValue Call(string video, bool runLua = false, int mouseX = 0, int mouseY = 0, string button = "")
         {
             // Create .\temp\job_%time%\
-            string oldVideo = video;
             string jobPath = Path.Join(@".\temp\", "job_" + DateTime.UtcNow.ToString("HHmmssfff", CultureInfo.InvariantCulture));
             // Delete job path if it already exists
             if (Directory.Exists(jobPath))
@@ -716,14 +809,17 @@ namespace NonsensicalVideoGenerator
             }
             Directory.CreateDirectory(jobPath);
             jobDirectory = Path.GetFullPath(jobPath) + @"\";
-            // Copy video to job path as result.mp4
-            File.Copy(video, Path.Join(jobPath, "result.mp4"));
-            video = Path.Join(jobPath, "result.mp4");
-            if (enabled == false)
+            if (!runLua)
             {
-                return new PluginReturnValue(false, Path.GetFileName(path));
+                // Copy video to job path as result.mp4
+                File.Copy(video, Path.Join(jobPath, "result.mp4"));
+                video = Path.Join(jobPath, "result.mp4");
+                if (!enabled)
+                {
+                    return new PluginReturnValue(false, Path.GetFileName(path));
+                }
             }
-            ConsoleOutput.WriteLine($"Calling Addon {Path.GetFileName(path)}", Color.LightBlue);
+            ConsoleOutput.WriteLine($"Calling addon {Path.GetFileName(path)} for " + video + (runLua ? " (RunLua)" : ""), Color.LightBlue);
             switch (type)
             {
                 case PluginType.Lua:
@@ -739,8 +835,8 @@ namespace NonsensicalVideoGenerator
                             Table videoOptions = new(luaScript);
                             videoOptions["width"] = int.Parse(SaveData.saveValues["VideoWidth"], CultureInfo.InvariantCulture);
                             videoOptions["height"] = int.Parse(SaveData.saveValues["VideoHeight"], CultureInfo.InvariantCulture);
-                            videoOptions["inputVideo"] = Path.GetFileName(video);
-                            videoOptions["outputVideo"] = "output.mp4";
+                            videoOptions["inputVideo"] = !runLua ? Path.GetFileName(video) : "";
+                            videoOptions["outputVideo"] = !runLua ? "output.mp4" : "";
                             videoOptions["localeName"] = L.GetLocale().name;
                             Table localizationTokens = new Table(luaScript);
                             foreach (Dictionary<string, string> version in L.GetLocale().localizationTokens)
@@ -751,6 +847,7 @@ namespace NonsensicalVideoGenerator
                                 }
                             }
                             videoOptions["localizationTokens"] = localizationTokens;
+                            videoOptions["saveData"] = SaveData.saveValues;
                             // Add settings to pluginSettings table
                             Table pluginSettings = new(luaScript);
                             foreach (KeyValuePair<string, object> setting in settings)
@@ -775,19 +872,36 @@ namespace NonsensicalVideoGenerator
                             functions["folderExists"] = (Func<string, bool>)FolderExists;
                             functions["enumerateFiles"] = (Func<string, IEnumerable<string>>)EnumerateFiles;
                             functions["getRandomLibraryFile"] = (Func<string, string, string>)GetRandomLibraryFile;
+                            functions["getAddons"] = (Func<List<PluginMetadata>>)GetAddons;
                             functions["ffmpegInstalled"] = (Func<bool>)FFmpegInstalled;
                             functions["ffprobeInstalled"] = (Func<bool>)FFprobeInstalled;
                             functions["magickInstalled"] = (Func<bool>)MagickInstalled;
                             functions["libraryHasFile"] = (Func<string, string, string, bool>)LibraryHasFile;
-                            // Requires permission
                             functions["addToLibrary"] = (Action<string, string, string>)AddToLibrary;
                             functions["downloadFile"] = (Action<string, string, string>)DownloadFile;
                             functions["executeProgram"] = (Action<string, string>)ExecuteProgram;
+                            functions["playSound"] = (Action<string>)GlobalContent.PlaySound;
+                            functions["openFilePicker"] = (Func<string, string, bool, string>)OpenFilePicker;
+                            functions["setStatusText"] = (Action<string>)SetStatusText;
+                            functions["getLibraryFileName"] = (Func<string, string>)GetLibraryFileName;
+                            functions["runFFmpegSync"] = (Action<string>)RunFFmpegSync;
+                            functions["runFFprobeSync"] = (Action<string>)RunFFprobeSync;
+                            functions["runMagickSync"] = (Action<string>)RunMagickSync;
+                            functions["runVocoderSync"] = (Action<string>)RunVocoder;
                             PluginHandler.commands.Clear();
                             // Call generation
-                            DynValue result = luaScript.Call(luaScript.Globals["StartGeneration"], videoOptions, pluginSettings, functions);
+                            string funcName = "StartGeneration";
+                            if (runLua)
+                            {
+                                funcName = video;
+                            }
+                            DynValue result = luaScript.Call(luaScript.Globals[funcName], videoOptions, pluginSettings, functions, mouseX, mouseY, button);
                             if (result.Type == DataType.Boolean && result.Boolean)
                             {
+                                if (runLua)
+                                {
+                                    return new PluginReturnValue(true, Path.GetFileName(path), jobPath + @"\");
+                                }
                                 for (int i = 0; i < PluginHandler.commands.Count; i++)
                                 {
                                     // PostCommand function is called with the index of the command
@@ -903,7 +1017,8 @@ namespace NonsensicalVideoGenerator
                                 string libraryPrettyName = library.Table.Get("name").String;
                                 string libraryName = library.Table.Get("path").String;
                                 string libraryTooltip = library.Table.Get("tooltip").String;
-                                LibraryType dummyType = new(rootType, libraryName, libraryTooltip);
+                                bool libraryReadOnly = library.Table.Get("readonly").Boolean;
+                                LibraryType dummyType = new(rootType, libraryName, libraryTooltip, libraryReadOnly);
                                 string libPath = Path.Join(rootTypeStr, libraryName);
                                 LibraryType libraryType = DefaultLibraryTypes.Video;
                                 for (int i = 0; i < DefaultLibraryTypes.AllTypes.Count; i++)
@@ -973,6 +1088,9 @@ namespace NonsensicalVideoGenerator
                                         break;
                                     case "label":
                                         settingTypes.Add(settingName, SettingType.Label);
+                                        break;
+                                    case "button":
+                                        settingTypes.Add(settingName, SettingType.Button);
                                         break;
                                     default:
                                         settingTypes.Add(settingName, SettingType.TextInput);

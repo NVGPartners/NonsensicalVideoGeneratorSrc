@@ -63,6 +63,7 @@ function Query(localeName, localizationTokens)
             --   bool           Only accept 1 or 0. (displayed as a switch)
             --   label          Read-only text for the user. (see labels above)
             --   any            Accept any text.
+            --   button         Runs the function named after the value when clicked. (displayed as a button)
             -- This example option will be a number between 1 and 100.
             -- Tooltips will be displayed once the user hovers over the option.
             {
@@ -71,6 +72,12 @@ function Query(localeName, localizationTokens)
                 ["value"] = "50",
                 ["type"] = "int"
             }
+            -- To create a button, use the "button" type and this format:
+            -- {
+            --     ["name"] = "Test Button",
+            --     ["tooltip"] = "Print a message to the console.",
+            --     ["type"] = "button"
+            -- }
         },
         -- If your addon would like to use a custom media directory, you can set it up here.
         -- Libraries are displayed in the Library tab of the program and store a specific type of media.
@@ -105,6 +112,7 @@ local temp = "temp.mp4"
 
 -- Variables for the effect to use and modify.
 local speedUpOrDown = false
+local finished = false
 
 -- This function is where generation is started.
 -- It is called once per clip and is passed a few variables.
@@ -137,6 +145,7 @@ function StartGeneration(options, pluginSettings, functions)
     -- Using the chance variable, the user can select the weight of how
     -- often the addon will be applied within the settings menu.
     speedUpOrDown = functions.randomInt(1, 100) <= chance and true or false
+    finished = false -- Variables may be persisted between runs, so we reset it here.
 
     -- Choose which effect to apply.
     -- Because this addon flips between two types of effects,
@@ -183,6 +192,7 @@ function PostCommand(commandindex, outputresult, errorresult, options, pluginSet
         print("<[0,255,0]>This is green text!")
         print("<[0,0,255]>This is blue text!")
         print("This is default text!")
+        finished = true -- Set the finished variable to true to indicate that the effect has been applied.
     end
 end
 
@@ -199,6 +209,23 @@ function StopGeneration(options, pluginSettings, functions)
     end
 
     -- If you return false, the console will report that this addon failed to apply.
-    -- Because we successfully applied the effect, we're going to return true.
-    return true
+    -- We're returning the finished variable to indicate whether the effect was applied successfully.
+    return finished
 end
+
+-- RunLua is a function that can be used to test Lua code within the addon.
+-- You can run this function by clicking on the addon in the addons tab.
+-- This is useful for debugging and testing Lua code without having to generate a video.
+function RunLua(options, pluginSettings, functions, mouseX, mouseY)
+    print("Hello from %filename%! Mouse coordinates: (" .. mouseX .. ", " .. mouseY .. ")")
+    -- Must return false to allow NVG to use the default behavior.
+    -- If you return true, no sound will play when this button is clicked.
+    -- Uncomment this line to play a sound when the button is clicked:
+    -- functions.playSound("Select")
+    return false
+end
+
+-- See the options above for how to create a button, this function will be called when the button is clicked.
+-- function ButtonInteraction(options, pluginSettings, functions, mouseX, mouseY, buttonName)
+--    print("Hello from " .. buttonName .. "! Mouse coordinates: (" .. mouseX .. ", " .. mouseY .. ")")
+-- end

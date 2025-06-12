@@ -75,7 +75,7 @@ namespace NonsensicalVideoGenerator
                 {
                     case 2: // left click
                         GlobalContent.PlaySound("Select");
-                        if(currentLibraryType == DefaultLibraryTypes.Render)
+                        if(currentLibraryType.ReadOnly)
                         {
                             GlobalContent.PlaySound("Error");
                             return true;
@@ -94,7 +94,7 @@ namespace NonsensicalVideoGenerator
                 {
                     case 2: // left click
                         GlobalContent.PlaySound("Select");
-                        if(currentLibraryType == DefaultLibraryTypes.Render)
+                        if(currentLibraryType.ReadOnly)
                         {
                             GlobalContent.PlaySound("Error");
                             return true;
@@ -245,7 +245,7 @@ namespace NonsensicalVideoGenerator
                         else
                         {
                             spriteBatch.Draw(GlobalContent.GetTexture("StaticAnim" + staticAnim), staticRect, Color.White);
-                            if(currentLibraryType != DefaultLibraryTypes.Render && currentLibraryType != DefaultLibraryTypes.NoImages)
+                            if(!currentLibraryType.ReadOnly)
                             {
                                 spriteBatch.Draw(GlobalContent.GetTexture("StaticOverlay"), staticRect, ThemeManager.GetColor("VideoHolderAddOverlayLibraryPage"));
                             }
@@ -255,7 +255,7 @@ namespace NonsensicalVideoGenerator
                         if(!video)
                         {
                             spriteBatch.Draw(addVideoOverlay, addVideoOverlayRect, Color.White);
-                            if(currentLibraryType == DefaultLibraryTypes.Render || currentLibraryType == DefaultLibraryTypes.NoImages)
+                            if(currentLibraryType.ReadOnly)
                             {
                                 spriteBatch.Draw(renderAddVideoOverlay, renderAddVideoOverlayRect, Color.White);
                             }
@@ -266,7 +266,7 @@ namespace NonsensicalVideoGenerator
                             GlobalContent.DrawString(spriteBatch, munroSmall, L.T(0, "Library:AskToDelete"), new Vector2(deleteConfirmRect.X - GlobalGraphics.Scale(1), deleteConfirmRect.Y - GlobalGraphics.Scale(14)), Color.White);
                             spriteBatch.Draw(deleteConfirm, deleteConfirmRect, Color.White);
                         }
-                        else if(currentLibraryType != DefaultLibraryTypes.Render && currentLibraryType != DefaultLibraryTypes.NoImages)
+                        else if(!currentLibraryType.ReadOnly)
                         {
                             // Draw toggle button for state of video
                             LibraryFile file = libraryFileCache[currentLibraryType][position];
@@ -286,7 +286,7 @@ namespace NonsensicalVideoGenerator
             spriteBatch.Draw(typeButton, rects["VideoButton"], Color.White);
             spriteBatch.Draw(typeButton, rects["AudioButton"], Color.White);
 #if WINDOWSDX
-            if(currentLibraryType != DefaultLibraryTypes.Render && currentLibraryType != DefaultLibraryTypes.NoImages)
+            if(!currentLibraryType.ReadOnly)
                 spriteBatch.Draw(headerButton, rects["DownloadMediaButton"], Color.White);
 #endif
             // Draw subtypes
@@ -306,7 +306,7 @@ namespace NonsensicalVideoGenerator
                 spriteBatch.Draw(typeButtonSelected, rects["VideoButton"], Color.White);
             if((selectedFlags & 2) == 2)
                 spriteBatch.Draw(typeButtonSelected, rects["AudioButton"], Color.White);
-            if(currentLibraryType != DefaultLibraryTypes.Render && currentLibraryType != DefaultLibraryTypes.NoImages)
+            if(!currentLibraryType.ReadOnly)
             {
                 if((selectedFlags & 4) == 4)
                     spriteBatch.Draw(headerButtonSelected, rects["DownloadMediaButton"], Color.White);
@@ -367,7 +367,7 @@ namespace NonsensicalVideoGenerator
             GlobalContent.DrawString(spriteBatch, munroSmall, "->", new Vector2(GlobalGraphics.Scale(281), GlobalGraphics.Scale(223)), Color.White);
             // Downloader
 #if WINDOWSDX
-            if(currentLibraryType != DefaultLibraryTypes.Render && currentLibraryType != DefaultLibraryTypes.NoImages)
+            if(!currentLibraryType.ReadOnly)
             {
                 string totalIndicator = L.T(0, "Library:DownloadMediaTitle");
                 if(downloading)
@@ -653,7 +653,7 @@ namespace NonsensicalVideoGenerator
             if(Global.dragDropFiles.Count > 0)
             {
                 bool success = true;
-                if(currentLibraryType != DefaultLibraryTypes.Render && currentLibraryType != DefaultLibraryTypes.NoImages)
+                if(!currentLibraryType.ReadOnly)
                 {
                     foreach (string file in Global.dragDropFiles)
                     {
@@ -703,7 +703,7 @@ namespace NonsensicalVideoGenerator
                 for(int i = 0; i < rects.Count; i++)
                 {   
 #if WINDOWSDX
-                    if((currentLibraryType == DefaultLibraryTypes.Render || currentLibraryType == DefaultLibraryTypes.NoImages) && rects.Keys.ElementAt(i) == "DownloadMediaButton")
+                    if(currentLibraryType.ReadOnly && rects.Keys.ElementAt(i) == "DownloadMediaButton")
 #else
                     if(rects.Keys.ElementAt(i) == "DownloadMediaButton")   
 #endif
@@ -757,13 +757,13 @@ namespace NonsensicalVideoGenerator
                             {
                                 Accessibility.CompatAccessibility(button1Rect, deleteConfirmPos == position ? L.T(0, "Accessibility:LibraryDeleteConfirm", Path.GetFileName(libraryFileCache[currentLibraryType][position].Path) ?? "???") : L.T(0, "Accessibility:LibraryOrganize", Path.GetFileName(libraryFileCache[currentLibraryType][position].Path) ?? "???"));
                                 Accessibility.CompatAccessibility(button2Rect, deleteConfirmPos == position ? L.T(0, "Accessibility:LibraryDeleteCancel", Path.GetFileName(libraryFileCache[currentLibraryType][position].Path) ?? "???") : L.T(0, "Accessibility:LibraryDelete", Path.GetFileName(libraryFileCache[currentLibraryType][position].Path) ?? "???"));
-                                if(currentLibraryType != DefaultLibraryTypes.Render && currentLibraryType != DefaultLibraryTypes.NoImages)
+                                if(!currentLibraryType.ReadOnly)
                                     Accessibility.CompatAccessibility(toggleButtonRect, libraryFileCache[currentLibraryType][position].Enabled ? L.T(0, "Accessibility:LibraryEnable", Path.GetFileName(libraryFileCache[currentLibraryType][position].Path) ?? "???") : L.T(0, "Accessibility:LibraryDisable", Path.GetFileName(libraryFileCache[currentLibraryType][position].Path) ?? "???"));
                                 Accessibility.CompatAccessibility(staticRect, L.T(0, "Accessibility:LibraryOpen", Path.GetFileName(libraryFileCache[currentLibraryType][position].Path) ?? "???"));
                             }
                             else
                             {
-                                if(currentLibraryType != DefaultLibraryTypes.Render && currentLibraryType != DefaultLibraryTypes.NoImages)
+                                if(!currentLibraryType.ReadOnly)
                                     Accessibility.CompatAccessibility(staticRect, L.T(0, "Accessibility:LibraryAddMedia"));
                             }
                         }
@@ -886,7 +886,7 @@ namespace NonsensicalVideoGenerator
                                             break;
                                         if(libraryFileCache.Keys.Contains(currentLibraryType))
                                         {
-                                            if(currentLibraryType != DefaultLibraryTypes.Render && currentLibraryType != DefaultLibraryTypes.NoImages)
+                                            if(!currentLibraryType.ReadOnly)
                                             {
                                                 if (!downloading)
                                                 {
@@ -1215,7 +1215,7 @@ namespace NonsensicalVideoGenerator
                                                 }
                                                 return false;
                                             }, false));
-                                            if(currentLibraryType != DefaultLibraryTypes.Render && currentLibraryType != DefaultLibraryTypes.NoImages)
+                                            if(!currentLibraryType.ReadOnly)
                                             {
                                                 Texture2D videoToggle = libraryFileCache[currentLibraryType][position].Enabled ? videoOn : videoOff;
                                                 Global.mask.AddUnmaskedObject("VideoToggle", new SimpleObject(toggleButtonRect, Color.White, videoToggle, () => {
@@ -1297,7 +1297,7 @@ namespace NonsensicalVideoGenerator
                                 }
                                 else if (toggleButtonRect.Contains(MouseInput.MouseState.Position) && left && deleteConfirmPos == -1)
                                 {
-                                    if(currentLibraryType != DefaultLibraryTypes.Render && currentLibraryType != DefaultLibraryTypes.NoImages)
+                                    if(!currentLibraryType.ReadOnly)
                                     {
                                         // Toggle video button
                                         if (libraryFileCache[currentLibraryType].Count > position)
@@ -1336,7 +1336,7 @@ namespace NonsensicalVideoGenerator
                                             }
                                         }
                                     }
-                                    else if(left && currentLibraryType != DefaultLibraryTypes.Render && currentLibraryType != DefaultLibraryTypes.NoImages)
+                                    else if(left && !currentLibraryType.ReadOnly)
                                     {
                                         // Add button: Open file dialog with filters from library type
                                         GlobalContent.PlaySound("Option");
@@ -1468,7 +1468,7 @@ namespace NonsensicalVideoGenerator
                                         }
                                     }
                                 }
-                                else if(currentLibraryType != DefaultLibraryTypes.Render && currentLibraryType != DefaultLibraryTypes.NoImages)
+                                else if(!currentLibraryType.ReadOnly)
                                 {
                                     tooltip = L.T(0, "Library:AddMedia");
                                 }

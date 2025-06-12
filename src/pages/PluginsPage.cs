@@ -685,85 +685,97 @@ namespace NonsensicalVideoGenerator
                             if (MouseInput.MouseState.X >= GlobalGraphics.Scale(138) && MouseInput.MouseState.X < GlobalGraphics.Scale(inRange)
                                 && MouseInput.MouseState.Y >= GlobalGraphics.Scale(59 + ((i-offsetpl) * 16) - scrollOffset) && MouseInput.MouseState.Y < GlobalGraphics.Scale(70 + ((i-offsetpl) * 16) - scrollOffset))
                             {
-                                // Play boot movie if it's a boot movie
-                                if(PluginHandler.plugins[i].GetAddonType() == AddonType.BootMovie)
+                                bool useOverride = false;
+                                try
                                 {
-                                    string filePath = PluginHandler.plugins[i].path.Replace(".lua", ".mp4");
-                                    if(File.Exists(filePath))
+                                    PluginReturnValue called = PluginHandler.plugins[i].Call("RunLua", true, MouseInput.MouseState.X, MouseInput.MouseState.Y);
+                                    if (called.success)
+                                    {
+                                        useOverride = true;
+                                    }
+                                } catch {}
+                                if (!useOverride)
+                                {
+                                    // Play boot movie if it's a boot movie
+                                    if (PluginHandler.plugins[i].GetAddonType() == AddonType.BootMovie)
+                                    {
+                                        string filePath = PluginHandler.plugins[i].path.Replace(".lua", ".mp4");
+                                        if (File.Exists(filePath))
+                                        {
+                                            FramePlayer.Stop();
+                                            GlobalContent.PlaySound("Select");
+                                            if (UserInterface.instance != null)
+                                            {
+                                                if (UserInterface.instance.videoPlayer != null)
+                                                {
+                                                    UserInterface.instance.videoPlayer.Dispose();
+                                                    Global.videoPlaying = false;
+                                                    UserInterface.instance.videoPlayer = null;
+                                                }
+                                                UserInterface.instance.videoPlayer = new MonoGame.Extended.Framework.Media.VideoPlayer(UserInterface.instance.GraphicsDevice);
+                                                FramePlayer.canPlayBgMusic = true;
+                                                if (UserInterface.instance.video != null)
+                                                {
+                                                    UserInterface.instance.video.Dispose();
+                                                    UserInterface.instance.video = null;
+                                                }
+                                                string cachePath = VideoCache.GetCachePath(filePath);
+                                                UserInterface.instance.videoPath = cachePath;
+                                                UserInterface.instance.video = VideoHelper.LoadFromFile(cachePath);
+                                                //UserInterface.instance.videoPlayer.IsLooped = true;
+                                                UserInterface.instance.videoPlayer.Play(UserInterface.instance.video);
+                                                Global.videoPlaying = true;
+                                                UserInterface.instance.videoPlayer.Volume = float.Parse(SaveData.saveValues["VideoVolume"], CultureInfo.InvariantCulture) / 100f;
+                                            }
+                                            FramePlayer.canPlayBgMusic = false;
+                                            Global.generator.progressText = L.T(0, "Video:StatusPlay");
+                                            if (ScreenManager.GetScreen<VideoScreen>("Video") == null
+                                                || ScreenManager.GetScreen<VideoScreen>("Video")?.screenType == ScreenType.Hidden)
+                                            {
+                                                ScreenManager.PushNavigation("Video");
+                                                ScreenManager.GetScreen<VideoScreen>("Video")?.Show();
+                                            }
+                                            return true;
+                                        }
+                                    }
+                                    // Test effect if it's an effect
+                                    if (PluginHandler.plugins[i].GetAddonType() == AddonType.Effect)
                                     {
                                         FramePlayer.Stop();
-                                        GlobalContent.PlaySound("Select");
-                                        if(UserInterface.instance != null)
+                                        Global.videoPlaying = false;
+                                        if (UserInterface.instance != null)
                                         {
-                                            if(UserInterface.instance.videoPlayer != null)
+                                            if (UserInterface.instance.videoPlayer != null && UserInterface.instance.videoPlayer.State != MediaState.Stopped)
                                             {
                                                 UserInterface.instance.videoPlayer.Dispose();
-                                                Global.videoPlaying = false;
                                                 UserInterface.instance.videoPlayer = null;
                                             }
-                                            UserInterface.instance.videoPlayer = new MonoGame.Extended.Framework.Media.VideoPlayer(UserInterface.instance.GraphicsDevice);
-                                            FramePlayer.canPlayBgMusic = true;
-                                            if(UserInterface.instance.video != null)
-                                            {
-                                                UserInterface.instance.video.Dispose();
-                                                UserInterface.instance.video = null;
-                                            }
-                                            string cachePath = VideoCache.GetCachePath(filePath);
-                                            UserInterface.instance.videoPath = cachePath;
-                                            UserInterface.instance.video = VideoHelper.LoadFromFile(cachePath);
-                                            //UserInterface.instance.videoPlayer.IsLooped = true;
-                                            UserInterface.instance.videoPlayer.Play(UserInterface.instance.video);
-                                            Global.videoPlaying = true;
-                                            UserInterface.instance.videoPlayer.Volume = float.Parse(SaveData.saveValues["VideoVolume"], CultureInfo.InvariantCulture) / 100f;
                                         }
-                                        FramePlayer.canPlayBgMusic = false;
-                                        Global.generator.progressText = L.T(0, "Video:StatusPlay");
-                                        if(ScreenManager.GetScreen<VideoScreen>("Video") == null
-                                            || ScreenManager.GetScreen<VideoScreen>("Video")?.screenType == ScreenType.Hidden)
-                                        {
-                                            ScreenManager.PushNavigation("Video");
-                                            ScreenManager.GetScreen<VideoScreen>("Video")?.Show();
-                                        }
+                                        FramePlayer.canPlayBgMusic = true;
+                                        Global.generator.progressText = L.T(0, "Video:StatusStop");
+                                        if (SaveData.saveValues["UseExternalVideoPlayer"] == "false")
+                                            ScreenManager.GetScreen<VideoScreen>("Video")?.Hide();
+                                        GlobalContent.PlaySound("Select");
+                                        Global.generator.StartEffectTest(PluginHandler.plugins[i]);
                                         return true;
                                     }
-                                }
-                                // Test effect if it's an effect
-                                if (PluginHandler.plugins[i].GetAddonType() == AddonType.Effect)
-                                {
-                                    FramePlayer.Stop();
-                                    Global.videoPlaying = false;
-                                    if (UserInterface.instance != null)
+                                    GlobalContent.PlaySound("Option");
+                                    ProcessStartInfo startInfo = new();
+                                    // Workshop plugin should open workshop page
+                                    if (PluginHandler.plugins[i].workshopId != "" && PluginHandler.plugins[i].rootPath.Contains("workshop"))
                                     {
-                                        if (UserInterface.instance.videoPlayer != null && UserInterface.instance.videoPlayer.State != MediaState.Stopped)
-                                        {
-                                            UserInterface.instance.videoPlayer.Dispose();
-                                            UserInterface.instance.videoPlayer = null;
-                                        }
+                                        startInfo.FileName = "steam://openurl/https://steamcommunity.com/sharedfiles/filedetails/?id=" + PluginHandler.plugins[i].workshopId;
+                                        startInfo.UseShellExecute = true;
+                                        ConsoleOutput.WriteLine($"> {startInfo.FileName} {startInfo.Arguments}", Color.Transparent);
+                                        Process.Start(startInfo);
+                                        return true;
                                     }
-                                    FramePlayer.canPlayBgMusic = true;
-                                    Global.generator.progressText = L.T(0, "Video:StatusStop");
-                                    if(SaveData.saveValues["UseExternalVideoPlayer"] == "false")
-                                        ScreenManager.GetScreen<VideoScreen>("Video")?.Hide();
-                                    GlobalContent.PlaySound("Select");
-                                    Global.generator.StartEffectTest(PluginHandler.plugins[i]);
-                                    return true;
-                                }
-                                GlobalContent.PlaySound("Option");
-                                ProcessStartInfo startInfo = new();
-                                // Workshop plugin should open workshop page
-                                if(PluginHandler.plugins[i].workshopId != "" && PluginHandler.plugins[i].rootPath.Contains("workshop"))
-                                {
-                                    startInfo.FileName = "steam://openurl/https://steamcommunity.com/sharedfiles/filedetails/?id=" + PluginHandler.plugins[i].workshopId;
-                                    startInfo.UseShellExecute = true;
+                                    // Open directory and select file
+                                    startInfo.FileName = "explorer.exe";
+                                    startInfo.Arguments = "/select, \"" + Path.GetFullPath(PluginHandler.plugins[i].path) + "\"";
                                     ConsoleOutput.WriteLine($"> {startInfo.FileName} {startInfo.Arguments}", Color.Transparent);
                                     Process.Start(startInfo);
-                                    return true;
                                 }
-                                // Open directory and select file
-                                startInfo.FileName = "explorer.exe";
-                                startInfo.Arguments = "/select, \"" + Path.GetFullPath(PluginHandler.plugins[i].path) + "\"";
-                                ConsoleOutput.WriteLine($"> {startInfo.FileName} {startInfo.Arguments}", Color.Transparent);
-                                Process.Start(startInfo);
                                 return true;
                             }
                             // Settings button
@@ -780,7 +792,7 @@ namespace NonsensicalVideoGenerator
                                     if(PluginHandler.plugins[i].workshopId != ""
                                         && PluginHandler.plugins[i].workshopId != "stock")
                                     {
-                                        if(PluginHandler.plugins[i].submittedId != "")
+                                        if(PluginHandler.plugins[i].submittedId != "" || PluginHandler.plugins[i].workshopId != "")
                                         {
                                             controller.Add("VisitWorkshopPage", new Button("View Workshop", "View this effect on the Workshop.", new Vector2(119+100, 60+10+19*7), (int i, string n) => {
                                                 switch(i)
@@ -1067,6 +1079,19 @@ namespace NonsensicalVideoGenerator
                                                     }
                                                     return switchState;
                                                 }, PluginHandler.plugins[i].settings[s.Key].ToString() == "1");
+                                                break;
+                                            case SettingType.Button:
+                                                te = new Button(s.Key, PluginHandler.plugins[i].settingTooltips[s.Key], new Vector2(119+100, 60+10+19*sindex), (int i, string keyFromIndex) => {
+                                                    if (i == 2)
+                                                    {
+                                                        PluginReturnValue returnValue = PluginHandler.plugins[settingsIndex].Call("ButtonInteraction", true, MouseInput.MouseState.X, MouseInput.MouseState.Y, s.Key);
+                                                        if (returnValue.success)
+                                                        {
+                                                            return true;
+                                                        }
+                                                    }
+                                                    return false;
+                                                });
                                                 break;
                                             case SettingType.TextInput:
                                             default:
