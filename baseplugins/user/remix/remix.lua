@@ -40,7 +40,7 @@ local indexoffset = 0
 function StartGeneration(options, pluginSettings, functions)
     -- Download default media
     if not functions.libraryHasFile("audio", "remix", "remix.mp3") then
-        functions.downloadFile("https://github.com/KiwifruitDev/NonsensicalVideoGenerator/raw/main/addonlibraries/remix.mp3", "audio", "remix")
+        functions.downloadFile("https://github.com/KiwifruitDev/NonsensicalVideoGenerator/raw/refs/heads/main/addonlibraries/remix.mp3", "audio", "remix")
         indexoffset = 1
     else
         -- Set variables

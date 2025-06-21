@@ -224,19 +224,15 @@ namespace NonsensicalVideoGenerator
             }
             if(UserInterface.instance != null)
             {
-                // Pressing the space bar will skip the intro video.
+                // Clicking on the intro video will skip it.
                 if(UserInterface.instance.videoPlayer != null && !UserInterface.instance.introFinished)
                 {
-                    if(keyboardState.IsKeyDown(Keys.Space))
+                    if(MouseInput.MouseState.LeftButton == ButtonState.Pressed && MouseInput.LastMouseState.LeftButton == ButtonState.Released)
                     {
                         UserInterface.instance.videoPlayer.Stop();
                         UserInterface.instance.videoPath = "";
                         FramePlayer.canPlayBgMusic = true;
                         GlobalContent.PlaySound("Select");
-                    }
-                    else if(keyboardState.GetPressedKeys().Length > 0 || (MouseInput.MouseState.LeftButton == ButtonState.Pressed && MouseInput.LastMouseState.LeftButton == ButtonState.Released))
-                    {
-                        GlobalContent.PlaySound("Hover");
                     }
                 }
                 // F11 or Alt+Enter will toggle fullscreen
@@ -274,20 +270,29 @@ namespace NonsensicalVideoGenerator
                     {
                         GetScreen<ContentScreen>("Content")?.Hide();
                         GetScreen<HeaderScreen>("Header")?.Hide();
-                        if(SaveData.saveValues["UseExternalVideoPlayer"] == "false")
+                        if (UserInterface.instance != null && UserInterface.instance.videoPlayer != null
+                            && SaveData.saveValues["UseExternalVideoPlayer"] == "false")
+                        {
+                            UserInterface.instance.videoPlayer.Stop();
+                            UserInterface.instance.videoPath = "";
+                            FramePlayer.canPlayBgMusic = true;
                             GetScreen<VideoScreen>("Video")?.Hide();
+                        }
                         GetScreen<MenuScreen>("Menu")?.Hide();
                     }
                     else
                     {
                         PushNavigation("Content");
                         PushNavigation("Header");
-                        PushNavigation("Video");
                         PushNavigation("Menu");
                         GetScreen<ContentScreen>("Content")?.Show();
                         GetScreen<HeaderScreen>("Header")?.Show();
-                        if(SaveData.saveValues["UseExternalVideoPlayer"] == "false")
+                        if (UserInterface.instance != null && UserInterface.instance.videoPlayer != null
+                            && SaveData.saveValues["UseExternalVideoPlayer"] == "true")
+                        {
+                            PushNavigation("Video");
                             GetScreen<VideoScreen>("Video")?.Show();
+                        }
                         GetScreen<MenuScreen>("Menu")?.Show();
                     }
                 }

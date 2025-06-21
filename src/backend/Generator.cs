@@ -146,36 +146,49 @@ namespace NonsensicalVideoGenerator
                             if (bool.Parse(SaveData.saveValues["PlayAutomatically"]))
                             {
                                 FramePlayer.Stop();
-                                if(UserInterface.instance != null)
+                                if (SaveData.saveValues["UseExternalVideoPlayer"] == "false")
                                 {
-                                    if(UserInterface.instance.videoPlayer != null)
+                                    if (UserInterface.instance != null)
                                     {
-                                        Global.videoPlaying = false;
-                                        UserInterface.instance.videoPlayer.Dispose();
-                                        UserInterface.instance.videoPlayer = null;
+                                        if (UserInterface.instance.videoPlayer != null)
+                                        {
+                                            Global.videoPlaying = false;
+                                            UserInterface.instance.videoPlayer.Dispose();
+                                            UserInterface.instance.videoPlayer = null;
+                                        }
+                                        UserInterface.instance.videoPlayer = new MonoGame.Extended.Framework.Media.VideoPlayer(UserInterface.instance.GraphicsDevice);
+                                        FramePlayer.canPlayBgMusic = true;
+                                        if (UserInterface.instance.video != null)
+                                        {
+                                            UserInterface.instance.video.Dispose();
+                                            UserInterface.instance.video = null;
+                                        }
+                                        string cachePath = VideoCache.GetCachePath(tempOutput);
+                                        UserInterface.instance.videoPath = cachePath;
+                                        UserInterface.instance.video = VideoHelper.LoadFromFile(cachePath);
+                                        //UserInterface.instance.videoPlayer.IsLooped = true;
+                                        UserInterface.instance.videoPlayer.Play(UserInterface.instance.video);
+                                        Global.videoPlaying = true;
+                                        UserInterface.instance.videoPlayer.Volume = float.Parse(SaveData.saveValues["VideoVolume"], CultureInfo.InvariantCulture) / 100f;
                                     }
-                                    UserInterface.instance.videoPlayer = new MonoGame.Extended.Framework.Media.VideoPlayer(UserInterface.instance.GraphicsDevice);
-                                    FramePlayer.canPlayBgMusic = true;
-                                    if(UserInterface.instance.video != null)
+                                    FramePlayer.canPlayBgMusic = false;
+                                    Global.generator.progressText = L.T(0, "Video:StatusPlay");
+                                    if (ScreenManager.GetScreen<VideoScreen>("Video") == null
+                                        || ScreenManager.GetScreen<VideoScreen>("Video")?.screenType == ScreenType.Hidden)
                                     {
-                                        UserInterface.instance.video.Dispose();
-                                        UserInterface.instance.video = null;
+                                        ScreenManager.PushNavigation("Video");
+                                        ScreenManager.GetScreen<VideoScreen>("Video")?.Show();
                                     }
-                                    string cachePath = VideoCache.GetCachePath(tempOutput);
-                                    UserInterface.instance.videoPath = cachePath;
-                                    UserInterface.instance.video = VideoHelper.LoadFromFile(cachePath);
-                                    //UserInterface.instance.videoPlayer.IsLooped = true;
-                                    UserInterface.instance.videoPlayer.Play(UserInterface.instance.video);
-                                    Global.videoPlaying = true;
-                                    UserInterface.instance.videoPlayer.Volume = float.Parse(SaveData.saveValues["VideoVolume"], CultureInfo.InvariantCulture) / 100f;
                                 }
-                                FramePlayer.canPlayBgMusic = false;
-                                Global.generator.progressText = L.T(0, "Video:StatusPlay");
-                                if(ScreenManager.GetScreen<VideoScreen>("Video") == null
-                                    || ScreenManager.GetScreen<VideoScreen>("Video")?.screenType == ScreenType.Hidden)
+                                else
                                 {
-                                    ScreenManager.PushNavigation("Video");
-                                    ScreenManager.GetScreen<VideoScreen>("Video")?.Show();
+                                    // Open the video in the default video player.
+                                    ProcessStartInfo startInfo = new ProcessStartInfo()
+                                    {
+                                        FileName = tempOutput,
+                                        UseShellExecute = true
+                                    };
+                                    Process.Start(startInfo);
                                 }
                             }
                         }
@@ -342,7 +355,7 @@ namespace NonsensicalVideoGenerator
                                         // Make sure this is a valid file with ffprobe.
                                         ProcessStartInfo ffprobe = new ProcessStartInfo()
                                         {
-                                            FileName = Global.useSystemFFprobe ? "ffprobe" : @".\ffprobe.exe",
+                                            FileName = Global.useSystemFFprobe ? "ffprobe" : @".\bin\ffprobe.exe",
                                             Arguments = "-v error -select_streams v:0 -show_entries stream=codec_name -of default=noprint_wrappers=1:nokey=1 \"" + file + "\"",
                                             UseShellExecute = false,
                                             RedirectStandardOutput = true,
@@ -716,7 +729,7 @@ namespace NonsensicalVideoGenerator
                                     // Make sure this is a valid file with ffprobe.
                                     ProcessStartInfo ffprobe = new ProcessStartInfo()
                                     {
-                                        FileName = Global.useSystemFFprobe ? "ffprobe" : @".\ffprobe.exe",
+                                        FileName = Global.useSystemFFprobe ? "ffprobe" : @".\bin\ffprobe.exe",
                                         Arguments = "-v error -select_streams v:0 -show_entries stream=codec_name -of default=noprint_wrappers=1:nokey=1 \"" + file + "\"",
                                         UseShellExecute = false,
                                         RedirectStandardOutput = true,
@@ -785,35 +798,48 @@ namespace NonsensicalVideoGenerator
                             if (bool.Parse(SaveData.saveValues["PlayAutomatically"]))
                             {
                                 FramePlayer.Stop();
-                                if(UserInterface.instance != null)
+                                if (SaveData.saveValues["UseExternalVideoPlayer"] == "false")
                                 {
-                                    if(UserInterface.instance.videoPlayer != null)
+                                    if (UserInterface.instance != null)
                                     {
-                                        Global.videoPlaying = false;
-                                        UserInterface.instance.videoPlayer.Dispose();
-                                        UserInterface.instance.videoPlayer = null;
+                                        if (UserInterface.instance.videoPlayer != null)
+                                        {
+                                            Global.videoPlaying = false;
+                                            UserInterface.instance.videoPlayer.Dispose();
+                                            UserInterface.instance.videoPlayer = null;
+                                        }
+                                        UserInterface.instance.videoPlayer = new MonoGame.Extended.Framework.Media.VideoPlayer(UserInterface.instance.GraphicsDevice);
+                                        if (UserInterface.instance.video != null)
+                                        {
+                                            UserInterface.instance.video.Dispose();
+                                            UserInterface.instance.video = null;
+                                        }
+                                        FramePlayer.canPlayBgMusic = true;
+                                        string cachePath = VideoCache.GetCachePath(tempOutput);
+                                        UserInterface.instance.videoPath = cachePath;
+                                        UserInterface.instance.video = VideoHelper.LoadFromFile(cachePath);
+                                        //UserInterface.instance.videoPlayer.IsLooped = true;
+                                        UserInterface.instance.videoPlayer.Play(UserInterface.instance.video);
+                                        Global.videoPlaying = true;
+                                        UserInterface.instance.videoPlayer.Volume = float.Parse(SaveData.saveValues["VideoVolume"], CultureInfo.InvariantCulture) / 100f;
                                     }
-                                    UserInterface.instance.videoPlayer = new MonoGame.Extended.Framework.Media.VideoPlayer(UserInterface.instance.GraphicsDevice);
-                                    if(UserInterface.instance.video != null)
+                                    FramePlayer.canPlayBgMusic = false;
+                                    if (ScreenManager.GetScreen<VideoScreen>("Video") == null
+                                        || ScreenManager.GetScreen<VideoScreen>("Video")?.screenType == ScreenType.Hidden)
                                     {
-                                        UserInterface.instance.video.Dispose();
-                                        UserInterface.instance.video = null;
+                                        ScreenManager.PushNavigation("Video");
+                                        ScreenManager.GetScreen<VideoScreen>("Video")?.Show();
                                     }
-                                    FramePlayer.canPlayBgMusic = true;
-                                    string cachePath = VideoCache.GetCachePath(tempOutput);
-                                    UserInterface.instance.videoPath = cachePath;
-                                    UserInterface.instance.video = VideoHelper.LoadFromFile(cachePath);
-                                    //UserInterface.instance.videoPlayer.IsLooped = true;
-                                    UserInterface.instance.videoPlayer.Play(UserInterface.instance.video);
-                                    Global.videoPlaying = true;
-                                    UserInterface.instance.videoPlayer.Volume = float.Parse(SaveData.saveValues["VideoVolume"], CultureInfo.InvariantCulture) / 100f;
                                 }
-                                FramePlayer.canPlayBgMusic = false;
-                                if(ScreenManager.GetScreen<VideoScreen>("Video") == null
-                                    || ScreenManager.GetScreen<VideoScreen>("Video")?.screenType == ScreenType.Hidden)
+                                else
                                 {
-                                    ScreenManager.PushNavigation("Video");
-                                    ScreenManager.GetScreen<VideoScreen>("Video")?.Show();
+                                    // Open the video in the default video player.
+                                    ProcessStartInfo startInfo = new()
+                                    {
+                                        FileName = tempOutput,
+                                        UseShellExecute = true
+                                    };
+                                    Process.Start(startInfo);
                                 }
                             }
                         }
@@ -1103,7 +1129,7 @@ namespace NonsensicalVideoGenerator
                                 // Make sure this is a valid file with ffprobe.
                                 ProcessStartInfo ffprobe = new ProcessStartInfo()
                                 {
-                                    FileName = Global.useSystemFFprobe ? "ffprobe" : @".\ffprobe.exe",
+                                    FileName = Global.useSystemFFprobe ? "ffprobe" : @".\bin\ffprobe.exe",
                                     Arguments = "-v error -select_streams v:0 -show_entries stream=codec_name -of default=noprint_wrappers=1:nokey=1 \"" + file + "\"",
                                     UseShellExecute = false,
                                     RedirectStandardOutput = true,
@@ -1156,35 +1182,48 @@ namespace NonsensicalVideoGenerator
                 if (File.Exists(Path.Combine(temporaryDirectory, thisClip.name)))
                 {
                     FramePlayer.Stop();
-                    if (UserInterface.instance != null)
+                    if (SaveData.saveValues["UseExternalVideoPlayer"] == "false")
                     {
-                        if (UserInterface.instance.videoPlayer != null)
+                        if (UserInterface.instance != null)
                         {
-                            Global.videoPlaying = false;
-                            UserInterface.instance.videoPlayer.Dispose();
-                            UserInterface.instance.videoPlayer = null;
+                            if (UserInterface.instance.videoPlayer != null)
+                            {
+                                Global.videoPlaying = false;
+                                UserInterface.instance.videoPlayer.Dispose();
+                                UserInterface.instance.videoPlayer = null;
+                            }
+                            UserInterface.instance.videoPlayer = new MonoGame.Extended.Framework.Media.VideoPlayer(UserInterface.instance.GraphicsDevice);
+                            if (UserInterface.instance.video != null)
+                            {
+                                UserInterface.instance.video.Dispose();
+                                UserInterface.instance.video = null;
+                            }
+                            FramePlayer.canPlayBgMusic = true;
+                            string cachePath = VideoCache.GetCachePath(Path.Combine(temporaryDirectory, thisClip.name));
+                            UserInterface.instance.videoPath = cachePath;
+                            UserInterface.instance.video = VideoHelper.LoadFromFile(cachePath);
+                            //UserInterface.instance.videoPlayer.IsLooped = true;
+                            UserInterface.instance.videoPlayer.Play(UserInterface.instance.video);
+                            Global.videoPlaying = true;
+                            UserInterface.instance.videoPlayer.Volume = float.Parse(SaveData.saveValues["VideoVolume"], CultureInfo.InvariantCulture) / 100f;
                         }
-                        UserInterface.instance.videoPlayer = new MonoGame.Extended.Framework.Media.VideoPlayer(UserInterface.instance.GraphicsDevice);
-                        if (UserInterface.instance.video != null)
+                        FramePlayer.canPlayBgMusic = false;
+                        if (ScreenManager.GetScreen<VideoScreen>("Video") == null
+                            || ScreenManager.GetScreen<VideoScreen>("Video")?.screenType == ScreenType.Hidden)
                         {
-                            UserInterface.instance.video.Dispose();
-                            UserInterface.instance.video = null;
+                            ScreenManager.PushNavigation("Video");
+                            ScreenManager.GetScreen<VideoScreen>("Video")?.Show();
                         }
-                        FramePlayer.canPlayBgMusic = true;
-                        string cachePath = VideoCache.GetCachePath(Path.Combine(temporaryDirectory, thisClip.name));
-                        UserInterface.instance.videoPath = cachePath;
-                        UserInterface.instance.video = VideoHelper.LoadFromFile(cachePath);
-                        //UserInterface.instance.videoPlayer.IsLooped = true;
-                        UserInterface.instance.videoPlayer.Play(UserInterface.instance.video);
-                        Global.videoPlaying = true;
-                        UserInterface.instance.videoPlayer.Volume = float.Parse(SaveData.saveValues["VideoVolume"], CultureInfo.InvariantCulture) / 100f;
                     }
-                    FramePlayer.canPlayBgMusic = false;
-                    if (ScreenManager.GetScreen<VideoScreen>("Video") == null
-                        || ScreenManager.GetScreen<VideoScreen>("Video")?.screenType == ScreenType.Hidden)
+                    else
                     {
-                        ScreenManager.PushNavigation("Video");
-                        ScreenManager.GetScreen<VideoScreen>("Video")?.Show();
+                        // Open the video in the default video player.
+                        ProcessStartInfo startInfo = new()
+                        {
+                            FileName = Path.Combine(temporaryDirectory, thisClip.name),
+                            UseShellExecute = true
+                        };
+                        Process.Start(startInfo);
                     }
                 }
                 if (effectTestThreadWorker?.CancellationPending == true)
@@ -1294,7 +1333,7 @@ namespace NonsensicalVideoGenerator
                 Process process = new Process();
                 ProcessStartInfo startInfo = new ProcessStartInfo();
                 startInfo.WindowStyle = ProcessWindowStyle.Hidden;
-                startInfo.FileName = Global.useSystemFFprobe ? "ffprobe" : @".\ffprobe.exe";
+                startInfo.FileName = Global.useSystemFFprobe ? "ffprobe" : @".\bin\ffprobe.exe";
                 startInfo.Arguments = "-i \"" + file
                         + "\" -show_entries format=duration"
                         + " -v quiet"
@@ -1345,7 +1384,7 @@ namespace NonsensicalVideoGenerator
                 Process process = new Process();
                 ProcessStartInfo startInfo = new ProcessStartInfo();
                 startInfo.WindowStyle = ProcessWindowStyle.Hidden;
-                startInfo.FileName = Global.useSystemFFmpeg ? "ffmpeg" : @".\ffmpeg.exe";
+                startInfo.FileName = Global.useSystemFFmpeg ? "ffmpeg" : @".\bin\ffmpeg.exe";
                 startInfo.Arguments = "-i \"" + video
                         + "\" -ss " + startTime
                         + " -to " + endTime
@@ -1392,7 +1431,7 @@ namespace NonsensicalVideoGenerator
                 Process process = new Process();
                 ProcessStartInfo startInfo = new ProcessStartInfo();
                 startInfo.WindowStyle = ProcessWindowStyle.Hidden;
-                startInfo.FileName = Global.useSystemFFprobe ? "ffprobe" : @".\ffprobe.exe";
+                startInfo.FileName = Global.useSystemFFprobe ? "ffprobe" : @".\bin\ffprobe.exe";
                 startInfo.Arguments = "-i \"" + video
                         + "\" -show_streams"
                         + " -v quiet"
@@ -1451,7 +1490,7 @@ namespace NonsensicalVideoGenerator
                 Process process = new Process();
                 ProcessStartInfo startInfo = new ProcessStartInfo();
                 startInfo.WindowStyle = ProcessWindowStyle.Hidden;
-                startInfo.FileName = Global.useSystemFFmpeg ? "ffmpeg" : @".\ffmpeg.exe";
+                startInfo.FileName = Global.useSystemFFmpeg ? "ffmpeg" : @".\bin\ffmpeg.exe";
                 startInfo.Arguments = "-i \"" + video + "\" " + appendNoAudio
                         + (SaveData.saveValues["ConstrainAspectRatio"] == "true" ? " -vf scale=" + SaveData.saveValues["VideoWidth"] + "x" + SaveData.saveValues["VideoHeight"] + ",setsar=1:1,fps=fps=" + SaveData.saveValues["VideoFPS"] : " -vf \"scale=(iw*sar)*min(" + SaveData.saveValues["VideoWidth"] + "/(iw*sar)\\," + SaveData.saveValues["VideoHeight"] + "/ih):ih*min(" + SaveData.saveValues["VideoWidth"] + "/(iw*sar)\\," + SaveData.saveValues["VideoHeight"] + "/ih),pad=" + SaveData.saveValues["VideoWidth"] + ":" + SaveData.saveValues["VideoHeight"] + ":(" + SaveData.saveValues["VideoWidth"] + "-iw*min(" + SaveData.saveValues["VideoWidth"] + "/iw\\," + SaveData.saveValues["VideoHeight"] + "/ih))/2:(" + SaveData.saveValues["VideoHeight"] + "-ih*min(" + SaveData.saveValues["VideoWidth"] + "/iw\\," + SaveData.saveValues["VideoHeight"] + "/ih))/2,setsar=1:1,fps=fps=" + SaveData.saveValues["VideoFPS"] + "\"")
                         + (Global.generator.audioSync == true ? " -af aresample=async=1000" : "")
@@ -1553,7 +1592,7 @@ namespace NonsensicalVideoGenerator
                         Process process2 = new Process();
                         ProcessStartInfo startInfo2 = new ProcessStartInfo();
                         startInfo2.WindowStyle = ProcessWindowStyle.Hidden;
-                        startInfo2.FileName = Global.useSystemFFmpeg ? "ffmpeg" : @".\ffmpeg.exe";
+                        startInfo2.FileName = Global.useSystemFFmpeg ? "ffmpeg" : @".\bin\ffmpeg.exe";
                         startInfo2.Arguments = "-i \"" + Path.Combine(temporaryDirectory, thisClip.name) + "\" " + appendNoAudio
                                 + (Global.generator.audioSync == true ? " -af \"aresample=async=1000\"" : "")
                                 + (SaveData.saveValues["ConstrainAspectRatio"] == "true" ? " -vf scale=" + SaveData.saveValues["VideoWidth"] + "x" + SaveData.saveValues["VideoHeight"] + ",setsar=1:1,fps=fps=" + SaveData.saveValues["VideoFPS"] : " -vf \"scale=(iw*sar)*min(" + SaveData.saveValues["VideoWidth"] + "/(iw*sar)\\," + SaveData.saveValues["VideoHeight"] + "/ih):ih*min(" + SaveData.saveValues["VideoWidth"] + "/(iw*sar)\\," + SaveData.saveValues["VideoHeight"] + "/ih),pad=" + SaveData.saveValues["VideoWidth"] + ":" + SaveData.saveValues["VideoHeight"] + ":(" + SaveData.saveValues["VideoWidth"] + "-iw*min(" + SaveData.saveValues["VideoWidth"] + "/iw\\," + SaveData.saveValues["VideoHeight"] + "/ih))/2:(" + SaveData.saveValues["VideoHeight"] + "-ih*min(" + SaveData.saveValues["VideoWidth"] + "/iw\\," + SaveData.saveValues["VideoHeight"] + "/ih))/2,setsar=1:1,fps=fps=" + SaveData.saveValues["VideoFPS"] + "\"")
@@ -1585,7 +1624,7 @@ namespace NonsensicalVideoGenerator
                     // Make sure this is a valid file with ffprobe.
                     ProcessStartInfo ffprobe = new ProcessStartInfo()
                     {
-                        FileName = Global.useSystemFFprobe ? "ffprobe" : @".\ffprobe.exe",
+                        FileName = Global.useSystemFFprobe ? "ffprobe" : @".\bin\ffprobe.exe",
                         Arguments = "-v error -select_streams v:0 -show_entries stream=codec_name -of default=noprint_wrappers=1:nokey=1 \"" + Path.Combine(temporaryDirectory, "concat" + i + ".mp4") + "\"",
                         UseShellExecute = false,
                         RedirectStandardOutput = true,
@@ -1665,7 +1704,7 @@ namespace NonsensicalVideoGenerator
             Process process = new Process();
             ProcessStartInfo startInfo = new ProcessStartInfo();
             startInfo.WindowStyle = ProcessWindowStyle.Hidden;
-            startInfo.FileName = Global.useSystemFFmpeg ? "ffmpeg" : @".\ffmpeg.exe";
+            startInfo.FileName = Global.useSystemFFmpeg ? "ffmpeg" : @".\bin\ffmpeg.exe";
             startInfo.Arguments = concat + " \"" + Path.Combine(temporaryDirectory, "iteration" + iteration + ".mp4") + "\"";
             startInfo.UseShellExecute = false;
             startInfo.RedirectStandardError = true;
@@ -1727,7 +1766,7 @@ namespace NonsensicalVideoGenerator
                 Process process2 = new Process();
                 ProcessStartInfo startInfo2 = new ProcessStartInfo();
                 startInfo2.WindowStyle = ProcessWindowStyle.Hidden;
-                startInfo2.FileName = Global.useSystemFFmpeg ? "ffmpeg" : @".\ffmpeg.exe";
+                startInfo2.FileName = Global.useSystemFFmpeg ? "ffmpeg" : @".\bin\ffmpeg.exe";
                 startInfo2.Arguments = concat2 + " \"" + output + "\"";
                 startInfo2.UseShellExecute = false;
                 startInfo2.RedirectStandardError = true;
@@ -1765,7 +1804,7 @@ namespace NonsensicalVideoGenerator
                 ProcessStartInfo startInfo = new ProcessStartInfo();
                 string overlayed_video = video.Replace(".mp4", "_chromakey.mp4");
                 startInfo.WindowStyle = ProcessWindowStyle.Hidden;
-                startInfo.FileName = Global.useSystemFFmpeg ? "ffmpeg" : @".\ffmpeg.exe";
+                startInfo.FileName = Global.useSystemFFmpeg ? "ffmpeg" : @".\bin\ffmpeg.exe";
                 startInfo.Arguments = "-i \"" + video
                         + "\" -i \"" + overlay
                         + "\" -filter_complex \""
@@ -1843,7 +1882,7 @@ namespace NonsensicalVideoGenerator
                 ProcessStartInfo startInfo = new ProcessStartInfo
                 {
                     WindowStyle = ProcessWindowStyle.Hidden,
-                    FileName = Global.useSystemFFmpeg ? "ffmpeg" : @".\ffmpeg.exe",
+                    FileName = Global.useSystemFFmpeg ? "ffmpeg" : @".\bin\ffmpeg.exe",
                     Arguments =  "-i \"" + media + "\" " + rootTypeFilters[rootType] + " -y \"" + output + "\"",
                     UseShellExecute = false,
                     RedirectStandardError = true,
@@ -1882,7 +1921,7 @@ namespace NonsensicalVideoGenerator
                 ProcessStartInfo startInfo = new ProcessStartInfo
                 {
                     WindowStyle = ProcessWindowStyle.Hidden,
-                    FileName = Global.useSystemFFmpeg ? "ffmpeg" : @".\ffmpeg.exe",
+                    FileName = Global.useSystemFFmpeg ? "ffmpeg" : @".\bin\ffmpeg.exe",
                     Arguments = $"-ss {startTime.ToString(CultureInfo.InvariantCulture)} -t {(endTime - startTime).ToString(CultureInfo.InvariantCulture)} -i \"{media}\" -i \"{templateImage}\" -filter_complex \"{rootTypeFilters[rootType]}[thumb];[thumb][1:v]overlay[finished]\" -map \"[finished]\" -r {fps.ToString(CultureInfo.InvariantCulture)} -y \"{output}\"",
                     UseShellExecute = false,
                     RedirectStandardError = true,
@@ -1918,7 +1957,7 @@ namespace NonsensicalVideoGenerator
                 ProcessStartInfo startInfo = new ProcessStartInfo()
                 {
                     WindowStyle = ProcessWindowStyle.Hidden,
-                    FileName = Global.useSystemFFmpeg ? "ffmpeg" : @".\ffmpeg.exe",
+                    FileName = Global.useSystemFFmpeg ? "ffmpeg" : @".\bin\ffmpeg.exe",
                     Arguments = "-ss " + startTime.ToString(CultureInfo.InvariantCulture)
                             + " -t " + (endTime - startTime).ToString(CultureInfo.InvariantCulture)
                             + " -i \"" + video + "\""

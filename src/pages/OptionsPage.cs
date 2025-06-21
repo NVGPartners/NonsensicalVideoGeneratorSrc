@@ -392,6 +392,9 @@ namespace NonsensicalVideoGenerator
                             UserInterface.instance.videoPlayer.Volume = int.Parse(SaveData.saveValues["VideoVolume"], CultureInfo.InvariantCulture) / 100f;
                         if(FramePlayer.audio != null)
                             FramePlayer.audio.Volume = float.Parse(SaveData.saveValues["VideoVolume"], CultureInfo.InvariantCulture) / 100f;
+                        DiscordRPC.Initialize();
+                        HolidayManager.CheckHolidays();
+                        ThemeManager.ApplyTheme(DefaultThemes.Nonsensical);
                         return true;
                 }
                 return false;
@@ -450,6 +453,38 @@ namespace NonsensicalVideoGenerator
                     else
                         ThemeManager.ApplyTheme(DefaultThemes.Nonsensical);
                 }
+                if ((i & 8) != 0)
+                {
+                    // Cycle holiday.
+                    GlobalContent.PlaySound("Select");
+                    if (HolidayManager.CurrentHoliday == null)
+                    {
+                        // set the first holiday
+                        Holiday holiday = HolidayManager.Holidays[0];
+                        ThemeManager.ApplyTheme(holiday.Theme);
+                        HolidayManager.SetHoliday(holiday);
+                        return switchState;
+                    }
+                    if (HolidayManager.CurrentHoliday != null)
+                    {
+                        for (int j = 0; j < HolidayManager.Holidays.Count; j++)
+                        {
+                            if (HolidayManager.CurrentHoliday.InternalName == HolidayManager.Holidays[j].InternalName)
+                            {
+                                if (j + 1 < HolidayManager.Holidays.Count)
+                                {
+                                    if (HolidayManager.Holidays[j + 1].Theme != null)
+                                        ThemeManager.ApplyTheme(HolidayManager.Holidays[j + 1].Theme);
+                                    HolidayManager.SetHoliday(HolidayManager.Holidays[j + 1]);
+                                    return switchState;
+                                }
+                                ThemeManager.ApplyTheme(DefaultThemes.Nonsensical);
+                                HolidayManager.SetHoliday(null);
+                                return switchState;
+                            }
+                        }
+                    }
+                }
                 return switchState;
             }, SaveData.saveValues["DisableHolidays"] == "true"));
             scrollView.Controller.Add("MotionDisable", new Switch("Disable Motion", "Turns off screen tweening and other elements.", new Vector2(139, 60-(8*3)+(19*14)+(10*1)+(9*1)), (int i, string n) => {
@@ -466,14 +501,23 @@ namespace NonsensicalVideoGenerator
             scrollView.Controller.Add("Preferences", new Label("Preferences:", new Vector2(139, 60-(8*2)+(19*13)+(10*1)+(9*1))));
             scrollView.Controller.Add("UseExternalVideoPlayer", new Switch("Use External Media Player", "Open media using their default programs instead of extracting frames.", new Vector2(139, 60-(8*2)+(19*12)+(10*1)+(9*1)), (int i, string n) => {
                 bool switchState = (i & 256) != 0;
-                if((i & 2) != 0)
+                if ((i & 2) != 0)
                 {
                     string oldValue = SaveData.saveValues["UseExternalVideoPlayer"];
                     SaveData.saveValues["UseExternalVideoPlayer"] = switchState.ToString().ToLower();
-                    if(oldValue != SaveData.saveValues["UseExternalVideoPlayer"])
+                    if (oldValue != SaveData.saveValues["UseExternalVideoPlayer"])
                         SaveData.Save();
-                    if(switchState)
+                    if (switchState)
+                    {
                         FramePlayer.Stop();
+                        if (UserInterface.instance != null && UserInterface.instance.videoPlayer != null)
+                        {
+                            UserInterface.instance.videoPlayer.Stop();
+                            UserInterface.instance.videoPath = "";
+                            FramePlayer.canPlayBgMusic = true;
+                            ScreenManager.GetScreen<VideoScreen>("Video")?.Hide();
+                        }
+                    }
                 }
                 return switchState;
             }, SaveData.saveValues["UseExternalVideoPlayer"] == "true"));
@@ -485,10 +529,6 @@ namespace NonsensicalVideoGenerator
                     SaveData.saveValues["MuteMusicWhileTabbedOut"] = switchState.ToString().ToLower();
                     if(oldValue != SaveData.saveValues["MuteMusicWhileTabbedOut"])
                         SaveData.Save();
-                    if(switchState)
-                        DiscordRPC.Initialize();
-                    else
-                        DiscordRPC.Shutdown();
                 }
                 return switchState;
             }, SaveData.saveValues["MuteMusicWhileTabbedOut"] == "true"));
@@ -611,6 +651,19 @@ namespace NonsensicalVideoGenerator
                 SaveData.saveValues["SoundEffectVolume"] = scrollView.Controller.interactables["SFXVolume"].Tooltip;
                 if(oldValue != SaveData.saveValues["SoundEffectVolume"])
                     SaveData.Save();
+                return false;
+            }));
+            scrollView.Controller.Add("NextMusicTrack", new Button("NextMusicTrack", "NextMusicTrack", new Vector2(258, 60+1+(19/2)-(8*1)+(19*1)+(10*1)+(9*1)), (int i, string n) => {
+                switch(i)
+                {
+                    case 2: // left click
+                        if (UserInterface.instance != null)
+                        {
+                            UserInterface.instance.FindMusic();
+                        }
+                        GlobalContent.PlaySound("Select");
+                        return true;
+                }
                 return false;
             }));
             scrollView.Controller.Add("MusicVolume", new TextEntry("Music Volume", "Background music volume level, from 0-100.", SaveData.saveValues["MusicVolume"], new Vector2(139, 60-(8*1)+(19*1)+(10*1)+(9*1)), 24, 3, 1, (int i, string n) => {

@@ -42,7 +42,8 @@
         "MoonSharp (BSD-3-Clause License)",
         "Sdcb.FFmpeg (GPL-3.0 License)",
         "FFmpeg (GPL-3.0 License)",
-        "yt-dlp (The Unlicense)"
+        "yt-dlp (The Unlicense)",
+        "ImageMagick (Custom License)"
     ],
     "FontLicense": [
         "Munro (SIL Open Font License)",
@@ -50,9 +51,11 @@
         "LanaPixel (SIL Open Font License)"
     ],
     "Attribution": [
+        "gyan.dev (FFmpeg)",
+        "ImageMagick Studio LLC (ImageMagick)",
         "Freepik (Flaticon)",
         "Pixel perfect (Flaticon)",
         "SeyfDesigner (Flaticon)",
-        "Spitfire Audio"
+        "Spitfire Audio (LABS)"
     ]
 }

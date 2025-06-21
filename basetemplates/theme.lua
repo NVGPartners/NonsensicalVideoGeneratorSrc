@@ -6,7 +6,7 @@
     
     -- All assets are stored inside of your addon's folder under "layer".
 
-    -- For music, you can have up to 9 songs as "theme1.wma" through "theme9.wma". These files may be in .wma or .ogg format.
+    -- For music, you can have up to 9 songs as "theme1.wma" through "theme9.wma". These files may be in .mp3 or .ogg format. (.wma is deprecated)
     -- Only the music included in your theme will play, otherwise the default theme music will play.
     -- This also applies to the misclick graphics in the "misclick" folder, you can have from 1-9 misclick graphics.
     -- If any music and/or misclick graphics are found, the default music and/or misclick graphics will not be loaded.

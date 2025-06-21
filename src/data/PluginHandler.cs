@@ -77,15 +77,15 @@ namespace NonsensicalVideoGenerator
                 switch (type)
                 {
                     case CommandType.FFmpeg:
-                        return Global.useSystemFFmpeg ? "ffmpeg" : Path.Combine(Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location) ?? ".", "ffmpeg.exe");
+                        return Global.useSystemFFmpeg ? "ffmpeg" : Path.Combine(Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location) ?? ".", "bin", "ffmpeg.exe");
                     case CommandType.FFprobe:
-                        return Global.useSystemFFprobe ? "ffprobe" : Path.Combine(Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location) ?? ".", "ffprobe.exe");
+                        return Global.useSystemFFprobe ? "ffprobe" : Path.Combine(Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location) ?? ".", "bin", "ffprobe.exe");
                     case CommandType.Magick:
-                        return Global.useSystemMagick ? "magick" : Path.Combine(Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location) ?? ".", "magick.exe");
+                        return Global.useSystemMagick ? "magick" : Path.Combine(Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location) ?? ".", "bin", "magick.exe");
                     case CommandType.YtDlp:
-                        return Global.useSystemYtDlp ? "yt-dlp" : Path.Combine(Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location) ?? ".", "yt-dlp.exe");
+                        return Global.useSystemYtDlp ? "yt-dlp" : Path.Combine(Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location) ?? ".", "bin", "yt-dlp.exe");
                     case CommandType.Vocoder:
-                        return Path.Combine(Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location) ?? ".", "vocoder.exe");
+                        return Path.Combine(Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location) ?? ".", "bin", "vocoder.exe");
                     default:
                         return customCommand;
                 }
@@ -329,7 +329,7 @@ namespace NonsensicalVideoGenerator
     {
         public static Dictionary<string, string> placeholders = new();
         // Fix broken URLs that Workshop addons use
-        public static readonly string urlBase = "https://github.com/KiwifruitDev/NonsensicalVideoGenerator/raw/main/addonlibraries/";
+        public static readonly string urlBase = "https://github.com/KiwifruitDev/NonsensicalVideoGenerator/raw/refs/heads/main/addonlibraries/";
         public static Dictionary<string, string> urlMapper = new()
         {
             {"https://cdn.discordapp.com/attachments/1068727704209342525/1133564849629188126/church.mp3", "church.mp3"},
@@ -554,17 +554,17 @@ namespace NonsensicalVideoGenerator
         // FFmpeg installed for lua
         public static bool FFmpegInstalled()
         {
-            return File.Exists(Path.Combine(Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location) ?? ".", "ffmpeg.exe"));
+            return File.Exists(Path.Combine(Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location) ?? ".", "bin", "ffmpeg.exe"));
         }
         // FFprobe installed for lua
         public static bool FFprobeInstalled()
         {
-            return File.Exists(Path.Combine(Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location) ?? ".", "ffprobe.exe"));
+            return File.Exists(Path.Combine(Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location) ?? ".", "bin", "ffprobe.exe"));
         }
         // Magick installed for lua
         public static bool MagickInstalled()
         {
-            return File.Exists(Path.Combine(Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location) ?? ".", "magick.exe"));
+            return File.Exists(Path.Combine(Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location) ?? ".", "bin", "magick.exe"));
         }
         // GetRandomLibraryFile for lua
         public static string GetRandomLibraryFile(string rootType = "video", string subType = "materials")
@@ -798,6 +798,33 @@ namespace NonsensicalVideoGenerator
             if (!ValidateInput(args)) return;
             new Command(CommandType.Vocoder, ReplacePlaceholders(args), jobDirectory).Call();
         }
+        // DownloadFileSync for lua
+        public static void DownloadFileSync(string url, string rootType = "", string subType = "")
+        {
+            string replacedUrl = ReplacePlaceholders(url);
+            // Compare with urlMapper
+            if (urlMapper.ContainsKey(replacedUrl))
+            {
+                // Replace with urlMapper value
+                replacedUrl = urlBase + urlMapper[replacedUrl];
+            }
+            else if (replacedUrl.Contains("discord.com") || replacedUrl.Contains("discordapp.com"))
+            {
+                // If it contains discordapp.com, deny it
+                ConsoleOutput.WriteLine("Addons can't download from Discord, tell the author!", Color.Red);
+                return;
+            }
+            if (subType == "")
+                rootType = jobDirectory;
+            CommandType commandType = CommandType.Download;
+            // Is it a YouTube url?
+            if (replacedUrl.Contains("youtube.com") || replacedUrl.Contains("youtu.be"))
+            {
+                // It's a YouTube url.
+                commandType = CommandType.YtDlp;
+            }
+            new Command(commandType, replacedUrl + " " + rootType + " " + subType, jobDirectory).Call();
+        }
         public PluginReturnValue Call(string video, bool runLua = false, int mouseX = 0, int mouseY = 0, string button = "")
         {
             // Create .\temp\job_%time%\
@@ -814,10 +841,6 @@ namespace NonsensicalVideoGenerator
                 // Copy video to job path as result.mp4
                 File.Copy(video, Path.Join(jobPath, "result.mp4"));
                 video = Path.Join(jobPath, "result.mp4");
-                if (!enabled)
-                {
-                    return new PluginReturnValue(false, Path.GetFileName(path));
-                }
             }
             ConsoleOutput.WriteLine($"Calling addon {Path.GetFileName(path)} for " + video + (runLua ? " (RunLua)" : ""), Color.LightBlue);
             switch (type)
@@ -846,6 +869,7 @@ namespace NonsensicalVideoGenerator
                                     localizationTokens[pair.Key] = pair.Value;
                                 }
                             }
+                            videoOptions["fps"] = int.Parse(SaveData.saveValues["VideoFPS"], CultureInfo.InvariantCulture);
                             videoOptions["localizationTokens"] = localizationTokens;
                             videoOptions["saveData"] = SaveData.saveValues;
                             // Add settings to pluginSettings table
@@ -888,6 +912,7 @@ namespace NonsensicalVideoGenerator
                             functions["runFFprobeSync"] = (Action<string>)RunFFprobeSync;
                             functions["runMagickSync"] = (Action<string>)RunMagickSync;
                             functions["runVocoderSync"] = (Action<string>)RunVocoder;
+                            functions["downloadFileSync"] = (Action<string, string, string>)DownloadFileSync;
                             PluginHandler.commands.Clear();
                             // Call generation
                             string funcName = "StartGeneration";
@@ -1017,8 +1042,10 @@ namespace NonsensicalVideoGenerator
                                 string libraryPrettyName = library.Table.Get("name").String;
                                 string libraryName = library.Table.Get("path").String;
                                 string libraryTooltip = library.Table.Get("tooltip").String;
-                                bool libraryReadOnly = library.Table.Get("readonly").Boolean;
-                                LibraryType dummyType = new(rootType, libraryName, libraryTooltip, libraryReadOnly);
+                                bool libraryPreventToggle = library.Table.Get("preventToggle").Boolean;
+                                bool libraryPreventImport = library.Table.Get("preventImport").Boolean;
+                                bool libraryPreventDownload = library.Table.Get("preventDownload").Boolean;
+                                LibraryType dummyType = new(rootType, libraryName, libraryTooltip, libraryPreventToggle, libraryPreventImport, libraryPreventDownload);
                                 string libPath = Path.Join(rootTypeStr, libraryName);
                                 LibraryType libraryType = DefaultLibraryTypes.Video;
                                 for (int i = 0; i < DefaultLibraryTypes.AllTypes.Count; i++)
@@ -1915,7 +1942,7 @@ namespace NonsensicalVideoGenerator
         {
             // Select jpg, png, or gif icon with file dialog
             OpenFileDialog fileDialog = new OpenFileDialog();
-            fileDialog.Filter = L.T(0, "Addons:WorkshopIcon") + " (*.jpg, *.png, *.gif)|*.jpg;*.png;*.gif|";
+            fileDialog.Filter = L.T(0, "Addons:WorkshopIcon") + " (*.jpg, *.png, *.gif)|*.jpg;*.png;*.gif";
             fileDialog.Title = L.T(0, "Addons:WorkshopIconPicker");
             fileDialog.InitialDirectory = Path.GetFullPath(@"templates");
             fileDialog.FileName = "workshop.jpg";
@@ -1932,10 +1959,13 @@ namespace NonsensicalVideoGenerator
         }
         public static void PublishPlugin(Plugin plugin, WorkshopTag tagflags, bool skipIconParsing = false, bool forceIconForBootMovies = false)
         {
-            if(publishing)
+            if (publishing)
+            {
+                ConsoleOutput.WriteLine("Couldn't publish addon, already publishing.", Color.Red);
                 return;
+            }
             // Is Steam API available?
-            if(SteamAPI.IsSteamRunning() == false || !SteamManager.initialized)
+            if (SteamAPI.IsSteamRunning() == false || !SteamManager.initialized)
             {
                 Global.generator.progressText = L.T(0, "Addons:StatusSteamNotRunning");
                 GlobalContent.PlaySound("Error");
@@ -1945,7 +1975,7 @@ namespace NonsensicalVideoGenerator
                 return;
             }
             string? iconPath = null;
-            if(!skipIconParsing)
+            if (!skipIconParsing)
             {
                 if(plugin.GetAddonType() == AddonType.BootMovie && !forceIconForBootMovies)
                 {
@@ -1973,9 +2003,6 @@ namespace NonsensicalVideoGenerator
             // file must exist
             if(!File.Exists(iconPath) || iconPath == null)
             {
-                GlobalContent.PlaySound("Error");
-                ConsoleOutput.WriteLine("No icon selected.", Color.Red);
-                Global.generator.progressText = L.T(0, "Addons:StatusFailWorkshopIcon");
                 failedCheck = true;
             }
             // file must be under 1mb
@@ -2313,6 +2340,20 @@ namespace NonsensicalVideoGenerator
                 publishPlugin = null;
                 publishing = false;
                 return;
+            }
+            // Mark as public
+            if(!updating)
+            {
+                cont = SteamUGC.SetItemVisibility(handle, ERemoteStoragePublishedFileVisibility.k_ERemoteStoragePublishedFileVisibilityPublic);
+                if(!cont)
+                {
+                    ConsoleOutput.WriteLine($"Error updating workshop item: Invalid visibility.", Color.Red);
+                    Global.generator.progressText = L.T(0, "Addons:StatusFailUpdateWorkshopItem");
+                    GlobalContent.PlaySound("Error");
+                    publishPlugin = null;
+                    publishing = false;
+                    return;
+                }
             }
             // Submit the update.
             SteamAPICall_t call = SteamUGC.SubmitItemUpdate(handle, "Updated addon.");

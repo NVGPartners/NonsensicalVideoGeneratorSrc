@@ -50,6 +50,12 @@ namespace NonsensicalVideoGenerator
                 if(Pagination.SelectedPage != Pagination.TopPageCount)
                     lastPage = Pagination.SelectedPage;
                 GlobalContent.PlaySound("Select");
+                if(Pagination.DrawnPage == 5)
+                {
+                    ScreenManager.GetScreen<PastimeGameScreen>("Game")?.Hide();
+                    ScreenManager.PushNavigation("Content");
+                    ScreenManager.GetScreen<ContentScreen>("Content")?.Show();
+                }
                 Pagination.SetPage(Pagination.TopPageCount);
             }
         }

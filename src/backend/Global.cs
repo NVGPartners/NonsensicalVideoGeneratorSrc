@@ -50,6 +50,7 @@ namespace NonsensicalVideoGenerator
         public static bool selectLanguage = false;
         public static readonly int currentYear = DateTime.UtcNow.Year;
         public static bool videoPlaying = false;
+        public static bool firstSongPlayed = false;
         
         // Aspect ratio functions
         public static (int, int) ConvertToFraction(double aspectRatio, double tolerance = 0.01)

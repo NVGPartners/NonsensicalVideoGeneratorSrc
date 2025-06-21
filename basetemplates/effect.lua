@@ -92,11 +92,18 @@ function Query(localeName, localizationTokens)
             -- The "path" is the internal directory name of the library.
             -- The "type" is the type of media that the library will accept.
             -- This can be "video", "audio", or "image".
+            -- The "preventToggle" option will prevent the user from toggling media on and off.
+            -- The "preventImport" option will prevent the user from importing media into the library.
+            -- The "preventDownload" option will prevent the user from downloading media into the library.
+            -- Set these to true if you want to limit how the user can interact with the library.
             {
                 ["name"] = "Example",
                 ["tooltip"] = "This is an example library.",
                 ["path"] = "example",
                 ["type"] = "video",
+                ["preventToggle"] = false,
+                ["preventImport"] = false,
+                ["preventDownload"] = false
             }
         }
         ]]
@@ -211,18 +218,6 @@ function StopGeneration(options, pluginSettings, functions)
     -- If you return false, the console will report that this addon failed to apply.
     -- We're returning the finished variable to indicate whether the effect was applied successfully.
     return finished
-end
-
--- RunLua is a function that can be used to test Lua code within the addon.
--- You can run this function by clicking on the addon in the addons tab.
--- This is useful for debugging and testing Lua code without having to generate a video.
-function RunLua(options, pluginSettings, functions, mouseX, mouseY)
-    print("Hello from %filename%! Mouse coordinates: (" .. mouseX .. ", " .. mouseY .. ")")
-    -- Must return false to allow NVG to use the default behavior.
-    -- If you return true, no sound will play when this button is clicked.
-    -- Uncomment this line to play a sound when the button is clicked:
-    -- functions.playSound("Select")
-    return false
 end
 
 -- See the options above for how to create a button, this function will be called when the button is clicked.

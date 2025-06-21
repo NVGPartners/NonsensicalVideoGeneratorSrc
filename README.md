@@ -15,15 +15,22 @@ The following instructions are for building **Nonsensical Video Generator** from
     - [Visual Studio Code](https://code.visualstudio.com/download)
         - [C# extension](https://marketplace.visualstudio.com/items?itemName=ms-dotnettools.csharp)
     - [.NET 8.0 SDK](https://dotnet.microsoft.com/en-us/download/dotnet/8.0)
+    - [ImageMagick-*-Q16-HDRI-x64-static.exe](https://imagemagick.org/script/download.php#windows)
     - [ffmpeg-release-full.7z (gyan.dev)](https://www.gyan.dev/ffmpeg/builds/)
     - [frei0r-*-win64.7z](https://github.com/dyne/frei0r/releases)
     - [yt-dlp.exe](https://github.com/yt-dlp/yt-dlp/releases)
-    - [vocoder-1.2-x86-win32.zip](https://borsboom.io/vocoder/)
+    - [vocoder-*-x86-win32.zip](https://borsboom.io/vocoder/)
 - Setup:
-    - Extract `ffmpeg.exe` and `ffprobe.exe` from `ffmpeg-release-full.7z` into `baseroot/`
-    - Extract all `.dll` files from `filter/` in `frei0r-*-win64.7z` into `baseroot/frei0r-1` (create the directory if it doesn't exist)
-    - Copy `yt-dlp.exe` into `baseroot/`
-    - Extract `vocoder.exe` from `vocoder-1.2-x86-win32.zip` into `baseroot/`
+    - Install `ImageMagick-*-Q16-HDRI-x64-static.exe` and copy only these files from `C:\Program Files\ImageMagick-*-Q16-HDRI` into `baseroot/bin/`:
+      - `images/` (the entire directory)
+      - All `*.xml` files
+      - `magick.exe`
+      - All `*.dll` files
+      - `sRGB.icc`
+    - Extract `ffmpeg.exe`, `ffprobe.exe`, and all `*.dll` files from `ffmpeg-release-full.7z` into `baseroot/bin/`
+    - Extract all `.dll` files from `filter/` in `frei0r-*-win64.7z` into `baseroot/bin/frei0r-1` (create the directory if it doesn't exist)
+    - Copy `yt-dlp.exe` into `baseroot/bin/`
+    - Extract `vocoder.exe` from `vocoder-*-x86-win32.zip` into `baseroot/bin/`
     - Run `dotnet restore` inside of the root directory to install dependencies
     - Copy `cred.template.bat` in the root directory
         - Paste as a new file named `cred.bat`

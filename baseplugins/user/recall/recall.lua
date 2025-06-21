@@ -58,7 +58,9 @@ function Query(localeName, localizationTokens)
                 ["tooltip"] = "Advanced form of overlaying videos.\nYou must create recall videos in the addon settings.",
                 ["path"] = "recall",
                 ["type"] = "video",
-                --["readonly"] = true
+                ["preventToggle"] = false,
+                ["preventImport"] = true,
+                ["preventDownload"] = false
             }
         }
     }
@@ -187,6 +189,9 @@ function StartGeneration(options, pluginSettings, functions)
         current = current + 1
     end
     -- Start the recall process
+    if not functions.libraryHasFile("video", "recall", "jasonbourne_s0.067l0.968x251y212w822h616.mp4") then
+        functions.downloadFileSync("https://github.com/KiwifruitDev/NonsensicalVideoGenerator/raw/refs/heads/main/addonlibraries/recall/jasonbourne_s0.067l0.968x251y212w822h616.mp4", "video", "recall")
+    end
     StartRecall(options, pluginSettings, functions)
     return true
 end
@@ -286,15 +291,10 @@ function StopGeneration(options, pluginSettings, functions)
     return finished
 end
 
-function RunLua(options, pluginSettings, functions, mouseX, mouseY)
-    functions.playSound("RenderComplete")
-    return true
-end
-
 function ButtonInteraction(options, pluginSettings, functions, mouseX, mouseY, buttonName)
     if buttonName == "Create Recall Video" then
         functions.playSound("Select")
-        local filePicked = functions.openFilePicker("Select Recall Video", "Recall Video (*.mp4;*.webm;*.mov;*.avi;*.mkv;*.wmv)|*.mp4;*.webm;*.mov;*.avi;*.mkv;*.wmv", false)
+        local filePicked = functions.openFilePicker("Select Recall Video", "Recall Video (*.mp4;*.m4v;*.webm;*.mov;*.avi;*.mkv;*.wmv)|*.mp4;*.m4v;*.webm;*.mov;*.avi;*.mkv;*.wmv", false)
         if filePicked == nil or filePicked == "" then
             functions.setStatusText("No file selected.")
             functions.playSound("Error")

@@ -1,9 +1,9 @@
-May 2025: Update v8.2
+June 2025: Update v8.2
 
 Here are the changes in this update:
 
 [list]
-[*]Fixed the date format in the Blog tab to properly utilize ISO 8601 format (YYYY-MM-DD).
+[*]
 [/list]
 
 Let me know if you have any issues with this update through the [url=https://discord.gg/8ppmspR6Wh]NVG Community Discord[/url].

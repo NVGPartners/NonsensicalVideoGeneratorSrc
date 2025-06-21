@@ -84,14 +84,6 @@ namespace NonsensicalVideoGenerator
         }
         public bool Update(GameTime gameTime, bool handleInput)
         {
-            if(Pagination.SelectedPage != Pagination.TopPageCount)
-            {
-                layer = 3;
-            }
-            else
-            {
-                layer = 999;
-            }
             // When animation is done, set screen type
             if (hiding && offset.Y == GlobalGraphics.Scale(240))
             {
@@ -119,7 +111,7 @@ namespace NonsensicalVideoGenerator
             spriteBatch.End();
             // Use offset
             spriteBatch.Begin(SpriteSortMode.Deferred, BlendState.AlphaBlend, SamplerState.PointClamp, null, null, null, Matrix.CreateTranslation(GlobalGraphics.Scale(GlobalGraphics.drawOffset.X)+offset.X, GlobalGraphics.Scale(GlobalGraphics.drawOffset.Y)+offset.Y, 0));
-            if(Pagination.SelectedPage != Pagination.TopPageCount)
+            if(Pagination.SelectedPage <= Pagination.TopPageCount)
             {
                 // Main Window
                 Texture2D mainwindow = GlobalContent.GetTexture("MainWindow");

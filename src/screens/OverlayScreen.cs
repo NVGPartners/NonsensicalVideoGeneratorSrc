@@ -78,7 +78,7 @@ namespace NonsensicalVideoGenerator
             spriteBatch.Draw(pixel, new Rectangle(GlobalGraphics.scaledWidth - GlobalGraphics.Scale(3), GlobalGraphics.Scale(2), GlobalGraphics.Scale(1), GlobalGraphics.Scale(1)), Color.White);
             spriteBatch.Draw(pixel, new Rectangle(GlobalGraphics.scaledWidth - GlobalGraphics.Scale(4), GlobalGraphics.Scale(3), GlobalGraphics.Scale(1), GlobalGraphics.Scale(1)), Color.White);
             spriteBatch.Draw(pixel, new Rectangle(GlobalGraphics.scaledWidth - GlobalGraphics.Scale(2), GlobalGraphics.Scale(3), GlobalGraphics.Scale(1), GlobalGraphics.Scale(1)), Color.White);
-            if(Global.ready)
+            if(Global.ready && SaveData.saveValues["UseExternalVideoPlayer"] == "false")
             {
                 // Draw a fullscreen button in the bottom right corner
                 spriteBatch.Draw(pixel, new Rectangle(GlobalGraphics.scaledWidth - GlobalGraphics.Scale(5), GlobalGraphics.scaledHeight - GlobalGraphics.Scale(5), GlobalGraphics.Scale(5), GlobalGraphics.Scale(5)), Color.Black);
@@ -103,42 +103,45 @@ namespace NonsensicalVideoGenerator
                 Global.tooltip = L.T(0, "Overlay:ExitTooltip");
             }
             // Clicking on the fullscreen button in the corner will toggle fullscreen
-            if(MouseInput.MouseState.Position.X > GlobalGraphics.scaledWidth - GlobalGraphics.Scale(5) && MouseInput.MouseState.Position.Y > GlobalGraphics.scaledHeight - GlobalGraphics.Scale(5)
-                && MouseInput.MouseState.Position.X < GlobalGraphics.scaledWidth && MouseInput.MouseState.Position.Y < GlobalGraphics.scaledHeight)
+            if (SaveData.saveValues["UseExternalVideoPlayer"] == "false")
             {
-                Global.tooltip = L.T(0, "Overlay:FullscreenTooltip");
-            }
-            if(!videoFullscreen && Global.tooltip != "" && tooltipVisible && Global.ready)
-            {
-                SpriteFont spriteFont = L.FontSmall();
-                if(Global.tooltipIsCycler)
+                if (MouseInput.MouseState.Position.X > GlobalGraphics.scaledWidth - GlobalGraphics.Scale(5) && MouseInput.MouseState.Position.Y > GlobalGraphics.scaledHeight - GlobalGraphics.Scale(5)
+                    && MouseInput.MouseState.Position.X < GlobalGraphics.scaledWidth && MouseInput.MouseState.Position.Y < GlobalGraphics.scaledHeight)
                 {
-                    if (L.cyclerLocale != null)
-                    {
-                        spriteFont = GlobalContent.GetFont(L.cyclerLocale.fontLarge);
-                    }
-                    Global.tooltipIsCycler = false;
+                    Global.tooltip = L.T(0, "Overlay:FullscreenTooltip");
                 }
-                string tooltip = Global.tooltip;
-                Vector2 tooltipSize = spriteFont.MeasureString(tooltip);
-                // Position is relative to mouse position but tries to avoid going off screen
-                Vector2 position = new(MouseInput.MouseState.Position.X + 16, MouseInput.MouseState.Position.Y + 16);
-                // Make sure it doesn't go off the right side of the screen
-                if (position.X + tooltipSize.X + GlobalGraphics.Scale(6) > GlobalGraphics.scaledWidth)
-                    position.X = GlobalGraphics.scaledWidth - tooltipSize.X - GlobalGraphics.Scale(6);
-                // Make sure it doesn't go off the left side of the screen
-                if (position.X < GlobalGraphics.Scale(2))
-                    position.X = GlobalGraphics.Scale(2);
-                // Make sure it doesn't go off the bottom of the screen
-                if (position.Y + tooltipSize.Y + GlobalGraphics.Scale(2) > GlobalGraphics.scaledHeight)
-                    position.Y = GlobalGraphics.scaledHeight - tooltipSize.Y - GlobalGraphics.Scale(2);
-                // Make sure it doesn't go off the top of the screen
-                if (position.Y < GlobalGraphics.Scale(2))
-                    position.Y = GlobalGraphics.Scale(2);
-                spriteBatch.Draw(pixel, new Rectangle((int)position.X, (int)position.Y, (int)tooltipSize.X + GlobalGraphics.Scale(2), (int)tooltipSize.Y - GlobalGraphics.Scale(2)), ThemeManager.GetColor("BackgroundTooltip"));
-                // White text
-                GlobalContent.DrawString(spriteBatch, spriteFont, tooltip, new Vector2(position.X + GlobalGraphics.Scale(2), position.Y - GlobalGraphics.Scale(2)), Color.White);
             }
+            if (!videoFullscreen && Global.tooltip != "" && tooltipVisible && Global.ready)
+                {
+                    SpriteFont spriteFont = L.FontSmall();
+                    if (Global.tooltipIsCycler)
+                    {
+                        if (L.cyclerLocale != null)
+                        {
+                            spriteFont = GlobalContent.GetFont(L.cyclerLocale.fontLarge);
+                        }
+                        Global.tooltipIsCycler = false;
+                    }
+                    string tooltip = Global.tooltip;
+                    Vector2 tooltipSize = spriteFont.MeasureString(tooltip);
+                    // Position is relative to mouse position but tries to avoid going off screen
+                    Vector2 position = new(MouseInput.MouseState.Position.X + 16, MouseInput.MouseState.Position.Y + 16);
+                    // Make sure it doesn't go off the right side of the screen
+                    if (position.X + tooltipSize.X + GlobalGraphics.Scale(6) > GlobalGraphics.scaledWidth)
+                        position.X = GlobalGraphics.scaledWidth - tooltipSize.X - GlobalGraphics.Scale(6);
+                    // Make sure it doesn't go off the left side of the screen
+                    if (position.X < GlobalGraphics.Scale(2))
+                        position.X = GlobalGraphics.Scale(2);
+                    // Make sure it doesn't go off the bottom of the screen
+                    if (position.Y + tooltipSize.Y + GlobalGraphics.Scale(2) > GlobalGraphics.scaledHeight)
+                        position.Y = GlobalGraphics.scaledHeight - tooltipSize.Y - GlobalGraphics.Scale(2);
+                    // Make sure it doesn't go off the top of the screen
+                    if (position.Y < GlobalGraphics.Scale(2))
+                        position.Y = GlobalGraphics.Scale(2);
+                    spriteBatch.Draw(pixel, new Rectangle((int)position.X, (int)position.Y, (int)tooltipSize.X + GlobalGraphics.Scale(2), (int)tooltipSize.Y - GlobalGraphics.Scale(2)), ThemeManager.GetColor("BackgroundTooltip"));
+                    // White text
+                    GlobalContent.DrawString(spriteBatch, spriteFont, tooltip, new Vector2(position.X + GlobalGraphics.Scale(2), position.Y - GlobalGraphics.Scale(2)), Color.White);
+                }
         }
         public bool Update(GameTime gameTime, bool handleInput)
         {
@@ -210,7 +213,8 @@ namespace NonsensicalVideoGenerator
                 }
             }
             // Clicking on the fullscreen button in the corner will toggle fullscreen
-            if(MouseInput.MouseState.Position.X > GlobalGraphics.scaledWidth - GlobalGraphics.Scale(5) && MouseInput.MouseState.Position.Y > GlobalGraphics.scaledHeight - GlobalGraphics.Scale(5)
+            if(SaveData.saveValues["UseExternalVideoPlayer"] == "false"
+                && MouseInput.MouseState.Position.X > GlobalGraphics.scaledWidth - GlobalGraphics.Scale(5) && MouseInput.MouseState.Position.Y > GlobalGraphics.scaledHeight - GlobalGraphics.Scale(5)
                 && MouseInput.MouseState.Position.X < GlobalGraphics.scaledWidth && MouseInput.MouseState.Position.Y < GlobalGraphics.scaledHeight)
             {
                 if (MouseInput.LastMouseState.LeftButton == ButtonState.Released && MouseInput.MouseState.LeftButton == ButtonState.Pressed)

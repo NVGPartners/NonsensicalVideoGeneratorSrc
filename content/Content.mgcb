@@ -205,6 +205,18 @@
 /processorParam:TextureFormat=Color
 /build:graphics/actionbutton.png
 
+#begin graphics/actions/bluesky.png
+/importer:TextureImporter
+/processor:TextureProcessor
+/processorParam:ColorKeyColor=255,0,255,255
+/processorParam:ColorKeyEnabled=True
+/processorParam:GenerateMipmaps=False
+/processorParam:PremultiplyAlpha=True
+/processorParam:ResizeToPowerOfTwo=False
+/processorParam:MakeSquare=False
+/processorParam:TextureFormat=Color
+/build:graphics/actions/bluesky.png
+
 #begin graphics/actions/console.png
 /importer:TextureImporter
 /processor:TextureProcessor
@@ -288,6 +300,18 @@
 /processorParam:MakeSquare=False
 /processorParam:TextureFormat=Color
 /build:graphics/actions/locales.png
+
+#begin graphics/actions/openfolder.png
+/importer:TextureImporter
+/processor:TextureProcessor
+/processorParam:ColorKeyColor=255,0,255,255
+/processorParam:ColorKeyEnabled=True
+/processorParam:GenerateMipmaps=False
+/processorParam:PremultiplyAlpha=True
+/processorParam:ResizeToPowerOfTwo=False
+/processorParam:MakeSquare=False
+/processorParam:TextureFormat=Color
+/build:graphics/actions/openfolder.png
 
 #begin graphics/actions/options.png
 /importer:TextureImporter

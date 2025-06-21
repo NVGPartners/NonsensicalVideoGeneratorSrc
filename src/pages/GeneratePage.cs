@@ -7,6 +7,7 @@ using Microsoft.Xna.Framework.Content;
 using Microsoft.Xna.Framework.Graphics;
 using System.Globalization;
 using MonoGame.Extended.VideoPlayback;
+using System.Diagnostics;
 
 namespace NonsensicalVideoGenerator
 {
@@ -269,36 +270,49 @@ namespace NonsensicalVideoGenerator
                             {
                                 FramePlayer.Stop();
                                 GlobalContent.PlaySound("Select");
-                                if(UserInterface.instance != null)
+                                if (SaveData.saveValues["UseExternalVideoPlayer"] == "false")
                                 {
-                                    if(UserInterface.instance.videoPlayer != null)
+                                    if (UserInterface.instance != null)
                                     {
-                                        UserInterface.instance.videoPlayer.Dispose();
-                                        Global.videoPlaying = false;
-                                        UserInterface.instance.videoPlayer = null;
+                                        if (UserInterface.instance.videoPlayer != null)
+                                        {
+                                            UserInterface.instance.videoPlayer.Dispose();
+                                            Global.videoPlaying = false;
+                                            UserInterface.instance.videoPlayer = null;
+                                        }
+                                        UserInterface.instance.videoPlayer = new MonoGame.Extended.Framework.Media.VideoPlayer(UserInterface.instance.GraphicsDevice);
+                                        FramePlayer.canPlayBgMusic = true;
+                                        if (UserInterface.instance.video != null)
+                                        {
+                                            UserInterface.instance.video.Dispose();
+                                            UserInterface.instance.video = null;
+                                        }
+                                        string cachePath = VideoCache.GetCachePath(file.Path);
+                                        UserInterface.instance.videoPath = cachePath;
+                                        UserInterface.instance.video = VideoHelper.LoadFromFile(cachePath);
+                                        //UserInterface.instance.videoPlayer.IsLooped = true;
+                                        UserInterface.instance.videoPlayer.Play(UserInterface.instance.video);
+                                        Global.videoPlaying = true;
+                                        UserInterface.instance.videoPlayer.Volume = float.Parse(SaveData.saveValues["VideoVolume"], CultureInfo.InvariantCulture) / 100f;
                                     }
-                                    UserInterface.instance.videoPlayer = new MonoGame.Extended.Framework.Media.VideoPlayer(UserInterface.instance.GraphicsDevice);
-                                    FramePlayer.canPlayBgMusic = true;
-                                    if(UserInterface.instance.video != null)
+                                    FramePlayer.canPlayBgMusic = false;
+                                    Global.generator.progressText = L.T(0, "Video:StatusPlay");
+                                    if (ScreenManager.GetScreen<VideoScreen>("Video") == null
+                                        || ScreenManager.GetScreen<VideoScreen>("Video")?.screenType == ScreenType.Hidden)
                                     {
-                                        UserInterface.instance.video.Dispose();
-                                        UserInterface.instance.video = null;
+                                        ScreenManager.PushNavigation("Video");
+                                        ScreenManager.GetScreen<VideoScreen>("Video")?.Show();
                                     }
-                                    string cachePath = VideoCache.GetCachePath(file.Path);
-                                    UserInterface.instance.videoPath = cachePath;
-                                    UserInterface.instance.video = VideoHelper.LoadFromFile(cachePath);
-                                    //UserInterface.instance.videoPlayer.IsLooped = true;
-                                    UserInterface.instance.videoPlayer.Play(UserInterface.instance.video);
-                                    Global.videoPlaying = true;
-                                    UserInterface.instance.videoPlayer.Volume = float.Parse(SaveData.saveValues["VideoVolume"], CultureInfo.InvariantCulture) / 100f;
                                 }
-                                FramePlayer.canPlayBgMusic = false;
-                                Global.generator.progressText = L.T(0, "Video:StatusPlay");
-                                if(ScreenManager.GetScreen<VideoScreen>("Video") == null
-                                    || ScreenManager.GetScreen<VideoScreen>("Video")?.screenType == ScreenType.Hidden)
+                                else
                                 {
-                                    ScreenManager.PushNavigation("Video");
-                                    ScreenManager.GetScreen<VideoScreen>("Video")?.Show();
+                                    // Open the video in the default video player.
+                                    ProcessStartInfo startInfo = new ProcessStartInfo()
+                                    {
+                                        FileName = file.Path,
+                                        UseShellExecute = true
+                                    };
+                                    Process.Start(startInfo);
                                 }
                                 return true;
                             }

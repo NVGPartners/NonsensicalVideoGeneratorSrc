@@ -253,8 +253,36 @@ namespace NonsensicalVideoGenerator
         }
         public void FindMusic()
         {
+            if(!Global.firstSongPlayed)
+            {
+                try
+                {
+                    music = int.Parse(SaveData.saveValues["LastMusicTrack"], CultureInfo.InvariantCulture);
+                }
+                catch
+                {
+                    music = -1;
+                }
+                Global.firstSongPlayed = true;
+            }
 #if WINDOWSDX
-            music = ThemeManager.GetNextSongIndex(music);
+            else
+            {
+                music = ThemeManager.GetNextSongIndex(music);
+            }
+            if (music < 0)
+            {
+                // Pick random music from the theme.
+                int max = ThemeManager.GetSongCount();
+                if (max > 0)
+                {
+                    music = Global.generator.globalRandom.Next(0, max);
+                }
+                else
+                {
+                    music = 0; // Fallback to the first song if no songs are available.
+                }
+            }
             _musicState = MusicState.Playing;
             try
             {
@@ -265,9 +293,10 @@ namespace NonsensicalVideoGenerator
                 //ConsoleOutput.WriteLine("Failed to play music: " + ex.Message, Color.Red);
             }
 #else
-            music = 0;
             _musicState = MusicState.Paused;
 #endif
+            SaveData.saveValues["LastMusicTrack"] = music.ToString(CultureInfo.InvariantCulture);
+            SaveData.Save();
         }
         protected override void Update(GameTime gameTime)
         {
@@ -375,23 +404,20 @@ namespace NonsensicalVideoGenerator
                         {
                             FindMusic();
                         }
-                        if(SaveData.saveValues["MuteMusicWhileTabbedOut"] == "true")
+                        if((SaveData.saveValues["MuteMusicWhileTabbedOut"] == "true" ? _windowState == WindowState.Focused : true) && _musicState == MusicState.Paused && FramePlayer.canPlayBgMusic)
                         {
-                            if(_windowState == WindowState.Focused && _musicState == MusicState.Paused && FramePlayer.canPlayBgMusic)
+                            MediaPlayer.Resume();
+                            _musicState = MusicState.Playing;
+                        }
+                        if(((SaveData.saveValues["MuteMusicWhileTabbedOut"] == "true" ? _windowState == WindowState.Unfocused : false) && _musicState == MusicState.Playing) || !FramePlayer.canPlayBgMusic)
+                        {
+                            // Fade out music.
+                            if(MediaPlayer.Volume > 0.1f)
+                                MediaPlayer.Volume -= 0.1f;
+                            else
                             {
-                                MediaPlayer.Resume();
-                                _musicState = MusicState.Playing;
-                            }
-                            if((_windowState == WindowState.Unfocused && _musicState == MusicState.Playing) || !FramePlayer.canPlayBgMusic)
-                            {
-                                // Fade out music.
-                                if(MediaPlayer.Volume > 0.1f)
-                                    MediaPlayer.Volume -= 0.1f;
-                                else
-                                {
-                                    MediaPlayer.Pause();
-                                    _musicState = MusicState.Paused;
-                                }
+                                MediaPlayer.Pause();
+                                _musicState = MusicState.Paused;
                             }
                         }
                     }

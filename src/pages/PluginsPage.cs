@@ -375,7 +375,8 @@ namespace NonsensicalVideoGenerator
                                 {
                                     internalTooltip = L.T(0, "Addons:ButtonPlayBootMovie");
                                 }
-                                if(PluginHandler.plugins[i].GetAddonType() == AddonType.Effect)
+                                if(PluginHandler.plugins[i].GetAddonType() == AddonType.Effect ||
+                                   PluginHandler.plugins[i].GetAddonType() == AddonType.PostRenderEffect)
                                 {
                                     internalTooltip = L.T(0, "Addons:ButtonTestEffect");
                                 }
@@ -685,25 +686,16 @@ namespace NonsensicalVideoGenerator
                             if (MouseInput.MouseState.X >= GlobalGraphics.Scale(138) && MouseInput.MouseState.X < GlobalGraphics.Scale(inRange)
                                 && MouseInput.MouseState.Y >= GlobalGraphics.Scale(59 + ((i-offsetpl) * 16) - scrollOffset) && MouseInput.MouseState.Y < GlobalGraphics.Scale(70 + ((i-offsetpl) * 16) - scrollOffset))
                             {
-                                bool useOverride = false;
-                                try
+                                // Play boot movie if it's a boot movie
+                                if (PluginHandler.plugins[i].GetAddonType() == AddonType.BootMovie)
                                 {
-                                    PluginReturnValue called = PluginHandler.plugins[i].Call("RunLua", true, MouseInput.MouseState.X, MouseInput.MouseState.Y);
-                                    if (called.success)
+                                    string filePath = PluginHandler.plugins[i].path.Replace(".lua", ".mp4");
+                                    if (File.Exists(filePath))
                                     {
-                                        useOverride = true;
-                                    }
-                                } catch {}
-                                if (!useOverride)
-                                {
-                                    // Play boot movie if it's a boot movie
-                                    if (PluginHandler.plugins[i].GetAddonType() == AddonType.BootMovie)
-                                    {
-                                        string filePath = PluginHandler.plugins[i].path.Replace(".lua", ".mp4");
-                                        if (File.Exists(filePath))
+                                        FramePlayer.Stop();
+                                        GlobalContent.PlaySound("Select");
+                                        if (SaveData.saveValues["UseExternalVideoPlayer"] == "false")
                                         {
-                                            FramePlayer.Stop();
-                                            GlobalContent.PlaySound("Select");
                                             if (UserInterface.instance != null)
                                             {
                                                 if (UserInterface.instance.videoPlayer != null)
@@ -735,47 +727,64 @@ namespace NonsensicalVideoGenerator
                                                 ScreenManager.PushNavigation("Video");
                                                 ScreenManager.GetScreen<VideoScreen>("Video")?.Show();
                                             }
-                                            return true;
                                         }
-                                    }
-                                    // Test effect if it's an effect
-                                    if (PluginHandler.plugins[i].GetAddonType() == AddonType.Effect)
-                                    {
-                                        FramePlayer.Stop();
-                                        Global.videoPlaying = false;
-                                        if (UserInterface.instance != null)
+                                        else
                                         {
-                                            if (UserInterface.instance.videoPlayer != null && UserInterface.instance.videoPlayer.State != MediaState.Stopped)
+                                            // Open the video in the default video player.
+                                            ProcessStartInfo defaultVideoStartInfo = new ProcessStartInfo()
                                             {
-                                                UserInterface.instance.videoPlayer.Dispose();
-                                                UserInterface.instance.videoPlayer = null;
-                                            }
+                                                FileName = filePath,
+                                                UseShellExecute = true
+                                            };
+                                            Process.Start(defaultVideoStartInfo);
                                         }
-                                        FramePlayer.canPlayBgMusic = true;
-                                        Global.generator.progressText = L.T(0, "Video:StatusStop");
-                                        if (SaveData.saveValues["UseExternalVideoPlayer"] == "false")
-                                            ScreenManager.GetScreen<VideoScreen>("Video")?.Hide();
-                                        GlobalContent.PlaySound("Select");
-                                        Global.generator.StartEffectTest(PluginHandler.plugins[i]);
                                         return true;
                                     }
-                                    GlobalContent.PlaySound("Option");
-                                    ProcessStartInfo startInfo = new();
-                                    // Workshop plugin should open workshop page
-                                    if (PluginHandler.plugins[i].workshopId != "" && PluginHandler.plugins[i].rootPath.Contains("workshop"))
+                                }
+                                // Test effect if it's an effect
+                                if (PluginHandler.plugins[i].GetAddonType() == AddonType.Effect ||
+                                    PluginHandler.plugins[i].GetAddonType() == AddonType.PostRenderEffect)
+                                {
+                                    FramePlayer.Stop();
+                                    Global.videoPlaying = false;
+                                    if (UserInterface.instance != null)
                                     {
-                                        startInfo.FileName = "steam://openurl/https://steamcommunity.com/sharedfiles/filedetails/?id=" + PluginHandler.plugins[i].workshopId;
-                                        startInfo.UseShellExecute = true;
-                                        ConsoleOutput.WriteLine($"> {startInfo.FileName} {startInfo.Arguments}", Color.Transparent);
-                                        Process.Start(startInfo);
-                                        return true;
+                                        if (UserInterface.instance.videoPlayer != null && UserInterface.instance.videoPlayer.State != MediaState.Stopped)
+                                        {
+                                            UserInterface.instance.videoPlayer.Dispose();
+                                            UserInterface.instance.videoPlayer = null;
+                                        }
                                     }
-                                    // Open directory and select file
-                                    startInfo.FileName = "explorer.exe";
-                                    startInfo.Arguments = "/select, \"" + Path.GetFullPath(PluginHandler.plugins[i].path) + "\"";
+                                    FramePlayer.canPlayBgMusic = true;
+                                    Global.generator.progressText = L.T(0, "Video:StatusStop");
+                                    if (UserInterface.instance != null && UserInterface.instance.videoPlayer != null
+                                        && SaveData.saveValues["UseExternalVideoPlayer"] == "true")
+                                    {
+                                        UserInterface.instance.videoPlayer.Stop();
+                                        UserInterface.instance.videoPath = "";
+                                        FramePlayer.canPlayBgMusic = true;
+                                        ScreenManager.GetScreen<VideoScreen>("Video")?.Hide();
+                                    }
+                                    GlobalContent.PlaySound("Select");
+                                    Global.generator.StartEffectTest(PluginHandler.plugins[i]);
+                                    return true;
+                                }
+                                GlobalContent.PlaySound("Option");
+                                ProcessStartInfo startInfo = new();
+                                // Workshop plugin should open workshop page
+                                if (PluginHandler.plugins[i].workshopId != "" && PluginHandler.plugins[i].rootPath.Contains("workshop"))
+                                {
+                                    startInfo.FileName = "steam://openurl/https://steamcommunity.com/sharedfiles/filedetails/?id=" + PluginHandler.plugins[i].workshopId;
+                                    startInfo.UseShellExecute = true;
                                     ConsoleOutput.WriteLine($"> {startInfo.FileName} {startInfo.Arguments}", Color.Transparent);
                                     Process.Start(startInfo);
+                                    return true;
                                 }
+                                // Open directory and select file
+                                startInfo.FileName = "explorer.exe";
+                                startInfo.Arguments = "/select, \"" + Path.GetFullPath(PluginHandler.plugins[i].path) + "\"";
+                                ConsoleOutput.WriteLine($"> {startInfo.FileName} {startInfo.Arguments}", Color.Transparent);
+                                Process.Start(startInfo);
                                 return true;
                             }
                             // Settings button
@@ -1164,7 +1173,7 @@ namespace NonsensicalVideoGenerator
             controllerPluginCreation.Clear();
             GlobalContent.AddTexture("PluginEntryBlank", ThemeManager.LoadLayeredContent<Texture2D>("graphics/pluginentryblank"));
             GlobalContent.AddTexture("PluginEntry", ThemeManager.LoadLayeredContent<Texture2D>("graphics/pluginentry"));
-            actionController.Add("ActionSteam", new ActionButton("View the Steam Workshop!", new Vector2(112, 161), (int i, string n) => {
+            actionController.Add("ActionSteam", new ActionButton("View the Steam Workshop!", new Vector2(112, 146), (int i, string n) => {
                 switch(i)
                 {
                     case 2: // left click
@@ -1183,7 +1192,7 @@ namespace NonsensicalVideoGenerator
                 }
                 return false;
             }, ThemeManager.LoadLayeredContent<Texture2D>("graphics/actions/steam")));
-            actionController.Add("ReloadPlugins", new ActionButton("Force reload all addons.", new Vector2(112, 176), (int i, string n) => {
+            actionController.Add("ReloadPlugins", new ActionButton("Force reload all addons.", new Vector2(112, 161), (int i, string n) => {
                 switch(i)
                 {
                     case 2: // left click
@@ -1197,7 +1206,7 @@ namespace NonsensicalVideoGenerator
                 }
                 return false;
             }, ThemeManager.LoadLayeredContent<Texture2D>("graphics/actions/reload")));
-            actionController.Add("Filter", new ActionButton("Change the filter type in the addon list.", new Vector2(112, 191), (int i, string n) => {
+            actionController.Add("Filter", new ActionButton("Change the filter type in the addon list.", new Vector2(112, 176), (int i, string n) => {
                 switch(i)
                 {
                     case 2: // left click
@@ -1212,6 +1221,22 @@ namespace NonsensicalVideoGenerator
                 }
                 return false;
             }, ThemeManager.LoadLayeredContent<Texture2D>("graphics/actions/filter")));
+            actionController.Add("ActionOpenFolder", new ActionButton("open folder", new Vector2(112, 191), (int i, string n) => {
+                switch (i)
+                {
+                    case 2: // left click
+                        GlobalContent.PlaySound("Select");
+                        // Open the plugins folder in explorer
+                        Process.Start(new ProcessStartInfo
+                        {
+                            FileName = "explorer.exe",
+                            Arguments = Path.Combine(Directory.GetCurrentDirectory(), "plugins"),
+                            UseShellExecute = true
+                        });
+                        return true;
+                }
+                return false;
+            }, ThemeManager.LoadLayeredContent<Texture2D>("graphics/actions/openfolder")));
             actionController.Add("ActionEnableAll", new ActionButton("Enable all content in this category.", new Vector2(112, 206), (int i, string n) => {
                 switch(i)
                 {

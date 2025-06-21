@@ -33,6 +33,10 @@ namespace NonsensicalVideoGenerator
             SpriteFont font = L.FontLarge();
             // Draw title
             string title = L.T(0, "Blog:UpdateTitle", L.T(0, "Blog:UpdateMonth" + BlogData.Month.ToString(CultureInfo.InvariantCulture)), BlogData.Year.ToString(CultureInfo.InvariantCulture), "v" + Global.productVersion.Remove(0, 2).Remove(3));
+            if (BlogData.Tier == 0) // Disable dated name for upcoming releases
+            {
+                title = L.T(0, "Blog:UpdateTitle", L.T(0, "Blog:UpdateTier0"), BlogData.Year.ToString(CultureInfo.InvariantCulture), "v" + BlogData.MinorUpcoming.ToString(CultureInfo.InvariantCulture) + "." + BlogData.MajorUpcoming.ToString(CultureInfo.InvariantCulture));
+            }
             Vector2 titleSize = font.MeasureString(title);
             GlobalContent.DrawString(spriteBatch, font, title, new Vector2(GlobalGraphics.Scale(220+1) - titleSize.X / 2, GlobalGraphics.Scale(59+1)), Color.Black);
             GlobalContent.DrawString(spriteBatch, font, title, new Vector2(GlobalGraphics.Scale(220) - titleSize.X / 2, GlobalGraphics.Scale(59)), Color.White);
@@ -54,7 +58,15 @@ namespace NonsensicalVideoGenerator
             int descriptionHeight = 133;
             for(int i = 0; i < BlogData.Description.Count; i++)
             {
-                string text = BlogData.Description[i].Replace("%footer%", L.T(0, "Blog:UpdateFooter"));
+                string text = BlogData.Description[i];
+                if (BlogData.Tier == 0)
+                {
+                    text = text.Replace("%footer%", " ");
+                }
+                else
+                {
+                    text = text.Replace("%footer%", L.T(0, "Blog:UpdateFooter"));
+                }
                 Vector2 descriptionSize = font.MeasureString(text);
                 GlobalContent.DrawString(spriteBatch, font, text, new Vector2(GlobalGraphics.Scale(220+1) - descriptionSize.X / 2, GlobalGraphics.Scale(descriptionHeight+1)), Color.Black);
                 GlobalContent.DrawString(spriteBatch, font, text, new Vector2(GlobalGraphics.Scale(220) - descriptionSize.X / 2, GlobalGraphics.Scale(descriptionHeight)), Color.White);
@@ -69,11 +81,32 @@ namespace NonsensicalVideoGenerator
             ParseBlog();
             controller.LoadContent(contentManager, graphicsDevice);
             actionController.Clear();
-            actionController.Add("ActionDiscord", new ActionButton("Join our Discord server!", new Vector2(112, 191+15), (int i, string n) => {
-                switch(i)
+            actionController.Add("ActionBluesky", new ActionButton("Follow us on Bluesky!", new Vector2(112, 191), (int i, string n) =>
+            {
+                switch (i)
                 {
                     case 2: // left click
-                        if(Global.ready)
+                        if (Global.ready)
+                        {
+                            GlobalContent.PlaySound("Select");
+                            ProcessStartInfo psi = new()
+                            {
+                                FileName = "https://bsky.app/profile/nvg.kiwifruitdev.com",
+                                UseShellExecute = true
+                            };
+                            ConsoleOutput.WriteLine($"> {psi.FileName} {psi.Arguments}", Color.Transparent);
+                            Process.Start(psi);
+                        }
+                        return true;
+                }
+                return false;
+            }, ThemeManager.LoadLayeredContent<Texture2D>("graphics/actions/bluesky")));
+            actionController.Add("ActionDiscord", new ActionButton("Join our Discord server!", new Vector2(112, 191 + 15), (int i, string n) =>
+            {
+                switch (i)
+                {
+                    case 2: // left click
+                        if (Global.ready)
                         {
                             GlobalContent.PlaySound("Select");
                             ProcessStartInfo psi = new()
@@ -88,11 +121,12 @@ namespace NonsensicalVideoGenerator
                 }
                 return false;
             }, ThemeManager.LoadLayeredContent<Texture2D>("graphics/actions/discord")));
-            actionController.Add("ActionGitHub", new ActionButton("View the issue tracker on GitHub!", new Vector2(112, 191+(15*2)), (int i, string n) => {
-                switch(i)
+            actionController.Add("ActionGitHub", new ActionButton("View the issue tracker on GitHub!", new Vector2(112, 191 + (15 * 2)), (int i, string n) =>
+            {
+                switch (i)
                 {
                     case 2: // left click
-                        if(Global.ready)
+                        if (Global.ready)
                         {
                             GlobalContent.PlaySound("Select");
                             ProcessStartInfo psi = new()
@@ -112,22 +146,26 @@ namespace NonsensicalVideoGenerator
         {
             controller.Clear();
             // Add URL button
-            controller.Add("BlogURL", new Button("Read More", "View announcement event on Steam.", new Vector2(220, 60+15+19*8), (int i, string n) => {
-                switch(i)
+            if (BlogData.Tier != 0)
+            {
+                controller.Add("BlogURL", new Button("Read More", "View announcement event on Steam.", new Vector2(220, 60 + 15 + 19 * 8), (int i, string n) =>
                 {
-                    case 2:
-                        GlobalContent.PlaySound("Select");
-                        ProcessStartInfo startInfo = new()
-                        {
-                            FileName = BlogData.Url.Replace("%postid%", BlogData.PostId).Replace("%locale%", L.GetLocale().name),
-                            UseShellExecute = true
-                        };
-                        ConsoleOutput.WriteLine($"> {startInfo.FileName} {startInfo.Arguments}", Color.Transparent);
-                        Process.Start(startInfo);
-                        return true;
-                }
-                return false;
-            }));
+                    switch (i)
+                    {
+                        case 2:
+                            GlobalContent.PlaySound("Select");
+                            ProcessStartInfo startInfo = new()
+                            {
+                                FileName = BlogData.Url.Replace("%postid%", BlogData.PostId).Replace("%locale%", L.GetLocale().name),
+                                UseShellExecute = true
+                            };
+                            ConsoleOutput.WriteLine($"> {startInfo.FileName} {startInfo.Arguments}", Color.Transparent);
+                            Process.Start(startInfo);
+                            return true;
+                    }
+                    return false;
+                }));
+            }
         }
     }
 }

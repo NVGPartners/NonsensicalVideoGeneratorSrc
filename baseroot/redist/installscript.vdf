@@ -5,8 +5,8 @@
 		"windowsdesktop-runtime-8.0.17-win-x64"
 		{
 			"HasRunKey"		"HKEY_LOCAL_MACHINE\\Software\\Valve\\Steam\\Apps\\2516360"
-			"process 1"		"%INSTALLDIR%\\redist\\windowsdesktop-runtime-8.0.17-win-x64.exe"
-			"command 1"		"/install /quiet /norestart"
+			"Process 1"		"%INSTALLDIR%\\redist\\windowsdesktop-runtime-8.0.17-win-x64.exe"
+			"Command 1"		"/install /quiet /norestart"
 			"NoCleanUp"		"1"
 			"Requirement_OS"
 			{
@@ -18,4 +18,8 @@
 	{
 		"Nonsensical Video Generator"		"%INSTALLDIR%\\NonsensicalVideoGenerator.exe"
 	}
+}
+"kvsignatures"
+{
+	"InstallScript"		"38f697757d4e622acc94ad35d3c886d55b6c1987b76e2d5831307fe0a05f8f52bf617020fdce3c73fb10ac7cb9fdf58c845c264df8d0fe28a9d7020c1e7707d0e67b8ef5aaab81feefa01229f3736871cc4aad3544eebc0077091ffd9f55c73329f60adff3d60bf3de37341e9cd8571bcdbc645e647491522de0ba44330bfad9"
 }
