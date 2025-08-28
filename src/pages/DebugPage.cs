@@ -94,6 +94,8 @@ namespace NonsensicalVideoGenerator
                                 SaveData.saveValues["ScreenScale"] = "4";
                             else if(SaveData.saveValues["ScreenScale"] == "4")
                                 SaveData.saveValues["ScreenScale"] = "1";
+                            else
+                                SaveData.saveValues["ScreenScale"] = "2";
                             GlobalContent.PlaySound("Select");
                             return true;
                         }

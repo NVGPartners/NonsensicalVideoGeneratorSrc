@@ -147,16 +147,6 @@ namespace NonsensicalVideoGenerator
                 StartYear = 2023,
                 StatusText = "Holidays:StatusAnniversary"
             },
-            new Holiday("birthday", "KiwifruitDev's Birthday")
-            {
-                Enabled = true,
-                Priority = 2,
-                Theme = DefaultThemes.Birthday,
-                Start = new SimpleDateTime(10, 14, 0, 0, 0),
-                End = new SimpleDateTime(10, 14, 23, 59, 59),
-                StartYear = 2003,
-                StatusText = "Holidays:StatusBirthday"
-            },
             new Holiday("halloween", "Halloween")
             {
                 Enabled = true,

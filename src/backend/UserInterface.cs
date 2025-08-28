@@ -83,7 +83,7 @@ namespace NonsensicalVideoGenerator
             if(fullscreen)
             {
                 // Set preferred resolution to screen resolution.
-                aspectRatio.preferredResolution = new Point(GraphicsAdapter.DefaultAdapter.CurrentDisplayMode.Width / GlobalGraphics.scale, GraphicsAdapter.DefaultAdapter.CurrentDisplayMode.Height / GlobalGraphics.scale);
+                aspectRatio.preferredResolution = new Point((int)(GraphicsAdapter.DefaultAdapter.CurrentDisplayMode.Width / GlobalGraphics.scale), (int)(GraphicsAdapter.DefaultAdapter.CurrentDisplayMode.Height / GlobalGraphics.scale));
                 // Calculate draw offset into center of screen.
                 aspectRatio.drawOffset = new Vector2((aspectRatio.preferredResolution.X - (GlobalGraphics.scaledWidth / GlobalGraphics.scale)) / 2, (aspectRatio.preferredResolution.Y - (GlobalGraphics.scaledHeight / GlobalGraphics.scale)) / 2);
             }
@@ -144,7 +144,7 @@ namespace NonsensicalVideoGenerator
         }
         protected override void Initialize()
         {
-            if(bool.Parse(SaveData.saveValues["EnableDiscordRPC"]))
+            if (bool.Parse(SaveData.saveValues["EnableDiscordRPC"]))
                 DiscordRPC.Initialize();
             ConsoleOutput.WriteLine("Starting initialization for v" + Global.productVersion + "...", Color.Transparent);
             Kiwano.Check();
@@ -170,21 +170,23 @@ namespace NonsensicalVideoGenerator
             _graphics.PreferMultiSampling = false;
             GraphicsDevice.SamplerStates[0] = SamplerState.PointClamp;
             // Set screen resolution.
-            ConsoleOutput.WriteLine("Setting screen resolution...", Color.Transparent);
-            GlobalGraphics.scale = int.Parse(SaveData.saveValues["ScreenScale"], CultureInfo.InvariantCulture);
-            GlobalGraphics.SetAspectRatio(new AspectRatio());
-            Resize(GlobalGraphics.scaledWidth, GlobalGraphics.scaledHeight);
-            ConsoleOutput.WriteLine("Screen resolution set.", Color.Transparent);
+            if (Global.parameters.Contains("-nosetresolution"))
+            {
+                ConsoleOutput.WriteLine("Setting screen resolution...", Color.Transparent);
+                GlobalGraphics.scale = float.Parse(SaveData.saveValues["ScreenScale"], CultureInfo.InvariantCulture);
+                GlobalGraphics.SetAspectRatio(new AspectRatio());
+                Resize(GlobalGraphics.scaledWidth, GlobalGraphics.scaledHeight);
+                ConsoleOutput.WriteLine("Screen resolution set.", Color.Transparent);
+            }
             ConsoleOutput.WriteLine("Detected system: " + (Architecture.IsRunningThroughProton() ? ("Proton " + Architecture.translatorVersion) : Architecture.IsRunningThroughWine() ? ("Wine " + Architecture.translatorVersion) : "Native"), Color.Transparent);
-            ConsoleOutput.WriteLine("Rendering API: " + Global.productSku, Color.Transparent);
             ScreenManager.LoadScreens();
             ConsoleOutput.WriteLine("Initialization complete.", Color.Transparent);
             LibraryData.SequentialName();
             // Show blog if new version.
-            if(SaveData.saveValues["LastVersion"] != Global.productVersion)
+            if (SaveData.saveValues["LastVersion"] != Global.productVersion)
             {
                 // Fix plugin list filter flags (new plugin type was added)
-                if(SaveData.saveValues["PluginListFilterFlags"] == "7")
+                if (SaveData.saveValues["PluginListFilterFlags"] == "7")
                     SaveData.saveValues["PluginListFilterFlags"] = "15";
                 Pagination.SetPage(4);
                 SaveData.saveValues["LastVersion"] = Global.productVersion;
@@ -200,17 +202,17 @@ namespace NonsensicalVideoGenerator
 #endif
             // match aspect ratio
             AspectRatio aspectRatio = new();
-            if(SaveData.saveValues["MatchAspectRatio"] == "true")
+            if (SaveData.saveValues["MatchAspectRatio"] == "true")
                 aspectRatio = GlobalGraphics.FindMatchingAspectRatio();
             GlobalGraphics.SetAspectRatio(aspectRatio);
             // fullscreen
-            if(bool.Parse(SaveData.saveValues["Fullscreen"]))
+            if (bool.Parse(SaveData.saveValues["Fullscreen"]))
                 SetFullscreen(true);
             // always on top
-            if(bool.Parse(SaveData.saveValues["AlwaysOnTop"]))
+            if (bool.Parse(SaveData.saveValues["AlwaysOnTop"]))
                 SetAlwaysOnTop(true);
             // hide cursor
-                SetNativeCursor(bool.Parse(SaveData.saveValues["UseNativeCursor"]));
+            SetNativeCursor(bool.Parse(SaveData.saveValues["UseNativeCursor"]));
             base.Initialize();
         }
         protected override void LoadContent()
@@ -336,9 +338,9 @@ namespace NonsensicalVideoGenerator
                         video = VideoHelper.LoadFromFile(videoPath);
                         // current time + intro duration
                         introGoal = gameTime.TotalGameTime.TotalSeconds + video.Duration.Seconds + 1;
-                        if(randomBootMovie.ToLower().EndsWith("kiwifruitdevlogo.mp4"))
+                        if(randomBootMovie.ToLower().EndsWith("defaultlogo.mp4"))
                         {
-                            introGoal -= 2;
+                            introGoal -= 0.5;
                         }
                     }
                     else

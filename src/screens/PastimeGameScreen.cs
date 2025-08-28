@@ -102,7 +102,7 @@ namespace NonsensicalVideoGenerator
                 {
                     // Use mouse cursor to control the bird
                     spacingPlacementY = (MouseInput.MouseState.Y / GlobalGraphics.scale) - 1;
-                    spacing = (MouseInput.MouseState.X / GlobalGraphics.scale) - 1;
+                    spacing = (int)(MouseInput.MouseState.X / GlobalGraphics.scale) - 1;
                 }
                 else
                 {

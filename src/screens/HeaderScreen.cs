@@ -136,6 +136,10 @@ namespace NonsensicalVideoGenerator
             
             if(Debug.GetDebugMode())
             {
+                if (MouseInput.MouseState.X >= GlobalGraphics.Scale(10 + 21 + 52) && MouseInput.MouseState.X <= GlobalGraphics.Scale(10 + 21 + 52) + GlobalGraphics.Scale(debug.Width) && MouseInput.MouseState.Y >= GlobalGraphics.Scale(10 + 6) && MouseInput.MouseState.Y <= GlobalGraphics.Scale(10 + 6) + GlobalGraphics.Scale(debug.Height))
+                {
+                    Global.tooltip = L.T(0, "Debug:Tooltip");
+                }
                 if(Pagination.SelectedPage == Pagination.TopPageCount)
                 {
                     spriteBatch.Draw(GlobalContent.GetTexture("Pixel"), new Rectangle(GlobalGraphics.Scale(10 + 21 + 51 + 1), GlobalGraphics.Scale(10 + 6 - 1 + 1), GlobalGraphics.Scale(debug.Width + 2), GlobalGraphics.Scale(debug.Height + 2)), Color.Black);
@@ -246,14 +250,14 @@ namespace NonsensicalVideoGenerator
             if(handleInput)
             {
                 // Allow clicking on the logo
-                if(MouseInput.MouseState.LeftButton == ButtonState.Pressed && MouseInput.LastMouseState.LeftButton == ButtonState.Released)
+                if (MouseInput.MouseState.LeftButton == ButtonState.Pressed && MouseInput.LastMouseState.LeftButton == ButtonState.Released)
                 {
                     Texture2D logo = GlobalContent.GetTexture("Logo");
                     Texture2D icon = GlobalContent.GetTexture("Icon");
                     Texture2D debug = GlobalContent.GetTexture("Debug");
-                    if(MouseInput.MouseState.X >= GlobalGraphics.Scale(10) && MouseInput.MouseState.X <= GlobalGraphics.Scale(10) + GlobalGraphics.Scale(logo.Width) + GlobalGraphics.Scale(21) && MouseInput.MouseState.Y >= GlobalGraphics.Scale(10) && MouseInput.MouseState.Y <= GlobalGraphics.Scale(10) + GlobalGraphics.Scale(logo.Height))
+                    if (MouseInput.MouseState.X >= GlobalGraphics.Scale(10) && MouseInput.MouseState.X <= GlobalGraphics.Scale(10) + GlobalGraphics.Scale(logo.Width) + GlobalGraphics.Scale(21) && MouseInput.MouseState.Y >= GlobalGraphics.Scale(10) && MouseInput.MouseState.Y <= GlobalGraphics.Scale(10) + GlobalGraphics.Scale(logo.Height))
                     {
-                        if(!bool.Parse(SaveData.saveValues["DisableMotion"]))
+                        if (!bool.Parse(SaveData.saveValues["DisableMotion"]))
                         {
                             Color clickColor = new Color(255, 255, 255, 255);
                             Rectangle clickOffset = new Rectangle(10 + 21, 10, logo.Width, logo.Height);
@@ -262,11 +266,11 @@ namespace NonsensicalVideoGenerator
                             clickHeaderList.Add(new ClickHeader(clickOffset, clickOffset2, gameTime.TotalGameTime.TotalSeconds, growth, clickColor));
                         }
                         // Roll for jump
-                        if(!jumping)
+                        if (!jumping)
                         {
-                            if(Global.generator.globalRandom.Next(0, 100) < 10)
+                            if (Global.generator.globalRandom.Next(0, 100) < 10)
                             {
-                                if(!bool.Parse(SaveData.saveValues["DisableMotion"]))
+                                if (!bool.Parse(SaveData.saveValues["DisableMotion"]))
                                 {
                                     jump = 0f;
                                     jumpTime = gameTime.TotalGameTime.TotalSeconds;
@@ -280,7 +284,7 @@ namespace NonsensicalVideoGenerator
                                 GlobalContent.PlaySound("Prompt");
                             }
                             // Seed random generator
-                            if(Global.randomSeed != 0 && !Global.parameters.Contains("-seed"))
+                            if (Global.randomSeed != 0 && !Global.parameters.Contains("-seed"))
                             {
                                 Global.randomSeed = Global.generator.globalRandom.Next();
                                 Global.generator.globalRandom = new Random(Global.randomSeed);
@@ -292,9 +296,9 @@ namespace NonsensicalVideoGenerator
                         }
                         return true;
                     }
-                    else if(MouseInput.MouseState.X >= GlobalGraphics.Scale(10 + 21 + 52) && MouseInput.MouseState.X <= GlobalGraphics.Scale(10 + 21 + 52) + GlobalGraphics.Scale(debug.Width) && MouseInput.MouseState.Y >= GlobalGraphics.Scale(10 + 6) && MouseInput.MouseState.Y <= GlobalGraphics.Scale(10 + 6) + GlobalGraphics.Scale(debug.Height))
+                    else if (MouseInput.MouseState.X >= GlobalGraphics.Scale(10 + 21 + 52) && MouseInput.MouseState.X <= GlobalGraphics.Scale(10 + 21 + 52) + GlobalGraphics.Scale(debug.Width) && MouseInput.MouseState.Y >= GlobalGraphics.Scale(10 + 6) && MouseInput.MouseState.Y <= GlobalGraphics.Scale(10 + 6) + GlobalGraphics.Scale(debug.Height))
                     {
-                        if(Debug.GetDebugMode())
+                        if (Debug.GetDebugMode())
                         {
                             Debug.ToggleDebugMenu();
                             return true;

@@ -43,10 +43,10 @@ namespace NonsensicalVideoGenerator
             if(!videoFullscreen)
             {
                 // Draw the border.
-                spriteBatch.Draw(pixel, new Rectangle(0, 0, GlobalGraphics.scaledWidth, 4 * GlobalGraphics.scale), bgColor);
-                spriteBatch.Draw(pixel, new Rectangle(0, GlobalGraphics.scaledHeight - 4 * GlobalGraphics.scale, GlobalGraphics.scaledWidth, 4 * GlobalGraphics.scale), bgColor);
-                spriteBatch.Draw(pixel, new Rectangle(0, 0, 4 * GlobalGraphics.scale, GlobalGraphics.scaledHeight), bgColor);
-                spriteBatch.Draw(pixel, new Rectangle(GlobalGraphics.scaledWidth - 4 * GlobalGraphics.scale, 0, 4 * GlobalGraphics.scale, GlobalGraphics.scaledHeight), bgColor);
+                spriteBatch.Draw(pixel, new Rectangle(0, 0, GlobalGraphics.scaledWidth, (int)(4 * GlobalGraphics.scale)), bgColor);
+                spriteBatch.Draw(pixel, new Rectangle(0, GlobalGraphics.scaledHeight - (int)(4 * GlobalGraphics.scale), GlobalGraphics.scaledWidth, (int)(4 * GlobalGraphics.scale)), bgColor);
+                spriteBatch.Draw(pixel, new Rectangle(0, 0, (int)(4 * GlobalGraphics.scale), GlobalGraphics.scaledHeight), bgColor);
+                spriteBatch.Draw(pixel, new Rectangle(GlobalGraphics.scaledWidth - (int)(4 * GlobalGraphics.scale), 0, (int)(4 * GlobalGraphics.scale), GlobalGraphics.scaledHeight), bgColor);
             }
             if(videoFullscreen)
             {

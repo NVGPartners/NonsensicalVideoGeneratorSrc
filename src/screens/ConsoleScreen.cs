@@ -183,9 +183,9 @@ namespace NonsensicalVideoGenerator
             Vector2 titleSize = L.FontSmall().MeasureString(newTitle);
             GlobalContent.DrawString(spriteBatch, L.FontSmall(), newTitle, new Vector2(GlobalGraphics.scaledWidth / 2 - titleSize.X / 2, (6 * GlobalGraphics.scale) - GlobalGraphics.Scale(1)), Color.White);
             // Draw lines.
-            int lineHeight = 8 * GlobalGraphics.scale;
-            int lineSpacing = 2 * GlobalGraphics.scale;
-            int lineY = GlobalGraphics.Scale(16) + lineSpacing;
+            float lineHeight = 8 * GlobalGraphics.scale;
+            float lineSpacing = 2 * GlobalGraphics.scale;
+            float lineY = GlobalGraphics.Scale(16) + lineSpacing;
             try
             {
                 foreach (ColoredString line in ConsoleOutput.GetOutput())

@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.Globalization;
 using System.IO;
 using System.Reflection;
 using Microsoft.Xna.Framework;
@@ -55,16 +56,24 @@ namespace NonsensicalVideoGenerator
         }
         public string GetMusicAttribution(int musicIndex)
         {
-            if (musicIndex < 0 || musicIndex >= musicAttributions.Count)
+            if (musicIndex >= 0 && musicIndex < musicAttributions.Count)
             {
-                return "";
+                string[] attribution = musicAttributions[musicIndex].Split(" - ");
+                if (attribution.Length >= 2)
+                {
+                    return L.T(0, "Overlay:MusicAttribution", attribution[0], attribution[1]);
+                }
+                else
+                {
+                    return musicAttributions[musicIndex];
+                }
             }
-            return musicAttributions[musicIndex];
+            return "";
         }
     }
     public static class DefaultThemes
     {
-        public static Theme Nonsensical = new Theme("Nonsensical", "The default theme.", "", 6, 4, new Dictionary<string, Color>() {
+        public static Theme Nonsensical = new Theme("Nonsensical", "The default theme.", "", 5, 4, new Dictionary<string, Color>() {
             {"ClearColor", new Color(0, 0, 0, 255)},
             {"ShadowActionButtonInteractable", new Color(0, 0, 0, 255)},
             {"ShadowButtonInteractable", new Color(0, 0, 0, 255)},
@@ -96,31 +105,25 @@ namespace NonsensicalVideoGenerator
         },
         new List<string>()
         {
-            "KiwifruitDev - This is Nonsense!",
             "Bobby I Guess - A Nonsensical Song",
             "Bobby I Guess - A Nonsensical Song Yet Again",
             "Bobby I Guess - Creation",
             "Bobby I Guess - Where We Began",
             "Bobby I Guess - Jazzy",
         }, true);
-        public static Theme Anniversary = new Theme("Anniversary", "Celebrate NVG's anniversary!", "themes/anniversary/", 6, 4, new Dictionary<string, Color>() {}, new List<string>() {}, true);
-        public static Theme Birthday = new Theme("Birthday", "Happy birthday to KiwifruitDev!", "themes/birthday/", 6, 5, new Dictionary<string, Color>() {
-            {"BackgroundScreen", new Color(100, 122, 58, 255)},
-            {"TileBackgroundScreen", new Color(134, 165, 79, 255)}
-        }, new List<string>() {}, true);
+        public static Theme Anniversary = new Theme("Anniversary", "Celebrate NVG's anniversary!", "themes/anniversary/", 5, 4, new Dictionary<string, Color>() {}, new List<string>() {}, true);
         public static Theme Spooky = new Theme("Spooky", "Trick or treat!", "themes/halloween/", 1, 5, new Dictionary<string, Color>() {
             {"VideoPlayerProgressBar", new Color(60, 0, 128, 255)},
         }, new List<string>() {
             "Bobby I Guess - Halloween",
         }, true);
-        public static Theme Holiday = new Theme("Holiday", "Merry Christmas!", "themes/holiday/", 6, 8, new Dictionary<string, Color>() {
+        public static Theme Holiday = new Theme("Holiday", "Merry Christmas!", "themes/holiday/", 5, 8, new Dictionary<string, Color>() {
         }, new List<string>() {}, true);
         public static List<Theme> themes = new List<Theme>()
         {
             Nonsensical,
             Anniversary,
             Spooky,
-            Birthday,
             Holiday
         };
         public static Theme defaultTheme = Nonsensical;
@@ -268,7 +271,7 @@ namespace NonsensicalVideoGenerator
                 // Get song name, remove extension
                 string songName = Path.GetFileNameWithoutExtension(path);
                 int defaultMusicCount = DefaultThemes.Nonsensical.songCount;
-                if (songName.StartsWith("theme") && int.TryParse(songName.Substring(5), out int songIndex) && songIndex > 0 && songIndex <= defaultMusicCount)
+                if (songName.StartsWith("theme") && int.TryParse(songName.Substring(5), NumberStyles.Integer, CultureInfo.InvariantCulture, out int songIndex) && songIndex > 0 && songIndex <= defaultMusicCount)
                 {
                     musicIndex = songIndex - 1; // Convert to zero-based index
                     // Get the default attribution for this song index

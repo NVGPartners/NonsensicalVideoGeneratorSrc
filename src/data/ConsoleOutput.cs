@@ -145,9 +145,9 @@ namespace NonsensicalVideoGenerator
                     string[] colorValues = colorString.Split(',');
                     if(colorValues.Length == 3)
                     {
-                        if (int.TryParse(colorValues[0], System.Globalization.NumberStyles.Integer, CultureInfo.InvariantCulture, out int r)
-                        && int.TryParse(colorValues[1], System.Globalization.NumberStyles.Integer, CultureInfo.InvariantCulture, out int g)
-                        && int.TryParse(colorValues[2], System.Globalization.NumberStyles.Integer, CultureInfo.InvariantCulture, out int b))
+                        if (int.TryParse(colorValues[0], NumberStyles.Integer, CultureInfo.InvariantCulture, out int r)
+                        && int.TryParse(colorValues[1], NumberStyles.Integer, CultureInfo.InvariantCulture, out int g)
+                        && int.TryParse(colorValues[2], NumberStyles.Integer, CultureInfo.InvariantCulture, out int b))
                         {
                             c = new Color(r, g, b);
                             line = line.Substring(end + 2);

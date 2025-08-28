@@ -37,7 +37,12 @@ namespace NonsensicalVideoGenerator
             AddSound("CompatSelect", ThemeManager.LoadLayeredContent<SoundEffect>("sound/compatselect"));
             AddSound("Disambiguation", ThemeManager.LoadLayeredContent<SoundEffect>("sound/disambiguation"));
             // Load default fonts.
-            int scale = int.Parse(SaveData.saveValues["ScreenScale"], CultureInfo.InvariantCulture);
+            int scale = (int)float.Parse(SaveData.saveValues["ScreenScale"], CultureInfo.InvariantCulture);
+            // font scale must be between 1 and 4
+            if (scale < 1 || scale > 4)
+            {
+                scale = 2;
+            }
             AddFont("Munro", ThemeManager.LoadLayeredContent<SpriteFont>("fonts/munro-x"+scale), new Vector2(0, 0));
             AddFont("MunroSmall", ThemeManager.LoadLayeredContent<SpriteFont>("fonts/munro-small-x"+scale), new Vector2(0, 0));
             AddFont("NotoSans", ThemeManager.LoadLayeredContent<SpriteFont>("fonts/notosans-x"+scale), new Vector2(-scale/2, -scale*2f));

@@ -54,7 +54,7 @@ function StartGeneration(options, pluginSettings, functions)
     isnvgupdated = options["saveData"] ~= nil
     -- Download default media
     if not functions.libraryHasFile("audio", "distort", "distort.mp3") then
-        functions.downloadFile("https://github.com/KiwifruitDev/NonsensicalVideoGenerator/raw/refs/heads/main/addonlibraries/distort.mp3", "audio", "distort")
+        functions.downloadFile("https://github.com/NVGPartners/NonsensicalVideoGenerator/raw/refs/heads/main/addonlibraries/distort.mp3", "audio", "distort")
         indexoffset = 1
     else
         -- Set variables

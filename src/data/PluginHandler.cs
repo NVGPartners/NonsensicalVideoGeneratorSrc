@@ -329,7 +329,7 @@ namespace NonsensicalVideoGenerator
     {
         public static Dictionary<string, string> placeholders = new();
         // Fix broken URLs that Workshop addons use
-        public static readonly string urlBase = "https://github.com/KiwifruitDev/NonsensicalVideoGenerator/raw/refs/heads/main/addonlibraries/";
+        public static readonly string urlBase = "https://github.com/NVGPartners/NonsensicalVideoGenerator/raw/refs/heads/main/addonlibraries/";
         public static Dictionary<string, string> urlMapper = new()
         {
             {"https://cdn.discordapp.com/attachments/1068727704209342525/1133564849629188126/church.mp3", "church.mp3"},
@@ -1221,25 +1221,6 @@ namespace NonsensicalVideoGenerator
                     break;
             }
         }
-        public Color GetColor(string color)
-        {
-            if (themeColors.ContainsKey(color))
-            {
-                return themeColors[color];
-            }
-            else
-            {
-                return Color.Transparent;
-            }
-        }
-        public string GetMusicAttribution(int musicIndex)
-        {
-            if (musicIndex < 0 || musicIndex >= themeMusicAttributions.Count)
-            {
-                return "";
-            }
-            return themeMusicAttributions[musicIndex];
-        }
     }
     public class LibraryCombinedType
     {
@@ -1895,7 +1876,7 @@ namespace NonsensicalVideoGenerator
                 else if(templateType == 3)
                 {
                     // Ask user to pick a video file or use bootmovie.mp4 otherwise.
-                    string bootMoviePath = Path.Combine("plugins", "user", "stock", "kiwifruitdevlogo.mp4");
+                    string bootMoviePath = Path.Combine("plugins", "user", "stock", "defaultlogo.mp4");
                     // Ask user to pick a video file.
                     OpenFileDialog openFileDialog = new()
                     {

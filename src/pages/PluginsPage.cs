@@ -52,11 +52,11 @@ namespace NonsensicalVideoGenerator
             if (!editingSettings)
             {
                 // Draw scroll bar
-                spriteBatch.Draw(pluginPage, new Rectangle(GlobalGraphics.Scale(293), GlobalGraphics.Scale(57), pluginPage.Width * GlobalGraphics.scale, pluginPage.Height * GlobalGraphics.scale), Color.White);
+                spriteBatch.Draw(pluginPage, new Rectangle(GlobalGraphics.Scale(293), GlobalGraphics.Scale(57), (int)(pluginPage.Width * GlobalGraphics.scale), (int)(pluginPage.Height * GlobalGraphics.scale)), Color.White);
                 // Move the scroll handle relative to the scroll offset and the max scroll offset.
                 if (maxScrollOffset > 0)
                 {
-                    spriteBatch.Draw(scrollHandle, new Rectangle(GlobalGraphics.Scale(294), GlobalGraphics.Scale(69 + scrollOffset * (214 - 69) / maxScrollOffset), scrollHandle.Width * GlobalGraphics.scale, scrollHandle.Height * GlobalGraphics.scale), Color.White);
+                    spriteBatch.Draw(scrollHandle, new Rectangle(GlobalGraphics.Scale(294), GlobalGraphics.Scale(69 + scrollOffset * (214 - 69) / maxScrollOffset), (int)(scrollHandle.Width * GlobalGraphics.scale), (int)(scrollHandle.Height * GlobalGraphics.scale)), Color.White);
                 }
                 // End existing spritebatch
                 ContentScreen? cntscr = ScreenManager.GetScreen<ContentScreen>("Content");
@@ -126,7 +126,7 @@ namespace NonsensicalVideoGenerator
                     }
 
                     // Draw the plugin entry
-                    spriteBatch.Draw(pluginEntry, new Rectangle(GlobalGraphics.Scale(136), GlobalGraphics.Scale(57 + (i - offsetpl) * pluginEntry.Height + (i - offsetpl)), pluginEntry.Width * GlobalGraphics.scale, pluginEntry.Height * GlobalGraphics.scale), curColor);
+                    spriteBatch.Draw(pluginEntry, new Rectangle(GlobalGraphics.Scale(136), GlobalGraphics.Scale(57 + (i - offsetpl) * pluginEntry.Height + (i - offsetpl)), (int)(pluginEntry.Width * GlobalGraphics.scale), (int)(pluginEntry.Height * GlobalGraphics.scale)), curColor);
 
                     // Set up the plugin name
                     string nam = PluginHandler.plugins[i].GetDisplayName();
@@ -223,7 +223,7 @@ namespace NonsensicalVideoGenerator
                     GlobalContent.DrawString(spriteBatch, munroSmall, nam, new Vector2(GlobalGraphics.Scale(141), GlobalGraphics.Scale(58 + (i - offsetpl) * pluginEntry.Height + (i - offsetpl))), Color.White);
                     if (Global.canRender)
                     {
-                        spriteBatch.Draw(PluginHandler.plugins[i].enabled ? interactiveSwitchOn : interactiveSwitchOff, new Rectangle(GlobalGraphics.Scale(271), GlobalGraphics.Scale(60 + (i - offsetpl) * pluginEntry.Height + (i - offsetpl)), interactiveSwitchOn.Width * GlobalGraphics.scale, interactiveSwitchOn.Height * GlobalGraphics.scale), Color.White);
+                        spriteBatch.Draw(PluginHandler.plugins[i].enabled ? interactiveSwitchOn : interactiveSwitchOff, new Rectangle(GlobalGraphics.Scale(271), GlobalGraphics.Scale(60 + (i - offsetpl) * pluginEntry.Height + (i - offsetpl)), (int)(interactiveSwitchOn.Width * GlobalGraphics.scale), (int)(interactiveSwitchOn.Height * GlobalGraphics.scale)), Color.White);
                     }
                     else
                     {
@@ -237,7 +237,7 @@ namespace NonsensicalVideoGenerator
                     curColor = ThemeManager.GetColor("PluginEntryGenericAltPluginsPage");
                 else
                     curColor = ThemeManager.GetColor("PluginEntryGenericPluginsPage");
-                spriteBatch.Draw(pluginEntryBlank, new Rectangle(GlobalGraphics.Scale(136), GlobalGraphics.Scale(57 + (plcount - offsetpl) * pluginEntry.Height + (plcount - offsetpl)), pluginEntry.Width * GlobalGraphics.scale, pluginEntry.Height * GlobalGraphics.scale), curColor);
+                spriteBatch.Draw(pluginEntryBlank, new Rectangle(GlobalGraphics.Scale(136), GlobalGraphics.Scale(57 + (plcount - offsetpl) * pluginEntry.Height + (plcount - offsetpl)), (int)(pluginEntry.Width * GlobalGraphics.scale), (int)(pluginEntry.Height * GlobalGraphics.scale)), curColor);
                 GlobalContent.DrawString(spriteBatch, munroSmall, L.T(0, "Addons:AddonManagementButton"), new Vector2(GlobalGraphics.Scale(141 + 1), GlobalGraphics.Scale(58 + 1 + (plcount - offsetpl) * pluginEntry.Height + (plcount - offsetpl))), Color.Black);
                 GlobalContent.DrawString(spriteBatch, munroSmall, L.T(0, "Addons:AddonManagementButton"), new Vector2(GlobalGraphics.Scale(141), GlobalGraphics.Scale(58 + (plcount - offsetpl) * pluginEntry.Height + (plcount - offsetpl))), Color.White);
                 // End offset

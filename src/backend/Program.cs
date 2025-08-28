@@ -1,5 +1,6 @@
 using System;
 using System.Diagnostics;
+using System.Globalization;
 using System.IO;
 using System.Reflection;
 using Microsoft.Xna.Framework;
@@ -47,7 +48,7 @@ namespace NonsensicalVideoGenerator
                 int index = Global.parameters.IndexOf("-seed");
                 if(index + 1 < Global.parameters.Count)
                 {
-                    if(int.TryParse(Global.parameters[index + 1], out int seed))
+                    if(int.TryParse(Global.parameters[index + 1], NumberStyles.Integer, CultureInfo.InvariantCulture, out int seed))
                     {
                         Global.randomSeed = seed;
                     }
@@ -57,7 +58,7 @@ namespace NonsensicalVideoGenerator
             if(!Global.parameters.Contains("-nofrei0r"))
             {
                 // Set FREI0R_PATH environment variable.
-                Environment.SetEnvironmentVariable("FREI0R_PATH", Path.Combine(Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location) ?? ".", "frei0r-1"), EnvironmentVariableTarget.User);
+                Environment.SetEnvironmentVariable("FREI0R_PATH", Path.Combine(Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location) ?? ".", "bin", "frei0r-1"), EnvironmentVariableTarget.User);
                 ConsoleOutput.WriteLine("FREI0R_PATH: " + Environment.GetEnvironmentVariable("FREI0R_PATH", EnvironmentVariableTarget.User), Color.Transparent);
             }
             SaveData.Load();
@@ -65,6 +66,17 @@ namespace NonsensicalVideoGenerator
             {
                 SaveData.saveValues["HiddenVerbose"] = "true";
                 SaveData.Save();
+            }
+            if(Global.parameters.Contains("-scale"))
+            {
+                int index = Global.parameters.IndexOf("-scale");
+                if(index + 1 < Global.parameters.Count)
+                {
+                    if (float.TryParse(Global.parameters[index + 1], NumberStyles.Float, CultureInfo.InvariantCulture, out float scale))
+                    {
+                        SaveData.saveValues["ScreenScale"] = scale.ToString();
+                    }
+                }
             }
             DisabledMedia.Load();
             if(Global.parameters.Count > 0)
@@ -123,7 +135,7 @@ namespace NonsensicalVideoGenerator
             if(Global.parameters.Contains("-fullscreen"))
                 SaveData.saveValues["Fullscreen"] = "true";
             HolidayManager.CheckHolidays();
-            Global.productVersion = (Assembly.GetExecutingAssembly().GetName().Version?.ToString() ?? "0.0.0.0") + Global.productSku;
+            Global.productVersion = (Assembly.GetExecutingAssembly().GetName().Version?.ToString() ?? "0.0.0.0");
             using (var game = new UserInterface())
                 game.Run();
             // On graceful exit, save the game data

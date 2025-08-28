@@ -1,4 +1,4 @@
-June 2025: Update v8.2
+August 2025: Update v8.2
 
 Here are the changes in this update:
 
@@ -7,7 +7,7 @@ Here are the changes in this update:
 [/list]
 
 Let me know if you have any issues with this update through the [url=https://discord.gg/8ppmspR6Wh]NVG Community Discord[/url].
-Also, please help translate NVG into your language on [url=https://github.com/KiwifruitDev/NonsensicalVideoGenerator/wiki/Localization]GitHub[/url]!
+Also, please help translate NVG into your language on [url=https://github.com/NVGPartners/NonsensicalVideoGenerator/wiki/Localization]GitHub[/url]!
 Happy generating!
 
-[url=https://store.steampowered.com/app/2516360/Nonsensical_Video_Generator/][img]{STEAM_CLAN_IMAGE}/44378200/ff687f086ff77748ead1a7a7f33a8fbcfdb6a772.png[/img][/url] [url=https://steamcommunity.com/id/KiwifruitDev][img]{STEAM_CLAN_IMAGE}/44378200/4c0156375f8a8430371fc2407e3a39caa2b54aca.png[/img][/url]
+[url=https://store.steampowered.com/app/2516360/Nonsensical_Video_Generator/][img]{STEAM_CLAN_IMAGE}/44378200/ff687f086ff77748ead1a7a7f33a8fbcfdb6a772.png[/img][/url]

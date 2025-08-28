@@ -91,7 +91,7 @@ namespace NonsensicalVideoGenerator
                             GlobalContent.PlaySound("Select");
                             ProcessStartInfo psi = new()
                             {
-                                FileName = "https://bsky.app/profile/nvg.kiwifruitdev.com",
+                                FileName = "https://bsky.app/profile/nvgapp.bsky.social",
                                 UseShellExecute = true
                             };
                             ConsoleOutput.WriteLine($"> {psi.FileName} {psi.Arguments}", Color.Transparent);
@@ -131,7 +131,7 @@ namespace NonsensicalVideoGenerator
                             GlobalContent.PlaySound("Select");
                             ProcessStartInfo psi = new()
                             {
-                                FileName = "https://github.com/KiwifruitDev/NonsensicalVideoGenerator",
+                                FileName = "https://github.com/NVGPartners/NonsensicalVideoGenerator",
                                 UseShellExecute = true
                             };
                             ConsoleOutput.WriteLine($"> {psi.FileName} {psi.Arguments}", Color.Transparent);

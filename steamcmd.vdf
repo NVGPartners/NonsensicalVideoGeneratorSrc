@@ -2,8 +2,8 @@
 {
 	"AppID" "2516360"
 	"Desc" "Upload Nonsensical Video Generator"
-	"ContentRoot" "C:\Users\Kiwi\Documents\NVGDev\NVGMonoGame\bin\x64\Release\net8.0-windows\"
-	"BuildOutput" "C:\Users\Kiwi\Documents\NVGDev\NVGMonoGame\steamcmdoutput"
+	"ContentRoot" "C:\NVGDev\NVGMonoGame\bin\x64\Release\net8.0-windows\"
+	"BuildOutput" "C:\NVGDev\NVGMonoGame\steamcmdoutput"
 	"Depots"
 	{
 		"2516361"

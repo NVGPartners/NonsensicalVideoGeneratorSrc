@@ -1,6 +1,6 @@
 <Project Sdk="Microsoft.NET.Sdk">
   <PropertyGroup>
-    <Version>1.8.1.1</Version>
+    <Version>1.8.1.2</Version>
     <OutputType>WinExe</OutputType>
     <RollForward>Major</RollForward>
     <PublishReadyToRun>false</PublishReadyToRun>
@@ -9,8 +9,8 @@
     <AssemblyProduct>NonsensicalVideoGenerator</AssemblyProduct>
     <AssemblyTitle>Nonsensical Video Generator</AssemblyTitle>
     <RootNamespace>NonsensicalVideoGenerator</RootNamespace>
-    <Authors>KiwifruitDev</Authors>
-    <AssemblyCopyright>Copyright © KiwifruitDev 2025</AssemblyCopyright>
+    <Authors>Bobby I Guess</Authors>
+    <AssemblyCopyright>Copyright © Bobby I Guess 2025</AssemblyCopyright>
     <AssemblyTrademark>Nonsensical Video Generator licensed under GPL-3.0
 MonoGame licensed under Ms-PL
 Newtonsoft.Json licensed under MIT

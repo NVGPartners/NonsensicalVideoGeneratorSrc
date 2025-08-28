@@ -57,10 +57,10 @@ local indexoffset = 0
 function StartGeneration(options, pluginSettings, functions)
     -- Download default media
     if not functions.libraryHasFile("audio", "whatthe", "whatthe.mp3") then
-        functions.downloadFile("https://github.com/KiwifruitDev/NonsensicalVideoGenerator/raw/refs/heads/main/addonlibraries/whatthe.mp3", "audio", "whatthe")
+        functions.downloadFile("https://github.com/NVGPartners/NonsensicalVideoGenerator/raw/refs/heads/main/addonlibraries/whatthe.mp3", "audio", "whatthe")
         indexoffset = 1
     elseif not functions.libraryHasFile("video", "boom", "boom.mp4") then
-        functions.downloadFile("https://github.com/KiwifruitDev/NonsensicalVideoGenerator/raw/refs/heads/main/addonlibraries/boom.mp4", "video", "boom")
+        functions.downloadFile("https://github.com/NVGPartners/NonsensicalVideoGenerator/raw/refs/heads/main/addonlibraries/boom.mp4", "video", "boom")
         indexoffset = 1
     else
         -- Set variables
@@ -76,7 +76,7 @@ end
 function PostCommand(commandindex, outputresult, errorresult, options, pluginSettings, functions)
     if commandindex == 1 and indexoffset == 1 then
         if not functions.libraryHasFile("video", "boom", "boom.mp4") then
-            functions.downloadFile("https://github.com/KiwifruitDev/NonsensicalVideoGenerator/raw/refs/heads/main/addonlibraries/boom.mp4", "video", "boom")
+            functions.downloadFile("https://github.com/NVGPartners/NonsensicalVideoGenerator/raw/refs/heads/main/addonlibraries/boom.mp4", "video", "boom")
             indexoffset = 2
         else
             -- Set variables

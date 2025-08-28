@@ -272,11 +272,11 @@ namespace NonsensicalVideoGenerator
                 Texture2D pluginEntry = GlobalContent.GetTexture("PluginEntryBlank");
                 Texture2D scrollHandle = GlobalContent.GetTexture("ScrollHandle");
                 // Draw scroll bar
-                spriteBatch.Draw(pluginPage, new Rectangle(GlobalGraphics.Scale(293), GlobalGraphics.Scale(57), pluginPage.Width * GlobalGraphics.scale, pluginPage.Height * GlobalGraphics.scale), Color.White);
+                spriteBatch.Draw(pluginPage, new Rectangle(GlobalGraphics.Scale(293), GlobalGraphics.Scale(57), (int)(pluginPage.Width * GlobalGraphics.scale), (int)(pluginPage.Height * GlobalGraphics.scale)), Color.White);
                 // Move the scroll handle relative to the scroll offset and the max scroll offset.
                 if(maxScrollOffset > 0)
                 {
-                    spriteBatch.Draw(scrollHandle, new Rectangle(GlobalGraphics.Scale(294), GlobalGraphics.Scale(69 + scrollOffset * (214 - 69) / maxScrollOffset), scrollHandle.Width * GlobalGraphics.scale, scrollHandle.Height * GlobalGraphics.scale), Color.White);
+                    spriteBatch.Draw(scrollHandle, new Rectangle(GlobalGraphics.Scale(294), GlobalGraphics.Scale(69 + scrollOffset * (214 - 69) / maxScrollOffset), (int)(scrollHandle.Width * GlobalGraphics.scale), (int)(scrollHandle.Height * GlobalGraphics.scale)), Color.White);
                 }
                 // End existing spritebatch
                 ContentScreen? cntscr = ScreenManager.GetScreen<ContentScreen>("Content");
@@ -284,7 +284,7 @@ namespace NonsensicalVideoGenerator
                 {
                     spriteBatch.End();
                     // Mask to specific area
-                    spriteBatch.GraphicsDevice.ScissorRectangle = new Rectangle((int)GlobalGraphics.Scale(GlobalGraphics.drawOffset.X+135), (int)GlobalGraphics.Scale(GlobalGraphics.drawOffset.Y+56), GlobalGraphics.Scale(293), GlobalGraphics.scaledHeight - GlobalGraphics.Scale(56));
+                    spriteBatch.GraphicsDevice.ScissorRectangle = new Rectangle((int)GlobalGraphics.Scale(GlobalGraphics.drawOffset.X+135), (int)GlobalGraphics.Scale(GlobalGraphics.drawOffset.Y+56), (int)(GlobalGraphics.Scale(293)), (int)(GlobalGraphics.scaledHeight - GlobalGraphics.Scale(56)));
                     RasterizerState rasterizerState = new RasterizerState();
                     rasterizerState.ScissorTestEnable = true;
                     spriteBatch.Begin(SpriteSortMode.Deferred, BlendState.AlphaBlend, SamplerState.PointClamp, null, rasterizerState, null, Matrix.CreateTranslation(GlobalGraphics.Scale(GlobalGraphics.drawOffset.X)+GlobalGraphics.Scale(cntscr.offset.X / GlobalGraphics.scale), GlobalGraphics.Scale(GlobalGraphics.drawOffset.Y)+GlobalGraphics.Scale((cntscr.offset.Y / GlobalGraphics.scale) + -scrollOffset), 0));
@@ -309,8 +309,8 @@ namespace NonsensicalVideoGenerator
                     }
 
                     // Draw the plugin entry
-                    spriteBatch.Draw(pluginEntry, new Rectangle(GlobalGraphics.Scale(136), GlobalGraphics.Scale(57 + (i-offsetpl) * pluginEntry.Height + (i-offsetpl)), pluginEntry.Width * GlobalGraphics.scale, pluginEntry.Height * GlobalGraphics.scale), curColor);
-                            
+                    spriteBatch.Draw(pluginEntry, new Rectangle(GlobalGraphics.Scale(136), GlobalGraphics.Scale(57 + (i-offsetpl) * pluginEntry.Height + (i-offsetpl)), (int)(pluginEntry.Width * GlobalGraphics.scale), (int)(pluginEntry.Height * GlobalGraphics.scale)), curColor);
+
                     // Set up the plugin name
                     string nam = L.locales[i+1].localizedName;
                     string localeFontName = L.locales[i+1].fontSmall;
@@ -615,14 +615,14 @@ namespace NonsensicalVideoGenerator
                 return switchState;
             }, SaveData.saveValues["Fullscreen"] == "true"));
             scrollView.Controller.Add("Scale", new TextEntry("Screen Resolution", "The screen scale multiplier for the UI. Restarts when set.", SaveData.saveValues["ScreenScale"], new Vector2(139, 60-(8*1)+(19*3)+(10*1)+(9*1)), 24, 3, 1, (int i, string n) => {
-                int oldValue = int.Parse(SaveData.saveValues["ScreenScale"], CultureInfo.InvariantCulture);
+                float oldValue = float.Parse(SaveData.saveValues["ScreenScale"], CultureInfo.InvariantCulture);
                 // Range: 1-4
-                if(int.Parse(scrollView.Controller.interactables["Scale"].Tooltip, CultureInfo.InvariantCulture) < 1)
+                if(float.Parse(scrollView.Controller.interactables["Scale"].Tooltip, CultureInfo.InvariantCulture) < 1)
                     scrollView.Controller.interactables["Scale"].Tooltip = "1";
-                if(int.Parse(scrollView.Controller.interactables["Scale"].Tooltip, CultureInfo.InvariantCulture) > 4)
+                if(float.Parse(scrollView.Controller.interactables["Scale"].Tooltip, CultureInfo.InvariantCulture) > 4)
                     scrollView.Controller.interactables["Scale"].Tooltip = "4";
                 SaveData.saveValues["ScreenScale"] = scrollView.Controller.interactables["Scale"].Tooltip;
-                if(oldValue != int.Parse(SaveData.saveValues["ScreenScale"], CultureInfo.InvariantCulture))
+                if(oldValue != float.Parse(SaveData.saveValues["ScreenScale"], CultureInfo.InvariantCulture))
                 {
                     SaveData.Save();
                     // Restart software through steam

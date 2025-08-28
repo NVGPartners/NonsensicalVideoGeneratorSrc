@@ -190,11 +190,11 @@ namespace NonsensicalVideoGenerator
             Texture2D pluginPage = GlobalContent.GetTexture("PluginPage");
             Texture2D scrollHandle = GlobalContent.GetTexture("ScrollHandle");
             // Draw scroll bar
-            spriteBatch.Draw(pluginPage, new Rectangle(GlobalGraphics.Scale(293), GlobalGraphics.Scale(57), pluginPage.Width * GlobalGraphics.scale, pluginPage.Height * GlobalGraphics.scale), Color.White);
+            spriteBatch.Draw(pluginPage, new Rectangle(GlobalGraphics.Scale(293), GlobalGraphics.Scale(57), (int)(pluginPage.Width * GlobalGraphics.scale), (int)(pluginPage.Height * GlobalGraphics.scale)), Color.White);
             // Move the scroll handle relative to the scroll offset and the max scroll offset.
             if(MaxScrollOffset > 0)
             {
-                spriteBatch.Draw(scrollHandle, new Rectangle(GlobalGraphics.Scale(294), GlobalGraphics.Scale(69 + ScrollOffset * (214 - 69) / MaxScrollOffset), scrollHandle.Width * GlobalGraphics.scale, scrollHandle.Height * GlobalGraphics.scale), Color.White);
+                spriteBatch.Draw(scrollHandle, new Rectangle(GlobalGraphics.Scale(294), GlobalGraphics.Scale(69 + ScrollOffset * (214 - 69) / MaxScrollOffset), (int)(scrollHandle.Width * GlobalGraphics.scale), (int)(scrollHandle.Height * GlobalGraphics.scale)), Color.White);
             }
             // End existing spritebatch
             ContentScreen? cntscr = ScreenManager.GetScreen<ContentScreen>("Content");

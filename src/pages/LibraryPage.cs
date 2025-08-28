@@ -412,14 +412,14 @@ namespace NonsensicalVideoGenerator
                 if (page > 0)
                 {
                     spriteBatch.Draw(typeButton, rects["PageLeftButton"], Color.White);
-                    GlobalContent.DrawString(spriteBatch, munroSmall, page.ToString(CultureInfo.InvariantCulture), new Vector2(GlobalGraphics.Scale(205 + 1), GlobalGraphics.Scale(223 + 1)), Color.Black);
-                    GlobalContent.DrawString(spriteBatch, munroSmall, page.ToString(CultureInfo.InvariantCulture), new Vector2(GlobalGraphics.Scale(205), GlobalGraphics.Scale(223)), Color.White);
+                    GlobalContent.DrawString(spriteBatch, munroSmall, L.T(0, "Library:BackButton"), new Vector2(GlobalGraphics.Scale(205 + 1), GlobalGraphics.Scale(223 + 1)), Color.Black);
+                    GlobalContent.DrawString(spriteBatch, munroSmall, L.T(0, "Library:BackButton"), new Vector2(GlobalGraphics.Scale(205), GlobalGraphics.Scale(223)), Color.White);
                 }
                 if (page < maxPages - 1)
                 {
                     spriteBatch.Draw(typeButton, rects["PageRightButton"], Color.White);
-                    GlobalContent.DrawString(spriteBatch, munroSmall, (page + 2).ToString(CultureInfo.InvariantCulture), new Vector2(GlobalGraphics.Scale(281 + 1), GlobalGraphics.Scale(223 + 1)), Color.Black);
-                    GlobalContent.DrawString(spriteBatch, munroSmall, (page + 2).ToString(CultureInfo.InvariantCulture), new Vector2(GlobalGraphics.Scale(281), GlobalGraphics.Scale(223)), Color.White);
+                    GlobalContent.DrawString(spriteBatch, munroSmall, L.T(0, "Library:NextButton"), new Vector2(GlobalGraphics.Scale(281 + 1), GlobalGraphics.Scale(223 + 1)), Color.Black);
+                    GlobalContent.DrawString(spriteBatch, munroSmall, L.T(0, "Library:NextButton"), new Vector2(GlobalGraphics.Scale(281), GlobalGraphics.Scale(223)), Color.White);
                 }
             }
             int offset = 0;

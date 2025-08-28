@@ -12,7 +12,6 @@ namespace NonsensicalVideoGenerator
         public static string productName = "Nonsensical Video Generator";
         public static string productNameShort = "NVG";
         public static string productVersion = "0.0.0.0";
-        public static string productSku = "";
         public static Mask mask = new();
         public static bool justCompletedRender = true;
         public static bool exiting = false;

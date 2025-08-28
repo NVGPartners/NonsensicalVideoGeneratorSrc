@@ -2,7 +2,7 @@
     -- Welcome to your very own %filename% custom addon!
 
     -- For more information on how to modify this file, please visit:
-    -- https://github.com/KiwifruitDev/NonsensicalVideoGenerator/wiki
+    -- https://github.com/NVGPartners/NonsensicalVideoGenerator/wiki
 
     -- If you need help, feel free to join the NVG Discord server:
     -- https://discord.gg/8ppmspR6Wh

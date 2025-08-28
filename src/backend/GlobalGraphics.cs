@@ -51,12 +51,12 @@ namespace NonsensicalVideoGenerator
     /// </summary>
     public static class GlobalGraphics
     {
-        public static int scale = (int)Math.Round(double.Parse(SaveData.saveValues["ScreenScale"], CultureInfo.InvariantCulture));
+        public static float scale = float.Parse(SaveData.saveValues["ScreenScale"], CultureInfo.InvariantCulture);
         public static Vector2 drawOffset = new(0, 0);
         public static Point preferredResolution = new(320, 240);
         public static bool fullScreen = false;
-        public static int scaledWidth = new AspectRatio().preferredResolution.X * scale;
-        public static int scaledHeight = new AspectRatio().preferredResolution.Y * scale;
+        public static int scaledWidth = (int)(new AspectRatio().preferredResolution.X * scale);
+        public static int scaledHeight = (int)(new AspectRatio().preferredResolution.Y * scale);
         public static AspectRatio FindMatchingAspectRatio()
         {
             AspectRatio closestMatch = new AspectRatio();
@@ -81,7 +81,7 @@ namespace NonsensicalVideoGenerator
         public static void SetAspectRatio(AspectRatio aspectRatio)
         {
             drawOffset = aspectRatio.drawOffset;
-            preferredResolution = new Point(aspectRatio.preferredResolution.X * scale, aspectRatio.preferredResolution.Y * scale);
+            preferredResolution = new Point((int)(aspectRatio.preferredResolution.X * scale), (int)(aspectRatio.preferredResolution.Y * scale));
             if(UserInterface.instance != null)
             {
                 UserInterface.instance.Resize(preferredResolution.X, preferredResolution.Y);
@@ -93,7 +93,7 @@ namespace NonsensicalVideoGenerator
         {
             foreach (AspectRatio aspectRatio in AspectRatio.All)
             {
-                if (aspectRatio.drawOffset == drawOffset && aspectRatio.preferredResolution == new Point(preferredResolution.X / scale, preferredResolution.Y / scale))
+                if (aspectRatio.drawOffset == drawOffset && aspectRatio.preferredResolution == new Point((int)(preferredResolution.X / scale), (int)(preferredResolution.Y / scale)))
                     return aspectRatio;
             }
             return new AspectRatio();

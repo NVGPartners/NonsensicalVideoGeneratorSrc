@@ -6,7 +6,7 @@
 
 This repository provides the source code and build system for [Nonsensical Video Generator](https://store.steampowered.com/app/2516360/Nonsensical_Video_Generator/).
 
-Public issue tracker can be found [here](https://github.com/KiwifruitDev/NonsensicalVideoGenerator).
+Public issue tracker can be found [here](https://github.com/NVGPartners/NonsensicalVideoGenerator).
 
 ## Building
 The following instructions are for building **Nonsensical Video Generator** from source.
@@ -21,6 +21,11 @@ The following instructions are for building **Nonsensical Video Generator** from
     - [yt-dlp.exe](https://github.com/yt-dlp/yt-dlp/releases)
     - [vocoder-*-x86-win32.zip](https://borsboom.io/vocoder/)
 - Setup:
+    - Clone this repository to `C:\NVGDev\NVGMonoGame` using these commands:
+      ```
+      mkdir C:\NVGDev
+      git clone https://github.com/NVGPartners/NonsensicalVideoGeneratorSrc.git C:\NVGDev\NVGMonoGame
+      ```
     - Install `ImageMagick-*-Q16-HDRI-x64-static.exe` and copy only these files from `C:\Program Files\ImageMagick-*-Q16-HDRI` into `baseroot/bin/`:
       - `images/` (the entire directory)
       - All `*.xml` files

@@ -190,7 +190,7 @@ function StartGeneration(options, pluginSettings, functions)
     end
     -- Start the recall process
     if not functions.libraryHasFile("video", "recall", "jasonbourne_s0.067l0.968x251y212w822h616.mp4") then
-        functions.downloadFileSync("https://github.com/KiwifruitDev/NonsensicalVideoGenerator/raw/refs/heads/main/addonlibraries/recall/jasonbourne_s0.067l0.968x251y212w822h616.mp4", "video", "recall")
+        functions.downloadFileSync("https://github.com/NVGPartners/NonsensicalVideoGenerator/raw/refs/heads/main/addonlibraries/recall/jasonbourne_s0.067l0.968x251y212w822h616.mp4", "video", "recall")
     end
     StartRecall(options, pluginSettings, functions)
     return true

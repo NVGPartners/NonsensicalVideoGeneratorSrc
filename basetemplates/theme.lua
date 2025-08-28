@@ -12,7 +12,7 @@
     -- If any music and/or misclick graphics are found, the default music and/or misclick graphics will not be loaded.
 
     -- For more information on how to modify this file, please visit:
-    -- https://github.com/KiwifruitDev/NonsensicalVideoGenerator/wiki
+    -- https://github.com/NVGPartners/NonsensicalVideoGenerator/wiki
 
     -- If you need help, feel free to join the NVG Discord server:
     -- https://discord.gg/8ppmspR6Wh
@@ -80,7 +80,6 @@ function ThemeMetadata(pluginSettings)
         -- Set proper names for each of the music tracks.
         -- These names will be displayed in the top center of the screen when the music is playing.
         ["musicattributions"] = {
-            "KiwifruitDev - This is Nonsense!",
             "Bobby I Guess - A Nonsensical Song",
             "Bobby I Guess - A Nonsensical Song Yet Again",
             "Bobby I Guess - Creation",
