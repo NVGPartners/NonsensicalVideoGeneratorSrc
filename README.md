@@ -14,8 +14,10 @@ The following instructions are for building **Nonsensical Video Generator** from
 - Prerequisites:
     - [Visual Studio Code](https://code.visualstudio.com/download)
         - [C# extension](https://marketplace.visualstudio.com/items?itemName=ms-dotnettools.csharp)
-    - [.NET 8.0 SDK](https://dotnet.microsoft.com/en-us/download/dotnet/8.0)
-    - [ImageMagick-*-Q16-HDRI-x64-static.exe](https://imagemagick.org/script/download.php#windows)
+        - [C# Dev extension](https://marketplace.visualstudio.com/items?itemName=ms-dotnettools.csdevkit)
+        - [MonoGame Content Builder (Editor) extension](https://marketplace.visualstudio.com/items?itemName=mangrimen.mgcb-editor)
+    - [.NET SDK 8.0.411](https://dotnet.microsoft.com/en-us/download/dotnet/thank-you/sdk-8.0.411-windows-x64-installer)
+    - [ImageMagick-*-portable-Q16-HDRI-x64.7z](https://imagemagick.org/script/download.php#windows)
     - [ffmpeg-release-full.7z (gyan.dev)](https://www.gyan.dev/ffmpeg/builds/)
     - [frei0r-*-win64.7z](https://github.com/dyne/frei0r/releases)
     - [yt-dlp.exe](https://github.com/yt-dlp/yt-dlp/releases)
@@ -24,15 +26,14 @@ The following instructions are for building **Nonsensical Video Generator** from
     - Clone this repository to `C:\NVGDev\NVGMonoGame` using these commands:
       ```
       mkdir C:\NVGDev
-      git clone https://github.com/NVGPartners/NonsensicalVideoGeneratorSrc.git C:\NVGDev\NVGMonoGame
+      git clone --recurse-submodules https://github.com/NVGPartners/NonsensicalVideoGeneratorSrc.git C:\NVGDev\NVGMonoGame
       ```
-    - Install `ImageMagick-*-Q16-HDRI-x64-static.exe` and copy only these files from `C:\Program Files\ImageMagick-*-Q16-HDRI` into `baseroot/bin/`:
-      - `images/` (the entire directory)
+    - Extract `ImageMagick-*-portable-Q16-HDRI-x64.7z` and copy only these files into `baseroot/bin/`:
       - All `*.xml` files
       - `magick.exe`
       - All `*.dll` files
       - `sRGB.icc`
-    - Extract `ffmpeg.exe`, `ffprobe.exe`, and all `*.dll` files from `ffmpeg-release-full.7z` into `baseroot/bin/`
+    - Extract `ffmpeg.exe` and `ffprobe.exe` from `ffmpeg-release-full.7z` into `baseroot/bin/`
     - Extract all `.dll` files from `filter/` in `frei0r-*-win64.7z` into `baseroot/bin/frei0r-1` (create the directory if it doesn't exist)
     - Copy `yt-dlp.exe` into `baseroot/bin/`
     - Extract `vocoder.exe` from `vocoder-*-x86-win32.zip` into `baseroot/bin/`
@@ -45,11 +46,15 @@ The following instructions are for building **Nonsensical Video Generator** from
     - Select "Build and Launch (Debug)"
 - Publishing:
     - Make sure that `NonsensicalVideoGenerator.csproj` has an incremented version number from live release
+    - Edit `BlogData.cs`, `update.txt`, and `update.md` with your changelog
+    - Create a new Steam news post for the update and paste the contents of `update.txt` inside
+    - Add the post ID to `BlogData.cs`
     - Close Steam to prevent login conflicts
     - Open the command pallette in VS Code (Ctrl+Shift+P)
     - Press backspace to remove the prepending `>`
     - Type `task publish` to build the release version
-    - After release build is finished, type `task upload`
+    - After release build is finished, type `task upload` to upload it to steam
+    - Provide your password and Steam guard authentication if it asks for them
     - Once the build is uploaded, visit the [SteamPipe partner page](https://partner.steamgames.com/apps/builds/2516360)
     - Set current `default` branch build as live on `previous` branch
         - Preview the change and accept it
@@ -57,7 +62,7 @@ The following instructions are for building **Nonsensical Video Generator** from
         - Preview the change and accept it
         - Confirm the build in your Steam mobile app
         - Proceed to the next page
-        - Create a changelog for the new build and publish it
+        - Link the Steam news post to the build and then make it public by publishing it
 
 DLL files available in `packages` are built beforehand to prevent .NET conflicts:
 - [Steamworks.NET](https://github.com/rlabrecque/Steamworks.NET)
