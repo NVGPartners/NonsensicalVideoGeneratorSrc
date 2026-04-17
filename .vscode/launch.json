@@ -6,9 +6,9 @@
             "type": "coreclr",
             "request": "launch",
             "preLaunchTask": "build_debug",
-            "program": "${workspaceFolder}/bin/x64/debug/net8.0-windows/NonsensicalVideoGenerator.dll",
+            "program": "${workspaceFolder}/bin/x64/Debug/net8.0-windows/NonsensicalVideoGenerator.dll",
             "args": ["-nopath"],
-            "cwd": "${workspaceFolder}/bin/x64/debug/net8.0-windows",
+            "cwd": "${workspaceFolder}/bin/x64/Debug/net8.0-windows",
             "console": "internalConsole",
             "stopAtEntry": false
         },
@@ -17,9 +17,9 @@
             "type": "coreclr",
             "request": "launch",
             "preLaunchTask": "build_release",
-            "program": "${workspaceFolder}/bin/x64/release/net8.0-windows/NonsensicalVideoGenerator.dll",
+            "program": "${workspaceFolder}/bin/x64/Release/net8.0-windows/NonsensicalVideoGenerator.dll",
             "args": ["-nopath"],
-            "cwd": "${workspaceFolder}/bin/x64/release/net8.0-windows",
+            "cwd": "${workspaceFolder}/bin/x64/Release/net8.0-windows",
             "console": "internalConsole",
             "stopAtEntry": false
         },

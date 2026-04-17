@@ -242,7 +242,7 @@ namespace NonsensicalVideoGenerator
                 else if(type == CommandType.YtDlp)
                 {
                     // Download YouTube video
-                    string ytdlp = Global.useSystemYtDlp ? "yt-dlp" : @".\yt-dlp.exe";
+                    string ytdlp = Global.useSystemYtDlp ? "yt-dlp" : @".\bin\yt-dlp.exe";
                     bool sound = rootType == "audio";
                     ProcessStartInfo startInfo = new ProcessStartInfo(ytdlp, "-o \"" + combinedPath + "\" " + (sound ? "--extract-audio --audio-format mp3 " : "--format mp4 ") + url)
                     {
@@ -328,6 +328,9 @@ namespace NonsensicalVideoGenerator
     public class Plugin : PluginMetadata
     {
         public static Dictionary<string, string> placeholders = new();
+        // Incremented each time a placeholder gets added
+        // ALlows for several random library files in addons
+        public static int placeholderUniqueIndicator = 0; 
         // Fix broken URLs that Workshop addons use
         public static readonly string urlBase = "https://github.com/NVGPartners/NonsensicalVideoGenerator/raw/refs/heads/main/addonlibraries/";
         public static Dictionary<string, string> urlMapper = new()
@@ -592,23 +595,27 @@ namespace NonsensicalVideoGenerator
             {
                 throw new Exception("Invalid subType");
             }
+            placeholderUniqueIndicator++;
+            string placeholderKey = "{File_" + placeholderUniqueIndicator + "}";
             // Material library in effect tests will always return the placeholder effect test video
             if (Global.generator.pluginEffectTest != null && subType == "materials")
             {
-                placeholders.Add("{LibraryFile_" + subType + "}", Path.Join("..", "effecttest.mp4"));
-                return "{LibraryFile_" + subType + "}";
+                ConsoleOutput.WriteLine(placeholderKey + " -> " + Path.Join("..", "effecttest.mp4"));
+                placeholders.Add(placeholderKey, Path.Join("..", "effecttest.mp4"));
+                return placeholderKey;
             }
             string file = LibraryData.PickRandom(dummyType, Global.generator.globalRandom);
             // remove placeholder if it already exists
-            if (placeholders.ContainsKey("{LibraryFile_" + subType + "}"))
+            if (placeholders.ContainsKey(placeholderKey))
             {
-                placeholders.Remove("{LibraryFile_" + subType + "}");
+                placeholders.Remove(placeholderKey);
             }
             string thepath = Path.Join("..", "..", file);
             if (thepath != "..\\..")
             {
-                placeholders.Add("{LibraryFile_" + subType + "}", thepath);
-                return "{LibraryFile_" + subType + "}";
+                ConsoleOutput.WriteLine(placeholderKey + " -> " + thepath);
+                placeholders.Add(placeholderKey, thepath);
+                return placeholderKey;
             }
             return "";
         }
@@ -750,9 +757,11 @@ namespace NonsensicalVideoGenerator
                 string fileName = openFileDialog.FileName;
                 if (!string.IsNullOrEmpty(fileName))
                 {
-                    placeholders.Add("{FilePicker_" + title + "}", fileName);
+                    placeholderUniqueIndicator++;
+                    string placeholderKey = "{File_" + placeholderUniqueIndicator + "}";
+                    placeholders.Add(placeholderKey, fileName);
+                    return placeholderKey;
                 }
-                return "{FilePicker_" + title + "}";
             }
             return "";
         }
@@ -766,7 +775,7 @@ namespace NonsensicalVideoGenerator
         public string GetLibraryFileName(string text)
         {
             // This will only work with library file placeholders
-            if (text.StartsWith("{LibraryFile_") && text.EndsWith("}"))
+            if (text.StartsWith("{File_") && text.EndsWith("}"))
             {
                 string replacedFile = ReplacePlaceholders(text);
                 // Return the name and extension

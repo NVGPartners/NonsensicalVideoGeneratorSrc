@@ -32,7 +32,6 @@ x86/
 [Aa][Rr][Mm]/
 [Aa][Rr][Mm]64/
 bld/
-[Bb]in/
 [Oo]bj/
 [Ll]og/
 [Ll]ogs/
@@ -401,7 +400,15 @@ FodyWeavers.xsd
 
 # Nonsensical video generator
 cred.bat
+cred.sh
 thumbs.db
 *.sfk
 steamcmdoutput/
-baseroot/bin/
+content/bin/
+baseroot/bin/frei0r-1/
+baseroot/bin/*.exe
+baseroot/bin/*.dll
+baseroot/bin/*.xml
+baseroot/bin/*.icc
+.temp/
+dotnet-install.sh

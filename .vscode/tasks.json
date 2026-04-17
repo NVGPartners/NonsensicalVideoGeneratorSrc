@@ -1,6 +1,5 @@
 {
-    // See https://go.microsoft.com/fwlink/?LinkId=733558
-    // for the documentation about the tasks.json format
+    // Tasks are Windows-only for now
     "version": "2.0.0",
     "tasks": [
         {
@@ -46,9 +45,6 @@
             "label": "upload",
             "command": "${workspaceFolder}\\publish.bat",
             "type": "process",
-            "args": [
-                "${workspaceFolder}\\steamcmd.vdf",
-            ],
             "problemMatcher": "$msCompile"
         },
         {

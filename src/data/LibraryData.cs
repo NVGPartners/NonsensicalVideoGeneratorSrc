@@ -602,7 +602,7 @@ namespace NonsensicalVideoGenerator
                     else
                     {
                         path = Path.Combine(libraryRootPath, libraryPaths[downloadType], "%(title)s.%(ext)s");
-                        string ytdlp = Global.useSystemYtDlp ? "yt-dlp" : @".\yt-dlp.exe";
+                        string ytdlp = Global.useSystemYtDlp ? "yt-dlp" : @".\bin\yt-dlp.exe";
                         bool sound = downloadType.RootType == LibraryRootType.Audio;
                         ProcessStartInfo startInfo = new ProcessStartInfo(ytdlp, "-o \"" + path + "\" " + (sound ? "--extract-audio --audio-format mp3 " : "--format mp4 ") + downloadUrl);
                         startInfo.UseShellExecute = false;

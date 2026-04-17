@@ -48,6 +48,11 @@ namespace NonsensicalVideoGenerator
         }
         public static ConsoleColor GetColor(Color col)
         {
+            // Show hidden output in debugging console
+            if(col == Color.Transparent)
+            {
+                col = Color.White;
+            }
             // Get closest match in terms of rgb values.
             ConsoleColor closest = ConsoleColor.White;
             double closestDistance = double.MaxValue;
