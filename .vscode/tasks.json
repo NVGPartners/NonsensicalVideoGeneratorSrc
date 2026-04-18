@@ -22,7 +22,7 @@
                 "/consoleloggerparameters:NoSummary",
                 "/p:Configuration=Debug",
                 "/p:Platform=x64",
-                "/p:DefineConstants=WINDOWSDX DEBUG",
+                "/p:DefineConstants=\"WINDOWSDX;DEBUG\"",
             ],
             "problemMatcher": "$msCompile"
         },
@@ -37,7 +37,7 @@
                 "/consoleloggerparameters:NoSummary",
                 "/p:Configuration=Release",
                 "/p:Platform=x64",
-                "/p:DefineConstants=WINDOWSDX RELEASE",
+                "/p:DefineConstants=\"WINDOWSDX;RELEASE\"",
             ],
             "problemMatcher": "$msCompile"
         },
