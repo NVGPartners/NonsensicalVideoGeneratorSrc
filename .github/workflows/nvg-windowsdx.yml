@@ -1,0 +1,217 @@
+name: NVG WindowsDX
+
+on:
+  push:
+    branches: [ "dev" ]
+  pull_request:
+    branches: [ "dev" ]
+
+jobs:
+  nvg-build-windowsdx:
+    runs-on: windows-latest
+
+    defaults:
+      run:
+        shell: pwsh
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+        with:
+          submodules: recursive
+
+      # -----------------------------
+      # Download yt-dlp
+      # -----------------------------
+      - name: Download yt-dlp
+        uses: robinraju/release-downloader@v1
+        with:
+          repository: "yt-dlp/yt-dlp"
+          latest: true
+          fileName: "yt-dlp.exe"
+
+      - name: Move yt-dlp
+        run: |
+          Move-Item "yt-dlp.exe" "baseroot\bin\" -Force
+
+      # -----------------------------
+      # Download ImageMagick
+      # -----------------------------
+      - name: Download ImageMagick
+        run: |
+          Invoke-WebRequest `
+            -Uri "https://github.com/ImageMagick/ImageMagick/releases/download/7.1.2-19/ImageMagick-7.1.2-19-portable-Q16-HDRI-x64.7z" `
+            -OutFile "imagemagick.7z"
+
+      - name: Extract ImageMagick
+        run: |
+          7z x imagemagick.7z -oimagemagick
+
+      - name: Copy ImageMagick required files
+        run: |
+          $src = "imagemagick"
+          $dst = "baseroot\bin"
+
+          @("*.dll","*.xml","magick.exe","sRGB.icc") | ForEach-Object {
+            Copy-Item "$src\$_" $dst -Force -ErrorAction SilentlyContinue
+          }
+
+      # -----------------------------
+      # Download FFmpeg (gyan.dev)
+      # -----------------------------
+      - name: Download FFmpeg
+        run: |
+          Invoke-WebRequest `
+            -Uri "https://www.gyan.dev/ffmpeg/builds/ffmpeg-release-full.7z" `
+            -OutFile "ffmpeg.7z"
+
+      - name: Extract FFmpeg
+        run: |
+          7z x ffmpeg.7z -offmpeg
+
+      - name: Copy FFmpeg binaries
+        run: |
+          $dir = Get-ChildItem ffmpeg -Directory | Select-Object -First 1
+          if (-not $dir) { throw "FFmpeg extraction failed" }
+          Copy-Item "$($dir.FullName)\bin\ffmpeg.exe" baseroot\bin\
+          Copy-Item "$($dir.FullName)\bin\ffprobe.exe" baseroot\bin\
+
+      # -----------------------------
+      # Download frei0r
+      # -----------------------------
+      - name: Download frei0r
+        uses: robinraju/release-downloader@v1
+        with:
+          repository: "dyne/frei0r"
+          latest: true
+          fileName: "*win64*.zip"
+
+      - name: Extract frei0r
+        run: |
+          $zip = Get-ChildItem -Filter "*win64*.zip" | Select-Object -First 1
+          if (-not $zip) { throw "frei0r download failed" }
+          Expand-Archive $zip.FullName -DestinationPath frei0r
+
+      - name: Create frei0r-1 directory
+        run: |
+          New-Item -ItemType Directory -Force -Path baseroot\bin\frei0r-1 | Out-Null
+
+      - name: Copy frei0r plugins
+        run: |
+          Get-ChildItem "frei0r" -Recurse -Filter "*.dll" |
+          Where-Object { $_.FullName -match "filter" } |
+          Copy-Item -Destination "baseroot\bin\frei0r-1\" -Force
+
+      # -----------------------------
+      # Download Vocoder
+      # -----------------------------
+      - name: Download Vocoder
+        run: |
+          Invoke-WebRequest `
+            -Uri "http://downloads.borsboom.io/vocoder/vocoder-1.2-x86-win32.zip" `
+            -OutFile "vocoder.zip"
+
+      - name: Extract Vocoder
+        run: |
+          Expand-Archive vocoder.zip -DestinationPath vocoder
+
+      - name: Copy Vocoder
+        run: |
+          Copy-Item "vocoder\vocoder-1.2-x86-win32\vocoder.exe" "baseroot\bin\" -Force
+
+      # -----------------------------
+      # Setup .NET
+      # -----------------------------
+      - name: Setup .NET
+        uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: '8.0.411'
+
+      - name: Restore
+        run: |
+          dotnet restore
+
+      # -----------------------------
+      # Build & test NVG
+      # -----------------------------
+      - name: Build NVG
+        run: |
+          dotnet build NonsensicalVideoGenerator.csproj `
+            --configuration Release `
+            -p:Platform=x64 `
+            -p:DefineConstants=WINDOWSDX%3BRELEASE `
+            -p:GenerateFullPaths=true `
+            -consoleloggerparameters:NoSummary
+
+      - name: Test NVG build
+        run: |
+          dotnet test --no-build --verbosity normal
+
+      - name: Clean up build output
+        # steamcmd.vdf contains a list of files to exclude
+        run: |
+          $root = "bin\x64\Release\net8.0-windows"
+
+          $removePaths = @(
+            "$root\cache",
+            "$root\temp",
+            "$root\**\*.pdb"
+          )
+          $removeFiles = @(
+            "$root\bin\ffplay.exe",
+            "$root\console.txt",
+            "$root\Options.json",
+            "$root\steam_appid.txt",
+            "$root\PluginSettings.json",
+            "$root\DisabledMedia.json"
+          )
+
+          foreach ($path in $removePaths) {
+            Remove-Item $path -Recurse -Force -ErrorAction SilentlyContinue
+          }
+
+          foreach ($file in $removeFiles) {
+            Remove-Item $file -Force -ErrorAction SilentlyContinue
+          }
+
+      # -----------------------------
+      # Upload artifact to GitHub
+      # -----------------------------
+      - name: Upload artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: windowsdx-build
+          path: bin\x64\Release\net8.0-windows\
+          retention-days: 7
+          
+  nvg-publish-windowsdx:
+    needs: nvg-build-windowsdx
+    runs-on: ubuntu-latest
+
+    steps:        
+      - name: Create build directory
+        run: |
+          mkdir -p bin/x64/Release
+
+      - name: Download artifact
+        uses: actions/download-artifact@v4
+        with:
+          name: windowsdx-build
+          path: bin/x64/Release/net8.0-windows
+
+      - uses: CyberAndrii/steam-totp@v1
+        name: Generate TOTP
+        id: steam-totp
+        with:
+          shared_secret: ${{ secrets.STEAM_SHARED_SECRET }}
+
+      - uses: game-ci/steam-deploy@v3
+        with:
+          username: ${{ secrets.STEAM_USERNAME }}
+          password: ${{ secrets.STEAM_PASSWORD }}
+          totp: ${{ steps.steam-totp.outputs.code }}
+          appId: 2516360
+          buildDescription: Automated CI build from GitHub Actions (WindowsDX)
+          rootPath: bin/x64/Release/net8.0-windows
+          depot1Path: .
+          releaseBranch: upcoming

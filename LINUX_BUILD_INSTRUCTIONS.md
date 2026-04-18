@@ -82,7 +82,10 @@ The following instructions are for building **Nonsensical Video Generator** from
     - After closing NVG you may have to press Ctrl+C in the terminal to cancel Proton
 - Publishing:
     - Make sure that `NonsensicalVideoGenerator.csproj` has an incremented version number from live release
+      - `1.[Major].[Minor].[Patch]` format is used for versioning
+      - Builds are prefixed with `1` because this is NVG 1 and not NVG 2
     - Edit `BlogData.cs`, `update.txt`, and `update.md` with your changelog
+      - Set the `Tier` variable depending on the importance of the update
     - Create a new Steam news post for the update and paste the contents of `update.txt` inside
     - Add the post ID to `BlogData.cs`
     - Open the **Run and Debug** tab in VS Code
