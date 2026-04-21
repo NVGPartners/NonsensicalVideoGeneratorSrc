@@ -1,9 +1,10 @@
-April 2026: Update v8.3.1
+April 2026: Update v8.3
 
 Here are the changes in this update:
 
 [list]
 [*]Updated ffmpeg, ffprobe, frei0r, yt-dlp, and ImageMagick
+[*]Add Deno as a new dependency to fix yt-dlp (silent audio bug)
 [*]Fixed bug that looked for yt-dlp in the wrong place
 [*]Added the ability for addons to get several random library files of the same type
 [/list]

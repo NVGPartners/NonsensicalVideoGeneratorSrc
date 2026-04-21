@@ -35,6 +35,26 @@ jobs:
           Move-Item "yt-dlp.exe" "baseroot\bin\" -Force
 
       # -----------------------------
+      # Download Deno
+      # -----------------------------
+      - name: Download Deno
+        uses: robinraju/release-downloader@v1
+        with:
+          repository: "denoland/deno"
+          latest: true
+          fileName: "deno-x86_64-pc-windows-msvc.zip"
+
+      - name: Extract Deno
+        run: |
+          $zip = Get-ChildItem -Filter "deno-x86_64-pc-windows-msvc.zip" | Select-Object -First 1
+          if (-not $zip) { throw "Deno download failed" }
+          Expand-Archive $zip.FullName -DestinationPath deno
+
+      - name: Move Deno
+        run: |
+          Move-Item "deno\deno.exe" "baseroot\bin\" -Force
+
+      # -----------------------------
       # Download ImageMagick
       # -----------------------------
       - name: Download ImageMagick

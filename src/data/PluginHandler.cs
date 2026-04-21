@@ -244,7 +244,15 @@ namespace NonsensicalVideoGenerator
                     // Download YouTube video
                     string ytdlp = Global.useSystemYtDlp ? "yt-dlp" : @".\bin\yt-dlp.exe";
                     bool sound = rootType == "audio";
-                    ProcessStartInfo startInfo = new ProcessStartInfo(ytdlp, "-o \"" + combinedPath + "\" " + (sound ? "--extract-audio --audio-format mp3 " : "--format mp4 ") + url)
+                    // Switching from --format mp4 to -t mp4 in yt-dlp to suppress the following warning:
+                    /*
+                    WARNING: "-f mp4" selects the best pre-merged mp4 format which is often not what's intended.
+                            Pre-merged mp4 formats are not available from all sites, or may only be available in lower quality.
+                            To prioritize the best h264 video and aac audio in an mp4 container, use "-t mp4" instead.
+                            If you know what you are doing and want a pre-merged mp4 format, use "-f b[ext=mp4]" instead to suppress this warning
+                    */
+                    // Specifying where deno.exe is because it's inside of bin instead of the NVG's root directory
+                    ProcessStartInfo startInfo = new ProcessStartInfo(ytdlp, "--js-runtimes deno:.\\bin\\deno.exe -o \"" + combinedPath + "\" " + (sound ? "--extract-audio --audio-format mp3 " : "-t mp4 ") + url)
                     {
                         UseShellExecute = false,
                         RedirectStandardOutput = true,
@@ -799,7 +807,14 @@ namespace NonsensicalVideoGenerator
         public static void RunMagickSync(string args)
         {
             if (!ValidateInput(args)) return;
-            new Command(CommandType.Magick, ReplacePlaceholders(args), jobDirectory).Call();
+            // ImageMagick v7 deprecates the "convert" syntax (magick.exe convert ...)
+            // Because addons were written with the "convert" syntax, we need to truncate it for compatibility
+            string magickArgs = ReplacePlaceholders(args);
+            if (magickArgs.StartsWith("convert "))
+            {
+                magickArgs = magickArgs.Substring(8); // Remove "convert " from the beginning of the arguments
+            }
+            new Command(CommandType.Magick, magickArgs, jobDirectory).Call();
         }
         // RunVocoderSync for lua
         public static void RunVocoderSync(string args)
