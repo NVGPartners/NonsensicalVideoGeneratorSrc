@@ -470,7 +470,14 @@ namespace NonsensicalVideoGenerator
         public static void RunMagick(string args)
         {
             if (!ValidateInput(args)) return;
-            PluginHandler.commands.Add(new Command(CommandType.Magick, ReplacePlaceholders(args), jobDirectory));
+            // ImageMagick v7 deprecates the "convert" syntax (magick.exe convert ...)
+            // Because addons were written with the "convert" syntax, we need to truncate it for compatibility
+            string magickArgs = ReplacePlaceholders(args);
+            if (magickArgs.StartsWith("convert "))
+            {
+                magickArgs = magickArgs.Substring(8); // Remove "convert " from the beginning of the arguments
+            }
+            PluginHandler.commands.Add(new Command(CommandType.Magick, magickArgs, jobDirectory));
         }
         // RunVocoder for lua
         public static void RunVocoder(string args)
