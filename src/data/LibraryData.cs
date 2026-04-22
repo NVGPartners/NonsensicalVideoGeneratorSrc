@@ -604,7 +604,15 @@ namespace NonsensicalVideoGenerator
                         path = Path.Combine(libraryRootPath, libraryPaths[downloadType], "%(title)s.%(ext)s");
                         string ytdlp = Global.useSystemYtDlp ? "yt-dlp" : @".\bin\yt-dlp.exe";
                         bool sound = downloadType.RootType == LibraryRootType.Audio;
-                        ProcessStartInfo startInfo = new ProcessStartInfo(ytdlp, "-o \"" + path + "\" " + (sound ? "--extract-audio --audio-format mp3 " : "--format mp4 ") + downloadUrl);
+                        // Switching from --format mp4 to -t mp4 in yt-dlp to suppress the following warning:
+                        /*
+                        WARNING: "-f mp4" selects the best pre-merged mp4 format which is often not what's intended.
+                                Pre-merged mp4 formats are not available from all sites, or may only be available in lower quality.
+                                To prioritize the best h264 video and aac audio in an mp4 container, use "-t mp4" instead.
+                                If you know what you are doing and want a pre-merged mp4 format, use "-f b[ext=mp4]" instead to suppress this warning
+                        */
+                        // Specifying where deno.exe is because it's inside of bin instead of the NVG's root directory
+                        ProcessStartInfo startInfo = new ProcessStartInfo(ytdlp, "--js-runtimes deno:.\\bin\\deno.exe -o \"" + path + "\" " + (sound ? "--extract-audio --audio-format mp3 " : "-t mp4 ") + downloadUrl);
                         startInfo.UseShellExecute = false;
                         startInfo.RedirectStandardOutput = true;
                         startInfo.RedirectStandardError = true;

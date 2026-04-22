@@ -61,7 +61,7 @@ function StartGeneration(options, pluginSettings, functions)
         distortmusic = functions.getRandomLibraryFile("audio", "distort")
         -- Apply effect
         if functions.magickInstalled() then
-            functions.runMagick("convert -size " .. options.width .. "x" .. options.height .. " canvas:black " .. black)
+            functions.runMagick("-size " .. options.width .. "x" .. options.height .. " canvas:black " .. black)
         else
             -- one frame
             if isnvgupdated then
@@ -80,7 +80,7 @@ function PostCommand(commandindex, outputresult, errorresult, options, pluginSet
         distortmusic = functions.getRandomLibraryFile("audio", "distort")
         -- Apply effect
         if functions.magickInstalled() then
-            functions.runMagick("convert -size " .. options.width .. "x" .. options.height .. " canvas:black " .. black)
+            functions.runMagick("-size " .. options.width .. "x" .. options.height .. " canvas:black " .. black)
         else
             -- one frame
             if isnvgupdated then
@@ -119,7 +119,7 @@ function PostCommand(commandindex, outputresult, errorresult, options, pluginSet
                 functions.setStatusText("Distort: " .. actionreadable .. "ing... (" .. (commandindex - indexoffset) .. "/6)")
             end
             print("Distort: " .. actionreadable .. "ing... (" .. (commandindex - indexoffset) .. "/6)")
-            functions.runMagick("convert \"" .. distort0 .. "\" " .. action .. " \"" .. distorts[commandindex - 1 - indexoffset] .. "\"")
+            functions.runMagick("\"" .. distort0 .. "\" " .. action .. " \"" .. distorts[commandindex - 1 - indexoffset] .. "\"")
         else
             if rng <= 2 then
                 action = "-vf hflip"
@@ -141,7 +141,7 @@ function PostCommand(commandindex, outputresult, errorresult, options, pluginSet
             functions.runFFmpeg("-i \"" .. distort0 .. "\" " .. action .. " -frames:v 1 -update 1 -preset veryfast -y \"" .. distorts[commandindex - 1 - indexoffset] .. "\"")
         end
     elseif commandindex == 7+indexoffset then
-        -- convert mp3 to wav
+        -- mp3 to wav
         functions.runFFmpeg("-i \"" .. distortmusic .. "\" -acodec pcm_s16le -ac 2 -ar 44100 -af \"aresample=async=1000\" -y \"" .. music .. "\"")
     elseif commandindex == 8+indexoffset then
         -- 0 duration = 0.533 seconds

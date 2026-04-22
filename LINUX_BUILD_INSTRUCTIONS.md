@@ -16,6 +16,7 @@ The following instructions are for building **Nonsensical Video Generator** from
     - [ffmpeg-release-full.7z (gyan.dev)](https://www.gyan.dev/ffmpeg/builds/)
     - [frei0r-*-win64.7z](https://github.com/dyne/frei0r/releases)
     - [yt-dlp.exe](https://github.com/yt-dlp/yt-dlp/releases)
+    - [deno-x86_64-pc-windows-msvc.zip](https://github.com/denoland/deno/releases)
     - [vocoder-*-x86-win32.zip](https://borsboom.io/vocoder/)
 
 - Setup:
@@ -71,6 +72,7 @@ The following instructions are for building **Nonsensical Video Generator** from
     - Extract `ffmpeg.exe` and `ffprobe.exe` from `ffmpeg-release-full.7z` into `baseroot/bin/`
     - Extract all `.dll` files from `filter/` in `frei0r-*-win64.7z` into `baseroot/bin/frei0r-1` (create the directory if it doesn't exist)
     - Copy `yt-dlp.exe` into `baseroot/bin/`
+    - Extract `deno.exe` from `deno-x86_64-pc-windows-msvc.zip` into `baseroot/bin/`
     - Extract `vocoder.exe` from `vocoder-*-x86-win32.zip` into `baseroot/bin/`
     - Run `dotnet restore` inside of the root directory to install dependencies
 - Building:
